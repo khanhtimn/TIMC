@@ -22,6 +22,8 @@ public abstract class ListenerAdapter implements EventListener {
     public void onRenderTickEvent(RenderTickEvent event) {}
     public void onTickEvent(TickEvent event) {}
     public void onWorldEvent(WorldEvent event) {}
+    public void onGuiOpenEvent(GuiOpenEvent event) {}
+
 
     // Network
     public void onPacketReceiveEvent(PacketReceiveEvent event) {}
@@ -84,6 +86,8 @@ public abstract class ListenerAdapter implements EventListener {
         registerEvent(KeyPressEvent.class, this::onKeyPressEvent);
         registerEvent(RenderTickEvent.class, this::onRenderTickEvent);
         registerEvent(TickEvent.class, this::onTickEvent);
+        registerEvent(GuiOpenEvent.class, this::onGuiOpenEvent);
+
 
         registerEvent(WorldEvent.Load.class, this::onWorldEvent);
         registerEvent(WorldEvent.Unload.class, this::onWorldEvent);

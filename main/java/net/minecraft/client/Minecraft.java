@@ -1012,6 +1012,19 @@ public class Minecraft implements IThreadListener, IPlayerUsage
             guiScreenIn = new GuiGameOver();
         }
 
+        GuiScreen old = this.currentScreen;
+        GuiOpenEvent guiOpenEvent = new GuiOpenEvent(guiScreenIn);
+        TIMC.INSTANCE.getEventProtocol().handleEvent(guiOpenEvent);
+
+//        if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event)) return;
+        if (guiOpenEvent.isPost()) return;
+
+        guiScreenIn = guiOpenEvent.gui;
+        if (old != null && guiScreenIn != old)
+        {
+            old.onGuiClosed();
+        }
+
         if (guiScreenIn instanceof GuiMainMenu)
         {
             this.gameSettings.showDebugProfilerChart = false;
