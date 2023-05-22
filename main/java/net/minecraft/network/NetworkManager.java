@@ -2,16 +2,16 @@ package net.minecraft.network;
 
 import com.google.common.collect.Queues;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.teamti.event.impl.network.PacketReceiveEvent;
-import com.teamti.event.impl.network.PacketSendEvent;
-import com.teamti.timc.TIMC;
+import com.teamti.timc.event.impl.network.PacketReceiveEvent;
+import com.teamti.timc.event.impl.network.PacketSendEvent;
+import com.teamti.timc.main.TIMC;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.connection.UserConnectionImpl;
 import com.viaversion.viaversion.protocol.ProtocolPipelineImpl;
-import de.florianmichael.vialoadingbase.ViaLoadingBase;
-import de.florianmichael.vialoadingbase.netty.event.CompressionReorderEvent;
-import de.florianmichael.viamcp.MCPVLBPipeline;
-import de.florianmichael.viamcp.ViaMCP;
+import com.teamti.timc.utils.vialoadingbase.ViaLoadingBase;
+import com.teamti.timc.utils.vialoadingbase.netty.event.CompressionReorderEvent;
+import com.teamti.timc.utils.viamcp.MCPVLBPipeline;
+import com.teamti.timc.utils.viamcp.ViaMCP;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelException;
@@ -156,20 +156,14 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet>
         this.closeChannel(chatcomponenttranslation);
     }
 
-    protected void channelRead0(ChannelHandlerContext p_channelRead0_1_, Packet p_channelRead0_2_) throws Exception
-    {
-        if (this.channel.isOpen())
-        {
-            try
-            {
+    protected void channelRead0(ChannelHandlerContext p_channelRead0_1_, Packet p_channelRead0_2_) throws Exception {
+        if (this.channel.isOpen()) {
+            try {
                 PacketReceiveEvent e = new PacketReceiveEvent(p_channelRead0_2_);
-                TIMC.dispatchEvent(e);
+                TIMC.INSTANCE.getEventProtocol().handleEvent(e);
                 if (e.isCancelled()) return;
                 p_channelRead0_2_.processPacket(this.packetListener);
-            }
-            catch (ThreadQuickExitException var4)
-            {
-                ;
+            } catch (ThreadQuickExitException ignored) {
             }
         }
     }
@@ -185,33 +179,15 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet>
         this.packetListener = handler;
     }
 
-    public void sendPacket(Packet packetIn)
-    {
-        if (this.isChannelOpen())
-        {
-            this.flushOutboundQueue();
-            this.dispatchPacket(packetIn, (GenericFutureListener <? extends Future <? super Void >> [])null);
-        }
-        else
-        {
-            this.readWriteLock.writeLock().lock();
-
-            try
-            {
-                this.outboundPacketsQueue.add(new NetworkManager.InboundHandlerTuplePacketListener(packetIn, (GenericFutureListener[])null));
-            }
-            finally
-            {
-                this.readWriteLock.writeLock().unlock();
-            }
-        }
+    public void sendPacket(Packet packetIn) {
+        sendPacket(packetIn, false);
     }
 
     public void sendPacket(Packet packetIn, boolean silent) {
         if (this.isChannelOpen()) {
             if (!silent) {
                 PacketSendEvent e = new PacketSendEvent(packetIn);
-                TIMC.dispatchEvent(e);
+                TIMC.INSTANCE.getEventProtocol().handleEvent(e);
                 if (e.isCancelled()) return;
                 packetIn = e.getPacket();
             }
@@ -228,23 +204,16 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet>
         }
     }
 
-    public void sendPacket(Packet packetIn, GenericFutureListener <? extends Future <? super Void >> listener, GenericFutureListener <? extends Future <? super Void >> ... listeners)
-    {
-        if (this.isChannelOpen())
-        {
+    public void sendPacket(Packet packetIn, GenericFutureListener<? extends Future<? super Void>> listener, GenericFutureListener<? extends Future<? super Void>>... listeners) {
+        if (this.isChannelOpen()) {
             this.flushOutboundQueue();
-            this.dispatchPacket(packetIn, (GenericFutureListener[])ArrayUtils.add(listeners, 0, listener));
-        }
-        else
-        {
+            this.dispatchPacket(packetIn, ArrayUtils.add(listeners, 0, listener));
+        } else {
             this.readWriteLock.writeLock().lock();
 
-            try
-            {
-                this.outboundPacketsQueue.add(new NetworkManager.InboundHandlerTuplePacketListener(packetIn, (GenericFutureListener[])ArrayUtils.add(listeners, 0, listener)));
-            }
-            finally
-            {
+            try {
+                this.outboundPacketsQueue.add(new NetworkManager.InboundHandlerTuplePacketListener(packetIn, ArrayUtils.add(listeners, 0, listener)));
+            } finally {
                 this.readWriteLock.writeLock().unlock();
             }
         }

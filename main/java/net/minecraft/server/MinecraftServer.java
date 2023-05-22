@@ -10,8 +10,8 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.GameProfileRepository;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
-import com.teamti.event.impl.game.GameCloseEvent;
-import com.teamti.timc.TIMC;
+import com.teamti.timc.event.impl.game.GameCloseEvent;
+import com.teamti.timc.main.TIMC;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
@@ -476,7 +476,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
         if (!this.worldIsBeingDeleted)
         {
             logger.info("Stopping server");
-            TIMC.dispatchEvent(new GameCloseEvent());
+            TIMC.INSTANCE.getEventProtocol().handleEvent(new GameCloseEvent());
 
             if (this.getNetworkSystem() != null)
             {

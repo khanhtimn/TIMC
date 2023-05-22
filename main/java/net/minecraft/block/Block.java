@@ -3,7 +3,7 @@ package net.minecraft.block;
 import java.util.List;
 import java.util.Random;
 
-import com.teamti.event.impl.player.BoundingBoxEvent;
+import com.teamti.timc.event.impl.player.BoundingBoxEvent;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -36,7 +36,7 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import com.teamti.timc.TIMC;
+import com.teamti.timc.main.TIMC;
 
 public class Block
 {
@@ -495,9 +495,9 @@ public class Block
     {
         AxisAlignedBB axisalignedbb = this.getCollisionBoundingBox(worldIn, pos, state);
 
-        if(collidingEntity == Minecraft.getMinecraft().thePlayer){
+        if(collidingEntity == Minecraft.getMinecraft().thePlayer) {
             BoundingBoxEvent boundingBoxEvent = new BoundingBoxEvent(this,pos,axisalignedbb);
-            TIMC.dispatchEvent(boundingBoxEvent);
+            TIMC.INSTANCE.getEventProtocol().handleEvent(boundingBoxEvent);
             axisalignedbb = boundingBoxEvent.getBoundingBox();
         }
 

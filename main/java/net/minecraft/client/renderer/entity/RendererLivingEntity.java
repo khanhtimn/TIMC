@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import java.nio.FloatBuffer;
 import java.util.List;
 
-import com.teamti.event.impl.render.NametagRenderEvent;
+import com.teamti.timc.event.impl.render.NametagRenderEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
@@ -33,7 +33,7 @@ import net.optifine.shaders.Shaders;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
-import com.teamti.timc.TIMC;
+import com.teamti.timc.main.TIMC;
 
 
 public abstract class RendererLivingEntity<T extends EntityLivingBase> extends Render<T>
@@ -634,7 +634,7 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
     {
         if (entity instanceof EntityPlayer) {
             NametagRenderEvent nametagRenderEvent = new NametagRenderEvent();
-            TIMC.dispatchEvent(nametagRenderEvent);
+            TIMC.INSTANCE.getEventProtocol().handleEvent(nametagRenderEvent);
             if (nametagRenderEvent.isCancelled()) return;
         }
         

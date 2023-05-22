@@ -36,13 +36,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import javax.imageio.ImageIO;
 
-import com.teamti.event.impl.game.GameCloseEvent;
-import com.teamti.event.impl.game.KeyPressEvent;
-import com.teamti.event.impl.game.TickEvent;
-import com.teamti.event.impl.game.WorldEvent;
-import com.teamti.event.impl.player.BlockEvent;
-import com.teamti.event.impl.player.ClickEvent;
-import de.florianmichael.viamcp.fixes.AttackOrder;
+
+import com.teamti.timc.event.impl.game.*;
+import com.teamti.timc.event.impl.player.BlockEvent;
+import com.teamti.timc.event.impl.player.BlockPlaceableEvent;
+import com.teamti.timc.event.impl.player.ClickEvent;
+import com.teamti.timc.event.impl.player.ClickEventRight;
+import com.teamti.timc.main.Init;
+import com.teamti.timc.utils.viamcp.fixes.AttackOrder;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.audio.MusicTicker;
@@ -192,7 +193,7 @@ import org.lwjgl.opengl.GLContext;
 import org.lwjgl.opengl.OpenGLException;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.glu.GLU;
-import com.teamti.timc.TIMC;
+import com.teamti.timc.main.TIMC;
 
 public class Minecraft implements IThreadListener, IPlayerUsage
 {
@@ -578,7 +579,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         this.checkGLError("Post startup");
         this.ingameGUI = new GuiIngame(this);
 
-        TIMC.INSTANCE.init();
+        Init.start();
 
         if (this.serverName != null)
         {
@@ -1152,6 +1153,19 @@ public class Minecraft implements IThreadListener, IPlayerUsage
 
         this.mcProfiler.endSection();
 
+        if (!this.skipRenderWorld) {
+            RenderTickEvent renderTickEvent = new RenderTickEvent(this.timer.renderPartialTicks);
+            TIMC.INSTANCE.getEventProtocol().handleEvent(renderTickEvent);
+            this.mcProfiler.endStartSection("gameRenderer");
+            this.entityRenderer.updateCameraAndRender(this.timer.renderPartialTicks, i);
+            this.mcProfiler.endSection();
+            renderTickEvent.setPost();
+            TIMC.INSTANCE.getEventProtocol().handleEvent(renderTickEvent);
+        }
+
+        this.mcProfiler.endSection();
+
+
         if (!this.skipRenderWorld)
         {
             this.mcProfiler.endStartSection("gameRenderer");
@@ -1455,7 +1469,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
      */
     public void shutdown()
     {
-        TIMC.dispatchEvent(new GameCloseEvent());
+        TIMC.INSTANCE.getEventProtocol().handleEvent(new GameCloseEvent());
         this.running = false;
     }
 
@@ -1536,7 +1550,8 @@ public class Minecraft implements IThreadListener, IPlayerUsage
     {
         if (this.leftClickCounter <= 0)
         {
-            final ClickEvent e = new ClickEvent();
+            final ClickEvent e = new ClickEvent(false);
+            TIMC.INSTANCE.getEventProtocol().handleEvent(e);
 
             //this.thePlayer.swingItem();
             AttackOrder.sendConditionalSwing(this.objectMouseOver);
@@ -1587,6 +1602,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
      */
     private void rightClickMouse()
     {
+        TIMC.INSTANCE.getEventProtocol().handleEvent(new ClickEventRight());
         if (!this.playerController.getIsHittingBlock())
         {
             this.rightClickDelayTimer = 4;
@@ -1758,12 +1774,14 @@ public class Minecraft implements IThreadListener, IPlayerUsage
      */
     public void runTick() throws IOException
     {
-        TIMC.dispatchEvent(new TickEvent(ticks));
 
         if (this.rightClickDelayTimer > 0)
         {
             --this.rightClickDelayTimer;
         }
+
+        TickEvent tickEvent = new TickEvent(ticks);
+        TIMC.INSTANCE.getEventProtocol().handleEvent(tickEvent);
 
         this.mcProfiler.startSection("gui");
 
@@ -1963,7 +1981,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
                     }
                     else
                     {
-                        TIMC.dispatchEvent(new KeyPressEvent(k));
+                        TIMC.INSTANCE.getEventProtocol().handleEvent(new KeyPressEvent(k));
 
                         if (k == 1)
                         {
@@ -2145,10 +2163,8 @@ public class Minecraft implements IThreadListener, IPlayerUsage
             if (this.thePlayer.isUsingItem())
             {
                 BlockEvent blockEvent = new BlockEvent();
-                TIMC.dispatchEvent(blockEvent);
-
-                if (!this.gameSettings.keyBindDrop.isKeyDown())
-                {
+                TIMC.INSTANCE.getEventProtocol().handleEvent(blockEvent);
+                if (!this.gameSettings.keyBindUseItem.isKeyDown() && !blockEvent.isCancelled()) {
                     this.playerController.onStoppedUsingItem(this.thePlayer);
                 }
 
@@ -2189,7 +2205,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
             {
                 this.rightClickMouse();
             }
-
+            TIMC.INSTANCE.getEventProtocol().handleEvent(new BlockPlaceableEvent());
             this.sendClickBlockToController(this.currentScreen == null && this.gameSettings.keyBindPickBlock.isKeyDown() && this.inGameHasFocus);
         }
 
@@ -2383,7 +2399,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         }
         if (theWorld != null) {
             WorldEvent e = new WorldEvent.Unload(theWorld);
-            TIMC.dispatchEvent(e);
+            TIMC.INSTANCE.getEventProtocol().handleEvent(e);
         }
 
         if (worldClientIn == null)

@@ -7,8 +7,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
-import com.teamti.event.impl.render.Render2DEvent;
-import com.teamti.timc.TIMC;
+import com.teamti.timc.event.impl.render.PreRenderEvent;
+import com.teamti.timc.event.impl.render.Render2DEvent;
+import com.teamti.timc.main.TIMC;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -164,6 +165,12 @@ public class GuiIngame extends Gui
             }
         }
 
+        TIMC.INSTANCE.getEventProtocol().handleEvent(new PreRenderEvent());
+
+        TIMC.INSTANCE.getEventProtocol().handleEvent(new Render2DEvent(scaledresolution.getScaledWidth(), scaledresolution.getScaledHeight()));
+
+
+
         if (this.mc.playerController.isSpectator())
         {
             this.spectatorGui.renderTooltip(scaledresolution, partialTicks);
@@ -172,8 +179,6 @@ public class GuiIngame extends Gui
         {
             this.renderTooltip(scaledresolution, partialTicks);
         }
-
-        TIMC.dispatchEvent(new Render2DEvent(scaledresolution.getScaledWidth(), scaledresolution.getScaledHeight()));
 
 
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);

@@ -4,7 +4,7 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.mojang.authlib.GameProfile;
-import com.teamti.event.impl.player.ChatReceivedEvent;
+import com.teamti.timc.event.impl.player.ChatReceivedEvent;
 import io.netty.buffer.Unpooled;
 import java.io.File;
 import java.io.IOException;
@@ -212,7 +212,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.storage.MapData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.teamti.timc.TIMC;
+import com.teamti.timc.main.TIMC;
 
 
 
@@ -850,22 +850,18 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
     /**
      * Prints a chatmessage in the chat GUI
      */
-    public void handleChat(S02PacketChat packetIn)
-    {
-
-        ChatReceivedEvent e = new ChatReceivedEvent(packetIn.getType(), packetIn.getChatComponent());
-        TIMC.dispatchEvent(e);
-        if (e.isCancelled() || e.message == null) return;
-
+    public void handleChat(S02PacketChat packetIn) {
         PacketThreadUtil.checkThreadAndEnqueue(packetIn, this, this.gameController);
 
-        if (packetIn.getType() == 2)
-        {
-            this.gameController.ingameGUI.setRecordPlaying(packetIn.getChatComponent(), false);
-        }
-        else
-        {
-            this.gameController.ingameGUI.getChatGUI().printChatMessage(packetIn.getChatComponent());
+        ChatReceivedEvent e = new ChatReceivedEvent(packetIn.getType(), packetIn.getChatComponent());
+
+        TIMC.INSTANCE.getEventProtocol().handleEvent(e);
+        if (e.isCancelled() || e.message == null) return;
+
+        if (packetIn.getType() == 2) {
+            this.gameController.ingameGUI.setRecordPlaying(e.message, false);
+        } else {
+            this.gameController.ingameGUI.getChatGUI().printChatMessage(e.message);
         }
     }
 

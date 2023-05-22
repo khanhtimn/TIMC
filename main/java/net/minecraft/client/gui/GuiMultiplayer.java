@@ -5,7 +5,7 @@ import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.util.List;
 
-import de.florianmichael.viamcp.ViaMCP;
+import com.teamti.timc.utils.viamcp.ViaMCP;
 import net.minecraft.client.multiplayer.GuiConnecting;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;

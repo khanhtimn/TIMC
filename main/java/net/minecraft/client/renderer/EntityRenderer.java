@@ -11,8 +11,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
 
-import com.teamti.timc.TIMC;
-import com.teamti.event.impl.render.Render3DEvent;
+import com.teamti.timc.event.impl.render.HurtCamEvent;
+import com.teamti.timc.main.TIMC;
+import com.teamti.timc.event.impl.render.Render3DEvent;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.material.Material;
@@ -675,30 +676,31 @@ public class EntityRenderer implements IResourceManagerReloadListener
         }
     }
 
-    private void hurtCameraEffect(float partialTicks)
-    {
-        if (this.mc.getRenderViewEntity() instanceof EntityLivingBase)
-        {
-            EntityLivingBase entitylivingbase = (EntityLivingBase)this.mc.getRenderViewEntity();
-            float f = (float)entitylivingbase.hurtTime - partialTicks;
+    private void hurtCameraEffect(float partialTicks) {
+        if (this.mc.getRenderViewEntity() instanceof EntityLivingBase) {
+            HurtCamEvent hurtCamEvent = new HurtCamEvent();
+            TIMC.INSTANCE.getEventProtocol().handleEvent(hurtCamEvent);
 
-            if (entitylivingbase.getHealth() <= 0.0F)
-            {
-                float f1 = (float)entitylivingbase.deathTime + partialTicks;
-                GlStateManager.rotate(40.0F - 8000.0F / (f1 + 200.0F), 0.0F, 0.0F, 1.0F);
+            if (!hurtCamEvent.isCancelled()) {
+                EntityLivingBase entitylivingbase = (EntityLivingBase) this.mc.getRenderViewEntity();
+                float f = (float) entitylivingbase.hurtTime - partialTicks;
+
+                if (entitylivingbase.getHealth() <= 0.0F) {
+                    float f1 = (float) entitylivingbase.deathTime + partialTicks;
+                    GlStateManager.rotate(40.0F - 8000.0F / (f1 + 200.0F), 0.0F, 0.0F, 1.0F);
+                }
+
+                if (f < 0.0F) {
+                    return;
+                }
+
+                f = f / (float) entitylivingbase.maxHurtTime;
+                f = MathHelper.sin(f * f * f * f * (float) Math.PI);
+                float f2 = entitylivingbase.attackedAtYaw;
+                GlStateManager.rotate(-f2, 0.0F, 1.0F, 0.0F);
+                GlStateManager.rotate(-f * 14.0F, 0.0F, 0.0F, 1.0F);
+                GlStateManager.rotate(f2, 0.0F, 1.0F, 0.0F);
             }
-
-            if (f < 0.0F)
-            {
-                return;
-            }
-
-            f = f / (float)entitylivingbase.maxHurtTime;
-            f = MathHelper.sin(f * f * f * f * (float)Math.PI);
-            float f2 = entitylivingbase.attackedAtYaw;
-            GlStateManager.rotate(-f2, 0.0F, 1.0F, 0.0F);
-            GlStateManager.rotate(-f * 14.0F, 0.0F, 0.0F, 1.0F);
-            GlStateManager.rotate(f2, 0.0F, 1.0F, 0.0F);
         }
     }
 
@@ -1899,7 +1901,7 @@ public class EntityRenderer implements IResourceManagerReloadListener
             Reflector.callVoid(Reflector.ForgeHooksClient_dispatchRenderLast, new Object[] {renderglobal, Float.valueOf(partialTicks)});
         }
 
-        TIMC.dispatchEvent(new Render3DEvent(partialTicks));
+        TIMC.INSTANCE.getEventProtocol().handleEvent(new Render3DEvent(partialTicks));
 
         this.mc.mcProfiler.endStartSection("hand");
 

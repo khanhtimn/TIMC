@@ -5,9 +5,10 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
-import com.teamti.event.impl.player.SafeWalkEvent;
-import com.teamti.event.impl.player.StepConfirmEvent;
-import com.teamti.timc.TIMC;
+import com.teamti.timc.event.impl.player.PlayerMoveUpdateEvent;
+import com.teamti.timc.event.impl.player.SafeWalkEvent;
+import com.teamti.timc.event.impl.player.StepConfirmEvent;
+import com.teamti.timc.main.TIMC;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
@@ -16,6 +17,7 @@ import net.minecraft.block.BlockWall;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.state.pattern.BlockPattern;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.command.CommandResultStats;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.crash.CrashReport;
@@ -629,7 +631,7 @@ public abstract class Entity implements ICommandSender
             double d5 = z;
 
             SafeWalkEvent safeWalkEvent = new SafeWalkEvent();
-            TIMC.dispatchEvent(safeWalkEvent);
+            TIMC.INSTANCE.getEventProtocol().handleEvent(safeWalkEvent);
 
             boolean flag = this.onGround && (this.isSneaking() || safeWalkEvent.isSafe()) && this instanceof EntityPlayer;
             if (flag)
@@ -817,8 +819,7 @@ public abstract class Entity implements ICommandSender
                     z = d8;
                     this.setEntityBoundingBox(axisalignedbb3);
                 } else {
-                    TIMC.dispatchEvent(new StepConfirmEvent());
-
+                    TIMC.INSTANCE.getEventProtocol().handleEvent(new StepConfirmEvent());
                 }
             }
 
@@ -1231,26 +1232,32 @@ public abstract class Entity implements ICommandSender
     /**
      * Used in both water and by flying objects
      */
-    public void moveFlying(float strafe, float forward, float friction)
-    {
+    public void moveFlying(float strafe, float forward, float friction) {
+        PlayerMoveUpdateEvent playerMovementEvent = new PlayerMoveUpdateEvent(strafe, forward, friction, this.rotationYaw, this.rotationPitch);
+        if (this instanceof EntityPlayerSP) {
+            TIMC.INSTANCE.getEventProtocol().handleEvent(playerMovementEvent);
+        }
+        if (playerMovementEvent.isCancelled()) return;
+
+        strafe = playerMovementEvent.getStrafe();
+        forward = playerMovementEvent.getForward();
+        friction = playerMovementEvent.getFriction();
         float f = strafe * strafe + forward * forward;
 
-        if (f >= 1.0E-4F)
-        {
+        if (f >= 1.0E-4F) {
             f = MathHelper.sqrt_float(f);
 
-            if (f < 1.0F)
-            {
+            if (f < 1.0F) {
                 f = 1.0F;
             }
 
             f = friction / f;
             strafe = strafe * f;
             forward = forward * f;
-            float f1 = MathHelper.sin(this.rotationYaw * (float)Math.PI / 180.0F);
-            float f2 = MathHelper.cos(this.rotationYaw * (float)Math.PI / 180.0F);
-            this.motionX += (double)(strafe * f2 - forward * f1);
-            this.motionZ += (double)(forward * f2 + strafe * f1);
+            float f1 = MathHelper.sin(playerMovementEvent.getYaw() * (float) Math.PI / 180.0F);
+            float f2 = MathHelper.cos(playerMovementEvent.getYaw() * (float) Math.PI / 180.0F);
+            this.motionX += strafe * f2 - forward * f1;
+            this.motionZ += forward * f2 + strafe * f1;
         }
     }
 
