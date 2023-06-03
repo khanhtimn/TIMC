@@ -3,6 +3,7 @@ package net.minecraft.world.storage;
 import java.util.List;
 import net.minecraft.client.AnvilConverterException;
 import net.minecraft.util.IProgressUpdate;
+import org.lwjgl.LWJGLException;
 
 public interface ISaveFormat
 {
@@ -51,7 +52,7 @@ public interface ISaveFormat
     /**
      * converts the map to mcRegion
      */
-    boolean convertMapFormat(String filename, IProgressUpdate progressCallback);
+    boolean convertMapFormat(String filename, IProgressUpdate progressCallback) throws LWJGLException;
 
     /**
      * Return whether the given world can be loaded.

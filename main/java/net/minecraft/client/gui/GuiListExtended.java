@@ -1,6 +1,7 @@
 package net.minecraft.client.gui;
 
 import net.minecraft.client.Minecraft;
+import org.lwjgl.LWJGLException;
 
 public abstract class GuiListExtended extends GuiSlot
 {
@@ -38,8 +39,7 @@ public abstract class GuiListExtended extends GuiSlot
         this.getListEntry(p_178040_1_).setSelected(p_178040_1_, p_178040_2_, p_178040_3_);
     }
 
-    public boolean mouseClicked(int mouseX, int mouseY, int mouseEvent)
-    {
+    public boolean mouseClicked(int mouseX, int mouseY, int mouseEvent) throws LWJGLException {
         if (this.isMouseYWithinSlotBounds(mouseY))
         {
             int i = this.getSlotIndexFromScreenCoords(mouseX, mouseY);
@@ -88,7 +88,7 @@ public abstract class GuiListExtended extends GuiSlot
 
         void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected);
 
-        boolean mousePressed(int slotIndex, int p_148278_2_, int p_148278_3_, int p_148278_4_, int p_148278_5_, int p_148278_6_);
+        boolean mousePressed(int slotIndex, int p_148278_2_, int p_148278_3_, int p_148278_4_, int p_148278_5_, int p_148278_6_) throws LWJGLException;
 
         void mouseReleased(int slotIndex, int x, int y, int mouseEvent, int relativeX, int relativeY);
     }

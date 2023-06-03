@@ -1,5 +1,7 @@
 package net.minecraft.util;
 
+import org.lwjgl.LWJGLException;
+
 public interface IProgressUpdate
 {
     /**
@@ -16,12 +18,12 @@ public interface IProgressUpdate
     /**
      * Displays a string on the loading screen supposed to indicate what is being done currently.
      */
-    void displayLoadingString(String message);
+    void displayLoadingString(String message) throws LWJGLException;
 
     /**
      * Updates the progress bar on the loading screen to the specified amount. Args: loadProgress
      */
-    void setLoadingProgress(int progress);
+    void setLoadingProgress(int progress) throws LWJGLException;
 
     void setDoneWorking();
 }

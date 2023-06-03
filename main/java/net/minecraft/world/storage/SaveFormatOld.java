@@ -11,6 +11,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IProgressUpdate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.LWJGLException;
 
 public class SaveFormatOld implements ISaveFormat
 {
@@ -260,8 +261,7 @@ public class SaveFormatOld implements ISaveFormat
     /**
      * converts the map to mcRegion
      */
-    public boolean convertMapFormat(String filename, IProgressUpdate progressCallback)
-    {
+    public boolean convertMapFormat(String filename, IProgressUpdate progressCallback) throws LWJGLException {
         return false;
     }
 

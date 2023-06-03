@@ -4,6 +4,7 @@ import java.io.IOException;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.world.storage.ISaveFormat;
 import net.minecraft.world.storage.WorldInfo;
+import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 
 public class GuiRenameWorld extends GuiScreen
@@ -90,8 +91,7 @@ public class GuiRenameWorld extends GuiScreen
     /**
      * Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
      */
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
-    {
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException, LWJGLException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
         this.field_146583_f.mouseClicked(mouseX, mouseY, mouseButton);
     }

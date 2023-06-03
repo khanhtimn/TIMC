@@ -1,6 +1,7 @@
 package net.minecraft.realms;
 
 import net.minecraft.client.gui.GuiClickableScrolledSelectionListProxy;
+import org.lwjgl.LWJGLException;
 
 public class RealmsClickableScrolledSelectionList
 {
@@ -68,8 +69,7 @@ public class RealmsClickableScrolledSelectionList
         return this.proxy.func_178044_e() / 2 + 124;
     }
 
-    public void mouseEvent()
-    {
+    public void mouseEvent() throws LWJGLException {
         this.proxy.handleMouseInput();
     }
 

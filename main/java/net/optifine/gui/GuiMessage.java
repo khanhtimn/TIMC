@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiOptionButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.src.Config;
+import org.lwjgl.LWJGLException;
 
 public class GuiMessage extends GuiScreen
 {
@@ -76,8 +77,7 @@ public class GuiMessage extends GuiScreen
     /**
      * Called from the main game loop to update the screen.
      */
-    public void updateScreen()
-    {
+    public void updateScreen() throws LWJGLException {
         super.updateScreen();
 
         if (--this.ticksUntilEnable == 0)

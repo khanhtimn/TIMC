@@ -20,6 +20,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IWorldNameable;
 import net.minecraft.world.World;
+import org.lwjgl.LWJGLException;
 import org.lwjgl.util.glu.Project;
 
 public class GuiEnchantment extends GuiContainer
@@ -73,8 +74,7 @@ public class GuiEnchantment extends GuiContainer
     /**
      * Called from the main game loop to update the screen.
      */
-    public void updateScreen()
-    {
+    public void updateScreen() throws LWJGLException {
         super.updateScreen();
         this.func_147068_g();
     }
@@ -82,8 +82,7 @@ public class GuiEnchantment extends GuiContainer
     /**
      * Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
      */
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
-    {
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException, LWJGLException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
         int i = (this.width - this.xSize) / 2;
         int j = (this.height - this.ySize) / 2;

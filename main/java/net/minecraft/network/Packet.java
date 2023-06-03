@@ -1,5 +1,7 @@
 package net.minecraft.network;
 
+import org.lwjgl.LWJGLException;
+
 import java.io.IOException;
 
 public interface Packet<T extends INetHandler>
@@ -17,7 +19,7 @@ public interface Packet<T extends INetHandler>
     /**
      * Passes this Packet on to the NetHandler for processing.
      */
-    void processPacket(T handler);
+    void processPacket(T handler) throws LWJGLException;
 
     default int getID(){
         return 99;

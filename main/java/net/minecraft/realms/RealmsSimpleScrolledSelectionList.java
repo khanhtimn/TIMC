@@ -1,6 +1,7 @@
 package net.minecraft.realms;
 
 import net.minecraft.client.gui.GuiSimpleScrolledSelectionListProxy;
+import org.lwjgl.LWJGLException;
 
 public class RealmsSimpleScrolledSelectionList
 {
@@ -68,8 +69,7 @@ public class RealmsSimpleScrolledSelectionList
         return this.proxy.getWidth() / 2 + 124;
     }
 
-    public void mouseEvent()
-    {
+    public void mouseEvent() throws LWJGLException {
         this.proxy.handleMouseInput();
     }
 

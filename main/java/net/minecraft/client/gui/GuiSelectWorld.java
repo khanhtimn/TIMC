@@ -17,6 +17,7 @@ import net.minecraft.world.storage.WorldInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.LWJGLException;
 
 public class GuiSelectWorld extends GuiScreen implements GuiYesNoCallback
 {
@@ -77,8 +78,7 @@ public class GuiSelectWorld extends GuiScreen implements GuiYesNoCallback
     /**
      * Handles mouse input.
      */
-    public void handleMouseInput() throws IOException
-    {
+    public void handleMouseInput() throws IOException, LWJGLException {
         super.handleMouseInput();
         this.availableWorlds.handleMouseInput();
     }
@@ -128,8 +128,7 @@ public class GuiSelectWorld extends GuiScreen implements GuiYesNoCallback
     /**
      * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
      */
-    protected void actionPerformed(GuiButton button) throws IOException
-    {
+    protected void actionPerformed(GuiButton button) throws IOException, LWJGLException {
         if (button.enabled)
         {
             if (button.id == 2)
@@ -175,8 +174,7 @@ public class GuiSelectWorld extends GuiScreen implements GuiYesNoCallback
         }
     }
 
-    public void func_146615_e(int p_146615_1_)
-    {
+    public void func_146615_e(int p_146615_1_) throws LWJGLException {
         this.mc.displayGuiScreen((GuiScreen)null);
 
         if (!this.field_146634_i)
@@ -270,8 +268,7 @@ public class GuiSelectWorld extends GuiScreen implements GuiYesNoCallback
             return GuiSelectWorld.this.field_146639_s.size();
         }
 
-        protected void elementClicked(int slotIndex, boolean isDoubleClick, int mouseX, int mouseY)
-        {
+        protected void elementClicked(int slotIndex, boolean isDoubleClick, int mouseX, int mouseY) throws LWJGLException {
             GuiSelectWorld.this.selectedIndex = slotIndex;
             boolean flag = GuiSelectWorld.this.selectedIndex >= 0 && GuiSelectWorld.this.selectedIndex < this.getSize();
             GuiSelectWorld.this.selectButton.enabled = flag;

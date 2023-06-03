@@ -6,6 +6,7 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.GameSettings;
+import org.lwjgl.LWJGLException;
 
 public class GuiSnooper extends GuiScreen
 {
@@ -69,8 +70,7 @@ public class GuiSnooper extends GuiScreen
     /**
      * Handles mouse input.
      */
-    public void handleMouseInput() throws IOException
-    {
+    public void handleMouseInput() throws IOException, LWJGLException {
         super.handleMouseInput();
         this.field_146606_s.handleMouseInput();
     }

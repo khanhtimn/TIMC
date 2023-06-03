@@ -15,6 +15,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.gen.FlatGeneratorInfo;
 import net.minecraft.world.gen.FlatLayerInfo;
+import org.lwjgl.LWJGLException;
 
 public class GuiCreateFlatWorld extends GuiScreen
 {
@@ -71,8 +72,7 @@ public class GuiCreateFlatWorld extends GuiScreen
     /**
      * Handles mouse input.
      */
-    public void handleMouseInput() throws IOException
-    {
+    public void handleMouseInput() throws IOException, LWJGLException {
         super.handleMouseInput();
         this.createFlatWorldListSlotGui.handleMouseInput();
     }

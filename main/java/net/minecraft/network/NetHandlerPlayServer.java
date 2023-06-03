@@ -94,6 +94,7 @@ import net.minecraft.world.WorldServer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.LWJGLException;
 
 public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable
 {
@@ -193,7 +194,11 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable
         {
             public void run()
             {
-                NetHandlerPlayServer.this.netManager.checkDisconnected();
+                try {
+                    NetHandlerPlayServer.this.netManager.checkDisconnected();
+                } catch (LWJGLException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }));
     }

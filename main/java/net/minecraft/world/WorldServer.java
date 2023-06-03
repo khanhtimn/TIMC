@@ -70,6 +70,7 @@ import net.minecraft.world.storage.MapStorage;
 import net.minecraft.world.storage.WorldInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.LWJGLException;
 
 public class WorldServer extends World implements IThreadListener
 {
@@ -884,8 +885,7 @@ public class WorldServer extends World implements IThreadListener
     /**
      * Saves all chunks to disk while updating progress bar.
      */
-    public void saveAllChunks(boolean p_73044_1_, IProgressUpdate progressCallback) throws MinecraftException
-    {
+    public void saveAllChunks(boolean p_73044_1_, IProgressUpdate progressCallback) throws MinecraftException, LWJGLException {
         if (this.chunkProvider.canSave())
         {
             if (progressCallback != null)

@@ -20,6 +20,7 @@ import net.minecraft.tileentity.TileEntityBeacon;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.LWJGLException;
 
 public class GuiBeacon extends GuiContainer
 {
@@ -53,8 +54,7 @@ public class GuiBeacon extends GuiContainer
     /**
      * Called from the main game loop to update the screen.
      */
-    public void updateScreen()
-    {
+    public void updateScreen() throws LWJGLException {
         super.updateScreen();
         int i = this.tileBeacon.getField(0);
         int j = this.tileBeacon.getField(1);
@@ -128,8 +128,7 @@ public class GuiBeacon extends GuiContainer
     /**
      * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
      */
-    protected void actionPerformed(GuiButton button) throws IOException
-    {
+    protected void actionPerformed(GuiButton button) throws IOException, LWJGLException {
         if (button.id == -2)
         {
             this.mc.displayGuiScreen((GuiScreen)null);

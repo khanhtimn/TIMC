@@ -44,6 +44,7 @@ import net.minecraft.util.MessageSerializer2;
 import net.minecraft.util.ReportedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.LWJGLException;
 
 public class NetworkSystem
 {
@@ -179,8 +180,7 @@ public class NetworkSystem
      * Will try to process the packets received by each NetworkManager, gracefully manage processing failures and cleans
      * up dead connections
      */
-    public void networkTick()
-    {
+    public void networkTick() throws LWJGLException {
         synchronized (this.networkManagers)
         {
             Iterator<NetworkManager> iterator = this.networkManagers.iterator();

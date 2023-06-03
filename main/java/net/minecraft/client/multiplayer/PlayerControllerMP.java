@@ -28,6 +28,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
+import org.lwjgl.LWJGLException;
 
 public class PlayerControllerMP
 {
@@ -346,8 +347,7 @@ public class PlayerControllerMP
         return this.currentGameType.isCreative() ? 5.0F : 4.5F;
     }
 
-    public void updateController()
-    {
+    public void updateController() throws LWJGLException {
         this.syncCurrentPlayItem();
 
         if (this.netClientHandler.getNetworkManager().isChannelOpen())

@@ -42,6 +42,7 @@ import net.minecraft.util.MathHelper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.LWJGLException;
 
 public class OldServerPinger
 {
@@ -271,8 +272,7 @@ public class OldServerPinger
         })).channel(NioSocketChannel.class)).connect(serveraddress.getIP(), serveraddress.getPort());
     }
 
-    public void pingPendingNetworks()
-    {
+    public void pingPendingNetworks() throws LWJGLException {
         synchronized (this.pingDestinations)
         {
             Iterator<NetworkManager> iterator = this.pingDestinations.iterator();

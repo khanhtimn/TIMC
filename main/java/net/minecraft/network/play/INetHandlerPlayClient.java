@@ -72,6 +72,7 @@ import net.minecraft.network.play.server.S46PacketSetCompressionLevel;
 import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter;
 import net.minecraft.network.play.server.S48PacketResourcePackSend;
 import net.minecraft.network.play.server.S49PacketUpdateEntityNBT;
+import org.lwjgl.LWJGLException;
 
 public interface INetHandlerPlayClient extends INetHandler
 {
@@ -256,7 +257,7 @@ public interface INetHandlerPlayClient extends INetHandler
      * Registers some server properties (gametype,hardcore-mode,terraintype,difficulty,player limit), creates a new
      * WorldClient and sets the player initial dimension
      */
-    void handleJoinGame(S01PacketJoinGame packetIn);
+    void handleJoinGame(S01PacketJoinGame packetIn) throws LWJGLException;
 
     /**
      * Updates the specified entity's position by the specified relative moment and absolute rotation. Note that
@@ -291,7 +292,7 @@ public interface INetHandlerPlayClient extends INetHandler
 
     void handleRemoveEntityEffect(S1EPacketRemoveEntityEffect packetIn);
 
-    void handleRespawn(S07PacketRespawn packetIn);
+    void handleRespawn(S07PacketRespawn packetIn) throws LWJGLException;
 
     /**
      * Updates the direction in which the specified entity is looking, normally this head rotation is independent of the

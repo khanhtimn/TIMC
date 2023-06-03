@@ -21,6 +21,7 @@ import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.LWJGLException;
 
 public class ServerListEntryNormal implements GuiListExtended.IGuiListEntry
 {
@@ -290,8 +291,7 @@ public class ServerListEntryNormal implements GuiListExtended.IGuiListEntry
     /**
      * Returns true if the mouse has been pressed on this control.
      */
-    public boolean mousePressed(int slotIndex, int p_148278_2_, int p_148278_3_, int p_148278_4_, int p_148278_5_, int p_148278_6_)
-    {
+    public boolean mousePressed(int slotIndex, int p_148278_2_, int p_148278_3_, int p_148278_4_, int p_148278_5_, int p_148278_6_) throws LWJGLException {
         if (p_148278_5_ <= 32)
         {
             if (p_148278_5_ < 32 && p_148278_5_ > 16 && this.func_178013_b())

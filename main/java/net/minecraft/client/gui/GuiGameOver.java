@@ -5,6 +5,7 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.EnumChatFormatting;
+import org.lwjgl.LWJGLException;
 
 public class GuiGameOver extends GuiScreen implements GuiYesNoCallback
 {
@@ -84,8 +85,7 @@ public class GuiGameOver extends GuiScreen implements GuiYesNoCallback
         }
     }
 
-    public void confirmClicked(boolean result, int id)
-    {
+    public void confirmClicked(boolean result, int id) throws LWJGLException {
         if (result)
         {
             this.mc.theWorld.sendQuittingDisconnectingPacket();
@@ -132,8 +132,7 @@ public class GuiGameOver extends GuiScreen implements GuiYesNoCallback
     /**
      * Called from the main game loop to update the screen.
      */
-    public void updateScreen()
-    {
+    public void updateScreen() throws LWJGLException {
         super.updateScreen();
         ++this.enableButtonsTimer;
 

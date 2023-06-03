@@ -21,6 +21,7 @@ import net.minecraft.util.IChatComponent;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.LWJGLException;
 
 public class RealmsServerStatusPinger
 {
@@ -105,8 +106,7 @@ public class RealmsServerStatusPinger
         }
     }
 
-    public void tick()
-    {
+    public void tick() throws LWJGLException {
         synchronized (this.connections)
         {
             Iterator<NetworkManager> iterator = this.connections.iterator();

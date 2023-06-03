@@ -26,6 +26,7 @@ import net.minecraft.stats.StatCrafting;
 import net.minecraft.stats.StatFileWriter;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Mouse;
 
 public class GuiStats extends GuiScreen implements IProgressMeter
@@ -62,8 +63,7 @@ public class GuiStats extends GuiScreen implements IProgressMeter
     /**
      * Handles mouse input.
      */
-    public void handleMouseInput() throws IOException
-    {
+    public void handleMouseInput() throws IOException, LWJGLException {
         super.handleMouseInput();
 
         if (this.displaySlot != null)

@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.util.List;
 import net.minecraft.client.resources.I18n;
+import org.lwjgl.LWJGLException;
 
 public class GuiYesNo extends GuiScreen
 {
@@ -58,8 +59,7 @@ public class GuiYesNo extends GuiScreen
     /**
      * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
      */
-    protected void actionPerformed(GuiButton button) throws IOException
-    {
+    protected void actionPerformed(GuiButton button) throws IOException, LWJGLException {
         this.parentScreen.confirmClicked(button.id == 0, this.parentButtonClickedId);
     }
 
@@ -97,8 +97,7 @@ public class GuiYesNo extends GuiScreen
     /**
      * Called from the main game loop to update the screen.
      */
-    public void updateScreen()
-    {
+    public void updateScreen() throws LWJGLException {
         super.updateScreen();
 
         if (--this.ticksUntilEnable == 0)

@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.realms.RealmsSimpleScrolledSelectionList;
 import net.minecraft.util.MathHelper;
+import org.lwjgl.LWJGLException;
 
 public class GuiSimpleScrolledSelectionListProxy extends GuiSlot
 {
@@ -77,8 +78,7 @@ public class GuiSimpleScrolledSelectionListProxy extends GuiSlot
         return this.field_178050_u.getScrollbarPosition();
     }
 
-    public void handleMouseInput()
-    {
+    public void handleMouseInput() throws LWJGLException {
         super.handleMouseInput();
     }
 

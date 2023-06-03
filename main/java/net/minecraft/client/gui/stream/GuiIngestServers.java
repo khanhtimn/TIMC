@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiSlot;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.stream.IngestServerTester;
 import net.minecraft.util.EnumChatFormatting;
+import org.lwjgl.LWJGLException;
 import tv.twitch.broadcast.IngestServer;
 
 public class GuiIngestServers extends GuiScreen
@@ -42,8 +43,7 @@ public class GuiIngestServers extends GuiScreen
     /**
      * Handles mouse input.
      */
-    public void handleMouseInput() throws IOException
-    {
+    public void handleMouseInput() throws IOException, LWJGLException {
         super.handleMouseInput();
         this.field_152311_g.handleMouseInput();
     }

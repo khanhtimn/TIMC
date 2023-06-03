@@ -3,23 +3,16 @@ package net.optifine;
 import java.nio.IntBuffer;
 import net.minecraft.src.Config;
 import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.ARBDebugOutput;
-import org.lwjgl.opengl.ARBDebugOutputCallback;
-import org.lwjgl.opengl.ContextAttribs;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GLContext;
-import org.lwjgl.opengl.PixelFormat;
-import org.lwjgl.opengl.ARBDebugOutputCallback.Handler;
+import org.lwjgl.opengl.*;
 
-public class GlDebugHandler implements Handler
-{
+
+public class GlDebugHandler extends ARBDebugOutput {
     public static void createDisplayDebug() throws LWJGLException
     {
         boolean flag = GLContext.getCapabilities().GL_ARB_debug_output;
-        ContextAttribs contextattribs = (new ContextAttribs()).withDebug(true);
-        Display.create((new PixelFormat()).withDepthBits(24), contextattribs);
-        ARBDebugOutput.glDebugMessageCallbackARB(new ARBDebugOutputCallback(new GlDebugHandler()));
+//        GLXARBCreateContext contextattribs = (new GLXARBCreateContext()).withDebug(true);
+        Display.create((new PixelFormat()).withDepthBits(24));
+//        ARBDebugOutput.glDebugMessageCallbackARB(new ARBDebugOutputCallback(new GlDebugHandler()));
         ARBDebugOutput.glDebugMessageControlARB(4352, 4352, 4352, (IntBuffer)null, true);
         GL11.glEnable(33346);
     }

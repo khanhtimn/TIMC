@@ -21,6 +21,7 @@ import net.minecraft.stats.StatFileWriter;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Mouse;
 
 public class GuiAchievements extends GuiScreen implements IProgressMeter
@@ -85,8 +86,7 @@ public class GuiAchievements extends GuiScreen implements IProgressMeter
      * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
      * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
      */
-    protected void keyTyped(char typedChar, int keyCode) throws IOException
-    {
+    protected void keyTyped(char typedChar, int keyCode) throws IOException, LWJGLException {
         if (keyCode == this.mc.gameSettings.keyBindUseItem.getKeyCode())
         {
             this.mc.displayGuiScreen((GuiScreen)null);

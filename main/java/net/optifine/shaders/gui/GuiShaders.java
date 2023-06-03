@@ -16,6 +16,7 @@ import net.optifine.gui.TooltipProviderEnumShaderOptions;
 import net.optifine.shaders.Shaders;
 import net.optifine.shaders.ShadersTex;
 import net.optifine.shaders.config.EnumShaderOption;
+import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 
 public class GuiShaders extends GuiScreenOF
@@ -98,8 +99,7 @@ public class GuiShaders extends GuiScreenOF
     /**
      * Handles mouse input.
      */
-    public void handleMouseInput() throws IOException
-    {
+    public void handleMouseInput() throws IOException, LWJGLException {
         super.handleMouseInput();
         this.shaderList.handleMouseInput();
     }
@@ -379,8 +379,7 @@ public class GuiShaders extends GuiScreenOF
     /**
      * Called from the main game loop to update the screen.
      */
-    public void updateScreen()
-    {
+    public void updateScreen() throws LWJGLException {
         super.updateScreen();
         --this.updateTimer;
     }

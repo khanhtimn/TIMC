@@ -40,6 +40,7 @@ import net.minecraft.util.IChatComponent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import tv.twitch.chat.ChatUserInfo;
@@ -101,8 +102,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
      * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
      * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
      */
-    protected void keyTyped(char typedChar, int keyCode) throws IOException
-    {
+    protected void keyTyped(char typedChar, int keyCode) throws IOException, LWJGLException {
         if (keyCode == 1)
         {
             this.mc.displayGuiScreen((GuiScreen)null);
@@ -496,8 +496,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
     /**
      * Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
      */
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
-    {
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException, LWJGLException {
         if (mouseButton == 0)
         {
             for (int i = 0; i < this.buttonList.size(); ++i)
@@ -537,8 +536,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
     /**
      * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
      */
-    protected void actionPerformed(GuiButton button) throws IOException
-    {
+    protected void actionPerformed(GuiButton button) throws IOException, LWJGLException {
     }
 
     /**
@@ -573,8 +571,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
     /**
      * Delegates mouse and keyboard input.
      */
-    public void handleInput() throws IOException
-    {
+    public void handleInput() throws IOException, LWJGLException {
         if (Mouse.isCreated())
         {
             while (Mouse.next())
@@ -595,8 +592,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
     /**
      * Handles mouse input.
      */
-    public void handleMouseInput() throws IOException
-    {
+    public void handleMouseInput() throws IOException, LWJGLException {
         int i = Mouse.getEventX() * this.width / this.mc.displayWidth;
         int j = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
         int k = Mouse.getEventButton();
@@ -632,8 +628,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
     /**
      * Handles keyboard input.
      */
-    public void handleKeyboardInput() throws IOException
-    {
+    public void handleKeyboardInput() throws IOException, LWJGLException {
         if (Keyboard.getEventKeyState())
         {
             this.keyTyped(Keyboard.getEventCharacter(), Keyboard.getEventKey());
@@ -645,8 +640,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
     /**
      * Called from the main game loop to update the screen.
      */
-    public void updateScreen()
-    {
+    public void updateScreen() throws LWJGLException {
     }
 
     /**
@@ -704,8 +698,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
         return true;
     }
 
-    public void confirmClicked(boolean result, int id)
-    {
+    public void confirmClicked(boolean result, int id) throws LWJGLException {
         if (id == 31102009)
         {
             if (result)

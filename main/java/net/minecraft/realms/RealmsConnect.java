@@ -11,6 +11,7 @@ import net.minecraft.network.login.client.C00PacketLoginStart;
 import net.minecraft.util.ChatComponentTranslation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.LWJGLException;
 
 public class RealmsConnect
 {
@@ -107,8 +108,7 @@ public class RealmsConnect
         this.aborted = true;
     }
 
-    public void tick()
-    {
+    public void tick() throws LWJGLException {
         if (this.connection != null)
         {
             if (this.connection.isChannelOpen())

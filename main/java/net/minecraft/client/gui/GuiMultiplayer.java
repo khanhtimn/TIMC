@@ -14,6 +14,7 @@ import net.minecraft.client.network.OldServerPinger;
 import net.minecraft.client.resources.I18n;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 
 public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
@@ -85,8 +86,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
     /**
      * Handles mouse input.
      */
-    public void handleMouseInput() throws IOException
-    {
+    public void handleMouseInput() throws IOException, LWJGLException {
         super.handleMouseInput();
         this.serverListSelector.handleMouseInput();
     }
@@ -107,8 +107,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
     /**
      * Called from the main game loop to update the screen.
      */
-    public void updateScreen()
-    {
+    public void updateScreen() throws LWJGLException {
         super.updateScreen();
 
         if (this.lanServerList.getWasUpdated())
@@ -140,8 +139,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
     /**
      * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
      */
-    protected void actionPerformed(GuiButton button) throws IOException
-    {
+    protected void actionPerformed(GuiButton button) throws IOException, LWJGLException {
         if (button.enabled)
         {
             GuiListExtended.IGuiListEntry guilistextended$iguilistentry = this.serverListSelector.func_148193_k() < 0 ? null : this.serverListSelector.getListEntry(this.serverListSelector.func_148193_k());
@@ -199,8 +197,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
         this.mc.displayGuiScreen(new GuiMultiplayer(this.parentScreen));
     }
 
-    public void confirmClicked(boolean result, int id)
-    {
+    public void confirmClicked(boolean result, int id) throws LWJGLException {
         GuiListExtended.IGuiListEntry guilistextended$iguilistentry = this.serverListSelector.func_148193_k() < 0 ? null : this.serverListSelector.getListEntry(this.serverListSelector.func_148193_k());
 
         if (this.deletingServer)
@@ -266,8 +263,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
      * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
      * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
      */
-    protected void keyTyped(char typedChar, int keyCode) throws IOException
-    {
+    protected void keyTyped(char typedChar, int keyCode) throws IOException, LWJGLException {
         int i = this.serverListSelector.func_148193_k();
         GuiListExtended.IGuiListEntry guilistextended$iguilistentry = i < 0 ? null : this.serverListSelector.getListEntry(i);
 
@@ -382,8 +378,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
         }
     }
 
-    public void connectToSelected()
-    {
+    public void connectToSelected() throws LWJGLException {
         GuiListExtended.IGuiListEntry guilistextended$iguilistentry = this.serverListSelector.func_148193_k() < 0 ? null : this.serverListSelector.getListEntry(this.serverListSelector.func_148193_k());
 
         if (guilistextended$iguilistentry instanceof ServerListEntryNormal)
@@ -397,8 +392,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
         }
     }
 
-    private void connectToServer(ServerData server)
-    {
+    private void connectToServer(ServerData server) throws LWJGLException {
         this.mc.displayGuiScreen(new GuiConnecting(this, this.mc, server));
     }
 
@@ -435,8 +429,7 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
     /**
      * Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
      */
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
-    {
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException, LWJGLException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
         this.serverListSelector.mouseClicked(mouseX, mouseY, mouseButton);
     }

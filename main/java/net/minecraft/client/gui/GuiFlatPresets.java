@@ -19,6 +19,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.FlatGeneratorInfo;
 import net.minecraft.world.gen.FlatLayerInfo;
+import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 
 public class GuiFlatPresets extends GuiScreen
@@ -62,8 +63,7 @@ public class GuiFlatPresets extends GuiScreen
     /**
      * Handles mouse input.
      */
-    public void handleMouseInput() throws IOException
-    {
+    public void handleMouseInput() throws IOException, LWJGLException {
         super.handleMouseInput();
         this.field_146435_s.handleMouseInput();
     }
@@ -79,8 +79,7 @@ public class GuiFlatPresets extends GuiScreen
     /**
      * Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
      */
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
-    {
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException, LWJGLException {
         this.field_146433_u.mouseClicked(mouseX, mouseY, mouseButton);
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
@@ -89,8 +88,7 @@ public class GuiFlatPresets extends GuiScreen
      * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
      * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
      */
-    protected void keyTyped(char typedChar, int keyCode) throws IOException
-    {
+    protected void keyTyped(char typedChar, int keyCode) throws IOException, LWJGLException {
         if (!this.field_146433_u.textboxKeyTyped(typedChar, keyCode))
         {
             super.keyTyped(typedChar, keyCode);
@@ -130,8 +128,7 @@ public class GuiFlatPresets extends GuiScreen
     /**
      * Called from the main game loop to update the screen.
      */
-    public void updateScreen()
-    {
+    public void updateScreen() throws LWJGLException {
         this.field_146433_u.updateCursorCounter();
         super.updateScreen();
     }

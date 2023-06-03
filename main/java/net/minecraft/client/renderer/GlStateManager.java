@@ -387,7 +387,7 @@ public class GlStateManager
 
     public static void texGen(GlStateManager.TexGen p_179105_0_, int pname, FloatBuffer params)
     {
-        GL11.glTexGen(texGenCoord(p_179105_0_).coord, pname, params);
+        GL11.glTexGenfv(texGenCoord(p_179105_0_).coord, pname, params);
     }
 
     private static GlStateManager.TexGenCoord texGenCoord(GlStateManager.TexGen p_179125_0_)
@@ -597,7 +597,7 @@ public class GlStateManager
 
     public static void multMatrix(FloatBuffer matrix)
     {
-        GL11.glMultMatrix(matrix);
+        GL11.glMultMatrixf(matrix);
     }
 
     public static void color(float colorRed, float colorGreen, float colorBlue, float colorAlpha)

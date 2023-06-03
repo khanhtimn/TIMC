@@ -6,6 +6,7 @@ import net.minecraft.client.AnvilConverterException;
 import net.minecraft.util.IProgressUpdate;
 import net.minecraft.world.storage.ISaveFormat;
 import net.minecraft.world.storage.SaveFormatComparator;
+import org.lwjgl.LWJGLException;
 
 public class RealmsAnvilLevelStorageSource
 {
@@ -26,8 +27,7 @@ public class RealmsAnvilLevelStorageSource
         return this.levelStorageSource.canLoadWorld(p_levelExists_1_);
     }
 
-    public boolean convertLevel(String p_convertLevel_1_, IProgressUpdate p_convertLevel_2_)
-    {
+    public boolean convertLevel(String p_convertLevel_1_, IProgressUpdate p_convertLevel_2_) throws LWJGLException {
         return this.levelStorageSource.convertMapFormat(p_convertLevel_1_, p_convertLevel_2_);
     }
 

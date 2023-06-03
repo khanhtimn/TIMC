@@ -8,6 +8,7 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IProgressUpdate;
 import net.minecraft.world.MinecraftException;
 import net.minecraft.world.WorldServer;
+import org.lwjgl.LWJGLException;
 
 public class CommandSaveAll extends CommandBase
 {
@@ -77,6 +78,8 @@ public class CommandSaveAll extends CommandBase
         {
             notifyOperators(sender, this, "commands.save.failed", new Object[] {minecraftexception.getMessage()});
             return;
+        } catch (LWJGLException e) {
+            throw new RuntimeException(e);
         }
 
         notifyOperators(sender, this, "commands.save.success", new Object[0]);

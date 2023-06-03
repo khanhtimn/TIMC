@@ -39,6 +39,7 @@ import net.optifine.ClearWater;
 import net.optifine.reflect.Reflector;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.LWJGLException;
 
 public class IntegratedServer extends MinecraftServer
 {
@@ -62,8 +63,7 @@ public class IntegratedServer extends MinecraftServer
         this.theWorldSettings = null;
     }
 
-    public IntegratedServer(Minecraft mcIn, String folderName, String worldName, WorldSettings settings)
-    {
+    public IntegratedServer(Minecraft mcIn, String folderName, String worldName, WorldSettings settings) throws LWJGLException {
         super(new File(mcIn.mcDataDir, "saves"), mcIn.getProxy(), new File(mcIn.mcDataDir, USER_CACHE_FILE.getName()));
         this.setServerOwner(mcIn.getSession().getUsername());
         this.setFolderName(folderName);
@@ -95,8 +95,7 @@ public class IntegratedServer extends MinecraftServer
         return new IntegratedServerCommandManager();
     }
 
-    protected void loadAllWorlds(String saveName, String worldNameIn, long seed, WorldType type, String worldNameIn2)
-    {
+    protected void loadAllWorlds(String saveName, String worldNameIn, long seed, WorldType type, String worldNameIn2) throws LWJGLException {
         this.convertMapIfNeeded(saveName);
         boolean flag = Reflector.DimensionManager.exists();
 
@@ -202,8 +201,7 @@ public class IntegratedServer extends MinecraftServer
     /**
      * Initialises the server and starts it.
      */
-    protected boolean startServer() throws IOException
-    {
+    protected boolean startServer() throws IOException, LWJGLException {
         logger.info("Starting integrated minecraft server version 1.9");
         this.setOnlineMode(true);
         this.setCanSpawnAnimals(true);
@@ -244,8 +242,7 @@ public class IntegratedServer extends MinecraftServer
     /**
      * Main function called by run() every loop.
      */
-    public void tick()
-    {
+    public void tick() throws LWJGLException {
         this.onTick();
         boolean flag = this.isGamePaused;
         this.isGamePaused = Minecraft.getMinecraft().getNetHandler() != null && Minecraft.getMinecraft().isGamePaused();

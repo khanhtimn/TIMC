@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.IDN;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.resources.I18n;
+import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 
 public class GuiScreenAddServer extends GuiScreen
@@ -93,8 +94,7 @@ public class GuiScreenAddServer extends GuiScreen
     /**
      * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
      */
-    protected void actionPerformed(GuiButton button) throws IOException
-    {
+    protected void actionPerformed(GuiButton button) throws IOException, LWJGLException {
         if (button.enabled)
         {
             if (button.id == 2)
@@ -119,8 +119,7 @@ public class GuiScreenAddServer extends GuiScreen
      * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
      * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
      */
-    protected void keyTyped(char typedChar, int keyCode) throws IOException
-    {
+    protected void keyTyped(char typedChar, int keyCode) throws IOException, LWJGLException {
         this.serverNameField.textboxKeyTyped(typedChar, keyCode);
         this.serverIPField.textboxKeyTyped(typedChar, keyCode);
 
@@ -141,8 +140,7 @@ public class GuiScreenAddServer extends GuiScreen
     /**
      * Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
      */
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
-    {
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException, LWJGLException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
         this.serverIPField.mouseClicked(mouseX, mouseY, mouseButton);
         this.serverNameField.mouseClicked(mouseX, mouseY, mouseButton);

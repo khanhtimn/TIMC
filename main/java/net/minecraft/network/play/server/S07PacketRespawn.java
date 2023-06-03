@@ -7,6 +7,7 @@ import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
+import org.lwjgl.LWJGLException;
 
 public class S07PacketRespawn implements Packet<INetHandlerPlayClient>
 {
@@ -30,8 +31,7 @@ public class S07PacketRespawn implements Packet<INetHandlerPlayClient>
     /**
      * Passes this Packet on to the NetHandler for processing.
      */
-    public void processPacket(INetHandlerPlayClient handler)
-    {
+    public void processPacket(INetHandlerPlayClient handler) throws LWJGLException {
         handler.handleRespawn(this);
     }
 

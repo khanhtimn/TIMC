@@ -58,6 +58,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
+import org.lwjgl.LWJGLException;
 
 public class NetworkManager extends SimpleChannelInboundHandler<Packet>
 {
@@ -502,8 +503,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet>
 
     }
 
-    public void checkDisconnected()
-    {
+    public void checkDisconnected() throws LWJGLException {
         if (this.channel != null && !this.channel.isOpen())
         {
             if (!this.disconnected)

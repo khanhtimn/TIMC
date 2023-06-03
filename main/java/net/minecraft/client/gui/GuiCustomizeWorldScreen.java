@@ -12,6 +12,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.gen.ChunkProviderSettings;
+import org.lwjgl.LWJGLException;
 
 public class GuiCustomizeWorldScreen extends GuiScreen implements GuiSlider.FormatHelper, GuiPageButtonList.GuiResponder
 {
@@ -102,8 +103,7 @@ public class GuiCustomizeWorldScreen extends GuiScreen implements GuiSlider.Form
     /**
      * Handles mouse input.
      */
-    public void handleMouseInput() throws IOException
-    {
+    public void handleMouseInput() throws IOException, LWJGLException {
         super.handleMouseInput();
         this.field_175349_r.handleMouseInput();
     }
@@ -868,8 +868,7 @@ public class GuiCustomizeWorldScreen extends GuiScreen implements GuiSlider.Form
      * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
      * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
      */
-    protected void keyTyped(char typedChar, int keyCode) throws IOException
-    {
+    protected void keyTyped(char typedChar, int keyCode) throws IOException, LWJGLException {
         super.keyTyped(typedChar, keyCode);
 
         if (this.field_175339_B == 0)
@@ -934,8 +933,7 @@ public class GuiCustomizeWorldScreen extends GuiScreen implements GuiSlider.Form
     /**
      * Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
      */
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
-    {
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException, LWJGLException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
 
         if (this.field_175339_B == 0 && !this.field_175340_C)

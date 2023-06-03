@@ -1106,8 +1106,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
     /**
      * Called repeatedly from run()
      */
-    private void runGameLoop() throws IOException
-    {
+    private void runGameLoop() throws IOException, LWJGLException {
         long i = System.nanoTime();
         this.mcProfiler.startSection("root");
 
@@ -1255,8 +1254,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         this.mcProfiler.endSection();
     }
 
-    public void updateDisplay()
-    {
+    public void updateDisplay() throws LWJGLException {
         this.mcProfiler.startSection("display_update");
         Display.update();
         this.mcProfiler.endSection();
@@ -1787,8 +1785,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
     /**
      * Runs the current tick.
      */
-    public void runTick() throws IOException
-    {
+    public void runTick() throws IOException, LWJGLException {
 
         if (this.rightClickDelayTimer > 0)
         {
@@ -2329,8 +2326,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
     /**
      * Arguments: World foldername,  World ingame name, WorldSettings
      */
-    public void launchIntegratedServer(String folderName, String worldName, WorldSettings worldSettingsIn)
-    {
+    public void launchIntegratedServer(String folderName, String worldName, WorldSettings worldSettingsIn) throws LWJGLException {
         this.loadWorld((WorldClient)null);
         System.gc();
         ISaveHandler isavehandler = this.saveLoader.getSaveLoader(folderName, false);
@@ -2399,16 +2395,14 @@ public class Minecraft implements IThreadListener, IPlayerUsage
     /**
      * unloads the current world first
      */
-    public void loadWorld(WorldClient worldClientIn)
-    {
+    public void loadWorld(WorldClient worldClientIn) throws LWJGLException {
         this.loadWorld(worldClientIn, "");
     }
 
     /**
      * par2Str is displayed on the loading screen to the user unloads the current world first
      */
-    public void loadWorld(WorldClient worldClientIn, String loadingMessage)
-    {
+    public void loadWorld(WorldClient worldClientIn, String loadingMessage) throws LWJGLException {
         if (worldClientIn != this.theWorld) {
             this.entityRenderer.getMapItemRenderer().clearLoadedMaps();
         }

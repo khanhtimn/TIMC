@@ -13,6 +13,7 @@ import net.minecraft.util.MinecraftError;
 import net.optifine.CustomLoadingScreen;
 import net.optifine.CustomLoadingScreens;
 import net.optifine.reflect.Reflector;
+import org.lwjgl.LWJGLException;
 
 public class LoadingScreenRenderer implements IProgressUpdate
 {
@@ -98,8 +99,7 @@ public class LoadingScreenRenderer implements IProgressUpdate
     /**
      * Displays a string on the loading screen supposed to indicate what is being done currently.
      */
-    public void displayLoadingString(String message)
-    {
+    public void displayLoadingString(String message) throws LWJGLException {
         if (!this.mc.running)
         {
             if (!this.loadingSuccess)
@@ -119,8 +119,7 @@ public class LoadingScreenRenderer implements IProgressUpdate
     /**
      * Updates the progress bar on the loading screen to the specified amount. Args: loadProgress
      */
-    public void setLoadingProgress(int progress)
-    {
+    public void setLoadingProgress(int progress) throws LWJGLException {
         if (!this.mc.running)
         {
             if (!this.loadingSuccess)

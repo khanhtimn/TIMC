@@ -78,6 +78,7 @@ import net.minecraft.world.storage.WorldInfo;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.LWJGLException;
 
 public abstract class MinecraftServer implements Runnable, ICommandSender, IThreadListener, IPlayerUsage
 {
@@ -221,10 +222,9 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
     /**
      * Initialises the server and starts it.
      */
-    protected abstract boolean startServer() throws IOException;
+    protected abstract boolean startServer() throws IOException, LWJGLException;
 
-    protected void convertMapIfNeeded(String worldNameIn)
-    {
+    protected void convertMapIfNeeded(String worldNameIn) throws LWJGLException {
         if (this.getActiveAnvilConverter().isOldMapFormat(worldNameIn))
         {
             logger.info("Converting map!");
@@ -269,8 +269,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
         return this.userMessage;
     }
 
-    protected void loadAllWorlds(String saveName, String worldNameIn, long seed, WorldType type, String worldNameIn2)
-    {
+    protected void loadAllWorlds(String saveName, String worldNameIn, long seed, WorldType type, String worldNameIn2) throws LWJGLException {
         this.convertMapIfNeeded(saveName);
         this.setUserMessage("menu.loadingLevel");
         this.worldServers = new WorldServer[3];
@@ -462,6 +461,8 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
                     catch (MinecraftException minecraftexception)
                     {
                         logger.warn(minecraftexception.getMessage());
+                    } catch (LWJGLException e) {
+                        throw new RuntimeException(e);
                     }
                 }
             }
@@ -678,8 +679,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
     /**
      * Main function called by run() every loop.
      */
-    public void tick()
-    {
+    public void tick() throws LWJGLException {
         long i = System.nanoTime();
         ++this.tickCounter;
 
@@ -736,8 +736,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
         this.theProfiler.endSection();
     }
 
-    public void updateTimeLightAndEntities()
-    {
+    public void updateTimeLightAndEntities() throws LWJGLException {
         this.theProfiler.startSection("jobs");
 
         synchronized (this.futureTaskQueue)

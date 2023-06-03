@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.IntHashMap;
+import org.lwjgl.LWJGLException;
 
 public class GuiPageButtonList extends GuiListExtended
 {
@@ -183,8 +184,7 @@ public class GuiPageButtonList extends GuiListExtended
         }
     }
 
-    public boolean mouseClicked(int mouseX, int mouseY, int mouseEvent)
-    {
+    public boolean mouseClicked(int mouseX, int mouseY, int mouseEvent) throws LWJGLException {
         boolean flag = super.mouseClicked(mouseX, mouseY, mouseEvent);
         int i = this.getSlotIndexFromScreenCoords(mouseX, mouseY);
 

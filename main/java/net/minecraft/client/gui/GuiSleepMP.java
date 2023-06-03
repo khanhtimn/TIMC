@@ -4,6 +4,7 @@ import java.io.IOException;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
+import org.lwjgl.LWJGLException;
 
 public class GuiSleepMP extends GuiChat
 {
@@ -48,8 +49,7 @@ public class GuiSleepMP extends GuiChat
     /**
      * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
      */
-    protected void actionPerformed(GuiButton button) throws IOException
-    {
+    protected void actionPerformed(GuiButton button) throws IOException, LWJGLException {
         if (button.id == 1)
         {
             this.wakeFromSleep();

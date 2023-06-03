@@ -24,6 +24,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.EnumChatFormatting;
+import org.lwjgl.LWJGLException;
 
 import java.io.IOException;
 
@@ -52,7 +53,7 @@ public class GuiProtocolSelector extends GuiScreen {
     }
 
     @Override
-    public void handleMouseInput() throws IOException {
+    public void handleMouseInput() throws IOException, LWJGLException {
         list.handleMouseInput();
         super.handleMouseInput();
     }

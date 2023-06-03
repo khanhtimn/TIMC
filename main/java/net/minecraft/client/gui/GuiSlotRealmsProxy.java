@@ -2,6 +2,7 @@ package net.minecraft.client.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.realms.RealmsScrolledSelectionList;
+import org.lwjgl.LWJGLException;
 
 public class GuiSlotRealmsProxy extends GuiSlot
 {
@@ -72,8 +73,7 @@ public class GuiSlotRealmsProxy extends GuiSlot
         return this.selectionList.getScrollbarPosition();
     }
 
-    public void handleMouseInput()
-    {
+    public void handleMouseInput() throws LWJGLException {
         super.handleMouseInput();
     }
 }

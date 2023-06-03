@@ -17,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 
 public abstract class GuiContainer extends GuiScreen
@@ -356,8 +357,7 @@ public abstract class GuiContainer extends GuiScreen
     /**
      * Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
      */
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
-    {
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException, LWJGLException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
         boolean flag = mouseButton == this.mc.gameSettings.keyBindChat.getKeyCode() + 100;
         Slot slot = this.getSlotAtPosition(mouseX, mouseY);
@@ -754,8 +754,7 @@ public abstract class GuiContainer extends GuiScreen
     /**
      * Called from the main game loop to update the screen.
      */
-    public void updateScreen()
-    {
+    public void updateScreen() throws LWJGLException {
         super.updateScreen();
 
         if (!this.mc.thePlayer.isEntityAlive() || this.mc.thePlayer.isDead)

@@ -24,6 +24,7 @@ import net.minecraft.world.storage.WorldInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.LWJGLException;
 
 public class AnvilSaveConverter extends SaveFormatOld
 {
@@ -116,8 +117,7 @@ public class AnvilSaveConverter extends SaveFormatOld
     /**
      * converts the map to mcRegion
      */
-    public boolean convertMapFormat(String filename, IProgressUpdate progressCallback)
-    {
+    public boolean convertMapFormat(String filename, IProgressUpdate progressCallback) throws LWJGLException {
         progressCallback.setLoadingProgress(0);
         List<File> list = Lists.<File>newArrayList();
         List<File> list1 = Lists.<File>newArrayList();
@@ -199,8 +199,7 @@ public class AnvilSaveConverter extends SaveFormatOld
         }
     }
 
-    private void convertFile(File p_75813_1_, Iterable<File> p_75813_2_, WorldChunkManager p_75813_3_, int p_75813_4_, int p_75813_5_, IProgressUpdate p_75813_6_)
-    {
+    private void convertFile(File p_75813_1_, Iterable<File> p_75813_2_, WorldChunkManager p_75813_3_, int p_75813_4_, int p_75813_5_, IProgressUpdate p_75813_6_) throws LWJGLException {
         for (File file1 : p_75813_2_)
         {
             this.convertChunks(p_75813_1_, file1, p_75813_3_, p_75813_4_, p_75813_5_, p_75813_6_);
@@ -265,6 +264,8 @@ public class AnvilSaveConverter extends SaveFormatOld
         catch (IOException ioexception)
         {
             ioexception.printStackTrace();
+        } catch (LWJGLException e) {
+            throw new RuntimeException(e);
         }
     }
 

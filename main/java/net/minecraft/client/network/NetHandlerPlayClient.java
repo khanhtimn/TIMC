@@ -213,7 +213,7 @@ import net.minecraft.world.storage.MapData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.teamti.timc.main.TIMC;
-
+import org.lwjgl.LWJGLException;
 
 
 public class NetHandlerPlayClient implements INetHandlerPlayClient
@@ -278,8 +278,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
      * Registers some server properties (gametype,hardcore-mode,terraintype,difficulty,player limit), creates a new
      * WorldClient and sets the player initial dimension
      */
-    public void handleJoinGame(S01PacketJoinGame packetIn)
-    {
+    public void handleJoinGame(S01PacketJoinGame packetIn) throws LWJGLException {
         PacketThreadUtil.checkThreadAndEnqueue(packetIn, this, this.gameController);
         this.gameController.playerController = new PlayerControllerMP(this.gameController, this);
         this.clientWorldController = new WorldClient(this, new WorldSettings(0L, packetIn.getGameType(), false, packetIn.isHardcoreMode(), packetIn.getWorldType()), packetIn.getDimension(), packetIn.getDifficulty(), this.gameController.mcProfiler);
@@ -794,8 +793,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
     /**
      * Invoked when disconnecting, the parameter is a ChatComponent describing the reason for termination
      */
-    public void onDisconnect(IChatComponent reason)
-    {
+    public void onDisconnect(IChatComponent reason) throws LWJGLException {
         this.gameController.loadWorld((WorldClient)null);
 
         if (this.guiScreenServer != null)
@@ -1058,8 +1056,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
         this.gameController.thePlayer.setXPStats(packetIn.func_149397_c(), packetIn.getTotalExperience(), packetIn.getLevel());
     }
 
-    public void handleRespawn(S07PacketRespawn packetIn)
-    {
+    public void handleRespawn(S07PacketRespawn packetIn) throws LWJGLException {
         PacketThreadUtil.checkThreadAndEnqueue(packetIn, this, this.gameController);
 
         if (packetIn.getDimensionID() != this.gameController.thePlayer.dimension)

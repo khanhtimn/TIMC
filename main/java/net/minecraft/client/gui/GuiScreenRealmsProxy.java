@@ -7,6 +7,7 @@ import java.util.List;
 import net.minecraft.item.ItemStack;
 import net.minecraft.realms.RealmsButton;
 import net.minecraft.realms.RealmsScreen;
+import org.lwjgl.LWJGLException;
 
 public class GuiScreenRealmsProxy extends GuiScreen
 {
@@ -122,8 +123,7 @@ public class GuiScreenRealmsProxy extends GuiScreen
     /**
      * Called from the main game loop to update the screen.
      */
-    public void updateScreen()
-    {
+    public void updateScreen() throws LWJGLException {
         this.field_154330_a.tick();
         super.updateScreen();
     }
@@ -186,8 +186,7 @@ public class GuiScreenRealmsProxy extends GuiScreen
     /**
      * Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
      */
-    public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
-    {
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException, LWJGLException {
         this.field_154330_a.mouseClicked(mouseX, mouseY, mouseButton);
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
@@ -195,8 +194,7 @@ public class GuiScreenRealmsProxy extends GuiScreen
     /**
      * Handles mouse input.
      */
-    public void handleMouseInput() throws IOException
-    {
+    public void handleMouseInput() throws IOException, LWJGLException {
         this.field_154330_a.mouseEvent();
         super.handleMouseInput();
     }
@@ -204,8 +202,7 @@ public class GuiScreenRealmsProxy extends GuiScreen
     /**
      * Handles keyboard input.
      */
-    public void handleKeyboardInput() throws IOException
-    {
+    public void handleKeyboardInput() throws IOException, LWJGLException {
         this.field_154330_a.keyboardEvent();
         super.handleKeyboardInput();
     }

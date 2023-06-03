@@ -27,6 +27,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.LWJGLException;
 
 public class HttpUtil
 {
@@ -148,7 +149,11 @@ public class HttpUtil
                 if (p_180192_4_ != null)
                 {
                     p_180192_4_.resetProgressAndMessage("Downloading Resource Pack");
-                    p_180192_4_.displayLoadingString("Making Request...");
+                    try {
+                        p_180192_4_.displayLoadingString("Making Request...");
+                    } catch (LWJGLException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
 
                 try

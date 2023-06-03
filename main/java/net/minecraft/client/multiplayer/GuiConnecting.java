@@ -18,6 +18,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.LWJGLException;
 
 public class GuiConnecting extends GuiScreen
 {
@@ -27,8 +28,7 @@ public class GuiConnecting extends GuiScreen
     private boolean cancel;
     private final GuiScreen previousGuiScreen;
 
-    public GuiConnecting(GuiScreen p_i1181_1_, Minecraft mcIn, ServerData p_i1181_3_)
-    {
+    public GuiConnecting(GuiScreen p_i1181_1_, Minecraft mcIn, ServerData p_i1181_3_) throws LWJGLException {
         this.mc = mcIn;
         this.previousGuiScreen = p_i1181_1_;
         ServerAddress serveraddress = ServerAddress.fromString(p_i1181_3_.serverIP);
@@ -37,8 +37,7 @@ public class GuiConnecting extends GuiScreen
         this.connect(serveraddress.getIP(), serveraddress.getPort());
     }
 
-    public GuiConnecting(GuiScreen p_i1182_1_, Minecraft mcIn, String hostName, int port)
-    {
+    public GuiConnecting(GuiScreen p_i1182_1_, Minecraft mcIn, String hostName, int port) throws LWJGLException {
         this.mc = mcIn;
         this.previousGuiScreen = p_i1182_1_;
         mcIn.loadWorld((WorldClient)null);
@@ -102,8 +101,7 @@ public class GuiConnecting extends GuiScreen
     /**
      * Called from the main game loop to update the screen.
      */
-    public void updateScreen()
-    {
+    public void updateScreen() throws LWJGLException {
         if (this.networkManager != null)
         {
             if (this.networkManager.isChannelOpen())

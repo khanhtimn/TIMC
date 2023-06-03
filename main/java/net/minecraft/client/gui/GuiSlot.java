@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.MathHelper;
+import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Mouse;
 
 public abstract class GuiSlot
@@ -108,7 +109,7 @@ public abstract class GuiSlot
     /**
      * The element in the slot that was clicked, boolean for whether it was double clicked or not
      */
-    protected abstract void elementClicked(int slotIndex, boolean isDoubleClick, int mouseX, int mouseY);
+    protected abstract void elementClicked(int slotIndex, boolean isDoubleClick, int mouseX, int mouseY) throws LWJGLException;
 
     /**
      * Returns true if the element passed in is currently selected
@@ -305,8 +306,7 @@ public abstract class GuiSlot
         }
     }
 
-    public void handleMouseInput()
-    {
+    public void handleMouseInput() throws LWJGLException {
         if (this.isMouseYWithinSlotBounds(this.mouseY))
         {
             if (Mouse.getEventButton() == 0 && Mouse.getEventButtonState() && this.mouseY >= this.top && this.mouseY <= this.bottom)

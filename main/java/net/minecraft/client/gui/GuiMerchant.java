@@ -20,6 +20,7 @@ import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.LWJGLException;
 
 public class GuiMerchant extends GuiContainer
 {
@@ -80,8 +81,7 @@ public class GuiMerchant extends GuiContainer
     /**
      * Called from the main game loop to update the screen.
      */
-    public void updateScreen()
-    {
+    public void updateScreen() throws LWJGLException {
         super.updateScreen();
         MerchantRecipeList merchantrecipelist = this.merchant.getRecipes(this.mc.thePlayer);
 
