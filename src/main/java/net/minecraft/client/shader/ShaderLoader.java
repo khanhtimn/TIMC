@@ -3,7 +3,6 @@ package net.minecraft.client.shader;
 import com.google.common.collect.Maps;
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -20,6 +19,7 @@ public class ShaderLoader
     private final String shaderFilename;
     private int shader;
     private int shaderAttachCount = 0;
+    
 
     private ShaderLoader(ShaderLoader.ShaderType type, int shaderId, String filename)
     {
@@ -52,62 +52,64 @@ public class ShaderLoader
 
     public static ShaderLoader loadShader(IResourceManager resourceManager, ShaderLoader.ShaderType type, String filename) throws IOException
     {
-        ShaderLoader shaderloader = (ShaderLoader)type.getLoadedShaders().get(filename);
+        ShaderLoader var3 = (ShaderLoader)type.getLoadedShaders().get(filename);
 
-        if (shaderloader == null)
+        if (var3 == null)
         {
-            ResourceLocation resourcelocation = new ResourceLocation("shaders/program/" + filename + type.getShaderExtension());
-            BufferedInputStream bufferedinputstream = new BufferedInputStream(resourceManager.getResource(resourcelocation).getInputStream());
-            byte[] abyte = toByteArray(bufferedinputstream);
-            ByteBuffer bytebuffer = BufferUtils.createByteBuffer(abyte.length);
-            bytebuffer.put(abyte);
-            bytebuffer.position(0);
-            int i = OpenGlHelper.glCreateShader(type.getShaderMode());
-            OpenGlHelper.glShaderSource(i, bytebuffer);
-            OpenGlHelper.glCompileShader(i);
+            ResourceLocation var4 = new ResourceLocation("shaders/program/" + filename + type.getShaderExtension());
+            BufferedInputStream var5 = new BufferedInputStream(resourceManager.getResource(var4).getInputStream());
+            byte[] var6 = func_177064_a(var5);
+            ByteBuffer var7 = BufferUtils.createByteBuffer(var6.length);
+            var7.put(var6);
+            var7.position(0);
+            int var8 = OpenGlHelper.glCreateShader(type.getShaderMode());
+            OpenGlHelper.glShaderSource(var8, var7);
+            OpenGlHelper.glCompileShader(var8);
 
-            if (OpenGlHelper.glGetShaderi(i, OpenGlHelper.GL_COMPILE_STATUS) == 0)
+            if (OpenGlHelper.glGetShaderi(var8, OpenGlHelper.GL_COMPILE_STATUS) == 0)
             {
-                String s = StringUtils.trim(OpenGlHelper.glGetShaderInfoLog(i, 32768));
-                JsonException jsonexception = new JsonException("Couldn\'t compile " + type.getShaderName() + " program: " + s);
-                jsonexception.func_151381_b(resourcelocation.getResourcePath());
-                throw jsonexception;
+                String var9 = StringUtils.trim(OpenGlHelper.glGetShaderInfoLog(var8, 32768));
+                JsonException var10 = new JsonException("Couldn\'t compile " + type.getShaderName() + " program: " + var9);
+                var10.func_151381_b(var4.getResourcePath());
+                throw var10;
             }
 
-            shaderloader = new ShaderLoader(type, i, filename);
-            type.getLoadedShaders().put(filename, shaderloader);
+            var3 = new ShaderLoader(type, var8, filename);
+            type.getLoadedShaders().put(filename, var3);
         }
 
-        return shaderloader;
+        return var3;
     }
 
-    protected static byte[] toByteArray(BufferedInputStream p_177064_0_) throws IOException
+    protected static byte[] func_177064_a(BufferedInputStream p_177064_0_) throws IOException
     {
-        byte[] abyte;
+        byte[] var1;
 
         try
         {
-            abyte = IOUtils.toByteArray((InputStream)p_177064_0_);
+            var1 = IOUtils.toByteArray(p_177064_0_);
         }
         finally
         {
             p_177064_0_.close();
         }
 
-        return abyte;
+        return var1;
     }
 
     public static enum ShaderType
     {
-        VERTEX("vertex", ".vsh", OpenGlHelper.GL_VERTEX_SHADER),
-        FRAGMENT("fragment", ".fsh", OpenGlHelper.GL_FRAGMENT_SHADER);
-
+        VERTEX("VERTEX", 0, "vertex", ".vsh", OpenGlHelper.GL_VERTEX_SHADER),
+        FRAGMENT("FRAGMENT", 1, "fragment", ".fsh", OpenGlHelper.GL_FRAGMENT_SHADER);
         private final String shaderName;
         private final String shaderExtension;
         private final int shaderMode;
-        private final Map<String, ShaderLoader> loadedShaders = Maps.<String, ShaderLoader>newHashMap();
+        private final Map loadedShaders = Maps.newHashMap();
 
-        private ShaderType(String p_i45090_3_, String p_i45090_4_, int p_i45090_5_)
+        private static final ShaderLoader.ShaderType[] $VALUES = new ShaderLoader.ShaderType[]{VERTEX, FRAGMENT};
+        
+
+        private ShaderType(String p_i45090_1_, int p_i45090_2_, String p_i45090_3_, String p_i45090_4_, int p_i45090_5_)
         {
             this.shaderName = p_i45090_3_;
             this.shaderExtension = p_i45090_4_;
@@ -129,7 +131,7 @@ public class ShaderLoader
             return this.shaderMode;
         }
 
-        protected Map<String, ShaderLoader> getLoadedShaders()
+        protected Map getLoadedShaders()
         {
             return this.loadedShaders;
         }

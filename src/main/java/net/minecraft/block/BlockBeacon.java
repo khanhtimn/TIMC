@@ -1,6 +1,5 @@
 package net.minecraft.block;
 
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -8,7 +7,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityBeacon;
 import net.minecraft.util.BlockPos;
@@ -21,9 +19,11 @@ import net.minecraft.world.chunk.Chunk;
 
 public class BlockBeacon extends BlockContainer
 {
+    
+
     public BlockBeacon()
     {
-        super(Material.glass, MapColor.diamondColor);
+        super(Material.glass);
         this.setHardness(3.0F);
         this.setCreativeTab(CreativeTabs.tabMisc);
     }
@@ -44,21 +44,17 @@ public class BlockBeacon extends BlockContainer
         }
         else
         {
-            TileEntity tileentity = worldIn.getTileEntity(pos);
+            TileEntity var9 = worldIn.getTileEntity(pos);
 
-            if (tileentity instanceof TileEntityBeacon)
+            if (var9 instanceof TileEntityBeacon)
             {
-                playerIn.displayGUIChest((TileEntityBeacon)tileentity);
-                playerIn.triggerAchievement(StatList.field_181730_N);
+                playerIn.displayGUIChest((TileEntityBeacon)var9);
             }
 
             return true;
         }
     }
 
-    /**
-     * Used to determine ambient occlusion and culling when rebuilding chunks for render
-     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -70,41 +66,35 @@ public class BlockBeacon extends BlockContainer
     }
 
     /**
-     * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
+     * The type of render function that is called for this block
      */
     public int getRenderType()
     {
         return 3;
     }
 
-    /**
-     * Called by ItemBlocks after a block is set in the world, to allow post-place logic
-     */
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
     {
         super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
 
         if (stack.hasDisplayName())
         {
-            TileEntity tileentity = worldIn.getTileEntity(pos);
+            TileEntity var6 = worldIn.getTileEntity(pos);
 
-            if (tileentity instanceof TileEntityBeacon)
+            if (var6 instanceof TileEntityBeacon)
             {
-                ((TileEntityBeacon)tileentity).setName(stack.getDisplayName());
+                ((TileEntityBeacon)var6).func_145999_a(stack.getDisplayName());
             }
         }
     }
 
-    /**
-     * Called when a neighboring block changes.
-     */
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
     {
-        TileEntity tileentity = worldIn.getTileEntity(pos);
+        TileEntity var5 = worldIn.getTileEntity(pos);
 
-        if (tileentity instanceof TileEntityBeacon)
+        if (var5 instanceof TileEntityBeacon)
         {
-            ((TileEntityBeacon)tileentity).updateBeacon();
+            ((TileEntityBeacon)var5).func_174908_m();
             worldIn.addBlockEvent(pos, this, 1, 0);
         }
     }
@@ -114,37 +104,39 @@ public class BlockBeacon extends BlockContainer
         return EnumWorldBlockLayer.CUTOUT;
     }
 
-    public static void updateColorAsync(final World worldIn, final BlockPos glassPos)
+    public static void func_176450_d(final World worldIn, final BlockPos p_176450_1_)
     {
         HttpUtil.field_180193_a.submit(new Runnable()
         {
+            
             public void run()
             {
-                Chunk chunk = worldIn.getChunkFromBlockCoords(glassPos);
+                Chunk var1 = worldIn.getChunkFromBlockCoords(p_176450_1_);
 
-                for (int i = glassPos.getY() - 1; i >= 0; --i)
+                for (int var2 = p_176450_1_.getY() - 1; var2 >= 0; --var2)
                 {
-                    final BlockPos blockpos = new BlockPos(glassPos.getX(), i, glassPos.getZ());
+                    final BlockPos var3 = new BlockPos(p_176450_1_.getX(), var2, p_176450_1_.getZ());
 
-                    if (!chunk.canSeeSky(blockpos))
+                    if (!var1.canSeeSky(var3))
                     {
                         break;
                     }
 
-                    IBlockState iblockstate = worldIn.getBlockState(blockpos);
+                    IBlockState var4 = worldIn.getBlockState(var3);
 
-                    if (iblockstate.getBlock() == Blocks.beacon)
+                    if (var4.getBlock() == Blocks.beacon)
                     {
                         ((WorldServer)worldIn).addScheduledTask(new Runnable()
                         {
+                            
                             public void run()
                             {
-                                TileEntity tileentity = worldIn.getTileEntity(blockpos);
+                                TileEntity var1 = worldIn.getTileEntity(var3);
 
-                                if (tileentity instanceof TileEntityBeacon)
+                                if (var1 instanceof TileEntityBeacon)
                                 {
-                                    ((TileEntityBeacon)tileentity).updateBeacon();
-                                    worldIn.addBlockEvent(blockpos, Blocks.beacon, 1, 0);
+                                    ((TileEntityBeacon)var1).func_174908_m();
+                                    worldIn.addBlockEvent(var3, Blocks.beacon, 1, 0);
                                 }
                             }
                         });

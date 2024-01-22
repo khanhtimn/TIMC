@@ -7,6 +7,7 @@ public class NibbleArray
      * pieces.
      */
     private final byte[] data;
+    
 
     public NibbleArray()
     {
@@ -46,32 +47,32 @@ public class NibbleArray
 
     public int getFromIndex(int index)
     {
-        int i = this.getNibbleIndex(index);
-        return this.isLowerNibble(index) ? this.data[i] & 15 : this.data[i] >> 4 & 15;
+        int var2 = this.func_177478_c(index);
+        return this.func_177479_b(index) ? this.data[var2] & 15 : this.data[var2] >> 4 & 15;
     }
 
     public void setIndex(int index, int value)
     {
-        int i = this.getNibbleIndex(index);
+        int var3 = this.func_177478_c(index);
 
-        if (this.isLowerNibble(index))
+        if (this.func_177479_b(index))
         {
-            this.data[i] = (byte)(this.data[i] & 240 | value & 15);
+            this.data[var3] = (byte)(this.data[var3] & 240 | value & 15);
         }
         else
         {
-            this.data[i] = (byte)(this.data[i] & 15 | (value & 15) << 4);
+            this.data[var3] = (byte)(this.data[var3] & 15 | (value & 15) << 4);
         }
     }
 
-    private boolean isLowerNibble(int index)
+    private boolean func_177479_b(int p_177479_1_)
     {
-        return (index & 1) == 0;
+        return (p_177479_1_ & 1) == 0;
     }
 
-    private int getNibbleIndex(int index)
+    private int func_177478_c(int p_177478_1_)
     {
-        return index >> 1;
+        return p_177478_1_ >> 1;
     }
 
     public byte[] getData()

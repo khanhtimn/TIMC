@@ -2,8 +2,10 @@ package net.minecraft.client;
 
 public class AnvilConverterException extends Exception
 {
-    public AnvilConverterException(String exceptionMessage)
+    
+
+    public AnvilConverterException(String p_i2160_1_)
     {
-        super(exceptionMessage);
+        super(p_i2160_1_);
     }
 }

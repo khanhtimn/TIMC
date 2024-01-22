@@ -1,6 +1,8 @@
 package net.minecraft.item.crafting;
 
 import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
@@ -10,12 +12,15 @@ public class ShapelessRecipes implements IRecipe
 {
     /** Is the ItemStack that you get when craft the recipe. */
     private final ItemStack recipeOutput;
-    private final List<ItemStack> recipeItems;
 
-    public ShapelessRecipes(ItemStack output, List<ItemStack> inputList)
+    /** Is a List of ItemStack that composes the recipe. */
+    private final List recipeItems;
+    
+
+    public ShapelessRecipes(ItemStack p_i1918_1_, List p_i1918_2_)
     {
-        this.recipeOutput = output;
-        this.recipeItems = inputList;
+        this.recipeOutput = p_i1918_1_;
+        this.recipeItems = p_i1918_2_;
     }
 
     public ItemStack getRecipeOutput()
@@ -23,51 +28,54 @@ public class ShapelessRecipes implements IRecipe
         return this.recipeOutput;
     }
 
-    public ItemStack[] getRemainingItems(InventoryCrafting inv)
+    public ItemStack[] func_179532_b(InventoryCrafting p_179532_1_)
     {
-        ItemStack[] aitemstack = new ItemStack[inv.getSizeInventory()];
+        ItemStack[] var2 = new ItemStack[p_179532_1_.getSizeInventory()];
 
-        for (int i = 0; i < aitemstack.length; ++i)
+        for (int var3 = 0; var3 < var2.length; ++var3)
         {
-            ItemStack itemstack = inv.getStackInSlot(i);
+            ItemStack var4 = p_179532_1_.getStackInSlot(var3);
 
-            if (itemstack != null && itemstack.getItem().hasContainerItem())
+            if (var4 != null && var4.getItem().hasContainerItem())
             {
-                aitemstack[i] = new ItemStack(itemstack.getItem().getContainerItem());
+                var2[var3] = new ItemStack(var4.getItem().getContainerItem());
             }
         }
 
-        return aitemstack;
+        return var2;
     }
 
     /**
      * Used to check if a recipe matches current crafting inventory
      */
-    public boolean matches(InventoryCrafting inv, World worldIn)
+    public boolean matches(InventoryCrafting p_77569_1_, World worldIn)
     {
-        List<ItemStack> list = Lists.newArrayList(this.recipeItems);
+        ArrayList var3 = Lists.newArrayList(this.recipeItems);
 
-        for (int i = 0; i < inv.getHeight(); ++i)
+        for (int var4 = 0; var4 < p_77569_1_.func_174923_h(); ++var4)
         {
-            for (int j = 0; j < inv.getWidth(); ++j)
+            for (int var5 = 0; var5 < p_77569_1_.func_174922_i(); ++var5)
             {
-                ItemStack itemstack = inv.getStackInRowAndColumn(j, i);
+                ItemStack var6 = p_77569_1_.getStackInRowAndColumn(var5, var4);
 
-                if (itemstack != null)
+                if (var6 != null)
                 {
-                    boolean flag = false;
+                    boolean var7 = false;
+                    Iterator var8 = var3.iterator();
 
-                    for (ItemStack itemstack1 : list)
+                    while (var8.hasNext())
                     {
-                        if (itemstack.getItem() == itemstack1.getItem() && (itemstack1.getMetadata() == 32767 || itemstack.getMetadata() == itemstack1.getMetadata()))
+                        ItemStack var9 = (ItemStack)var8.next();
+
+                        if (var6.getItem() == var9.getItem() && (var9.getMetadata() == 32767 || var6.getMetadata() == var9.getMetadata()))
                         {
-                            flag = true;
-                            list.remove(itemstack1);
+                            var7 = true;
+                            var3.remove(var9);
                             break;
                         }
                     }
 
-                    if (!flag)
+                    if (!var7)
                     {
                         return false;
                     }
@@ -75,13 +83,13 @@ public class ShapelessRecipes implements IRecipe
             }
         }
 
-        return list.isEmpty();
+        return var3.isEmpty();
     }
 
     /**
      * Returns an Item that is the result of this recipe
      */
-    public ItemStack getCraftingResult(InventoryCrafting inv)
+    public ItemStack getCraftingResult(InventoryCrafting p_77572_1_)
     {
         return this.recipeOutput.copy();
     }

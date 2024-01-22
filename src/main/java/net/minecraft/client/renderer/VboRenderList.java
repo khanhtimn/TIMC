@@ -1,76 +1,43 @@
 package net.minecraft.client.renderer;
 
+import java.util.Iterator;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.client.renderer.vertex.VertexBuffer;
-import net.minecraft.src.Config;
 import net.minecraft.util.EnumWorldBlockLayer;
-import net.optifine.render.VboRegion;
-import net.optifine.shaders.ShadersRender;
+import optifine.Config;
+
 import org.lwjgl.opengl.GL11;
+import shadersmod.client.ShadersRender;
 
 public class VboRenderList extends ChunkRenderContainer
 {
-    private double viewEntityX;
-    private double viewEntityY;
-    private double viewEntityZ;
 
-    public void renderChunkLayer(EnumWorldBlockLayer layer)
+    public void func_178001_a(EnumWorldBlockLayer p_178001_1_)
     {
-        if (this.initialized)
+        if (this.field_178007_b)
         {
-            if (!Config.isRenderRegions())
+            Iterator var2 = this.field_178009_a.iterator();
+
+            while (var2.hasNext())
             {
-                for (RenderChunk renderchunk1 : this.renderChunks)
-                {
-                    VertexBuffer vertexbuffer1 = renderchunk1.getVertexBufferByLayer(layer.ordinal());
-                    GlStateManager.pushMatrix();
-                    this.preRenderChunk(renderchunk1);
-                    renderchunk1.multModelviewMatrix();
-                    vertexbuffer1.bindBuffer();
-                    this.setupArrayPointers();
-                    vertexbuffer1.drawArrays(7);
-                    GlStateManager.popMatrix();
-                }
-            }
-            else
-            {
-                int i = Integer.MIN_VALUE;
-                int j = Integer.MIN_VALUE;
-                VboRegion vboregion = null;
-
-                for (RenderChunk renderchunk : this.renderChunks)
-                {
-                    VertexBuffer vertexbuffer = renderchunk.getVertexBufferByLayer(layer.ordinal());
-                    VboRegion vboregion1 = vertexbuffer.getVboRegion();
-
-                    if (vboregion1 != vboregion || i != renderchunk.regionX || j != renderchunk.regionZ)
-                    {
-                        if (vboregion != null)
-                        {
-                            this.drawRegion(i, j, vboregion);
-                        }
-
-                        i = renderchunk.regionX;
-                        j = renderchunk.regionZ;
-                        vboregion = vboregion1;
-                    }
-
-                    vertexbuffer.drawArrays(7);
-                }
-
-                if (vboregion != null)
-                {
-                    this.drawRegion(i, j, vboregion);
-                }
+                RenderChunk var3 = (RenderChunk)var2.next();
+                VertexBuffer var4 = var3.func_178565_b(p_178001_1_.ordinal());
+                GlStateManager.pushMatrix();
+                this.func_178003_a(var3);
+                var3.func_178572_f();
+                var4.func_177359_a();
+                this.func_178010_a();
+                var4.func_177358_a(7);
+                GlStateManager.popMatrix();
             }
 
-            OpenGlHelper.glBindBuffer(OpenGlHelper.GL_ARRAY_BUFFER, 0);
-            GlStateManager.resetColor();
-            this.renderChunks.clear();
+            OpenGlHelper.func_176072_g(OpenGlHelper.field_176089_P, 0);
+            GlStateManager.func_179117_G();
+            this.field_178009_a.clear();
         }
     }
 
-    public void setupArrayPointers()
+    private void func_178010_a()
     {
         if (Config.isShaders())
         {
@@ -85,26 +52,5 @@ public class VboRenderList extends ChunkRenderContainer
             GL11.glTexCoordPointer(2, GL11.GL_SHORT, 28, 24L);
             OpenGlHelper.setClientActiveTexture(OpenGlHelper.defaultTexUnit);
         }
-    }
-
-    public void initialize(double viewEntityXIn, double viewEntityYIn, double viewEntityZIn)
-    {
-        this.viewEntityX = viewEntityXIn;
-        this.viewEntityY = viewEntityYIn;
-        this.viewEntityZ = viewEntityZIn;
-        super.initialize(viewEntityXIn, viewEntityYIn, viewEntityZIn);
-    }
-
-    private void drawRegion(int p_drawRegion_1_, int p_drawRegion_2_, VboRegion p_drawRegion_3_)
-    {
-        GlStateManager.pushMatrix();
-        this.preRenderRegion(p_drawRegion_1_, 0, p_drawRegion_2_);
-        p_drawRegion_3_.finishDraw(this);
-        GlStateManager.popMatrix();
-    }
-
-    public void preRenderRegion(int p_preRenderRegion_1_, int p_preRenderRegion_2_, int p_preRenderRegion_3_)
-    {
-        GlStateManager.translate((float)((double)p_preRenderRegion_1_ - this.viewEntityX), (float)((double)p_preRenderRegion_2_ - this.viewEntityY), (float)((double)p_preRenderRegion_3_ - this.viewEntityZ));
     }
 }

@@ -9,6 +9,8 @@ import net.minecraft.world.World;
 
 public class ItemCarrotOnAStick extends Item
 {
+    
+
     public ItemCarrotOnAStick()
     {
         this.setCreativeTab(CreativeTabs.tabTransport);
@@ -40,18 +42,18 @@ public class ItemCarrotOnAStick extends Item
     {
         if (playerIn.isRiding() && playerIn.ridingEntity instanceof EntityPig)
         {
-            EntityPig entitypig = (EntityPig)playerIn.ridingEntity;
+            EntityPig var4 = (EntityPig)playerIn.ridingEntity;
 
-            if (entitypig.getAIControlledByPlayer().isControlledByPlayer() && itemStackIn.getMaxDamage() - itemStackIn.getMetadata() >= 7)
+            if (var4.getAIControlledByPlayer().isControlledByPlayer() && itemStackIn.getMaxDamage() - itemStackIn.getMetadata() >= 7)
             {
-                entitypig.getAIControlledByPlayer().boostSpeed();
+                var4.getAIControlledByPlayer().boostSpeed();
                 itemStackIn.damageItem(7, playerIn);
 
                 if (itemStackIn.stackSize == 0)
                 {
-                    ItemStack itemstack = new ItemStack(Items.fishing_rod);
-                    itemstack.setTagCompound(itemStackIn.getTagCompound());
-                    return itemstack;
+                    ItemStack var5 = new ItemStack(Items.fishing_rod);
+                    var5.setTagCompound(itemStackIn.getTagCompound());
+                    return var5;
                 }
             }
         }

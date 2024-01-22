@@ -10,93 +10,94 @@ import org.apache.logging.log4j.Logger;
 public class MapGenStructureIO
 {
     private static final Logger logger = LogManager.getLogger();
-    private static Map < String, Class <? extends StructureStart >> startNameToClassMap = Maps. < String, Class <? extends StructureStart >> newHashMap();
-    private static Map < Class <? extends StructureStart > , String > startClassToNameMap = Maps. < Class <? extends StructureStart > , String > newHashMap();
-    private static Map < String, Class <? extends StructureComponent >> componentNameToClassMap = Maps. < String, Class <? extends StructureComponent >> newHashMap();
-    private static Map < Class <? extends StructureComponent > , String > componentClassToNameMap = Maps. < Class <? extends StructureComponent > , String > newHashMap();
+    private static Map field_143040_a = Maps.newHashMap();
+    private static Map field_143038_b = Maps.newHashMap();
+    private static Map field_143039_c = Maps.newHashMap();
+    private static Map field_143037_d = Maps.newHashMap();
+    
 
-    private static void registerStructure(Class <? extends StructureStart > startClass, String structureName)
+    private static void registerStructure(Class p_143034_0_, String p_143034_1_)
     {
-        startNameToClassMap.put(structureName, startClass);
-        startClassToNameMap.put(startClass, structureName);
+        field_143040_a.put(p_143034_1_, p_143034_0_);
+        field_143038_b.put(p_143034_0_, p_143034_1_);
     }
 
-    static void registerStructureComponent(Class <? extends StructureComponent > componentClass, String componentName)
+    static void registerStructureComponent(Class p_143031_0_, String p_143031_1_)
     {
-        componentNameToClassMap.put(componentName, componentClass);
-        componentClassToNameMap.put(componentClass, componentName);
+        field_143039_c.put(p_143031_1_, p_143031_0_);
+        field_143037_d.put(p_143031_0_, p_143031_1_);
     }
 
-    public static String getStructureStartName(StructureStart start)
+    public static String func_143033_a(StructureStart p_143033_0_)
     {
-        return (String)startClassToNameMap.get(start.getClass());
+        return (String)field_143038_b.get(p_143033_0_.getClass());
     }
 
-    public static String getStructureComponentName(StructureComponent component)
+    public static String func_143036_a(StructureComponent p_143036_0_)
     {
-        return (String)componentClassToNameMap.get(component.getClass());
+        return (String)field_143037_d.get(p_143036_0_.getClass());
     }
 
-    public static StructureStart getStructureStart(NBTTagCompound tagCompound, World worldIn)
+    public static StructureStart func_143035_a(NBTTagCompound p_143035_0_, World worldIn)
     {
-        StructureStart structurestart = null;
+        StructureStart var2 = null;
 
         try
         {
-            Class <? extends StructureStart > oclass = (Class)startNameToClassMap.get(tagCompound.getString("id"));
+            Class var3 = (Class)field_143040_a.get(p_143035_0_.getString("id"));
 
-            if (oclass != null)
+            if (var3 != null)
             {
-                structurestart = (StructureStart)oclass.newInstance();
+                var2 = (StructureStart)var3.newInstance();
             }
         }
-        catch (Exception exception)
+        catch (Exception var4)
         {
-            logger.warn("Failed Start with id " + tagCompound.getString("id"));
-            exception.printStackTrace();
+            logger.warn("Failed Start with id " + p_143035_0_.getString("id"));
+            var4.printStackTrace();
         }
 
-        if (structurestart != null)
+        if (var2 != null)
         {
-            structurestart.readStructureComponentsFromNBT(worldIn, tagCompound);
+            var2.func_143020_a(worldIn, p_143035_0_);
         }
         else
         {
-            logger.warn("Skipping Structure with id " + tagCompound.getString("id"));
+            logger.warn("Skipping Structure with id " + p_143035_0_.getString("id"));
         }
 
-        return structurestart;
+        return var2;
     }
 
-    public static StructureComponent getStructureComponent(NBTTagCompound tagCompound, World worldIn)
+    public static StructureComponent func_143032_b(NBTTagCompound p_143032_0_, World worldIn)
     {
-        StructureComponent structurecomponent = null;
+        StructureComponent var2 = null;
 
         try
         {
-            Class <? extends StructureComponent > oclass = (Class)componentNameToClassMap.get(tagCompound.getString("id"));
+            Class var3 = (Class)field_143039_c.get(p_143032_0_.getString("id"));
 
-            if (oclass != null)
+            if (var3 != null)
             {
-                structurecomponent = (StructureComponent)oclass.newInstance();
+                var2 = (StructureComponent)var3.newInstance();
             }
         }
-        catch (Exception exception)
+        catch (Exception var4)
         {
-            logger.warn("Failed Piece with id " + tagCompound.getString("id"));
-            exception.printStackTrace();
+            logger.warn("Failed Piece with id " + p_143032_0_.getString("id"));
+            var4.printStackTrace();
         }
 
-        if (structurecomponent != null)
+        if (var2 != null)
         {
-            structurecomponent.readStructureBaseNBT(worldIn, tagCompound);
+            var2.func_143009_a(worldIn, p_143032_0_);
         }
         else
         {
-            logger.warn("Skipping Piece with id " + tagCompound.getString("id"));
+            logger.warn("Skipping Piece with id " + p_143032_0_.getString("id"));
         }
 
-        return structurecomponent;
+        return var2;
     }
 
     static
@@ -112,6 +113,6 @@ public class MapGenStructureIO
         StructureNetherBridgePieces.registerNetherFortressPieces();
         StructureStrongholdPieces.registerStrongholdPieces();
         ComponentScatteredFeaturePieces.registerScatteredFeaturePieces();
-        StructureOceanMonumentPieces.registerOceanMonumentPieces();
+        StructureOceanMonumentPieces.func_175970_a();
     }
 }

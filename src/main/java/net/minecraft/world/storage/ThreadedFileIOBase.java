@@ -8,22 +8,20 @@ public class ThreadedFileIOBase implements Runnable
 {
     /** Instance of ThreadedFileIOBase */
     private static final ThreadedFileIOBase threadedIOInstance = new ThreadedFileIOBase();
-    private List<IThreadedFileIO> threadedIOQueue = Collections.<IThreadedFileIO>synchronizedList(Lists.<IThreadedFileIO>newArrayList());
+    private List threadedIOQueue = Collections.synchronizedList(Lists.newArrayList());
     private volatile long writeQueuedCounter;
     private volatile long savedIOCounter;
     private volatile boolean isThreadWaiting;
+    
 
     private ThreadedFileIOBase()
     {
-        Thread thread = new Thread(this, "File IO Thread");
-        thread.setPriority(1);
-        thread.start();
+        Thread var1 = new Thread(this, "File IO Thread");
+        var1.setPriority(1);
+        var1.start();
     }
 
-    /**
-     * Retrieves an instance of the threadedFileIOBase.
-     */
-    public static ThreadedFileIOBase getThreadedIOInstance()
+    public static ThreadedFileIOBase func_178779_a()
     {
         return threadedIOInstance;
     }
@@ -41,14 +39,14 @@ public class ThreadedFileIOBase implements Runnable
      */
     private void processQueue()
     {
-        for (int i = 0; i < this.threadedIOQueue.size(); ++i)
+        for (int var1 = 0; var1 < this.threadedIOQueue.size(); ++var1)
         {
-            IThreadedFileIO ithreadedfileio = (IThreadedFileIO)this.threadedIOQueue.get(i);
-            boolean flag = ithreadedfileio.writeNextIO();
+            IThreadedFileIO var2 = (IThreadedFileIO)this.threadedIOQueue.get(var1);
+            boolean var3 = var2.writeNextIO();
 
-            if (!flag)
+            if (!var3)
             {
-                this.threadedIOQueue.remove(i--);
+                this.threadedIOQueue.remove(var1--);
                 ++this.savedIOCounter;
             }
 
@@ -56,9 +54,9 @@ public class ThreadedFileIOBase implements Runnable
             {
                 Thread.sleep(this.isThreadWaiting ? 0L : 10L);
             }
-            catch (InterruptedException interruptedexception1)
+            catch (InterruptedException var6)
             {
-                interruptedexception1.printStackTrace();
+                var6.printStackTrace();
             }
         }
 
@@ -68,9 +66,9 @@ public class ThreadedFileIOBase implements Runnable
             {
                 Thread.sleep(25L);
             }
-            catch (InterruptedException interruptedexception)
+            catch (InterruptedException var5)
             {
-                interruptedexception.printStackTrace();
+                var5.printStackTrace();
             }
         }
     }

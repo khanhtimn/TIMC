@@ -9,15 +9,16 @@ public class RealmsButton
 {
     protected static final ResourceLocation WIDGETS_LOCATION = new ResourceLocation("textures/gui/widgets.png");
     private GuiButtonRealmsProxy proxy;
+    
 
-    public RealmsButton(int buttonId, int x, int y, String text)
+    public RealmsButton(int p_i1177_1_, int p_i1177_2_, int p_i1177_3_, String p_i1177_4_)
     {
-        this.proxy = new GuiButtonRealmsProxy(this, buttonId, x, y, text);
+        this.proxy = new GuiButtonRealmsProxy(this, p_i1177_1_, p_i1177_2_, p_i1177_3_, p_i1177_4_);
     }
 
-    public RealmsButton(int buttonId, int x, int y, int widthIn, int heightIn, String text)
+    public RealmsButton(int p_i1178_1_, int p_i1178_2_, int p_i1178_3_, int p_i1178_4_, int p_i1178_5_, String p_i1178_6_)
     {
-        this.proxy = new GuiButtonRealmsProxy(this, buttonId, x, y, text, widthIn, heightIn);
+        this.proxy = new GuiButtonRealmsProxy(this, p_i1178_1_, p_i1178_2_, p_i1178_3_, p_i1178_6_, p_i1178_4_, p_i1178_5_);
     }
 
     public GuiButton getProxy()
@@ -52,7 +53,7 @@ public class RealmsButton
 
     public int getHeight()
     {
-        return this.proxy.getHeight();
+        return this.proxy.func_175232_g();
     }
 
     public int y()
@@ -65,22 +66,16 @@ public class RealmsButton
         this.proxy.drawButton(Minecraft.getMinecraft(), p_render_1_, p_render_2_);
     }
 
-    public void clicked(int p_clicked_1_, int p_clicked_2_)
-    {
-    }
+    public void clicked(int p_clicked_1_, int p_clicked_2_) {}
 
-    public void released(int p_released_1_, int p_released_2_)
-    {
-    }
+    public void released(int p_released_1_, int p_released_2_) {}
 
     public void blit(int p_blit_1_, int p_blit_2_, int p_blit_3_, int p_blit_4_, int p_blit_5_, int p_blit_6_)
     {
         this.proxy.drawTexturedModalRect(p_blit_1_, p_blit_2_, p_blit_3_, p_blit_4_, p_blit_5_, p_blit_6_);
     }
 
-    public void renderBg(int p_renderBg_1_, int p_renderBg_2_)
-    {
-    }
+    public void renderBg(int p_renderBg_1_, int p_renderBg_2_) {}
 
     public int getYImage(boolean p_getYImage_1_)
     {

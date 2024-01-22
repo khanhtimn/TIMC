@@ -12,9 +12,8 @@ import net.minecraft.world.World;
 
 public class CommandExecuteAt extends CommandBase
 {
-    /**
-     * Gets the name of the command
-     */
+    
+
     public String getCommandName()
     {
         return "execute";
@@ -28,17 +27,11 @@ public class CommandExecuteAt extends CommandBase
         return 2;
     }
 
-    /**
-     * Gets the usage string for the command.
-     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.execute.usage";
     }
 
-    /**
-     * Callback when the command is invoked
-     */
     public void processCommand(final ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 5)
@@ -47,98 +40,99 @@ public class CommandExecuteAt extends CommandBase
         }
         else
         {
-            final Entity entity = getEntity(sender, args[0], Entity.class);
-            final double d0 = parseDouble(entity.posX, args[1], false);
-            final double d1 = parseDouble(entity.posY, args[2], false);
-            final double d2 = parseDouble(entity.posZ, args[3], false);
-            final BlockPos blockpos = new BlockPos(d0, d1, d2);
-            int i = 4;
+            final Entity var3 = func_175759_a(sender, args[0], Entity.class);
+            final double var4 = func_175761_b(var3.posX, args[1], false);
+            final double var6 = func_175761_b(var3.posY, args[2], false);
+            final double var8 = func_175761_b(var3.posZ, args[3], false);
+            final BlockPos var10 = new BlockPos(var4, var6, var8);
+            byte var11 = 4;
 
             if ("detect".equals(args[4]) && args.length > 10)
             {
-                World world = entity.getEntityWorld();
-                double d3 = parseDouble(d0, args[5], false);
-                double d4 = parseDouble(d1, args[6], false);
-                double d5 = parseDouble(d2, args[7], false);
-                Block block = getBlockByText(sender, args[8]);
-                int k = parseInt(args[9], -1, 15);
-                BlockPos blockpos1 = new BlockPos(d3, d4, d5);
-                IBlockState iblockstate = world.getBlockState(blockpos1);
+                World var12 = sender.getEntityWorld();
+                double var13 = func_175761_b(var4, args[5], false);
+                double var15 = func_175761_b(var6, args[6], false);
+                double var17 = func_175761_b(var8, args[7], false);
+                Block var19 = getBlockByText(sender, args[8]);
+                int var20 = parseInt(args[9], -1, 15);
+                BlockPos var21 = new BlockPos(var13, var15, var17);
+                IBlockState var22 = var12.getBlockState(var21);
 
-                if (iblockstate.getBlock() != block || k >= 0 && iblockstate.getBlock().getMetaFromState(iblockstate) != k)
+                if (var22.getBlock() != var19 || var20 >= 0 && var22.getBlock().getMetaFromState(var22) != var20)
                 {
-                    throw new CommandException("commands.execute.failed", new Object[] {"detect", entity.getName()});
+                    throw new CommandException("commands.execute.failed", new Object[] {"detect", var3.getName()});
                 }
 
-                i = 10;
+                var11 = 10;
             }
 
-            String s = buildString(args, i);
-            ICommandSender icommandsender = new ICommandSender()
+            String var24 = func_180529_a(args, var11);
+            ICommandSender var14 = new ICommandSender()
             {
+                
                 public String getName()
                 {
-                    return entity.getName();
+                    return var3.getName();
                 }
                 public IChatComponent getDisplayName()
                 {
-                    return entity.getDisplayName();
+                    return var3.getDisplayName();
                 }
-                public void addChatMessage(IChatComponent component)
+                public void addChatMessage(IChatComponent message)
                 {
-                    sender.addChatMessage(component);
+                    sender.addChatMessage(message);
                 }
-                public boolean canCommandSenderUseCommand(int permLevel, String commandName)
+                public boolean canCommandSenderUseCommand(int permissionLevel, String command)
                 {
-                    return sender.canCommandSenderUseCommand(permLevel, commandName);
+                    return sender.canCommandSenderUseCommand(permissionLevel, command);
                 }
                 public BlockPos getPosition()
                 {
-                    return blockpos;
+                    return var10;
                 }
                 public Vec3 getPositionVector()
                 {
-                    return new Vec3(d0, d1, d2);
+                    return new Vec3(var4, var6, var8);
                 }
                 public World getEntityWorld()
                 {
-                    return entity.worldObj;
+                    return var3.worldObj;
                 }
                 public Entity getCommandSenderEntity()
                 {
-                    return entity;
+                    return var3;
                 }
                 public boolean sendCommandFeedback()
                 {
-                    MinecraftServer minecraftserver = MinecraftServer.getServer();
-                    return minecraftserver == null || minecraftserver.worldServers[0].getGameRules().getBoolean("commandBlockOutput");
+                    MinecraftServer var1 = MinecraftServer.getServer();
+                    return var1 == null || var1.worldServers[0].getGameRules().getGameRuleBooleanValue("commandBlockOutput");
                 }
-                public void setCommandStat(CommandResultStats.Type type, int amount)
+                public void func_174794_a(CommandResultStats.Type p_174794_1_, int p_174794_2_)
                 {
-                    entity.setCommandStat(type, amount);
+                    var3.func_174794_a(p_174794_1_, p_174794_2_);
                 }
             };
-            ICommandManager icommandmanager = MinecraftServer.getServer().getCommandManager();
+            ICommandManager var25 = MinecraftServer.getServer().getCommandManager();
 
             try
             {
-                int j = icommandmanager.executeCommand(icommandsender, s);
+                int var16 = var25.executeCommand(var14, var24);
 
-                if (j < 1)
+                if (var16 < 1)
                 {
-                    throw new CommandException("commands.execute.allInvocationsFailed", new Object[] {s});
+                    throw new CommandException("commands.execute.allInvocationsFailed", new Object[] {var24});
                 }
             }
             catch (Throwable var23)
             {
-                throw new CommandException("commands.execute.failed", new Object[] {s, entity.getName()});
+                throw new CommandException("commands.execute.failed", new Object[] {var24, var3.getName()});
             }
         }
     }
 
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
-        return args.length == 1 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : (args.length > 1 && args.length <= 4 ? func_175771_a(args, 1, pos) : (args.length > 5 && args.length <= 8 && "detect".equals(args[4]) ? func_175771_a(args, 5, pos) : (args.length == 9 && "detect".equals(args[4]) ? getListOfStringsMatchingLastWord(args, Block.blockRegistry.getKeys()) : null)));
+        return args.length == 1 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : (args.length > 1 && args.length <= 4 ? func_175771_a(args, 1, pos) : (args.length > 5 && args.length <= 8 && "detect".equals(args[4]) ? func_175771_a(args, 5, pos) : (args.length == 9 && "detect".equals(args[4]) ? func_175762_a(args, Block.blockRegistry.getKeys()) : null)));
     }
 
     /**

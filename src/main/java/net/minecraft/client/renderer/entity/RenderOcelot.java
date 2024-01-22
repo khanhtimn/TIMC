@@ -2,27 +2,30 @@ package net.minecraft.client.renderer.entity;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityOcelot;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderOcelot extends RenderLiving<EntityOcelot>
+public class RenderOcelot extends RenderLiving
 {
     private static final ResourceLocation blackOcelotTextures = new ResourceLocation("textures/entity/cat/black.png");
     private static final ResourceLocation ocelotTextures = new ResourceLocation("textures/entity/cat/ocelot.png");
     private static final ResourceLocation redOcelotTextures = new ResourceLocation("textures/entity/cat/red.png");
     private static final ResourceLocation siameseOcelotTextures = new ResourceLocation("textures/entity/cat/siamese.png");
+    
 
-    public RenderOcelot(RenderManager renderManagerIn, ModelBase modelBaseIn, float shadowSizeIn)
+    public RenderOcelot(RenderManager p_i46151_1_, ModelBase p_i46151_2_, float p_i46151_3_)
     {
-        super(renderManagerIn, modelBaseIn, shadowSizeIn);
+        super(p_i46151_1_, p_i46151_2_, p_i46151_3_);
     }
 
     /**
      * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
      */
-    protected ResourceLocation getEntityTexture(EntityOcelot entity)
+    protected ResourceLocation getEntityTexture(EntityOcelot p_110775_1_)
     {
-        switch (entity.getTameSkin())
+        switch (p_110775_1_.getTameSkin())
         {
             case 0:
             default:
@@ -43,13 +46,30 @@ public class RenderOcelot extends RenderLiving<EntityOcelot>
      * Allows the render to do any OpenGL state modifications necessary before the model is rendered. Args:
      * entityLiving, partialTickTime
      */
-    protected void preRenderCallback(EntityOcelot entitylivingbaseIn, float partialTickTime)
+    protected void preRenderCallback(EntityOcelot p_77041_1_, float p_77041_2_)
     {
-        super.preRenderCallback(entitylivingbaseIn, partialTickTime);
+        super.preRenderCallback(p_77041_1_, p_77041_2_);
 
-        if (entitylivingbaseIn.isTamed())
+        if (p_77041_1_.isTamed())
         {
             GlStateManager.scale(0.8F, 0.8F, 0.8F);
         }
+    }
+
+    /**
+     * Allows the render to do any OpenGL state modifications necessary before the model is rendered. Args:
+     * entityLiving, partialTickTime
+     */
+    protected void preRenderCallback(EntityLivingBase p_77041_1_, float p_77041_2_)
+    {
+        this.preRenderCallback((EntityOcelot)p_77041_1_, p_77041_2_);
+    }
+
+    /**
+     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
+     */
+    protected ResourceLocation getEntityTexture(Entity p_110775_1_)
+    {
+        return this.getEntityTexture((EntityOcelot)p_110775_1_);
     }
 }

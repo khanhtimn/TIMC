@@ -5,21 +5,23 @@ import com.mojang.authlib.GameProfile;
 import java.util.Date;
 import java.util.UUID;
 
-public class UserListBansEntry extends BanEntry<GameProfile>
+public class UserListBansEntry extends BanEntry
 {
-    public UserListBansEntry(GameProfile profile)
+    
+
+    public UserListBansEntry(GameProfile p_i1134_1_)
     {
-        this(profile, (Date)null, (String)null, (Date)null, (String)null);
+        this(p_i1134_1_, (Date)null, (String)null, (Date)null, (String)null);
     }
 
-    public UserListBansEntry(GameProfile profile, Date startDate, String banner, Date endDate, String banReason)
+    public UserListBansEntry(GameProfile p_i1135_1_, Date p_i1135_2_, String p_i1135_3_, Date p_i1135_4_, String p_i1135_5_)
     {
-        super(profile, endDate, banner, endDate, banReason);
+        super(p_i1135_1_, p_i1135_4_, p_i1135_3_, p_i1135_4_, p_i1135_5_);
     }
 
-    public UserListBansEntry(JsonObject json)
+    public UserListBansEntry(JsonObject p_i1136_1_)
     {
-        super(toGameProfile(json), json);
+        super(func_152648_b(p_i1136_1_), p_i1136_1_);
     }
 
     protected void onSerialization(JsonObject data)
@@ -32,27 +34,23 @@ public class UserListBansEntry extends BanEntry<GameProfile>
         }
     }
 
-    /**
-     * Convert a {@linkplain com.google.gson.JsonObject JsonObject} into a {@linkplain com.mojang.authlib.GameProfile}.
-     * The json object must have {@code uuid} and {@code name} attributes or {@code null} will be returned.
-     */
-    private static GameProfile toGameProfile(JsonObject json)
+    private static GameProfile func_152648_b(JsonObject p_152648_0_)
     {
-        if (json.has("uuid") && json.has("name"))
+        if (p_152648_0_.has("uuid") && p_152648_0_.has("name"))
         {
-            String s = json.get("uuid").getAsString();
-            UUID uuid;
+            String var1 = p_152648_0_.get("uuid").getAsString();
+            UUID var2;
 
             try
             {
-                uuid = UUID.fromString(s);
+                var2 = UUID.fromString(var1);
             }
             catch (Throwable var4)
             {
                 return null;
             }
 
-            return new GameProfile(uuid, json.get("name").getAsString());
+            return new GameProfile(var2, p_152648_0_.get("name").getAsString());
         }
         else
         {

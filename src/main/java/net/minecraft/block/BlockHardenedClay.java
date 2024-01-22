@@ -7,6 +7,8 @@ import net.minecraft.creativetab.CreativeTabs;
 
 public class BlockHardenedClay extends Block
 {
+    
+
     public BlockHardenedClay()
     {
         super(Material.rock);

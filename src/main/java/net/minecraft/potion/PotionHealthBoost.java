@@ -6,18 +6,20 @@ import net.minecraft.util.ResourceLocation;
 
 public class PotionHealthBoost extends Potion
 {
-    public PotionHealthBoost(int potionID, ResourceLocation location, boolean badEffect, int potionColor)
+    
+
+    public PotionHealthBoost(int p_i45899_1_, ResourceLocation p_i45899_2_, boolean p_i45899_3_, int p_i45899_4_)
     {
-        super(potionID, location, badEffect, potionColor);
+        super(p_i45899_1_, p_i45899_2_, p_i45899_3_, p_i45899_4_);
     }
 
-    public void removeAttributesModifiersFromEntity(EntityLivingBase entityLivingBaseIn, BaseAttributeMap p_111187_2_, int amplifier)
+    public void removeAttributesModifiersFromEntity(EntityLivingBase p_111187_1_, BaseAttributeMap p_111187_2_, int p_111187_3_)
     {
-        super.removeAttributesModifiersFromEntity(entityLivingBaseIn, p_111187_2_, amplifier);
+        super.removeAttributesModifiersFromEntity(p_111187_1_, p_111187_2_, p_111187_3_);
 
-        if (entityLivingBaseIn.getHealth() > entityLivingBaseIn.getMaxHealth())
+        if (p_111187_1_.getHealth() > p_111187_1_.getMaxHealth())
         {
-            entityLivingBaseIn.setHealth(entityLivingBaseIn.getMaxHealth());
+            p_111187_1_.setHealth(p_111187_1_.getMaxHealth());
         }
     }
 }

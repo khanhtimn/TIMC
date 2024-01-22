@@ -6,9 +6,11 @@ import net.minecraft.tileentity.TileEntityFurnace;
 
 public class SlotFurnaceFuel extends Slot
 {
-    public SlotFurnaceFuel(IInventory inventoryIn, int slotIndex, int xPosition, int yPosition)
+    
+
+    public SlotFurnaceFuel(IInventory p_i45795_1_, int p_i45795_2_, int p_i45795_3_, int p_i45795_4_)
     {
-        super(inventoryIn, slotIndex, xPosition, yPosition);
+        super(p_i45795_1_, p_i45795_2_, p_i45795_3_, p_i45795_4_);
     }
 
     /**
@@ -16,16 +18,16 @@ public class SlotFurnaceFuel extends Slot
      */
     public boolean isItemValid(ItemStack stack)
     {
-        return TileEntityFurnace.isItemFuel(stack) || isBucket(stack);
+        return TileEntityFurnace.isItemFuel(stack) || func_178173_c_(stack);
     }
 
-    public int getItemStackLimit(ItemStack stack)
+    public int func_178170_b(ItemStack p_178170_1_)
     {
-        return isBucket(stack) ? 1 : super.getItemStackLimit(stack);
+        return func_178173_c_(p_178170_1_) ? 1 : super.func_178170_b(p_178170_1_);
     }
 
-    public static boolean isBucket(ItemStack stack)
+    public static boolean func_178173_c_(ItemStack p_178173_0_)
     {
-        return stack != null && stack.getItem() != null && stack.getItem() == Items.bucket;
+        return p_178173_0_ != null && p_178173_0_.getItem() != null && p_178173_0_.getItem() == Items.bucket;
     }
 }

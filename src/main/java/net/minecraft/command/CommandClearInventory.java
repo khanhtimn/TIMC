@@ -12,17 +12,13 @@ import net.minecraft.util.ChatComponentTranslation;
 
 public class CommandClearInventory extends CommandBase
 {
-    /**
-     * Gets the name of the command
-     */
+    
+
     public String getCommandName()
     {
         return "clear";
     }
 
-    /**
-     * Gets the usage string for the command.
-     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.clear.usage";
@@ -36,66 +32,63 @@ public class CommandClearInventory extends CommandBase
         return 2;
     }
 
-    /**
-     * Callback when the command is invoked
-     */
     public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
-        EntityPlayerMP entityplayermp = args.length == 0 ? getCommandSenderAsPlayer(sender) : getPlayer(sender, args[0]);
-        Item item = args.length >= 2 ? getItemByText(sender, args[1]) : null;
-        int i = args.length >= 3 ? parseInt(args[2], -1) : -1;
-        int j = args.length >= 4 ? parseInt(args[3], -1) : -1;
-        NBTTagCompound nbttagcompound = null;
+        EntityPlayerMP var3 = args.length == 0 ? getCommandSenderAsPlayer(sender) : getPlayer(sender, args[0]);
+        Item var4 = args.length >= 2 ? getItemByText(sender, args[1]) : null;
+        int var5 = args.length >= 3 ? parseInt(args[2], -1) : -1;
+        int var6 = args.length >= 4 ? parseInt(args[3], -1) : -1;
+        NBTTagCompound var7 = null;
 
         if (args.length >= 5)
         {
             try
             {
-                nbttagcompound = JsonToNBT.getTagFromJson(buildString(args, 4));
+                var7 = JsonToNBT.func_180713_a(func_180529_a(args, 4));
             }
-            catch (NBTException nbtexception)
+            catch (NBTException var9)
             {
-                throw new CommandException("commands.clear.tagError", new Object[] {nbtexception.getMessage()});
+                throw new CommandException("commands.clear.tagError", new Object[] {var9.getMessage()});
             }
         }
 
-        if (args.length >= 2 && item == null)
+        if (args.length >= 2 && var4 == null)
         {
-            throw new CommandException("commands.clear.failure", new Object[] {entityplayermp.getName()});
+            throw new CommandException("commands.clear.failure", new Object[] {var3.getName()});
         }
         else
         {
-            int k = entityplayermp.inventory.clearMatchingItems(item, i, j, nbttagcompound);
-            entityplayermp.inventoryContainer.detectAndSendChanges();
+            int var8 = var3.inventory.func_174925_a(var4, var5, var6, var7);
+            var3.inventoryContainer.detectAndSendChanges();
 
-            if (!entityplayermp.capabilities.isCreativeMode)
+            if (!var3.capabilities.isCreativeMode)
             {
-                entityplayermp.updateHeldItem();
+                var3.updateHeldItem();
             }
 
-            sender.setCommandStat(CommandResultStats.Type.AFFECTED_ITEMS, k);
+            sender.func_174794_a(CommandResultStats.Type.AFFECTED_ITEMS, var8);
 
-            if (k == 0)
+            if (var8 == 0)
             {
-                throw new CommandException("commands.clear.failure", new Object[] {entityplayermp.getName()});
+                throw new CommandException("commands.clear.failure", new Object[] {var3.getName()});
             }
             else
             {
-                if (j == 0)
+                if (var6 == 0)
                 {
-                    sender.addChatMessage(new ChatComponentTranslation("commands.clear.testing", new Object[] {entityplayermp.getName(), Integer.valueOf(k)}));
+                    sender.addChatMessage(new ChatComponentTranslation("commands.clear.testing", new Object[] {var3.getName(), Integer.valueOf(var8)}));
                 }
                 else
                 {
-                    notifyOperators(sender, this, "commands.clear.success", new Object[] {entityplayermp.getName(), Integer.valueOf(k)});
+                    notifyOperators(sender, this, "commands.clear.success", new Object[] {var3.getName(), Integer.valueOf(var8)});
                 }
             }
         }
     }
 
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
-        return args.length == 1 ? getListOfStringsMatchingLastWord(args, this.func_147209_d()) : (args.length == 2 ? getListOfStringsMatchingLastWord(args, Item.itemRegistry.getKeys()) : null);
+        return args.length == 1 ? getListOfStringsMatchingLastWord(args, this.func_147209_d()) : (args.length == 2 ? func_175762_a(args, Item.itemRegistry.getKeys()) : null);
     }
 
     protected String[] func_147209_d()

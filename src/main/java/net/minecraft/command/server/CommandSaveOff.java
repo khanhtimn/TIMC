@@ -8,45 +8,38 @@ import net.minecraft.world.WorldServer;
 
 public class CommandSaveOff extends CommandBase
 {
-    /**
-     * Gets the name of the command
-     */
+    
+
     public String getCommandName()
     {
         return "save-off";
     }
 
-    /**
-     * Gets the usage string for the command.
-     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.save-off.usage";
     }
 
-    /**
-     * Callback when the command is invoked
-     */
     public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
-        MinecraftServer minecraftserver = MinecraftServer.getServer();
-        boolean flag = false;
+        MinecraftServer var3 = MinecraftServer.getServer();
+        boolean var4 = false;
 
-        for (int i = 0; i < minecraftserver.worldServers.length; ++i)
+        for (int var5 = 0; var5 < var3.worldServers.length; ++var5)
         {
-            if (minecraftserver.worldServers[i] != null)
+            if (var3.worldServers[var5] != null)
             {
-                WorldServer worldserver = minecraftserver.worldServers[i];
+                WorldServer var6 = var3.worldServers[var5];
 
-                if (!worldserver.disableLevelSaving)
+                if (!var6.disableLevelSaving)
                 {
-                    worldserver.disableLevelSaving = true;
-                    flag = true;
+                    var6.disableLevelSaving = true;
+                    var4 = true;
                 }
             }
         }
 
-        if (flag)
+        if (var4)
         {
             notifyOperators(sender, this, "commands.save.disabled", new Object[0]);
         }

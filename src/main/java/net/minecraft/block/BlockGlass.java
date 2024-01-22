@@ -7,9 +7,11 @@ import net.minecraft.util.EnumWorldBlockLayer;
 
 public class BlockGlass extends BlockBreakable
 {
-    public BlockGlass(Material materialIn, boolean ignoreSimilarity)
+    
+
+    public BlockGlass(Material p_i45408_1_, boolean p_i45408_2_)
     {
-        super(materialIn, ignoreSimilarity);
+        super(p_i45408_1_, p_i45408_2_);
         this.setCreativeTab(CreativeTabs.tabBlock);
     }
 

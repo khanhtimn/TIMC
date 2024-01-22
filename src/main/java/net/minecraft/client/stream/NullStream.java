@@ -7,6 +7,7 @@ import tv.twitch.chat.ChatUserInfo;
 public class NullStream implements IStream
 {
     private final Throwable field_152938_a;
+    
 
     public NullStream(Throwable p_i1006_1_)
     {
@@ -16,84 +17,54 @@ public class NullStream implements IStream
     /**
      * Shuts down a steam
      */
-    public void shutdownStream()
-    {
-    }
+    public void shutdownStream() {}
 
-    public void func_152935_j()
-    {
-    }
+    public void func_152935_j() {}
 
-    public void func_152922_k()
-    {
-    }
+    public void func_152922_k() {}
 
     public boolean func_152936_l()
     {
         return false;
     }
 
-    public boolean isReadyToBroadcast()
+    public boolean func_152924_m()
     {
         return false;
     }
 
-    public boolean isBroadcasting()
+    public boolean func_152934_n()
     {
         return false;
     }
 
-    public void func_152911_a(Metadata p_152911_1_, long p_152911_2_)
-    {
-    }
+    public void func_152911_a(Metadata p_152911_1_, long p_152911_2_) {}
 
-    public void func_176026_a(Metadata p_176026_1_, long p_176026_2_, long p_176026_4_)
-    {
-    }
+    public void func_176026_a(Metadata p_176026_1_, long p_176026_2_, long p_176026_4_) {}
 
     public boolean isPaused()
     {
         return false;
     }
 
-    public void requestCommercial()
-    {
-    }
+    public void func_152931_p() {}
 
-    /**
-     * pauses a stream
-     */
-    public void pause()
-    {
-    }
+    public void func_152916_q() {}
 
-    /**
-     * unpauses a stream
-     */
-    public void unpause()
-    {
-    }
+    public void func_152933_r() {}
 
-    public void updateStreamVolume()
-    {
-    }
+    public void func_152915_s() {}
 
-    public void func_152930_t()
-    {
-    }
+    public void func_152930_t() {}
 
-    public void stopBroadcasting()
-    {
-    }
+    public void func_152914_u() {}
 
     public IngestServer[] func_152925_v()
     {
         return new IngestServer[0];
     }
 
-    public void func_152909_x()
-    {
-    }
+    public void func_152909_x() {}
 
     public IngestServerTester func_152932_y()
     {
@@ -125,9 +96,7 @@ public class NullStream implements IStream
         return null;
     }
 
-    public void func_152917_b(String p_152917_1_)
-    {
-    }
+    public void func_152917_b(String p_152917_1_) {}
 
     public boolean func_152928_D()
     {
@@ -144,12 +113,7 @@ public class NullStream implements IStream
         return false;
     }
 
-    /**
-     * mutes or unmutes the microphone based on the boolean parameter passed into the method
-     */
-    public void muteMicrophone(boolean p_152910_1_)
-    {
-    }
+    public void func_152910_a(boolean p_152910_1_) {}
 
     public boolean func_152929_G()
     {

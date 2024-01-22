@@ -11,6 +11,7 @@ public class RealmsSliderButton extends RealmsButton
     private final float minValue;
     private final float maxValue;
     private int steps;
+    
 
     public RealmsSliderButton(int p_i1056_1_, int p_i1056_2_, int p_i1056_3_, int p_i1056_4_, int p_i1056_5_, int p_i1056_6_)
     {
@@ -71,9 +72,9 @@ public class RealmsSliderButton extends RealmsButton
             {
                 this.value = (float)(p_renderBg_1_ - (this.getProxy().xPosition + 4)) / (float)(this.getProxy().getButtonWidth() - 8);
                 this.value = MathHelper.clamp_float(this.value, 0.0F, 1.0F);
-                float f = this.toValue(this.value);
-                this.clicked(f);
-                this.value = this.toPct(f);
+                float var3 = this.toValue(this.value);
+                this.clicked(var3);
+                this.value = this.toPct(var3);
                 this.getProxy().displayString = this.getMessage();
             }
 
@@ -93,9 +94,7 @@ public class RealmsSliderButton extends RealmsButton
         this.sliding = true;
     }
 
-    public void clicked(float p_clicked_1_)
-    {
-    }
+    public void clicked(float p_clicked_1_) {}
 
     public void released(int p_released_1_, int p_released_2_)
     {

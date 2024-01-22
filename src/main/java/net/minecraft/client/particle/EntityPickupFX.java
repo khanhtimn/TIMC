@@ -6,10 +6,7 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.src.Config;
 import net.minecraft.world.World;
-import net.optifine.shaders.Program;
-import net.optifine.shaders.Shaders;
 
 public class EntityPickupFX extends EntityFX
 {
@@ -19,6 +16,7 @@ public class EntityPickupFX extends EntityFX
     private int maxAge;
     private float field_174841_aA;
     private RenderManager field_174842_aB = Minecraft.getMinecraft().getRenderManager();
+    
 
     public EntityPickupFX(World worldIn, Entity p_i1233_2_, Entity p_i1233_3_, float p_i1233_4_)
     {
@@ -29,45 +27,28 @@ public class EntityPickupFX extends EntityFX
         this.field_174841_aA = p_i1233_4_;
     }
 
-    /**
-     * Renders the particle
-     */
-    public void renderParticle(WorldRenderer worldRendererIn, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ)
+    public void func_180434_a(WorldRenderer p_180434_1_, Entity p_180434_2_, float p_180434_3_, float p_180434_4_, float p_180434_5_, float p_180434_6_, float p_180434_7_, float p_180434_8_)
     {
-        Program program = null;
-
-        if (Config.isShaders())
-        {
-            program = Shaders.activeProgram;
-            Shaders.nextEntity(this.field_174840_a);
-        }
-
-        float f = ((float)this.age + partialTicks) / (float)this.maxAge;
-        f = f * f;
-        double d0 = this.field_174840_a.posX;
-        double d1 = this.field_174840_a.posY;
-        double d2 = this.field_174840_a.posZ;
-        double d3 = this.field_174843_ax.lastTickPosX + (this.field_174843_ax.posX - this.field_174843_ax.lastTickPosX) * (double)partialTicks;
-        double d4 = this.field_174843_ax.lastTickPosY + (this.field_174843_ax.posY - this.field_174843_ax.lastTickPosY) * (double)partialTicks + (double)this.field_174841_aA;
-        double d5 = this.field_174843_ax.lastTickPosZ + (this.field_174843_ax.posZ - this.field_174843_ax.lastTickPosZ) * (double)partialTicks;
-        double d6 = d0 + (d3 - d0) * (double)f;
-        double d7 = d1 + (d4 - d1) * (double)f;
-        double d8 = d2 + (d5 - d2) * (double)f;
-        int i = this.getBrightnessForRender(partialTicks);
-        int j = i % 65536;
-        int k = i / 65536;
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)j / 1.0F, (float)k / 1.0F);
+        float var9 = ((float)this.age + p_180434_3_) / (float)this.maxAge;
+        var9 *= var9;
+        double var10 = this.field_174840_a.posX;
+        double var12 = this.field_174840_a.posY;
+        double var14 = this.field_174840_a.posZ;
+        double var16 = this.field_174843_ax.lastTickPosX + (this.field_174843_ax.posX - this.field_174843_ax.lastTickPosX) * (double)p_180434_3_;
+        double var18 = this.field_174843_ax.lastTickPosY + (this.field_174843_ax.posY - this.field_174843_ax.lastTickPosY) * (double)p_180434_3_ + (double)this.field_174841_aA;
+        double var20 = this.field_174843_ax.lastTickPosZ + (this.field_174843_ax.posZ - this.field_174843_ax.lastTickPosZ) * (double)p_180434_3_;
+        double var22 = var10 + (var16 - var10) * (double)var9;
+        double var24 = var12 + (var18 - var12) * (double)var9;
+        double var26 = var14 + (var20 - var14) * (double)var9;
+        int var28 = this.getBrightnessForRender(p_180434_3_);
+        int var29 = var28 % 65536;
+        int var30 = var28 / 65536;
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)var29 / 1.0F, (float)var30 / 1.0F);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        d6 = d6 - interpPosX;
-        d7 = d7 - interpPosY;
-        d8 = d8 - interpPosZ;
-        this.field_174842_aB.renderEntityWithPosYaw(this.field_174840_a, (double)((float)d6), (double)((float)d7), (double)((float)d8), this.field_174840_a.rotationYaw, partialTicks);
-
-        if (Config.isShaders())
-        {
-            Shaders.setEntityId((Entity)null);
-            Shaders.useProgram(program);
-        }
+        var22 -= interpPosX;
+        var24 -= interpPosY;
+        var26 -= interpPosZ;
+        this.field_174842_aB.renderEntityWithPosYaw(this.field_174840_a, (double)((float)var22), (double)((float)var24), (double)((float)var26), this.field_174840_a.rotationYaw, p_180434_3_);
     }
 
     /**

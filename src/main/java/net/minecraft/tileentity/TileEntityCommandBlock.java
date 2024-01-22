@@ -13,8 +13,9 @@ import net.minecraft.world.World;
 
 public class TileEntityCommandBlock extends TileEntity
 {
-    private final CommandBlockLogic commandBlockLogic = new CommandBlockLogic()
+    private final CommandBlockLogic field_145994_a = new CommandBlockLogic()
     {
+        
         public BlockPos getPosition()
         {
             return TileEntityCommandBlock.this.pos;
@@ -27,12 +28,12 @@ public class TileEntityCommandBlock extends TileEntity
         {
             return TileEntityCommandBlock.this.getWorld();
         }
-        public void setCommand(String command)
+        public void setCommand(String p_145752_1_)
         {
-            super.setCommand(command);
+            super.setCommand(p_145752_1_);
             TileEntityCommandBlock.this.markDirty();
         }
-        public void updateCommand()
+        public void func_145756_e()
         {
             TileEntityCommandBlock.this.getWorld().markBlockForUpdate(TileEntityCommandBlock.this.pos);
         }
@@ -51,42 +52,37 @@ public class TileEntityCommandBlock extends TileEntity
             return null;
         }
     };
+    
 
     public void writeToNBT(NBTTagCompound compound)
     {
         super.writeToNBT(compound);
-        this.commandBlockLogic.writeDataToNBT(compound);
+        this.field_145994_a.writeDataToNBT(compound);
     }
 
     public void readFromNBT(NBTTagCompound compound)
     {
         super.readFromNBT(compound);
-        this.commandBlockLogic.readDataFromNBT(compound);
+        this.field_145994_a.readDataFromNBT(compound);
     }
 
     /**
-     * Allows for a specialized description packet to be created. This is often used to sync tile entity data from the
-     * server to the client easily. For example this is used by signs to synchronise the text to be displayed.
+     * Overriden in a sign to provide the text.
      */
     public Packet getDescriptionPacket()
     {
-        NBTTagCompound nbttagcompound = new NBTTagCompound();
-        this.writeToNBT(nbttagcompound);
-        return new S35PacketUpdateTileEntity(this.pos, 2, nbttagcompound);
-    }
-
-    public boolean func_183000_F()
-    {
-        return true;
+        NBTTagCompound var1 = new NBTTagCompound();
+        this.writeToNBT(var1);
+        return new S35PacketUpdateTileEntity(this.pos, 2, var1);
     }
 
     public CommandBlockLogic getCommandBlockLogic()
     {
-        return this.commandBlockLogic;
+        return this.field_145994_a;
     }
 
-    public CommandResultStats getCommandResultStats()
+    public CommandResultStats func_175124_c()
     {
-        return this.commandBlockLogic.getCommandResultStats();
+        return this.field_145994_a.func_175572_n();
     }
 }

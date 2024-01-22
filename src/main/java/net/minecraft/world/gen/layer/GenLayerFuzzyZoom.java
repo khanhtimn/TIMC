@@ -2,6 +2,8 @@ package net.minecraft.world.gen.layer;
 
 public class GenLayerFuzzyZoom extends GenLayerZoom
 {
+    
+
     public GenLayerFuzzyZoom(long p_i2123_1_, GenLayer p_i2123_3_)
     {
         super(p_i2123_1_, p_i2123_3_);

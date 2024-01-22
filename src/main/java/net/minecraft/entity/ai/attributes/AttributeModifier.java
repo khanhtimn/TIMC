@@ -16,21 +16,22 @@ public class AttributeModifier
      * If false, this modifier is not saved in NBT. Used for "natural" modifiers like speed boost from sprinting
      */
     private boolean isSaved;
+    
 
-    public AttributeModifier(String nameIn, double amountIn, int operationIn)
+    public AttributeModifier(String p_i1605_1_, double p_i1605_2_, int p_i1605_4_)
     {
-        this(MathHelper.getRandomUuid(ThreadLocalRandom.current()), nameIn, amountIn, operationIn);
+        this(MathHelper.func_180182_a(ThreadLocalRandom.current()), p_i1605_1_, p_i1605_2_, p_i1605_4_);
     }
 
-    public AttributeModifier(UUID idIn, String nameIn, double amountIn, int operationIn)
+    public AttributeModifier(UUID p_i1606_1_, String p_i1606_2_, double p_i1606_3_, int p_i1606_5_)
     {
         this.isSaved = true;
-        this.id = idIn;
-        this.name = nameIn;
-        this.amount = amountIn;
-        this.operation = operationIn;
-        Validate.notEmpty(nameIn, "Modifier name cannot be empty", new Object[0]);
-        Validate.inclusiveBetween(0L, 2L, (long)operationIn, "Invalid operation");
+        this.id = p_i1606_1_;
+        this.name = p_i1606_2_;
+        this.amount = p_i1606_3_;
+        this.operation = p_i1606_5_;
+        Validate.notEmpty(p_i1606_2_, "Modifier name cannot be empty", new Object[0]);
+        Validate.inclusiveBetween(0L, 2L, (long)p_i1606_5_, "Invalid operation");
     }
 
     public UUID getID()
@@ -64,9 +65,9 @@ public class AttributeModifier
     /**
      * @see #isSaved
      */
-    public AttributeModifier setSaved(boolean saved)
+    public AttributeModifier setSaved(boolean p_111168_1_)
     {
-        this.isSaved = saved;
+        this.isSaved = p_111168_1_;
         return this;
     }
 
@@ -78,16 +79,16 @@ public class AttributeModifier
         }
         else if (p_equals_1_ != null && this.getClass() == p_equals_1_.getClass())
         {
-            AttributeModifier attributemodifier = (AttributeModifier)p_equals_1_;
+            AttributeModifier var2 = (AttributeModifier)p_equals_1_;
 
             if (this.id != null)
             {
-                if (!this.id.equals(attributemodifier.id))
+                if (!this.id.equals(var2.id))
                 {
                     return false;
                 }
             }
-            else if (attributemodifier.id != null)
+            else if (var2.id != null)
             {
                 return false;
             }

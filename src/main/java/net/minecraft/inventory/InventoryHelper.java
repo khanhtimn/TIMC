@@ -10,59 +10,60 @@ import net.minecraft.world.World;
 
 public class InventoryHelper
 {
-    private static final Random RANDOM = new Random();
+    private static final Random field_180177_a = new Random();
+    
 
-    public static void dropInventoryItems(World worldIn, BlockPos pos, IInventory inventory)
+    public static void dropInventoryItems(World worldIn, BlockPos p_180175_1_, IInventory p_180175_2_)
     {
-        dropInventoryItems(worldIn, (double)pos.getX(), (double)pos.getY(), (double)pos.getZ(), inventory);
+        func_180174_a(worldIn, (double)p_180175_1_.getX(), (double)p_180175_1_.getY(), (double)p_180175_1_.getZ(), p_180175_2_);
     }
 
-    public static void dropInventoryItems(World worldIn, Entity entityAt, IInventory inventory)
+    public static void func_180176_a(World worldIn, Entity p_180176_1_, IInventory p_180176_2_)
     {
-        dropInventoryItems(worldIn, entityAt.posX, entityAt.posY, entityAt.posZ, inventory);
+        func_180174_a(worldIn, p_180176_1_.posX, p_180176_1_.posY, p_180176_1_.posZ, p_180176_2_);
     }
 
-    private static void dropInventoryItems(World worldIn, double x, double y, double z, IInventory inventory)
+    private static void func_180174_a(World worldIn, double p_180174_1_, double p_180174_3_, double p_180174_5_, IInventory p_180174_7_)
     {
-        for (int i = 0; i < inventory.getSizeInventory(); ++i)
+        for (int var8 = 0; var8 < p_180174_7_.getSizeInventory(); ++var8)
         {
-            ItemStack itemstack = inventory.getStackInSlot(i);
+            ItemStack var9 = p_180174_7_.getStackInSlot(var8);
 
-            if (itemstack != null)
+            if (var9 != null)
             {
-                spawnItemStack(worldIn, x, y, z, itemstack);
+                func_180173_a(worldIn, p_180174_1_, p_180174_3_, p_180174_5_, var9);
             }
         }
     }
 
-    private static void spawnItemStack(World worldIn, double x, double y, double z, ItemStack stack)
+    private static void func_180173_a(World worldIn, double p_180173_1_, double p_180173_3_, double p_180173_5_, ItemStack p_180173_7_)
     {
-        float f = RANDOM.nextFloat() * 0.8F + 0.1F;
-        float f1 = RANDOM.nextFloat() * 0.8F + 0.1F;
-        float f2 = RANDOM.nextFloat() * 0.8F + 0.1F;
+        float var8 = field_180177_a.nextFloat() * 0.8F + 0.1F;
+        float var9 = field_180177_a.nextFloat() * 0.8F + 0.1F;
+        float var10 = field_180177_a.nextFloat() * 0.8F + 0.1F;
 
-        while (stack.stackSize > 0)
+        while (p_180173_7_.stackSize > 0)
         {
-            int i = RANDOM.nextInt(21) + 10;
+            int var11 = field_180177_a.nextInt(21) + 10;
 
-            if (i > stack.stackSize)
+            if (var11 > p_180173_7_.stackSize)
             {
-                i = stack.stackSize;
+                var11 = p_180173_7_.stackSize;
             }
 
-            stack.stackSize -= i;
-            EntityItem entityitem = new EntityItem(worldIn, x + (double)f, y + (double)f1, z + (double)f2, new ItemStack(stack.getItem(), i, stack.getMetadata()));
+            p_180173_7_.stackSize -= var11;
+            EntityItem var12 = new EntityItem(worldIn, p_180173_1_ + (double)var8, p_180173_3_ + (double)var9, p_180173_5_ + (double)var10, new ItemStack(p_180173_7_.getItem(), var11, p_180173_7_.getMetadata()));
 
-            if (stack.hasTagCompound())
+            if (p_180173_7_.hasTagCompound())
             {
-                entityitem.getEntityItem().setTagCompound((NBTTagCompound)stack.getTagCompound().copy());
+                var12.getEntityItem().setTagCompound((NBTTagCompound)p_180173_7_.getTagCompound().copy());
             }
 
-            float f3 = 0.05F;
-            entityitem.motionX = RANDOM.nextGaussian() * (double)f3;
-            entityitem.motionY = RANDOM.nextGaussian() * (double)f3 + 0.20000000298023224D;
-            entityitem.motionZ = RANDOM.nextGaussian() * (double)f3;
-            worldIn.spawnEntityInWorld(entityitem);
+            float var13 = 0.05F;
+            var12.motionX = field_180177_a.nextGaussian() * (double)var13;
+            var12.motionY = field_180177_a.nextGaussian() * (double)var13 + 0.20000000298023224D;
+            var12.motionZ = field_180177_a.nextGaussian() * (double)var13;
+            worldIn.spawnEntityInWorld(var12);
         }
     }
 }

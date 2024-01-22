@@ -5,9 +5,11 @@ import net.minecraft.init.Blocks;
 
 public class BiomeGenEnd extends BiomeGenBase
 {
-    public BiomeGenEnd(int id)
+    
+
+    public BiomeGenEnd(int p_i1990_1_)
     {
-        super(id);
+        super(p_i1990_1_);
         this.spawnableMonsterList.clear();
         this.spawnableCreatureList.clear();
         this.spawnableWaterCreatureList.clear();

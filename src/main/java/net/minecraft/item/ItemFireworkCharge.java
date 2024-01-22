@@ -9,6 +9,8 @@ import net.minecraft.util.StatCollector;
 
 public class ItemFireworkCharge extends Item
 {
+    
+
     public int getColorFromItemStack(ItemStack stack, int renderPass)
     {
         if (renderPass != 1)
@@ -17,52 +19,55 @@ public class ItemFireworkCharge extends Item
         }
         else
         {
-            NBTBase nbtbase = getExplosionTag(stack, "Colors");
+            NBTBase var3 = func_150903_a(stack, "Colors");
 
-            if (!(nbtbase instanceof NBTTagIntArray))
+            if (!(var3 instanceof NBTTagIntArray))
             {
                 return 9079434;
             }
             else
             {
-                NBTTagIntArray nbttagintarray = (NBTTagIntArray)nbtbase;
-                int[] aint = nbttagintarray.getIntArray();
+                NBTTagIntArray var4 = (NBTTagIntArray)var3;
+                int[] var5 = var4.getIntArray();
 
-                if (aint.length == 1)
+                if (var5.length == 1)
                 {
-                    return aint[0];
+                    return var5[0];
                 }
                 else
                 {
-                    int i = 0;
-                    int j = 0;
-                    int k = 0;
+                    int var6 = 0;
+                    int var7 = 0;
+                    int var8 = 0;
+                    int[] var9 = var5;
+                    int var10 = var5.length;
 
-                    for (int l : aint)
+                    for (int var11 = 0; var11 < var10; ++var11)
                     {
-                        i += (l & 16711680) >> 16;
-                        j += (l & 65280) >> 8;
-                        k += (l & 255) >> 0;
+                        int var12 = var9[var11];
+                        var6 += (var12 & 16711680) >> 16;
+                        var7 += (var12 & 65280) >> 8;
+                        var8 += (var12 & 255) >> 0;
                     }
 
-                    i = i / aint.length;
-                    j = j / aint.length;
-                    k = k / aint.length;
-                    return i << 16 | j << 8 | k;
+                    var6 /= var5.length;
+                    var7 /= var5.length;
+                    var8 /= var5.length;
+                    return var6 << 16 | var7 << 8 | var8;
                 }
             }
         }
     }
 
-    public static NBTBase getExplosionTag(ItemStack stack, String key)
+    public static NBTBase func_150903_a(ItemStack p_150903_0_, String p_150903_1_)
     {
-        if (stack.hasTagCompound())
+        if (p_150903_0_.hasTagCompound())
         {
-            NBTTagCompound nbttagcompound = stack.getTagCompound().getCompoundTag("Explosion");
+            NBTTagCompound var2 = p_150903_0_.getTagCompound().getCompoundTag("Explosion");
 
-            if (nbttagcompound != null)
+            if (var2 != null)
             {
-                return nbttagcompound.getTag(key);
+                return var2.getTag(p_150903_1_);
             }
         }
 
@@ -71,117 +76,131 @@ public class ItemFireworkCharge extends Item
 
     /**
      * allows items to add custom lines of information to the mouseover description
+     *  
+     * @param tooltip All lines to display in the Item's tooltip. This is a List of Strings.
+     * @param advanced Whether the setting "Advanced tooltips" is enabled
      */
-    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced)
+    public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced)
     {
         if (stack.hasTagCompound())
         {
-            NBTTagCompound nbttagcompound = stack.getTagCompound().getCompoundTag("Explosion");
+            NBTTagCompound var5 = stack.getTagCompound().getCompoundTag("Explosion");
 
-            if (nbttagcompound != null)
+            if (var5 != null)
             {
-                addExplosionInfo(nbttagcompound, tooltip);
+                func_150902_a(var5, tooltip);
             }
         }
     }
 
-    public static void addExplosionInfo(NBTTagCompound nbt, List<String> tooltip)
+    public static void func_150902_a(NBTTagCompound p_150902_0_, List p_150902_1_)
     {
-        byte b0 = nbt.getByte("Type");
+        byte var2 = p_150902_0_.getByte("Type");
 
-        if (b0 >= 0 && b0 <= 4)
+        if (var2 >= 0 && var2 <= 4)
         {
-            tooltip.add(StatCollector.translateToLocal("item.fireworksCharge.type." + b0).trim());
+            p_150902_1_.add(StatCollector.translateToLocal("item.fireworksCharge.type." + var2).trim());
         }
         else
         {
-            tooltip.add(StatCollector.translateToLocal("item.fireworksCharge.type").trim());
+            p_150902_1_.add(StatCollector.translateToLocal("item.fireworksCharge.type").trim());
         }
 
-        int[] aint = nbt.getIntArray("Colors");
+        int[] var3 = p_150902_0_.getIntArray("Colors");
+        int var8;
+        int var9;
 
-        if (aint.length > 0)
+        if (var3.length > 0)
         {
-            boolean flag = true;
-            String s = "";
+            boolean var4 = true;
+            String var5 = "";
+            int[] var6 = var3;
+            int var7 = var3.length;
 
-            for (int i : aint)
+            for (var8 = 0; var8 < var7; ++var8)
             {
-                if (!flag)
+                var9 = var6[var8];
+
+                if (!var4)
                 {
-                    s = s + ", ";
+                    var5 = var5 + ", ";
                 }
 
-                flag = false;
-                boolean flag1 = false;
+                var4 = false;
+                boolean var10 = false;
 
-                for (int j = 0; j < ItemDye.dyeColors.length; ++j)
+                for (int var11 = 0; var11 < ItemDye.dyeColors.length; ++var11)
                 {
-                    if (i == ItemDye.dyeColors[j])
+                    if (var9 == ItemDye.dyeColors[var11])
                     {
-                        flag1 = true;
-                        s = s + StatCollector.translateToLocal("item.fireworksCharge." + EnumDyeColor.byDyeDamage(j).getUnlocalizedName());
+                        var10 = true;
+                        var5 = var5 + StatCollector.translateToLocal("item.fireworksCharge." + EnumDyeColor.func_176766_a(var11).func_176762_d());
                         break;
                     }
                 }
 
-                if (!flag1)
+                if (!var10)
                 {
-                    s = s + StatCollector.translateToLocal("item.fireworksCharge.customColor");
+                    var5 = var5 + StatCollector.translateToLocal("item.fireworksCharge.customColor");
                 }
             }
 
-            tooltip.add(s);
+            p_150902_1_.add(var5);
         }
 
-        int[] aint1 = nbt.getIntArray("FadeColors");
+        int[] var13 = p_150902_0_.getIntArray("FadeColors");
+        boolean var14;
 
-        if (aint1.length > 0)
+        if (var13.length > 0)
         {
-            boolean flag2 = true;
-            String s1 = StatCollector.translateToLocal("item.fireworksCharge.fadeTo") + " ";
+            var14 = true;
+            String var15 = StatCollector.translateToLocal("item.fireworksCharge.fadeTo") + " ";
+            int[] var17 = var13;
+            var8 = var13.length;
 
-            for (int l : aint1)
+            for (var9 = 0; var9 < var8; ++var9)
             {
-                if (!flag2)
+                int var18 = var17[var9];
+
+                if (!var14)
                 {
-                    s1 = s1 + ", ";
+                    var15 = var15 + ", ";
                 }
 
-                flag2 = false;
-                boolean flag5 = false;
+                var14 = false;
+                boolean var19 = false;
 
-                for (int k = 0; k < 16; ++k)
+                for (int var12 = 0; var12 < 16; ++var12)
                 {
-                    if (l == ItemDye.dyeColors[k])
+                    if (var18 == ItemDye.dyeColors[var12])
                     {
-                        flag5 = true;
-                        s1 = s1 + StatCollector.translateToLocal("item.fireworksCharge." + EnumDyeColor.byDyeDamage(k).getUnlocalizedName());
+                        var19 = true;
+                        var15 = var15 + StatCollector.translateToLocal("item.fireworksCharge." + EnumDyeColor.func_176766_a(var12).func_176762_d());
                         break;
                     }
                 }
 
-                if (!flag5)
+                if (!var19)
                 {
-                    s1 = s1 + StatCollector.translateToLocal("item.fireworksCharge.customColor");
+                    var15 = var15 + StatCollector.translateToLocal("item.fireworksCharge.customColor");
                 }
             }
 
-            tooltip.add(s1);
+            p_150902_1_.add(var15);
         }
 
-        boolean flag3 = nbt.getBoolean("Trail");
+        var14 = p_150902_0_.getBoolean("Trail");
 
-        if (flag3)
+        if (var14)
         {
-            tooltip.add(StatCollector.translateToLocal("item.fireworksCharge.trail"));
+            p_150902_1_.add(StatCollector.translateToLocal("item.fireworksCharge.trail"));
         }
 
-        boolean flag4 = nbt.getBoolean("Flicker");
+        boolean var16 = p_150902_0_.getBoolean("Flicker");
 
-        if (flag4)
+        if (var16)
         {
-            tooltip.add(StatCollector.translateToLocal("item.fireworksCharge.flicker"));
+            p_150902_1_.add(StatCollector.translateToLocal("item.fireworksCharge.flicker"));
         }
     }
 }

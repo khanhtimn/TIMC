@@ -20,53 +20,55 @@ import net.minecraft.util.ReportedException;
 
 public class CompressedStreamTools
 {
+    
+
     /**
      * Load the gzipped compound from the inputstream.
      */
-    public static NBTTagCompound readCompressed(InputStream is) throws IOException
+    public static NBTTagCompound readCompressed(InputStream p_74796_0_) throws IOException
     {
-        DataInputStream datainputstream = new DataInputStream(new BufferedInputStream(new GZIPInputStream(is)));
-        NBTTagCompound nbttagcompound;
+        DataInputStream var1 = new DataInputStream(new BufferedInputStream(new GZIPInputStream(p_74796_0_)));
+        NBTTagCompound var2;
 
         try
         {
-            nbttagcompound = read(datainputstream, NBTSizeTracker.INFINITE);
+            var2 = func_152456_a(var1, NBTSizeTracker.INFINITE);
         }
         finally
         {
-            datainputstream.close();
+            var1.close();
         }
 
-        return nbttagcompound;
+        return var2;
     }
 
     /**
      * Write the compound, gzipped, to the outputstream.
      */
-    public static void writeCompressed(NBTTagCompound p_74799_0_, OutputStream outputStream) throws IOException
+    public static void writeCompressed(NBTTagCompound p_74799_0_, OutputStream p_74799_1_) throws IOException
     {
-        DataOutputStream dataoutputstream = new DataOutputStream(new BufferedOutputStream(new GZIPOutputStream(outputStream)));
+        DataOutputStream var2 = new DataOutputStream(new BufferedOutputStream(new GZIPOutputStream(p_74799_1_)));
 
         try
         {
-            write(p_74799_0_, dataoutputstream);
+            write(p_74799_0_, var2);
         }
         finally
         {
-            dataoutputstream.close();
+            var2.close();
         }
     }
 
     public static void safeWrite(NBTTagCompound p_74793_0_, File p_74793_1_) throws IOException
     {
-        File file1 = new File(p_74793_1_.getAbsolutePath() + "_tmp");
+        File var2 = new File(p_74793_1_.getAbsolutePath() + "_tmp");
 
-        if (file1.exists())
+        if (var2.exists())
         {
-            file1.delete();
+            var2.delete();
         }
 
-        write(p_74793_0_, file1);
+        write(p_74793_0_, var2);
 
         if (p_74793_1_.exists())
         {
@@ -79,21 +81,21 @@ public class CompressedStreamTools
         }
         else
         {
-            file1.renameTo(p_74793_1_);
+            var2.renameTo(p_74793_1_);
         }
     }
 
     public static void write(NBTTagCompound p_74795_0_, File p_74795_1_) throws IOException
     {
-        DataOutputStream dataoutputstream = new DataOutputStream(new FileOutputStream(p_74795_1_));
+        DataOutputStream var2 = new DataOutputStream(new FileOutputStream(p_74795_1_));
 
         try
         {
-            write(p_74795_0_, dataoutputstream);
+            write(p_74795_0_, var2);
         }
         finally
         {
-            dataoutputstream.close();
+            var2.close();
         }
     }
 
@@ -105,40 +107,37 @@ public class CompressedStreamTools
         }
         else
         {
-            DataInputStream datainputstream = new DataInputStream(new FileInputStream(p_74797_0_));
-            NBTTagCompound nbttagcompound;
+            DataInputStream var1 = new DataInputStream(new FileInputStream(p_74797_0_));
+            NBTTagCompound var2;
 
             try
             {
-                nbttagcompound = read(datainputstream, NBTSizeTracker.INFINITE);
+                var2 = func_152456_a(var1, NBTSizeTracker.INFINITE);
             }
             finally
             {
-                datainputstream.close();
+                var1.close();
             }
 
-            return nbttagcompound;
+            return var2;
         }
     }
 
     /**
      * Reads from a CompressedStream.
      */
-    public static NBTTagCompound read(DataInputStream inputStream) throws IOException
+    public static NBTTagCompound read(DataInputStream p_74794_0_) throws IOException
     {
-        return read(inputStream, NBTSizeTracker.INFINITE);
+        return func_152456_a(p_74794_0_, NBTSizeTracker.INFINITE);
     }
 
-    /**
-     * Reads the given DataInput, constructs, and returns an NBTTagCompound with the data from the DataInput
-     */
-    public static NBTTagCompound read(DataInput p_152456_0_, NBTSizeTracker p_152456_1_) throws IOException
+    public static NBTTagCompound func_152456_a(DataInput p_152456_0_, NBTSizeTracker p_152456_1_) throws IOException
     {
-        NBTBase nbtbase = func_152455_a(p_152456_0_, 0, p_152456_1_);
+        NBTBase var2 = func_152455_a(p_152456_0_, 0, p_152456_1_);
 
-        if (nbtbase instanceof NBTTagCompound)
+        if (var2 instanceof NBTTagCompound)
         {
-            return (NBTTagCompound)nbtbase;
+            return (NBTTagCompound)var2;
         }
         else
         {
@@ -164,29 +163,29 @@ public class CompressedStreamTools
 
     private static NBTBase func_152455_a(DataInput p_152455_0_, int p_152455_1_, NBTSizeTracker p_152455_2_) throws IOException
     {
-        byte b0 = p_152455_0_.readByte();
+        byte var3 = p_152455_0_.readByte();
 
-        if (b0 == 0)
+        if (var3 == 0)
         {
             return new NBTTagEnd();
         }
         else
         {
             p_152455_0_.readUTF();
-            NBTBase nbtbase = NBTBase.createNewByType(b0);
+            NBTBase var4 = NBTBase.createNewByType(var3);
 
             try
             {
-                nbtbase.read(p_152455_0_, p_152455_1_, p_152455_2_);
-                return nbtbase;
+                var4.read(p_152455_0_, p_152455_1_, p_152455_2_);
+                return var4;
             }
-            catch (IOException ioexception)
+            catch (IOException var8)
             {
-                CrashReport crashreport = CrashReport.makeCrashReport(ioexception, "Loading NBT data");
-                CrashReportCategory crashreportcategory = crashreport.makeCategory("NBT Tag");
-                crashreportcategory.addCrashSection("Tag name", "[UNNAMED TAG]");
-                crashreportcategory.addCrashSection("Tag type", Byte.valueOf(b0));
-                throw new ReportedException(crashreport);
+                CrashReport var6 = CrashReport.makeCrashReport(var8, "Loading NBT data");
+                CrashReportCategory var7 = var6.makeCategory("NBT Tag");
+                var7.addCrashSection("Tag name", "[UNNAMED TAG]");
+                var7.addCrashSection("Tag type", Byte.valueOf(var3));
+                throw new ReportedException(var6);
             }
         }
     }

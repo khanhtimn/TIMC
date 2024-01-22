@@ -1,6 +1,5 @@
 package net.minecraft.client.main;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.authlib.properties.PropertyMap.Serializer;
@@ -11,110 +10,112 @@ import java.net.PasswordAuthentication;
 import java.net.Proxy;
 import java.net.Proxy.Type;
 import java.util.List;
+import joptsimple.ArgumentAcceptingOptionSpec;
+import joptsimple.NonOptionArgumentSpec;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import joptsimple.OptionSpec;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Session;
 
 public class Main
 {
+    
+
     public static void main(String[] p_main_0_)
     {
         System.setProperty("java.net.preferIPv4Stack", "true");
-        OptionParser optionparser = new OptionParser();
-        optionparser.allowsUnrecognizedOptions();
-        optionparser.accepts("demo");
-        optionparser.accepts("fullscreen");
-        optionparser.accepts("checkGlErrors");
-        OptionSpec<String> optionspec = optionparser.accepts("server").withRequiredArg();
-        OptionSpec<Integer> optionspec1 = optionparser.accepts("port").withRequiredArg().ofType(Integer.class).defaultsTo(Integer.valueOf(25565), new Integer[0]);
-        OptionSpec<File> optionspec2 = optionparser.accepts("gameDir").withRequiredArg().ofType(File.class).defaultsTo(new File("."), new File[0]);
-        OptionSpec<File> optionspec3 = optionparser.accepts("assetsDir").withRequiredArg().<File>ofType(File.class);
-        OptionSpec<File> optionspec4 = optionparser.accepts("resourcePackDir").withRequiredArg().<File>ofType(File.class);
-        OptionSpec<String> optionspec5 = optionparser.accepts("proxyHost").withRequiredArg();
-        OptionSpec<Integer> optionspec6 = optionparser.accepts("proxyPort").withRequiredArg().defaultsTo("8080", new String[0]).<Integer>ofType(Integer.class);
-        OptionSpec<String> optionspec7 = optionparser.accepts("proxyUser").withRequiredArg();
-        OptionSpec<String> optionspec8 = optionparser.accepts("proxyPass").withRequiredArg();
-        OptionSpec<String> optionspec9 = optionparser.accepts("username").withRequiredArg().defaultsTo("Player" + Minecraft.getSystemTime() % 1000L, new String[0]);
-        OptionSpec<String> optionspec10 = optionparser.accepts("uuid").withRequiredArg();
-        OptionSpec<String> optionspec11 = optionparser.accepts("accessToken").withRequiredArg().required();
-        OptionSpec<String> optionspec12 = optionparser.accepts("version").withRequiredArg().required();
-        OptionSpec<Integer> optionspec13 = optionparser.accepts("width").withRequiredArg().ofType(Integer.class).defaultsTo(Integer.valueOf(854), new Integer[0]);
-        OptionSpec<Integer> optionspec14 = optionparser.accepts("height").withRequiredArg().ofType(Integer.class).defaultsTo(Integer.valueOf(480), new Integer[0]);
-        OptionSpec<String> optionspec15 = optionparser.accepts("userProperties").withRequiredArg().defaultsTo("{}", new String[0]);
-        OptionSpec<String> optionspec16 = optionparser.accepts("profileProperties").withRequiredArg().defaultsTo("{}", new String[0]);
-        OptionSpec<String> optionspec17 = optionparser.accepts("assetIndex").withRequiredArg();
-        OptionSpec<String> optionspec18 = optionparser.accepts("userType").withRequiredArg().defaultsTo("legacy", new String[0]);
-        OptionSpec<String> optionspec19 = optionparser.nonOptions();
-        OptionSet optionset = optionparser.parse(p_main_0_);
-        List<String> list = optionset.valuesOf(optionspec19);
+        OptionParser var1 = new OptionParser();
+        var1.allowsUnrecognizedOptions();
+        var1.accepts("demo");
+        var1.accepts("fullscreen");
+        var1.accepts("checkGlErrors");
+        ArgumentAcceptingOptionSpec var2 = var1.accepts("server").withRequiredArg();
+        ArgumentAcceptingOptionSpec var3 = var1.accepts("port").withRequiredArg().ofType(Integer.class).defaultsTo(Integer.valueOf(25565), new Integer[0]);
+        ArgumentAcceptingOptionSpec var4 = var1.accepts("gameDir").withRequiredArg().ofType(File.class).defaultsTo(new File("."), new File[0]);
+        ArgumentAcceptingOptionSpec var5 = var1.accepts("assetsDir").withRequiredArg().ofType(File.class);
+        ArgumentAcceptingOptionSpec var6 = var1.accepts("resourcePackDir").withRequiredArg().ofType(File.class);
+        ArgumentAcceptingOptionSpec var7 = var1.accepts("proxyHost").withRequiredArg();
+        ArgumentAcceptingOptionSpec var8 = var1.accepts("proxyPort").withRequiredArg().defaultsTo("8080", new String[0]).ofType(Integer.class);
+        ArgumentAcceptingOptionSpec var9 = var1.accepts("proxyUser").withRequiredArg();
+        ArgumentAcceptingOptionSpec var10 = var1.accepts("proxyPass").withRequiredArg();
+        ArgumentAcceptingOptionSpec var11 = var1.accepts("username").withRequiredArg().defaultsTo("Player" + Minecraft.getSystemTime() % 1000L, new String[0]);
+        ArgumentAcceptingOptionSpec var12 = var1.accepts("uuid").withRequiredArg();
+        ArgumentAcceptingOptionSpec var13 = var1.accepts("accessToken").withRequiredArg().required();
+        ArgumentAcceptingOptionSpec var14 = var1.accepts("version").withRequiredArg().required();
+        ArgumentAcceptingOptionSpec var15 = var1.accepts("width").withRequiredArg().ofType(Integer.class).defaultsTo(Integer.valueOf(854), new Integer[0]);
+        ArgumentAcceptingOptionSpec var16 = var1.accepts("height").withRequiredArg().ofType(Integer.class).defaultsTo(Integer.valueOf(480), new Integer[0]);
+        ArgumentAcceptingOptionSpec var17 = var1.accepts("userProperties").withRequiredArg().required();
+        ArgumentAcceptingOptionSpec var18 = var1.accepts("assetIndex").withRequiredArg();
+        ArgumentAcceptingOptionSpec var19 = var1.accepts("userType").withRequiredArg().defaultsTo("legacy", new String[0]);
+        NonOptionArgumentSpec var20 = var1.nonOptions();
+        OptionSet var21 = var1.parse(p_main_0_);
+        List var22 = var21.valuesOf(var20);
 
-        if (!list.isEmpty())
+        if (!var22.isEmpty())
         {
-            System.out.println("Completely ignored arguments: " + list);
+            System.out.println("Completely ignored arguments: " + var22);
         }
 
-        String s = (String)optionset.valueOf(optionspec5);
-        Proxy proxy = Proxy.NO_PROXY;
+        String var23 = (String)var21.valueOf(var7);
+        Proxy var24 = Proxy.NO_PROXY;
 
-        if (s != null)
+        if (var23 != null)
         {
             try
             {
-                proxy = new Proxy(Type.SOCKS, new InetSocketAddress(s, ((Integer)optionset.valueOf(optionspec6)).intValue()));
+                var24 = new Proxy(Type.SOCKS, new InetSocketAddress(var23, ((Integer)var21.valueOf(var8)).intValue()));
             }
-            catch (Exception var46)
+            catch (Exception var43)
             {
                 ;
             }
         }
 
-        final String s1 = (String)optionset.valueOf(optionspec7);
-        final String s2 = (String)optionset.valueOf(optionspec8);
+        final String var25 = (String)var21.valueOf(var9);
+        final String var26 = (String)var21.valueOf(var10);
 
-        if (!proxy.equals(Proxy.NO_PROXY) && isNullOrEmpty(s1) && isNullOrEmpty(s2))
+        if (!var24.equals(Proxy.NO_PROXY) && func_110121_a(var25) && func_110121_a(var26))
         {
             Authenticator.setDefault(new Authenticator()
             {
+                
                 protected PasswordAuthentication getPasswordAuthentication()
                 {
-                    return new PasswordAuthentication(s1, s2.toCharArray());
+                    return new PasswordAuthentication(var25, var26.toCharArray());
                 }
             });
         }
 
-        int i = ((Integer)optionset.valueOf(optionspec13)).intValue();
-        int j = ((Integer)optionset.valueOf(optionspec14)).intValue();
-        boolean flag = optionset.has("fullscreen");
-        boolean flag1 = optionset.has("checkGlErrors");
-        boolean flag2 = optionset.has("demo");
-        String s3 = (String)optionset.valueOf(optionspec12);
-        Gson gson = (new GsonBuilder()).registerTypeAdapter(PropertyMap.class, new Serializer()).create();
-        PropertyMap propertymap = (PropertyMap)gson.fromJson((String)optionset.valueOf(optionspec15), PropertyMap.class);
-        PropertyMap propertymap1 = (PropertyMap)gson.fromJson((String)optionset.valueOf(optionspec16), PropertyMap.class);
-        File file1 = (File)optionset.valueOf(optionspec2);
-        File file2 = optionset.has(optionspec3) ? (File)optionset.valueOf(optionspec3) : new File(file1, "assets/");
-        File file3 = optionset.has(optionspec4) ? (File)optionset.valueOf(optionspec4) : new File(file1, "resourcepacks/");
-        String s4 = optionset.has(optionspec10) ? (String)optionspec10.value(optionset) : (String)optionspec9.value(optionset);
-        String s5 = optionset.has(optionspec17) ? (String)optionspec17.value(optionset) : null;
-        String s6 = (String)optionset.valueOf(optionspec);
-        Integer integer = (Integer)optionset.valueOf(optionspec1);
-        Session session = new Session((String)optionspec9.value(optionset), s4, (String)optionspec11.value(optionset), (String)optionspec18.value(optionset));
-        GameConfiguration gameconfiguration = new GameConfiguration(new GameConfiguration.UserInformation(session, propertymap, propertymap1, proxy), new GameConfiguration.DisplayInformation(i, j, flag, flag1), new GameConfiguration.FolderInformation(file1, file3, file2, s5), new GameConfiguration.GameInformation(flag2, s3), new GameConfiguration.ServerInformation(s6, integer.intValue()));
+        int var27 = ((Integer)var21.valueOf(var15)).intValue();
+        int var28 = ((Integer)var21.valueOf(var16)).intValue();
+        boolean var29 = var21.has("fullscreen");
+        boolean var30 = var21.has("checkGlErrors");
+        boolean var31 = var21.has("demo");
+        String var32 = (String)var21.valueOf(var14);
+        PropertyMap var33 = (PropertyMap)(new GsonBuilder()).registerTypeAdapter(PropertyMap.class, new Serializer()).create().fromJson((String)var21.valueOf(var17), PropertyMap.class);
+        File var34 = (File)var21.valueOf(var4);
+        File var35 = var21.has(var5) ? (File)var21.valueOf(var5) : new File(var34, "assets/");
+        File var36 = var21.has(var6) ? (File)var21.valueOf(var6) : new File(var34, "resourcepacks/");
+        String var37 = var21.has(var12) ? (String)var12.value(var21) : (String)var11.value(var21);
+        String var38 = var21.has(var18) ? (String)var18.value(var21) : null;
+        String var39 = (String)var21.valueOf(var2);
+        Integer var40 = (Integer)var21.valueOf(var3);
+        Session var41 = new Session((String)var11.value(var21), var37, (String)var13.value(var21), (String)var19.value(var21));
+        GameConfiguration var42 = new GameConfiguration(new GameConfiguration.UserInformation(var41, var33, var24), new GameConfiguration.DisplayInformation(var27, var28, var29, var30), new GameConfiguration.FolderInformation(var34, var36, var35, var38), new GameConfiguration.GameInformation(var31, var32), new GameConfiguration.ServerInformation(var39, var40.intValue()));
         Runtime.getRuntime().addShutdownHook(new Thread("Client Shutdown Thread")
         {
+            
             public void run()
             {
                 Minecraft.stopIntegratedServer();
             }
         });
         Thread.currentThread().setName("Client thread");
-        (new Minecraft(gameconfiguration)).run();
+        (new Minecraft(var42)).run();
     }
 
-    private static boolean isNullOrEmpty(String str)
+    private static boolean func_110121_a(String p_110121_0_)
     {
-        return str != null && !str.isEmpty();
+        return p_110121_0_ != null && !p_110121_0_.isEmpty();
     }
 }

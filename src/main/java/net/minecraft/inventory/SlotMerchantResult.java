@@ -17,13 +17,14 @@ public class SlotMerchantResult extends Slot
 
     /** "Instance" of the Merchant. */
     private final IMerchant theMerchant;
+    
 
-    public SlotMerchantResult(EntityPlayer player, IMerchant merchant, InventoryMerchant merchantInventory, int slotIndex, int xPosition, int yPosition)
+    public SlotMerchantResult(EntityPlayer p_i1822_1_, IMerchant p_i1822_2_, InventoryMerchant p_i1822_3_, int p_i1822_4_, int p_i1822_5_, int p_i1822_6_)
     {
-        super(merchantInventory, slotIndex, xPosition, yPosition);
-        this.thePlayer = player;
-        this.theMerchant = merchant;
-        this.theMerchantInventory = merchantInventory;
+        super(p_i1822_3_, p_i1822_4_, p_i1822_5_, p_i1822_6_);
+        this.thePlayer = p_i1822_1_;
+        this.theMerchant = p_i1822_2_;
+        this.theMerchantInventory = p_i1822_3_;
     }
 
     /**
@@ -38,83 +39,83 @@ public class SlotMerchantResult extends Slot
      * Decrease the size of the stack in slot (first int arg) by the amount of the second int arg. Returns the new
      * stack.
      */
-    public ItemStack decrStackSize(int amount)
+    public ItemStack decrStackSize(int p_75209_1_)
     {
         if (this.getHasStack())
         {
-            this.field_75231_g += Math.min(amount, this.getStack().stackSize);
+            this.field_75231_g += Math.min(p_75209_1_, this.getStack().stackSize);
         }
 
-        return super.decrStackSize(amount);
+        return super.decrStackSize(p_75209_1_);
     }
 
     /**
      * the itemStack passed in is the output - ie, iron ingots, and pickaxes, not ore and wood. Typically increases an
      * internal count then calls onCrafting(item).
      */
-    protected void onCrafting(ItemStack stack, int amount)
+    protected void onCrafting(ItemStack p_75210_1_, int p_75210_2_)
     {
-        this.field_75231_g += amount;
-        this.onCrafting(stack);
+        this.field_75231_g += p_75210_2_;
+        this.onCrafting(p_75210_1_);
     }
 
     /**
      * the itemStack passed in is the output - ie, iron ingots, and pickaxes, not ore and wood.
      */
-    protected void onCrafting(ItemStack stack)
+    protected void onCrafting(ItemStack p_75208_1_)
     {
-        stack.onCrafting(this.thePlayer.worldObj, this.thePlayer, this.field_75231_g);
+        p_75208_1_.onCrafting(this.thePlayer.worldObj, this.thePlayer, this.field_75231_g);
         this.field_75231_g = 0;
     }
 
     public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack)
     {
         this.onCrafting(stack);
-        MerchantRecipe merchantrecipe = this.theMerchantInventory.getCurrentRecipe();
+        MerchantRecipe var3 = this.theMerchantInventory.getCurrentRecipe();
 
-        if (merchantrecipe != null)
+        if (var3 != null)
         {
-            ItemStack itemstack = this.theMerchantInventory.getStackInSlot(0);
-            ItemStack itemstack1 = this.theMerchantInventory.getStackInSlot(1);
+            ItemStack var4 = this.theMerchantInventory.getStackInSlot(0);
+            ItemStack var5 = this.theMerchantInventory.getStackInSlot(1);
 
-            if (this.doTrade(merchantrecipe, itemstack, itemstack1) || this.doTrade(merchantrecipe, itemstack1, itemstack))
+            if (this.doTrade(var3, var4, var5) || this.doTrade(var3, var5, var4))
             {
-                this.theMerchant.useRecipe(merchantrecipe);
+                this.theMerchant.useRecipe(var3);
                 playerIn.triggerAchievement(StatList.timesTradedWithVillagerStat);
 
-                if (itemstack != null && itemstack.stackSize <= 0)
+                if (var4 != null && var4.stackSize <= 0)
                 {
-                    itemstack = null;
+                    var4 = null;
                 }
 
-                if (itemstack1 != null && itemstack1.stackSize <= 0)
+                if (var5 != null && var5.stackSize <= 0)
                 {
-                    itemstack1 = null;
+                    var5 = null;
                 }
 
-                this.theMerchantInventory.setInventorySlotContents(0, itemstack);
-                this.theMerchantInventory.setInventorySlotContents(1, itemstack1);
+                this.theMerchantInventory.setInventorySlotContents(0, var4);
+                this.theMerchantInventory.setInventorySlotContents(1, var5);
             }
         }
     }
 
     private boolean doTrade(MerchantRecipe trade, ItemStack firstItem, ItemStack secondItem)
     {
-        ItemStack itemstack = trade.getItemToBuy();
-        ItemStack itemstack1 = trade.getSecondItemToBuy();
+        ItemStack var4 = trade.getItemToBuy();
+        ItemStack var5 = trade.getSecondItemToBuy();
 
-        if (firstItem != null && firstItem.getItem() == itemstack.getItem())
+        if (firstItem != null && firstItem.getItem() == var4.getItem())
         {
-            if (itemstack1 != null && secondItem != null && itemstack1.getItem() == secondItem.getItem())
+            if (var5 != null && secondItem != null && var5.getItem() == secondItem.getItem())
             {
-                firstItem.stackSize -= itemstack.stackSize;
-                secondItem.stackSize -= itemstack1.stackSize;
+                firstItem.stackSize -= var4.stackSize;
+                secondItem.stackSize -= var5.stackSize;
                 return true;
             }
 
-            if (itemstack1 == null && secondItem == null)
+            if (var5 == null && secondItem == null)
             {
-                firstItem.stackSize -= itemstack.stackSize;
+                firstItem.stackSize -= var4.stackSize;
                 return true;
             }
         }

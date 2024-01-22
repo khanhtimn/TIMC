@@ -6,9 +6,11 @@ import net.minecraft.world.World;
 
 public class ItemSoup extends ItemFood
 {
-    public ItemSoup(int healAmount)
+    
+
+    public ItemSoup(int p_i45330_1_)
     {
-        super(healAmount, false);
+        super(p_i45330_1_, false);
         this.setMaxStackSize(1);
     }
 

@@ -1,41 +1,41 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
+import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 
-public class S0DPacketCollectItem implements Packet<INetHandlerPlayClient>
+public class S0DPacketCollectItem implements Packet
 {
-    private int collectedItemEntityId;
-    private int entityId;
+    private int field_149357_a;
+    private int field_149356_b;
+    
 
-    public S0DPacketCollectItem()
-    {
-    }
+    public S0DPacketCollectItem() {}
 
-    public S0DPacketCollectItem(int collectedItemEntityIdIn, int entityIdIn)
+    public S0DPacketCollectItem(int p_i45232_1_, int p_i45232_2_)
     {
-        this.collectedItemEntityId = collectedItemEntityIdIn;
-        this.entityId = entityIdIn;
+        this.field_149357_a = p_i45232_1_;
+        this.field_149356_b = p_i45232_2_;
     }
 
     /**
      * Reads the raw packet data from the data stream.
      */
-    public void readPacketData(PacketBuffer buf) throws IOException
+    public void readPacketData(PacketBuffer data) throws IOException
     {
-        this.collectedItemEntityId = buf.readVarIntFromBuffer();
-        this.entityId = buf.readVarIntFromBuffer();
+        this.field_149357_a = data.readVarIntFromBuffer();
+        this.field_149356_b = data.readVarIntFromBuffer();
     }
 
     /**
      * Writes the raw packet data to the data stream.
      */
-    public void writePacketData(PacketBuffer buf) throws IOException
+    public void writePacketData(PacketBuffer data) throws IOException
     {
-        buf.writeVarIntToBuffer(this.collectedItemEntityId);
-        buf.writeVarIntToBuffer(this.entityId);
+        data.writeVarIntToBuffer(this.field_149357_a);
+        data.writeVarIntToBuffer(this.field_149356_b);
     }
 
     /**
@@ -46,13 +46,21 @@ public class S0DPacketCollectItem implements Packet<INetHandlerPlayClient>
         handler.handleCollectItem(this);
     }
 
-    public int getCollectedItemEntityID()
+    public int func_149354_c()
     {
-        return this.collectedItemEntityId;
+        return this.field_149357_a;
     }
 
-    public int getEntityID()
+    public int func_149353_d()
     {
-        return this.entityId;
+        return this.field_149356_b;
+    }
+
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandler handler)
+    {
+        this.processPacket((INetHandlerPlayClient)handler);
     }
 }

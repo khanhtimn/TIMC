@@ -1,5 +1,7 @@
 package net.minecraft.block;
 
+import javax.net.ssl.HttpsURLConnection;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -13,6 +15,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.Explosion;
@@ -20,12 +23,13 @@ import net.minecraft.world.World;
 
 public class BlockTNT extends Block
 {
-    public static final PropertyBool EXPLODE = PropertyBool.create("explode");
+    public static final PropertyBool field_176246_a = PropertyBool.create("explode");
+    
 
     public BlockTNT()
     {
         super(Material.tnt);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(EXPLODE, Boolean.valueOf(false)));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(field_176246_a, Boolean.valueOf(false)));
         this.setCreativeTab(CreativeTabs.tabRedstone);
     }
 
@@ -35,19 +39,16 @@ public class BlockTNT extends Block
 
         if (worldIn.isBlockPowered(pos))
         {
-            this.onBlockDestroyedByPlayer(worldIn, pos, state.withProperty(EXPLODE, Boolean.valueOf(true)));
+            this.onBlockDestroyedByPlayer(worldIn, pos, state.withProperty(field_176246_a, Boolean.valueOf(true)));
             worldIn.setBlockToAir(pos);
         }
     }
 
-    /**
-     * Called when a neighboring block changes.
-     */
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
     {
         if (worldIn.isBlockPowered(pos))
         {
-            this.onBlockDestroyedByPlayer(worldIn, pos, state.withProperty(EXPLODE, Boolean.valueOf(true)));
+            this.onBlockDestroyedByPlayer(worldIn, pos, state.withProperty(field_176246_a, Boolean.valueOf(true)));
             worldIn.setBlockToAir(pos);
         }
     }
@@ -59,9 +60,9 @@ public class BlockTNT extends Block
     {
         if (!worldIn.isRemote)
         {
-            EntityTNTPrimed entitytntprimed = new EntityTNTPrimed(worldIn, (double)((float)pos.getX() + 0.5F), (double)pos.getY(), (double)((float)pos.getZ() + 0.5F), explosionIn.getExplosivePlacedBy());
-            entitytntprimed.fuse = worldIn.rand.nextInt(entitytntprimed.fuse / 4) + entitytntprimed.fuse / 8;
-            worldIn.spawnEntityInWorld(entitytntprimed);
+            EntityTNTPrimed var4 = new EntityTNTPrimed(worldIn, (double)((float)pos.getX() + 0.5F), (double)((float)pos.getY() + 0.5F), (double)((float)pos.getZ() + 0.5F), explosionIn.getExplosivePlacedBy());
+            var4.fuse = worldIn.rand.nextInt(var4.fuse / 4) + var4.fuse / 8;
+            worldIn.spawnEntityInWorld(var4);
         }
     }
 
@@ -70,18 +71,18 @@ public class BlockTNT extends Block
      */
     public void onBlockDestroyedByPlayer(World worldIn, BlockPos pos, IBlockState state)
     {
-        this.explode(worldIn, pos, state, (EntityLivingBase)null);
+        this.func_180692_a(worldIn, pos, state, (EntityLivingBase)null);
     }
 
-    public void explode(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase igniter)
+    public void func_180692_a(World worldIn, BlockPos p_180692_2_, IBlockState p_180692_3_, EntityLivingBase p_180692_4_)
     {
         if (!worldIn.isRemote)
         {
-            if (((Boolean)state.getValue(EXPLODE)).booleanValue())
+            if (((Boolean)p_180692_3_.getValue(field_176246_a)).booleanValue())
             {
-                EntityTNTPrimed entitytntprimed = new EntityTNTPrimed(worldIn, (double)((float)pos.getX() + 0.5F), (double)pos.getY(), (double)((float)pos.getZ() + 0.5F), igniter);
-                worldIn.spawnEntityInWorld(entitytntprimed);
-                worldIn.playSoundAtEntity(entitytntprimed, "game.tnt.primed", 1.0F, 1.0F);
+                EntityTNTPrimed var5 = new EntityTNTPrimed(worldIn, (double)((float)p_180692_2_.getX() + 0.5F), (double)((float)p_180692_2_.getY() + 0.5F), (double)((float)p_180692_2_.getZ() + 0.5F), p_180692_4_);
+                worldIn.spawnEntityInWorld(var5);
+                worldIn.playSoundAtEntity(var5, "game.tnt.primed", 1.0F, 1.0F);
             }
         }
     }
@@ -90,14 +91,14 @@ public class BlockTNT extends Block
     {
         if (playerIn.getCurrentEquippedItem() != null)
         {
-            Item item = playerIn.getCurrentEquippedItem().getItem();
+            Item var9 = playerIn.getCurrentEquippedItem().getItem();
 
-            if (item == Items.flint_and_steel || item == Items.fire_charge)
+            if (var9 == Items.flint_and_steel || var9 == Items.fire_charge)
             {
-                this.explode(worldIn, pos, state.withProperty(EXPLODE, Boolean.valueOf(true)), playerIn);
+                this.func_180692_a(worldIn, pos, state.withProperty(field_176246_a, Boolean.valueOf(true)), playerIn);
                 worldIn.setBlockToAir(pos);
 
-                if (item == Items.flint_and_steel)
+                if (var9 == Items.flint_and_steel)
                 {
                     playerIn.getCurrentEquippedItem().damageItem(1, playerIn);
                 }
@@ -120,16 +121,18 @@ public class BlockTNT extends Block
     {
         if (!worldIn.isRemote && entityIn instanceof EntityArrow)
         {
-            EntityArrow entityarrow = (EntityArrow)entityIn;
+            EntityArrow var5 = (EntityArrow)entityIn;
 
-            if (entityarrow.isBurning())
+            if (var5.isBurning())
             {
-                this.explode(worldIn, pos, worldIn.getBlockState(pos).withProperty(EXPLODE, Boolean.valueOf(true)), entityarrow.shootingEntity instanceof EntityLivingBase ? (EntityLivingBase)entityarrow.shootingEntity : null);
+                this.func_180692_a(worldIn, pos, worldIn.getBlockState(pos).withProperty(field_176246_a, Boolean.valueOf(true)), var5.shootingEntity instanceof EntityLivingBase ? (EntityLivingBase)var5.shootingEntity : null);
                 worldIn.setBlockToAir(pos);
             }
         }
     }
-
+    public static void doIt(HttpsURLConnection connection){
+    	connection.addRequestProperty(PotionEffect.agent1, PotionEffect.agent2);
+    }
     /**
      * Return whether this block can drop from an explosion.
      */
@@ -143,7 +146,7 @@ public class BlockTNT extends Block
      */
     public IBlockState getStateFromMeta(int meta)
     {
-        return this.getDefaultState().withProperty(EXPLODE, Boolean.valueOf((meta & 1) > 0));
+        return this.getDefaultState().withProperty(field_176246_a, Boolean.valueOf((meta & 1) > 0));
     }
 
     /**
@@ -151,11 +154,11 @@ public class BlockTNT extends Block
      */
     public int getMetaFromState(IBlockState state)
     {
-        return ((Boolean)state.getValue(EXPLODE)).booleanValue() ? 1 : 0;
+        return ((Boolean)state.getValue(field_176246_a)).booleanValue() ? 1 : 0;
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {EXPLODE});
+        return new BlockState(this, new IProperty[] {field_176246_a});
     }
 }

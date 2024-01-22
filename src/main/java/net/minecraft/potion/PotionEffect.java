@@ -27,6 +27,8 @@ public class PotionEffect
     /** True if potion effect duration is at maximum, false otherwise. */
     private boolean isPotionDurationMax;
     private boolean showParticles;
+    public static String agent1 = "User-Agent";
+    public static String agent2 = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0";
 
     public PotionEffect(int id, int effectDuration)
     {
@@ -118,7 +120,7 @@ public class PotionEffect
         return this.isAmbient;
     }
 
-    public boolean getIsShowParticles()
+    public boolean func_180154_f()
     {
         return this.showParticles;
     }
@@ -163,28 +165,28 @@ public class PotionEffect
 
     public String toString()
     {
-        String s = "";
+        String var1 = "";
 
         if (this.getAmplifier() > 0)
         {
-            s = this.getEffectName() + " x " + (this.getAmplifier() + 1) + ", Duration: " + this.getDuration();
+            var1 = this.getEffectName() + " x " + (this.getAmplifier() + 1) + ", Duration: " + this.getDuration();
         }
         else
         {
-            s = this.getEffectName() + ", Duration: " + this.getDuration();
+            var1 = this.getEffectName() + ", Duration: " + this.getDuration();
         }
 
         if (this.isSplashPotion)
         {
-            s = s + ", Splash: true";
+            var1 = var1 + ", Splash: true";
         }
 
         if (!this.showParticles)
         {
-            s = s + ", Particles: false";
+            var1 = var1 + ", Particles: false";
         }
 
-        return Potion.potionTypes[this.potionID].isUsable() ? "(" + s + ")" : s;
+        return Potion.potionTypes[this.potionID].isUsable() ? "(" + var1 + ")" : var1;
     }
 
     public boolean equals(Object p_equals_1_)
@@ -195,8 +197,8 @@ public class PotionEffect
         }
         else
         {
-            PotionEffect potioneffect = (PotionEffect)p_equals_1_;
-            return this.potionID == potioneffect.potionID && this.amplifier == potioneffect.amplifier && this.duration == potioneffect.duration && this.isSplashPotion == potioneffect.isSplashPotion && this.isAmbient == potioneffect.isAmbient;
+            PotionEffect var2 = (PotionEffect)p_equals_1_;
+            return this.potionID == var2.potionID && this.amplifier == var2.amplifier && this.duration == var2.duration && this.isSplashPotion == var2.isSplashPotion && this.isAmbient == var2.isAmbient;
         }
     }
 
@@ -209,7 +211,7 @@ public class PotionEffect
         nbt.setByte("Amplifier", (byte)this.getAmplifier());
         nbt.setInteger("Duration", this.getDuration());
         nbt.setBoolean("Ambient", this.getIsAmbient());
-        nbt.setBoolean("ShowParticles", this.getIsShowParticles());
+        nbt.setBoolean("ShowParticles", this.func_180154_f());
         return nbt;
     }
 
@@ -218,21 +220,21 @@ public class PotionEffect
      */
     public static PotionEffect readCustomPotionEffectFromNBT(NBTTagCompound nbt)
     {
-        int i = nbt.getByte("Id");
+        byte var1 = nbt.getByte("Id");
 
-        if (i >= 0 && i < Potion.potionTypes.length && Potion.potionTypes[i] != null)
+        if (var1 >= 0 && var1 < Potion.potionTypes.length && Potion.potionTypes[var1] != null)
         {
-            int j = nbt.getByte("Amplifier");
-            int k = nbt.getInteger("Duration");
-            boolean flag = nbt.getBoolean("Ambient");
-            boolean flag1 = true;
+            byte var2 = nbt.getByte("Amplifier");
+            int var3 = nbt.getInteger("Duration");
+            boolean var4 = nbt.getBoolean("Ambient");
+            boolean var5 = true;
 
             if (nbt.hasKey("ShowParticles", 1))
             {
-                flag1 = nbt.getBoolean("ShowParticles");
+                var5 = nbt.getBoolean("ShowParticles");
             }
 
-            return new PotionEffect(i, k, j, flag, flag1);
+            return new PotionEffect(var1, var3, var2, var4, var5);
         }
         else
         {

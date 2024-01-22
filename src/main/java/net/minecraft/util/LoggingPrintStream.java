@@ -9,11 +9,12 @@ public class LoggingPrintStream extends PrintStream
 {
     private static final Logger LOGGER = LogManager.getLogger();
     private final String domain;
+    
 
-    public LoggingPrintStream(String domainIn, OutputStream outStream)
+    public LoggingPrintStream(String p_i45927_1_, OutputStream p_i45927_2_)
     {
-        super(outStream);
-        this.domain = domainIn;
+        super(p_i45927_2_);
+        this.domain = p_i45927_1_;
     }
 
     public void println(String p_println_1_)
@@ -26,10 +27,10 @@ public class LoggingPrintStream extends PrintStream
         this.logString(String.valueOf(p_println_1_));
     }
 
-    private void logString(String string)
+    private void logString(String p_179882_1_)
     {
-        StackTraceElement[] astacktraceelement = Thread.currentThread().getStackTrace();
-        StackTraceElement stacktraceelement = astacktraceelement[Math.min(3, astacktraceelement.length)];
-        LOGGER.info("[{}]@.({}:{}): {}", new Object[] {this.domain, stacktraceelement.getFileName(), Integer.valueOf(stacktraceelement.getLineNumber()), string});
+        StackTraceElement[] var2 = Thread.currentThread().getStackTrace();
+        StackTraceElement var3 = var2[Math.min(3, var2.length)];
+        LOGGER.info("[{}]@.({}:{}): {}", new Object[] {this.domain, var3.getFileName(), Integer.valueOf(var3.getLineNumber()), p_179882_1_});
     }
 }

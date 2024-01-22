@@ -1,17 +1,17 @@
 package net.minecraft.network.play.client;
 
 import java.io.IOException;
+import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 
-public class C01PacketChatMessage implements Packet<INetHandlerPlayServer>
+public class C01PacketChatMessage implements Packet
 {
     private String message;
+    
 
-    public C01PacketChatMessage()
-    {
-    }
+    public C01PacketChatMessage() {}
 
     public C01PacketChatMessage(String messageIn)
     {
@@ -26,29 +26,34 @@ public class C01PacketChatMessage implements Packet<INetHandlerPlayServer>
     /**
      * Reads the raw packet data from the data stream.
      */
-    public void readPacketData(PacketBuffer buf) throws IOException
+    public void readPacketData(PacketBuffer data) throws IOException
     {
-        this.message = buf.readStringFromBuffer(100);
+        this.message = data.readStringFromBuffer(100);
     }
 
     /**
      * Writes the raw packet data to the data stream.
      */
-    public void writePacketData(PacketBuffer buf) throws IOException
+    public void writePacketData(PacketBuffer data) throws IOException
     {
-        buf.writeString(this.message);
+        data.writeString(this.message);
     }
 
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandlerPlayServer handler)
+    public void func_180757_a(INetHandlerPlayServer p_180757_1_)
     {
-        handler.processChatMessage(this);
+        p_180757_1_.processChatMessage(this);
     }
 
     public String getMessage()
     {
         return this.message;
+    }
+
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandler handler)
+    {
+        this.func_180757_a((INetHandlerPlayServer)handler);
     }
 }

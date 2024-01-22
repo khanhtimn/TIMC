@@ -12,128 +12,118 @@ public class PathFinder
 
     /** Selection of path points to add to the path */
     private PathPoint[] pathOptions = new PathPoint[32];
-    private NodeProcessor nodeProcessor;
+    private NodeProcessor field_176190_c;
+    
 
-    public PathFinder(NodeProcessor nodeProcessorIn)
+    public PathFinder(NodeProcessor p_i45557_1_)
     {
-        this.nodeProcessor = nodeProcessorIn;
+        this.field_176190_c = p_i45557_1_;
     }
 
-    /**
-     * Creates a path from one entity to another within a minimum distance
-     */
-    public PathEntity createEntityPathTo(IBlockAccess blockaccess, Entity entityFrom, Entity entityTo, float dist)
+    public PathEntity func_176188_a(IBlockAccess p_176188_1_, Entity p_176188_2_, Entity p_176188_3_, float p_176188_4_)
     {
-        return this.createEntityPathTo(blockaccess, entityFrom, entityTo.posX, entityTo.getEntityBoundingBox().minY, entityTo.posZ, dist);
+        return this.func_176189_a(p_176188_1_, p_176188_2_, p_176188_3_.posX, p_176188_3_.getEntityBoundingBox().minY, p_176188_3_.posZ, p_176188_4_);
     }
 
-    /**
-     * Creates a path from an entity to a specified location within a minimum distance
-     */
-    public PathEntity createEntityPathTo(IBlockAccess blockaccess, Entity entityIn, BlockPos targetPos, float dist)
+    public PathEntity func_180782_a(IBlockAccess p_180782_1_, Entity p_180782_2_, BlockPos p_180782_3_, float p_180782_4_)
     {
-        return this.createEntityPathTo(blockaccess, entityIn, (double)((float)targetPos.getX() + 0.5F), (double)((float)targetPos.getY() + 0.5F), (double)((float)targetPos.getZ() + 0.5F), dist);
+        return this.func_176189_a(p_180782_1_, p_180782_2_, (double)((float)p_180782_3_.getX() + 0.5F), (double)((float)p_180782_3_.getY() + 0.5F), (double)((float)p_180782_3_.getZ() + 0.5F), p_180782_4_);
     }
 
-    /**
-     * Internal implementation of creating a path from an entity to a point
-     */
-    private PathEntity createEntityPathTo(IBlockAccess blockaccess, Entity entityIn, double x, double y, double z, float distance)
+    private PathEntity func_176189_a(IBlockAccess p_176189_1_, Entity p_176189_2_, double p_176189_3_, double p_176189_5_, double p_176189_7_, float p_176189_9_)
     {
         this.path.clearPath();
-        this.nodeProcessor.initProcessor(blockaccess, entityIn);
-        PathPoint pathpoint = this.nodeProcessor.getPathPointTo(entityIn);
-        PathPoint pathpoint1 = this.nodeProcessor.getPathPointToCoords(entityIn, x, y, z);
-        PathEntity pathentity = this.addToPath(entityIn, pathpoint, pathpoint1, distance);
-        this.nodeProcessor.postProcess();
-        return pathentity;
+        this.field_176190_c.func_176162_a(p_176189_1_, p_176189_2_);
+        PathPoint var10 = this.field_176190_c.func_176161_a(p_176189_2_);
+        PathPoint var11 = this.field_176190_c.func_176160_a(p_176189_2_, p_176189_3_, p_176189_5_, p_176189_7_);
+        PathEntity var12 = this.func_176187_a(p_176189_2_, var10, var11, p_176189_9_);
+        this.field_176190_c.func_176163_a();
+        return var12;
     }
 
-    /**
-     * Adds a path from start to end and returns the whole path
-     */
-    private PathEntity addToPath(Entity entityIn, PathPoint pathpointStart, PathPoint pathpointEnd, float maxDistance)
+    private PathEntity func_176187_a(Entity p_176187_1_, PathPoint p_176187_2_, PathPoint p_176187_3_, float p_176187_4_)
     {
-        pathpointStart.totalPathDistance = 0.0F;
-        pathpointStart.distanceToNext = pathpointStart.distanceToSquared(pathpointEnd);
-        pathpointStart.distanceToTarget = pathpointStart.distanceToNext;
+        p_176187_2_.totalPathDistance = 0.0F;
+        p_176187_2_.distanceToNext = p_176187_2_.distanceToSquared(p_176187_3_);
+        p_176187_2_.distanceToTarget = p_176187_2_.distanceToNext;
         this.path.clearPath();
-        this.path.addPoint(pathpointStart);
-        PathPoint pathpoint = pathpointStart;
+        this.path.addPoint(p_176187_2_);
+        PathPoint var5 = p_176187_2_;
 
         while (!this.path.isPathEmpty())
         {
-            PathPoint pathpoint1 = this.path.dequeue();
+            PathPoint var6 = this.path.dequeue();
 
-            if (pathpoint1.equals(pathpointEnd))
+            if (var6.equals(p_176187_3_))
             {
-                return this.createEntityPath(pathpointStart, pathpointEnd);
+                return this.createEntityPath(p_176187_2_, p_176187_3_);
             }
 
-            if (pathpoint1.distanceToSquared(pathpointEnd) < pathpoint.distanceToSquared(pathpointEnd))
+            if (var6.distanceToSquared(p_176187_3_) < var5.distanceToSquared(p_176187_3_))
             {
-                pathpoint = pathpoint1;
+                var5 = var6;
             }
 
-            pathpoint1.visited = true;
-            int i = this.nodeProcessor.findPathOptions(this.pathOptions, entityIn, pathpoint1, pathpointEnd, maxDistance);
+            var6.visited = true;
+            int var7 = this.field_176190_c.func_176164_a(this.pathOptions, p_176187_1_, var6, p_176187_3_, p_176187_4_);
 
-            for (int j = 0; j < i; ++j)
+            for (int var8 = 0; var8 < var7; ++var8)
             {
-                PathPoint pathpoint2 = this.pathOptions[j];
-                float f = pathpoint1.totalPathDistance + pathpoint1.distanceToSquared(pathpoint2);
+                PathPoint var9 = this.pathOptions[var8];
+                float var10 = var6.totalPathDistance + var6.distanceToSquared(var9);
 
-                if (f < maxDistance * 2.0F && (!pathpoint2.isAssigned() || f < pathpoint2.totalPathDistance))
+                if (var10 < p_176187_4_ * 2.0F && (!var9.isAssigned() || var10 < var9.totalPathDistance))
                 {
-                    pathpoint2.previous = pathpoint1;
-                    pathpoint2.totalPathDistance = f;
-                    pathpoint2.distanceToNext = pathpoint2.distanceToSquared(pathpointEnd);
+                    var9.previous = var6;
+                    var9.totalPathDistance = var10;
+                    var9.distanceToNext = var9.distanceToSquared(p_176187_3_);
 
-                    if (pathpoint2.isAssigned())
+                    if (var9.isAssigned())
                     {
-                        this.path.changeDistance(pathpoint2, pathpoint2.totalPathDistance + pathpoint2.distanceToNext);
+                        this.path.changeDistance(var9, var9.totalPathDistance + var9.distanceToNext);
                     }
                     else
                     {
-                        pathpoint2.distanceToTarget = pathpoint2.totalPathDistance + pathpoint2.distanceToNext;
-                        this.path.addPoint(pathpoint2);
+                        var9.distanceToTarget = var9.totalPathDistance + var9.distanceToNext;
+                        this.path.addPoint(var9);
                     }
                 }
             }
         }
 
-        if (pathpoint == pathpointStart)
+        if (var5 == p_176187_2_)
         {
             return null;
         }
         else
         {
-            return this.createEntityPath(pathpointStart, pathpoint);
+            return this.createEntityPath(p_176187_2_, var5);
         }
     }
 
     /**
      * Returns a new PathEntity for a given start and end point
      */
-    private PathEntity createEntityPath(PathPoint start, PathPoint end)
+    private PathEntity createEntityPath(PathPoint p_75853_1_, PathPoint p_75853_2_)
     {
-        int i = 1;
+        int var3 = 1;
+        PathPoint var4;
 
-        for (PathPoint pathpoint = end; pathpoint.previous != null; pathpoint = pathpoint.previous)
+        for (var4 = p_75853_2_; var4.previous != null; var4 = var4.previous)
         {
-            ++i;
+            ++var3;
         }
 
-        PathPoint[] apathpoint = new PathPoint[i];
-        PathPoint pathpoint1 = end;
-        --i;
+        PathPoint[] var5 = new PathPoint[var3];
+        var4 = p_75853_2_;
+        --var3;
 
-        for (apathpoint[i] = end; pathpoint1.previous != null; apathpoint[i] = pathpoint1)
+        for (var5[var3] = p_75853_2_; var4.previous != null; var5[var3] = var4)
         {
-            pathpoint1 = pathpoint1.previous;
-            --i;
+            var4 = var4.previous;
+            --var3;
         }
 
-        return new PathEntity(apathpoint);
+        return new PathEntity(var5);
     }
 }

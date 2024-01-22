@@ -7,16 +7,17 @@ import net.minecraft.util.IChatComponent;
 public class StatCrafting extends StatBase
 {
     private final Item field_150960_a;
+    
 
-    public StatCrafting(String p_i45910_1_, String p_i45910_2_, IChatComponent statNameIn, Item p_i45910_4_)
+    public StatCrafting(String p_i45910_1_, String p_i45910_2_, IChatComponent p_i45910_3_, Item p_i45910_4_)
     {
-        super(p_i45910_1_ + p_i45910_2_, statNameIn);
+        super(p_i45910_1_ + p_i45910_2_, p_i45910_3_);
         this.field_150960_a = p_i45910_4_;
-        int i = Item.getIdFromItem(p_i45910_4_);
+        int var5 = Item.getIdFromItem(p_i45910_4_);
 
-        if (i != 0)
+        if (var5 != 0)
         {
-            IScoreObjectiveCriteria.INSTANCES.put(p_i45910_1_ + i, this.getCriteria());
+            IScoreObjectiveCriteria.INSTANCES.put(p_i45910_1_ + var5, this.func_150952_k());
         }
     }
 

@@ -11,43 +11,46 @@ import net.minecraft.world.storage.WorldInfo;
 
 public class AnvilSaveHandler extends SaveHandler
 {
-    public AnvilSaveHandler(File savesDirectory, String directoryName, boolean storePlayerdata)
+    
+
+    public AnvilSaveHandler(File p_i2142_1_, String p_i2142_2_, boolean p_i2142_3_)
     {
-        super(savesDirectory, directoryName, storePlayerdata);
+        super(p_i2142_1_, p_i2142_2_, p_i2142_3_);
     }
 
     /**
      * initializes and returns the chunk loader for the specified world provider
      */
-    public IChunkLoader getChunkLoader(WorldProvider provider)
+    public IChunkLoader getChunkLoader(WorldProvider p_75763_1_)
     {
-        File file1 = this.getWorldDirectory();
+        File var2 = this.getWorldDirectory();
+        File var3;
 
-        if (provider instanceof WorldProviderHell)
+        if (p_75763_1_ instanceof WorldProviderHell)
         {
-            File file3 = new File(file1, "DIM-1");
-            file3.mkdirs();
-            return new AnvilChunkLoader(file3);
+            var3 = new File(var2, "DIM-1");
+            var3.mkdirs();
+            return new AnvilChunkLoader(var3);
         }
-        else if (provider instanceof WorldProviderEnd)
+        else if (p_75763_1_ instanceof WorldProviderEnd)
         {
-            File file2 = new File(file1, "DIM1");
-            file2.mkdirs();
-            return new AnvilChunkLoader(file2);
+            var3 = new File(var2, "DIM1");
+            var3.mkdirs();
+            return new AnvilChunkLoader(var3);
         }
         else
         {
-            return new AnvilChunkLoader(file1);
+            return new AnvilChunkLoader(var2);
         }
     }
 
     /**
      * Saves the given World Info with the given NBTTagCompound as the Player.
      */
-    public void saveWorldInfoWithPlayer(WorldInfo worldInformation, NBTTagCompound tagCompound)
+    public void saveWorldInfoWithPlayer(WorldInfo p_75755_1_, NBTTagCompound p_75755_2_)
     {
-        worldInformation.setSaveVersion(19133);
-        super.saveWorldInfoWithPlayer(worldInformation, tagCompound);
+        p_75755_1_.setSaveVersion(19133);
+        super.saveWorldInfoWithPlayer(p_75755_1_, p_75755_2_);
     }
 
     /**
@@ -57,11 +60,11 @@ public class AnvilSaveHandler extends SaveHandler
     {
         try
         {
-            ThreadedFileIOBase.getThreadedIOInstance().waitForFinish();
+            ThreadedFileIOBase.func_178779_a().waitForFinish();
         }
-        catch (InterruptedException interruptedexception)
+        catch (InterruptedException var2)
         {
-            interruptedexception.printStackTrace();
+            var2.printStackTrace();
         }
 
         RegionFileCache.clearRegionFileReferences();

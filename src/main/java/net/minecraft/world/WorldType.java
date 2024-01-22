@@ -37,6 +37,7 @@ public class WorldType
     /** Whether this WorldType has a version or not. */
     private boolean isWorldTypeVersioned;
     private boolean hasNotificationData;
+    
 
     private WorldType(int id, String name)
     {
@@ -65,10 +66,7 @@ public class WorldType
         return "generator." + this.worldType;
     }
 
-    /**
-     * Gets the translation key for the info text for this world type.
-     */
-    public String getTranslatedInfo()
+    public String func_151359_c()
     {
         return this.getTranslateName() + ".info";
     }
@@ -122,11 +120,11 @@ public class WorldType
 
     public static WorldType parseWorldType(String type)
     {
-        for (int i = 0; i < worldTypes.length; ++i)
+        for (int var1 = 0; var1 < worldTypes.length; ++var1)
         {
-            if (worldTypes[i] != null && worldTypes[i].worldType.equalsIgnoreCase(type))
+            if (worldTypes[var1] != null && worldTypes[var1].worldType.equalsIgnoreCase(type))
             {
-                return worldTypes[i];
+                return worldTypes[var1];
             }
         }
 

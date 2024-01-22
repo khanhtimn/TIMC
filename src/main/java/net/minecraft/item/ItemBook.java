@@ -2,6 +2,8 @@ package net.minecraft.item;
 
 public class ItemBook extends Item
 {
+    
+
     /**
      * Checks isDamagable and if it cannot be stacked
      */

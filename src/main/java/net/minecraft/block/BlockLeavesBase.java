@@ -1,23 +1,25 @@
 package net.minecraft.block;
 
+import java.util.IdentityHashMap;
+import java.util.Map;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
+import optifine.Config;
 
 public class BlockLeavesBase extends Block
 {
-    protected boolean fancyGraphics;
+    protected boolean field_150121_P;
+    
+    private static Map mapOriginalOpacity = new IdentityHashMap();
 
     protected BlockLeavesBase(Material materialIn, boolean fancyGraphics)
     {
         super(materialIn);
-        this.fancyGraphics = fancyGraphics;
+        this.field_150121_P = fancyGraphics;
     }
 
-    /**
-     * Used to determine ambient occlusion and culling when rebuilding chunks for render
-     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -25,6 +27,25 @@ public class BlockLeavesBase extends Block
 
     public boolean shouldSideBeRendered(IBlockAccess worldIn, BlockPos pos, EnumFacing side)
     {
-        return !this.fancyGraphics && worldIn.getBlockState(pos).getBlock() == this ? false : super.shouldSideBeRendered(worldIn, pos, side);
+        return Config.isCullFacesLeaves() && worldIn.getBlockState(pos).getBlock() == this ? false : super.shouldSideBeRendered(worldIn, pos, side);
+    }
+
+    public static void setLightOpacity(Block block, int opacity)
+    {
+        if (!mapOriginalOpacity.containsKey(block))
+        {
+            mapOriginalOpacity.put(block, Integer.valueOf(block.getLightOpacity()));
+        }
+
+        block.setLightOpacity(opacity);
+    }
+
+    public static void restoreLightOpacity(Block block)
+    {
+        if (mapOriginalOpacity.containsKey(block))
+        {
+            int opacity = ((Integer)mapOriginalOpacity.get(block)).intValue();
+            setLightOpacity(block, opacity);
+        }
     }
 }

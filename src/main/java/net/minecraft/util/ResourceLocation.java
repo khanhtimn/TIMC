@@ -6,44 +6,41 @@ public class ResourceLocation
 {
     protected final String resourceDomain;
     protected final String resourcePath;
+    
 
-    protected ResourceLocation(int p_i45928_1_, String... resourceName)
+    protected ResourceLocation(int p_i45928_1_, String ... p_i45928_2_)
     {
-        this.resourceDomain = org.apache.commons.lang3.StringUtils.isEmpty(resourceName[0]) ? "minecraft" : resourceName[0].toLowerCase();
-        this.resourcePath = resourceName[1];
+        this.resourceDomain = org.apache.commons.lang3.StringUtils.isEmpty(p_i45928_2_[0]) ? "minecraft" : p_i45928_2_[0].toLowerCase();
+        this.resourcePath = p_i45928_2_[1];
         Validate.notNull(this.resourcePath);
     }
 
-    public ResourceLocation(String resourceName)
+    public ResourceLocation(String p_i1293_1_)
     {
-        this(0, splitObjectName(resourceName));
+        this(0, func_177516_a(p_i1293_1_));
     }
 
-    public ResourceLocation(String resourceDomainIn, String resourcePathIn)
+    public ResourceLocation(String p_i1292_1_, String p_i1292_2_)
     {
-        this(0, new String[] {resourceDomainIn, resourcePathIn});
+        this(0, new String[] {p_i1292_1_, p_i1292_2_});
     }
 
-    /**
-     * Splits an object name (such as minecraft:apple) into the domain and path parts and returns these as an array of
-     * length 2. If no colon is present in the passed value the returned array will contain {null, toSplit}.
-     */
-    protected static String[] splitObjectName(String toSplit)
+    protected static String[] func_177516_a(String p_177516_0_)
     {
-        String[] astring = new String[] {null, toSplit};
-        int i = toSplit.indexOf(58);
+        String[] var1 = new String[] {null, p_177516_0_};
+        int var2 = p_177516_0_.indexOf(58);
 
-        if (i >= 0)
+        if (var2 >= 0)
         {
-            astring[1] = toSplit.substring(i + 1, toSplit.length());
+            var1[1] = p_177516_0_.substring(var2 + 1, p_177516_0_.length());
 
-            if (i > 1)
+            if (var2 > 1)
             {
-                astring[0] = toSplit.substring(0, i);
+                var1[0] = p_177516_0_.substring(0, var2);
             }
         }
 
-        return astring;
+        return var1;
     }
 
     public String getResourcePath()
@@ -73,8 +70,8 @@ public class ResourceLocation
         }
         else
         {
-            ResourceLocation resourcelocation = (ResourceLocation)p_equals_1_;
-            return this.resourceDomain.equals(resourcelocation.resourceDomain) && this.resourcePath.equals(resourcelocation.resourcePath);
+            ResourceLocation var2 = (ResourceLocation)p_equals_1_;
+            return this.resourceDomain.equals(var2.resourceDomain) && this.resourcePath.equals(var2.resourcePath);
         }
     }
 

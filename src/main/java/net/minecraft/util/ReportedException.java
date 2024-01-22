@@ -6,10 +6,11 @@ public class ReportedException extends RuntimeException
 {
     /** Instance of CrashReport. */
     private final CrashReport theReportedExceptionCrashReport;
+    
 
-    public ReportedException(CrashReport report)
+    public ReportedException(CrashReport p_i1356_1_)
     {
-        this.theReportedExceptionCrashReport = report;
+        this.theReportedExceptionCrashReport = p_i1356_1_;
     }
 
     /**

@@ -8,9 +8,11 @@ import net.minecraft.world.gen.feature.WorldGenDesertWells;
 
 public class BiomeGenDesert extends BiomeGenBase
 {
-    public BiomeGenDesert(int id)
+    
+
+    public BiomeGenDesert(int p_i1977_1_)
     {
-        super(id);
+        super(p_i1977_1_);
         this.spawnableCreatureList.clear();
         this.topBlock = Blocks.sand.getDefaultState();
         this.fillerBlock = Blocks.sand.getDefaultState();
@@ -21,16 +23,16 @@ public class BiomeGenDesert extends BiomeGenBase
         this.spawnableCreatureList.clear();
     }
 
-    public void decorate(World worldIn, Random rand, BlockPos pos)
+    public void func_180624_a(World worldIn, Random p_180624_2_, BlockPos p_180624_3_)
     {
-        super.decorate(worldIn, rand, pos);
+        super.func_180624_a(worldIn, p_180624_2_, p_180624_3_);
 
-        if (rand.nextInt(1000) == 0)
+        if (p_180624_2_.nextInt(1000) == 0)
         {
-            int i = rand.nextInt(16) + 8;
-            int j = rand.nextInt(16) + 8;
-            BlockPos blockpos = worldIn.getHeight(pos.add(i, 0, j)).up();
-            (new WorldGenDesertWells()).generate(worldIn, rand, blockpos);
+            int var4 = p_180624_2_.nextInt(16) + 8;
+            int var5 = p_180624_2_.nextInt(16) + 8;
+            BlockPos var6 = worldIn.getHorizon(p_180624_3_.add(var4, 0, var5)).offsetUp();
+            (new WorldGenDesertWells()).generate(worldIn, p_180624_2_, var6);
         }
     }
 }

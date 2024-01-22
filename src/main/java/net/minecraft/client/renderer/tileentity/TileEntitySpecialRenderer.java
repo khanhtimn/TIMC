@@ -1,29 +1,26 @@
 package net.minecraft.client.renderer.tileentity;
 
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.optifine.entity.model.IEntityRenderer;
 
-public abstract class TileEntitySpecialRenderer<T extends TileEntity> implements IEntityRenderer
+public abstract class TileEntitySpecialRenderer
 {
     protected static final ResourceLocation[] DESTROY_STAGES = new ResourceLocation[] {new ResourceLocation("textures/blocks/destroy_stage_0.png"), new ResourceLocation("textures/blocks/destroy_stage_1.png"), new ResourceLocation("textures/blocks/destroy_stage_2.png"), new ResourceLocation("textures/blocks/destroy_stage_3.png"), new ResourceLocation("textures/blocks/destroy_stage_4.png"), new ResourceLocation("textures/blocks/destroy_stage_5.png"), new ResourceLocation("textures/blocks/destroy_stage_6.png"), new ResourceLocation("textures/blocks/destroy_stage_7.png"), new ResourceLocation("textures/blocks/destroy_stage_8.png"), new ResourceLocation("textures/blocks/destroy_stage_9.png")};
     protected TileEntityRendererDispatcher rendererDispatcher;
-    private Class tileEntityClass = null;
-    private ResourceLocation locationTextureCustom = null;
+    
 
-    public abstract void renderTileEntityAt(T te, double x, double y, double z, float partialTicks, int destroyStage);
+    public abstract void renderTileEntityAt(TileEntity var1, double var2, double var4, double var6, float var8, int var9);
 
-    protected void bindTexture(ResourceLocation location)
+    protected void bindTexture(ResourceLocation p_147499_1_)
     {
-        TextureManager texturemanager = this.rendererDispatcher.renderEngine;
+        TextureManager var2 = this.rendererDispatcher.renderEngine;
 
-        if (texturemanager != null)
+        if (var2 != null)
         {
-            texturemanager.bindTexture(location);
+            var2.bindTexture(p_147499_1_);
         }
     }
 
@@ -32,47 +29,13 @@ public abstract class TileEntitySpecialRenderer<T extends TileEntity> implements
         return this.rendererDispatcher.worldObj;
     }
 
-    public void setRendererDispatcher(TileEntityRendererDispatcher rendererDispatcherIn)
+    public void setRendererDispatcher(TileEntityRendererDispatcher p_147497_1_)
     {
-        this.rendererDispatcher = rendererDispatcherIn;
+        this.rendererDispatcher = p_147497_1_;
     }
 
     public FontRenderer getFontRenderer()
     {
         return this.rendererDispatcher.getFontRenderer();
-    }
-
-    /**
-     * If true the {@link TileEntitySpecialRenderer} will always be rendered while the player is in the render bounding
-     * box {@link TileEntity#getRenderBoundingBox()} and his squared distance with the {@link TileEntity} is smaller
-     * than {@link TileEntity#getMaxRenderDistanceSquared()}.
-     */
-    public boolean forceTileEntityRender()
-    {
-        return false;
-    }
-
-    public void renderTileEntityFast(T p_renderTileEntityFast_1_, double p_renderTileEntityFast_2_, double p_renderTileEntityFast_4_, double p_renderTileEntityFast_6_, float p_renderTileEntityFast_8_, int p_renderTileEntityFast_9_, WorldRenderer p_renderTileEntityFast_10_)
-    {
-    }
-
-    public Class getEntityClass()
-    {
-        return this.tileEntityClass;
-    }
-
-    public void setEntityClass(Class p_setEntityClass_1_)
-    {
-        this.tileEntityClass = p_setEntityClass_1_;
-    }
-
-    public ResourceLocation getLocationTextureCustom()
-    {
-        return this.locationTextureCustom;
-    }
-
-    public void setLocationTextureCustom(ResourceLocation p_setLocationTextureCustom_1_)
-    {
-        this.locationTextureCustom = p_setLocationTextureCustom_1_;
     }
 }

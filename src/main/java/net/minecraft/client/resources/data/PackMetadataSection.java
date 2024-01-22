@@ -6,6 +6,7 @@ public class PackMetadataSection implements IMetadataSection
 {
     private final IChatComponent packDescription;
     private final int packFormat;
+    
 
     public PackMetadataSection(IChatComponent p_i1034_1_, int p_i1034_2_)
     {
@@ -13,7 +14,7 @@ public class PackMetadataSection implements IMetadataSection
         this.packFormat = p_i1034_2_;
     }
 
-    public IChatComponent getPackDescription()
+    public IChatComponent func_152805_a()
     {
         return this.packDescription;
     }

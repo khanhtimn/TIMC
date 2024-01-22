@@ -1,55 +1,51 @@
 package net.minecraft.network.play.client;
 
 import java.io.IOException;
+import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.IChatComponent;
 
-public class C12PacketUpdateSign implements Packet<INetHandlerPlayServer>
+public class C12PacketUpdateSign implements Packet
 {
-    private BlockPos pos;
+    private BlockPos field_179723_a;
     private IChatComponent[] lines;
+    
 
-    public C12PacketUpdateSign()
-    {
-    }
+    public C12PacketUpdateSign() {}
 
-    public C12PacketUpdateSign(BlockPos pos, IChatComponent[] lines)
+    public C12PacketUpdateSign(BlockPos p_i45933_1_, IChatComponent[] p_i45933_2_)
     {
-        this.pos = pos;
-        this.lines = new IChatComponent[] {lines[0], lines[1], lines[2], lines[3]};
+        this.field_179723_a = p_i45933_1_;
+        this.lines = new IChatComponent[] {p_i45933_2_[0], p_i45933_2_[1], p_i45933_2_[2], p_i45933_2_[3]};
     }
 
     /**
      * Reads the raw packet data from the data stream.
      */
-    public void readPacketData(PacketBuffer buf) throws IOException
+    public void readPacketData(PacketBuffer data) throws IOException
     {
-        this.pos = buf.readBlockPos();
+        this.field_179723_a = data.readBlockPos();
         this.lines = new IChatComponent[4];
 
-        for (int i = 0; i < 4; ++i)
+        for (int var2 = 0; var2 < 4; ++var2)
         {
-            String s = buf.readStringFromBuffer(384);
-            IChatComponent ichatcomponent = IChatComponent.Serializer.jsonToComponent(s);
-            this.lines[i] = ichatcomponent;
+            this.lines[var2] = data.readChatComponent();
         }
     }
 
     /**
      * Writes the raw packet data to the data stream.
      */
-    public void writePacketData(PacketBuffer buf) throws IOException
+    public void writePacketData(PacketBuffer data) throws IOException
     {
-        buf.writeBlockPos(this.pos);
+        data.writeBlockPos(this.field_179723_a);
 
-        for (int i = 0; i < 4; ++i)
+        for (int var2 = 0; var2 < 4; ++var2)
         {
-            IChatComponent ichatcomponent = this.lines[i];
-            String s = IChatComponent.Serializer.componentToJson(ichatcomponent);
-            buf.writeString(s);
+            data.writeChatComponent(this.lines[var2]);
         }
     }
 
@@ -61,13 +57,21 @@ public class C12PacketUpdateSign implements Packet<INetHandlerPlayServer>
         handler.processUpdateSign(this);
     }
 
-    public BlockPos getPosition()
+    public BlockPos func_179722_a()
     {
-        return this.pos;
+        return this.field_179723_a;
     }
 
-    public IChatComponent[] getLines()
+    public IChatComponent[] func_180768_b()
     {
         return this.lines;
+    }
+
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandler handler)
+    {
+        this.processPacket((INetHandlerPlayServer)handler);
     }
 }

@@ -12,6 +12,7 @@ public class NoiseGeneratorSimplex
     public double field_151610_d;
     private static final double field_151609_g = 0.5D * (field_151614_a - 1.0D);
     private static final double field_151615_h = (3.0D - field_151614_a) / 6.0D;
+    
 
     public NoiseGeneratorSimplex()
     {
@@ -24,19 +25,20 @@ public class NoiseGeneratorSimplex
         this.field_151612_b = p_i45471_1_.nextDouble() * 256.0D;
         this.field_151613_c = p_i45471_1_.nextDouble() * 256.0D;
         this.field_151610_d = p_i45471_1_.nextDouble() * 256.0D;
+        int var2;
 
-        for (int i = 0; i < 256; this.field_151608_f[i] = i++)
+        for (var2 = 0; var2 < 256; this.field_151608_f[var2] = var2++)
         {
             ;
         }
 
-        for (int l = 0; l < 256; ++l)
+        for (var2 = 0; var2 < 256; ++var2)
         {
-            int j = p_i45471_1_.nextInt(256 - l) + l;
-            int k = this.field_151608_f[l];
-            this.field_151608_f[l] = this.field_151608_f[j];
-            this.field_151608_f[j] = k;
-            this.field_151608_f[l + 256] = this.field_151608_f[l];
+            int var3 = p_i45471_1_.nextInt(256 - var2) + var2;
+            int var4 = this.field_151608_f[var2];
+            this.field_151608_f[var2] = this.field_151608_f[var3];
+            this.field_151608_f[var3] = var4;
+            this.field_151608_f[var2 + 256] = this.field_151608_f[var2];
         }
     }
 
@@ -52,164 +54,164 @@ public class NoiseGeneratorSimplex
 
     public double func_151605_a(double p_151605_1_, double p_151605_3_)
     {
-        double d3 = 0.5D * (field_151614_a - 1.0D);
-        double d4 = (p_151605_1_ + p_151605_3_) * d3;
-        int i = func_151607_a(p_151605_1_ + d4);
-        int j = func_151607_a(p_151605_3_ + d4);
-        double d5 = (3.0D - field_151614_a) / 6.0D;
-        double d6 = (double)(i + j) * d5;
-        double d7 = (double)i - d6;
-        double d8 = (double)j - d6;
-        double d9 = p_151605_1_ - d7;
-        double d10 = p_151605_3_ - d8;
-        int k;
-        int l;
+        double var11 = 0.5D * (field_151614_a - 1.0D);
+        double var13 = (p_151605_1_ + p_151605_3_) * var11;
+        int var15 = func_151607_a(p_151605_1_ + var13);
+        int var16 = func_151607_a(p_151605_3_ + var13);
+        double var17 = (3.0D - field_151614_a) / 6.0D;
+        double var19 = (double)(var15 + var16) * var17;
+        double var21 = (double)var15 - var19;
+        double var23 = (double)var16 - var19;
+        double var25 = p_151605_1_ - var21;
+        double var27 = p_151605_3_ - var23;
+        byte var29;
+        byte var30;
 
-        if (d9 > d10)
+        if (var25 > var27)
         {
-            k = 1;
-            l = 0;
+            var29 = 1;
+            var30 = 0;
         }
         else
         {
-            k = 0;
-            l = 1;
+            var29 = 0;
+            var30 = 1;
         }
 
-        double d11 = d9 - (double)k + d5;
-        double d12 = d10 - (double)l + d5;
-        double d13 = d9 - 1.0D + 2.0D * d5;
-        double d14 = d10 - 1.0D + 2.0D * d5;
-        int i1 = i & 255;
-        int j1 = j & 255;
-        int k1 = this.field_151608_f[i1 + this.field_151608_f[j1]] % 12;
-        int l1 = this.field_151608_f[i1 + k + this.field_151608_f[j1 + l]] % 12;
-        int i2 = this.field_151608_f[i1 + 1 + this.field_151608_f[j1 + 1]] % 12;
-        double d15 = 0.5D - d9 * d9 - d10 * d10;
-        double d0;
+        double var31 = var25 - (double)var29 + var17;
+        double var33 = var27 - (double)var30 + var17;
+        double var35 = var25 - 1.0D + 2.0D * var17;
+        double var37 = var27 - 1.0D + 2.0D * var17;
+        int var39 = var15 & 255;
+        int var40 = var16 & 255;
+        int var41 = this.field_151608_f[var39 + this.field_151608_f[var40]] % 12;
+        int var42 = this.field_151608_f[var39 + var29 + this.field_151608_f[var40 + var30]] % 12;
+        int var43 = this.field_151608_f[var39 + 1 + this.field_151608_f[var40 + 1]] % 12;
+        double var44 = 0.5D - var25 * var25 - var27 * var27;
+        double var5;
 
-        if (d15 < 0.0D)
+        if (var44 < 0.0D)
         {
-            d0 = 0.0D;
+            var5 = 0.0D;
         }
         else
         {
-            d15 = d15 * d15;
-            d0 = d15 * d15 * func_151604_a(field_151611_e[k1], d9, d10);
+            var44 *= var44;
+            var5 = var44 * var44 * func_151604_a(field_151611_e[var41], var25, var27);
         }
 
-        double d16 = 0.5D - d11 * d11 - d12 * d12;
-        double d1;
+        double var46 = 0.5D - var31 * var31 - var33 * var33;
+        double var7;
 
-        if (d16 < 0.0D)
+        if (var46 < 0.0D)
         {
-            d1 = 0.0D;
+            var7 = 0.0D;
         }
         else
         {
-            d16 = d16 * d16;
-            d1 = d16 * d16 * func_151604_a(field_151611_e[l1], d11, d12);
+            var46 *= var46;
+            var7 = var46 * var46 * func_151604_a(field_151611_e[var42], var31, var33);
         }
 
-        double d17 = 0.5D - d13 * d13 - d14 * d14;
-        double d2;
+        double var48 = 0.5D - var35 * var35 - var37 * var37;
+        double var9;
 
-        if (d17 < 0.0D)
+        if (var48 < 0.0D)
         {
-            d2 = 0.0D;
+            var9 = 0.0D;
         }
         else
         {
-            d17 = d17 * d17;
-            d2 = d17 * d17 * func_151604_a(field_151611_e[i2], d13, d14);
+            var48 *= var48;
+            var9 = var48 * var48 * func_151604_a(field_151611_e[var43], var35, var37);
         }
 
-        return 70.0D * (d0 + d1 + d2);
+        return 70.0D * (var5 + var7 + var9);
     }
 
     public void func_151606_a(double[] p_151606_1_, double p_151606_2_, double p_151606_4_, int p_151606_6_, int p_151606_7_, double p_151606_8_, double p_151606_10_, double p_151606_12_)
     {
-        int i = 0;
+        int var14 = 0;
 
-        for (int j = 0; j < p_151606_7_; ++j)
+        for (int var15 = 0; var15 < p_151606_7_; ++var15)
         {
-            double d0 = (p_151606_4_ + (double)j) * p_151606_10_ + this.field_151613_c;
+            double var16 = (p_151606_4_ + (double)var15) * p_151606_10_ + this.field_151613_c;
 
-            for (int k = 0; k < p_151606_6_; ++k)
+            for (int var18 = 0; var18 < p_151606_6_; ++var18)
             {
-                double d1 = (p_151606_2_ + (double)k) * p_151606_8_ + this.field_151612_b;
-                double d5 = (d1 + d0) * field_151609_g;
-                int l = func_151607_a(d1 + d5);
-                int i1 = func_151607_a(d0 + d5);
-                double d6 = (double)(l + i1) * field_151615_h;
-                double d7 = (double)l - d6;
-                double d8 = (double)i1 - d6;
-                double d9 = d1 - d7;
-                double d10 = d0 - d8;
-                int j1;
-                int k1;
+                double var19 = (p_151606_2_ + (double)var18) * p_151606_8_ + this.field_151612_b;
+                double var27 = (var19 + var16) * field_151609_g;
+                int var29 = func_151607_a(var19 + var27);
+                int var30 = func_151607_a(var16 + var27);
+                double var31 = (double)(var29 + var30) * field_151615_h;
+                double var33 = (double)var29 - var31;
+                double var35 = (double)var30 - var31;
+                double var37 = var19 - var33;
+                double var39 = var16 - var35;
+                byte var41;
+                byte var42;
 
-                if (d9 > d10)
+                if (var37 > var39)
                 {
-                    j1 = 1;
-                    k1 = 0;
+                    var41 = 1;
+                    var42 = 0;
                 }
                 else
                 {
-                    j1 = 0;
-                    k1 = 1;
+                    var41 = 0;
+                    var42 = 1;
                 }
 
-                double d11 = d9 - (double)j1 + field_151615_h;
-                double d12 = d10 - (double)k1 + field_151615_h;
-                double d13 = d9 - 1.0D + 2.0D * field_151615_h;
-                double d14 = d10 - 1.0D + 2.0D * field_151615_h;
-                int l1 = l & 255;
-                int i2 = i1 & 255;
-                int j2 = this.field_151608_f[l1 + this.field_151608_f[i2]] % 12;
-                int k2 = this.field_151608_f[l1 + j1 + this.field_151608_f[i2 + k1]] % 12;
-                int l2 = this.field_151608_f[l1 + 1 + this.field_151608_f[i2 + 1]] % 12;
-                double d15 = 0.5D - d9 * d9 - d10 * d10;
-                double d2;
+                double var43 = var37 - (double)var41 + field_151615_h;
+                double var45 = var39 - (double)var42 + field_151615_h;
+                double var47 = var37 - 1.0D + 2.0D * field_151615_h;
+                double var49 = var39 - 1.0D + 2.0D * field_151615_h;
+                int var51 = var29 & 255;
+                int var52 = var30 & 255;
+                int var53 = this.field_151608_f[var51 + this.field_151608_f[var52]] % 12;
+                int var54 = this.field_151608_f[var51 + var41 + this.field_151608_f[var52 + var42]] % 12;
+                int var55 = this.field_151608_f[var51 + 1 + this.field_151608_f[var52 + 1]] % 12;
+                double var56 = 0.5D - var37 * var37 - var39 * var39;
+                double var21;
 
-                if (d15 < 0.0D)
+                if (var56 < 0.0D)
                 {
-                    d2 = 0.0D;
+                    var21 = 0.0D;
                 }
                 else
                 {
-                    d15 = d15 * d15;
-                    d2 = d15 * d15 * func_151604_a(field_151611_e[j2], d9, d10);
+                    var56 *= var56;
+                    var21 = var56 * var56 * func_151604_a(field_151611_e[var53], var37, var39);
                 }
 
-                double d16 = 0.5D - d11 * d11 - d12 * d12;
-                double d3;
+                double var58 = 0.5D - var43 * var43 - var45 * var45;
+                double var23;
 
-                if (d16 < 0.0D)
+                if (var58 < 0.0D)
                 {
-                    d3 = 0.0D;
+                    var23 = 0.0D;
                 }
                 else
                 {
-                    d16 = d16 * d16;
-                    d3 = d16 * d16 * func_151604_a(field_151611_e[k2], d11, d12);
+                    var58 *= var58;
+                    var23 = var58 * var58 * func_151604_a(field_151611_e[var54], var43, var45);
                 }
 
-                double d17 = 0.5D - d13 * d13 - d14 * d14;
-                double d4;
+                double var60 = 0.5D - var47 * var47 - var49 * var49;
+                double var25;
 
-                if (d17 < 0.0D)
+                if (var60 < 0.0D)
                 {
-                    d4 = 0.0D;
+                    var25 = 0.0D;
                 }
                 else
                 {
-                    d17 = d17 * d17;
-                    d4 = d17 * d17 * func_151604_a(field_151611_e[l2], d13, d14);
+                    var60 *= var60;
+                    var25 = var60 * var60 * func_151604_a(field_151611_e[var55], var47, var49);
                 }
 
-                int i3 = i++;
-                p_151606_1_[i3] += 70.0D * (d2 + d3 + d4) * p_151606_12_;
+                int var10001 = var14++;
+                p_151606_1_[var10001] += 70.0D * (var21 + var23 + var25) * p_151606_12_;
             }
         }
     }

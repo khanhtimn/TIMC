@@ -1,24 +1,24 @@
 package net.minecraft.scoreboard;
 
 import java.util.List;
-import net.minecraft.entity.player.EntityPlayer;
 
 public class ScoreDummyCriteria implements IScoreObjectiveCriteria
 {
-    private final String dummyName;
+    private final String field_96644_g;
+    
 
-    public ScoreDummyCriteria(String name)
+    public ScoreDummyCriteria(String p_i2311_1_)
     {
-        this.dummyName = name;
-        IScoreObjectiveCriteria.INSTANCES.put(name, this);
+        this.field_96644_g = p_i2311_1_;
+        IScoreObjectiveCriteria.INSTANCES.put(p_i2311_1_, this);
     }
 
     public String getName()
     {
-        return this.dummyName;
+        return this.field_96644_g;
     }
 
-    public int setScore(List<EntityPlayer> p_96635_1_)
+    public int func_96635_a(List p_96635_1_)
     {
         return 0;
     }
@@ -28,7 +28,7 @@ public class ScoreDummyCriteria implements IScoreObjectiveCriteria
         return false;
     }
 
-    public IScoreObjectiveCriteria.EnumRenderType getRenderType()
+    public IScoreObjectiveCriteria.EnumRenderType func_178790_c()
     {
         return IScoreObjectiveCriteria.EnumRenderType.INTEGER;
     }

@@ -2,103 +2,50 @@ package net.minecraft.client.renderer.vertex;
 
 import java.nio.ByteBuffer;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.optifine.render.VboRange;
-import net.optifine.render.VboRegion;
 import org.lwjgl.opengl.GL11;
 
 public class VertexBuffer
 {
-    private int glBufferId;
-    private final VertexFormat vertexFormat;
-    private int count;
-    private VboRegion vboRegion;
-    private VboRange vboRange;
-    private int drawMode;
+    private int field_177365_a;
+    private final VertexFormat field_177363_b;
+    private int field_177364_c;
+    
 
-    public VertexBuffer(VertexFormat vertexFormatIn)
+    public VertexBuffer(VertexFormat p_i46098_1_)
     {
-        this.vertexFormat = vertexFormatIn;
-        this.glBufferId = OpenGlHelper.glGenBuffers();
+        this.field_177363_b = p_i46098_1_;
+        this.field_177365_a = OpenGlHelper.func_176073_e();
     }
 
-    public void bindBuffer()
+    public void func_177359_a()
     {
-        OpenGlHelper.glBindBuffer(OpenGlHelper.GL_ARRAY_BUFFER, this.glBufferId);
+        OpenGlHelper.func_176072_g(OpenGlHelper.field_176089_P, this.field_177365_a);
     }
 
-    public void bufferData(ByteBuffer p_181722_1_)
+    public void func_177360_a(ByteBuffer p_177360_1_, int p_177360_2_)
     {
-        if (this.vboRegion != null)
+        this.func_177359_a();
+        OpenGlHelper.func_176071_a(OpenGlHelper.field_176089_P, p_177360_1_, 35044);
+        this.func_177361_b();
+        this.field_177364_c = p_177360_2_ / this.field_177363_b.func_177338_f();
+    }
+
+    public void func_177358_a(int p_177358_1_)
+    {
+        GL11.glDrawArrays(p_177358_1_, 0, this.field_177364_c);
+    }
+
+    public void func_177361_b()
+    {
+        OpenGlHelper.func_176072_g(OpenGlHelper.field_176089_P, 0);
+    }
+
+    public void func_177362_c()
+    {
+        if (this.field_177365_a >= 0)
         {
-            this.vboRegion.bufferData(p_181722_1_, this.vboRange);
+            OpenGlHelper.func_176074_g(this.field_177365_a);
+            this.field_177365_a = -1;
         }
-        else
-        {
-            this.bindBuffer();
-            OpenGlHelper.glBufferData(OpenGlHelper.GL_ARRAY_BUFFER, p_181722_1_, 35044);
-            this.unbindBuffer();
-            this.count = p_181722_1_.limit() / this.vertexFormat.getNextOffset();
-        }
-    }
-
-    public void drawArrays(int mode)
-    {
-        if (this.drawMode > 0)
-        {
-            mode = this.drawMode;
-        }
-
-        if (this.vboRegion != null)
-        {
-            this.vboRegion.drawArrays(mode, this.vboRange);
-        }
-        else
-        {
-            GL11.glDrawArrays(mode, 0, this.count);
-        }
-    }
-
-    public void unbindBuffer()
-    {
-        OpenGlHelper.glBindBuffer(OpenGlHelper.GL_ARRAY_BUFFER, 0);
-    }
-
-    public void deleteGlBuffers()
-    {
-        if (this.glBufferId >= 0)
-        {
-            OpenGlHelper.glDeleteBuffers(this.glBufferId);
-            this.glBufferId = -1;
-        }
-    }
-
-    public void setVboRegion(VboRegion p_setVboRegion_1_)
-    {
-        if (p_setVboRegion_1_ != null)
-        {
-            this.deleteGlBuffers();
-            this.vboRegion = p_setVboRegion_1_;
-            this.vboRange = new VboRange();
-        }
-    }
-
-    public VboRegion getVboRegion()
-    {
-        return this.vboRegion;
-    }
-
-    public VboRange getVboRange()
-    {
-        return this.vboRange;
-    }
-
-    public int getDrawMode()
-    {
-        return this.drawMode;
-    }
-
-    public void setDrawMode(int p_setDrawMode_1_)
-    {
-        this.drawMode = p_setDrawMode_1_;
     }
 }

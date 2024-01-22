@@ -4,4 +4,5 @@ import net.minecraft.command.ServerCommandManager;
 
 public class IntegratedServerCommandManager extends ServerCommandManager
 {
+    
 }

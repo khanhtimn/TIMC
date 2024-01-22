@@ -3,7 +3,6 @@ package net.minecraft.world.gen.feature;
 import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
@@ -14,65 +13,66 @@ public abstract class WorldGenHugeTrees extends WorldGenAbstractTree
     protected final int baseHeight;
 
     /** Sets the metadata for the wood blocks used */
-    protected final IBlockState woodMetadata;
+    protected final int woodMetadata;
 
     /** Sets the metadata for the leaves used in huge trees */
-    protected final IBlockState leavesMetadata;
-    protected int extraRandomHeight;
+    protected final int leavesMetadata;
+    protected int field_150538_d;
+    
 
-    public WorldGenHugeTrees(boolean p_i46447_1_, int p_i46447_2_, int p_i46447_3_, IBlockState p_i46447_4_, IBlockState p_i46447_5_)
+    public WorldGenHugeTrees(boolean p_i45458_1_, int p_i45458_2_, int p_i45458_3_, int p_i45458_4_, int p_i45458_5_)
     {
-        super(p_i46447_1_);
-        this.baseHeight = p_i46447_2_;
-        this.extraRandomHeight = p_i46447_3_;
-        this.woodMetadata = p_i46447_4_;
-        this.leavesMetadata = p_i46447_5_;
+        super(p_i45458_1_);
+        this.baseHeight = p_i45458_2_;
+        this.field_150538_d = p_i45458_3_;
+        this.woodMetadata = p_i45458_4_;
+        this.leavesMetadata = p_i45458_5_;
     }
 
     protected int func_150533_a(Random p_150533_1_)
     {
-        int i = p_150533_1_.nextInt(3) + this.baseHeight;
+        int var2 = p_150533_1_.nextInt(3) + this.baseHeight;
 
-        if (this.extraRandomHeight > 1)
+        if (this.field_150538_d > 1)
         {
-            i += p_150533_1_.nextInt(this.extraRandomHeight);
+            var2 += p_150533_1_.nextInt(this.field_150538_d);
         }
 
-        return i;
+        return var2;
     }
 
     private boolean func_175926_c(World worldIn, BlockPos p_175926_2_, int p_175926_3_)
     {
-        boolean flag = true;
+        boolean var4 = true;
 
         if (p_175926_2_.getY() >= 1 && p_175926_2_.getY() + p_175926_3_ + 1 <= 256)
         {
-            for (int i = 0; i <= 1 + p_175926_3_; ++i)
+            for (int var5 = 0; var5 <= 1 + p_175926_3_; ++var5)
             {
-                int j = 2;
+                byte var6 = 2;
 
-                if (i == 0)
+                if (var5 == 0)
                 {
-                    j = 1;
+                    var6 = 1;
                 }
-                else if (i >= 1 + p_175926_3_ - 2)
+                else if (var5 >= 1 + p_175926_3_ - 2)
                 {
-                    j = 2;
+                    var6 = 2;
                 }
 
-                for (int k = -j; k <= j && flag; ++k)
+                for (int var7 = -var6; var7 <= var6 && var4; ++var7)
                 {
-                    for (int l = -j; l <= j && flag; ++l)
+                    for (int var8 = -var6; var8 <= var6 && var4; ++var8)
                     {
-                        if (p_175926_2_.getY() + i < 0 || p_175926_2_.getY() + i >= 256 || !this.func_150523_a(worldIn.getBlockState(p_175926_2_.add(k, i, l)).getBlock()))
+                        if (p_175926_2_.getY() + var5 < 0 || p_175926_2_.getY() + var5 >= 256 || !this.func_150523_a(worldIn.getBlockState(p_175926_2_.add(var7, var5, var8)).getBlock()))
                         {
-                            flag = false;
+                            var4 = false;
                         }
                     }
                 }
             }
 
-            return flag;
+            return var4;
         }
         else
         {
@@ -82,15 +82,15 @@ public abstract class WorldGenHugeTrees extends WorldGenAbstractTree
 
     private boolean func_175927_a(BlockPos p_175927_1_, World worldIn)
     {
-        BlockPos blockpos = p_175927_1_.down();
-        Block block = worldIn.getBlockState(blockpos).getBlock();
+        BlockPos var3 = p_175927_1_.offsetDown();
+        Block var4 = worldIn.getBlockState(var3).getBlock();
 
-        if ((block == Blocks.grass || block == Blocks.dirt) && p_175927_1_.getY() >= 2)
+        if ((var4 == Blocks.grass || var4 == Blocks.dirt) && p_175927_1_.getY() >= 2)
         {
-            this.func_175921_a(worldIn, blockpos);
-            this.func_175921_a(worldIn, blockpos.east());
-            this.func_175921_a(worldIn, blockpos.south());
-            this.func_175921_a(worldIn, blockpos.south().east());
+            this.func_175921_a(worldIn, var3);
+            this.func_175921_a(worldIn, var3.offsetEast());
+            this.func_175921_a(worldIn, var3.offsetSouth());
+            this.func_175921_a(worldIn, var3.offsetSouth().offsetEast());
             return true;
         }
         else
@@ -106,23 +106,23 @@ public abstract class WorldGenHugeTrees extends WorldGenAbstractTree
 
     protected void func_175925_a(World worldIn, BlockPos p_175925_2_, int p_175925_3_)
     {
-        int i = p_175925_3_ * p_175925_3_;
+        int var4 = p_175925_3_ * p_175925_3_;
 
-        for (int j = -p_175925_3_; j <= p_175925_3_ + 1; ++j)
+        for (int var5 = -p_175925_3_; var5 <= p_175925_3_ + 1; ++var5)
         {
-            for (int k = -p_175925_3_; k <= p_175925_3_ + 1; ++k)
+            for (int var6 = -p_175925_3_; var6 <= p_175925_3_ + 1; ++var6)
             {
-                int l = j - 1;
-                int i1 = k - 1;
+                int var7 = var5 - 1;
+                int var8 = var6 - 1;
 
-                if (j * j + k * k <= i || l * l + i1 * i1 <= i || j * j + i1 * i1 <= i || l * l + k * k <= i)
+                if (var5 * var5 + var6 * var6 <= var4 || var7 * var7 + var8 * var8 <= var4 || var5 * var5 + var8 * var8 <= var4 || var7 * var7 + var6 * var6 <= var4)
                 {
-                    BlockPos blockpos = p_175925_2_.add(j, 0, k);
-                    Material material = worldIn.getBlockState(blockpos).getBlock().getMaterial();
+                    BlockPos var9 = p_175925_2_.add(var5, 0, var6);
+                    Material var10 = worldIn.getBlockState(var9).getBlock().getMaterial();
 
-                    if (material == Material.air || material == Material.leaves)
+                    if (var10 == Material.air || var10 == Material.leaves)
                     {
-                        this.setBlockAndNotifyAdequately(worldIn, blockpos, this.leavesMetadata);
+                        this.func_175905_a(worldIn, var9, Blocks.leaves, this.leavesMetadata);
                     }
                 }
             }
@@ -131,20 +131,20 @@ public abstract class WorldGenHugeTrees extends WorldGenAbstractTree
 
     protected void func_175928_b(World worldIn, BlockPos p_175928_2_, int p_175928_3_)
     {
-        int i = p_175928_3_ * p_175928_3_;
+        int var4 = p_175928_3_ * p_175928_3_;
 
-        for (int j = -p_175928_3_; j <= p_175928_3_; ++j)
+        for (int var5 = -p_175928_3_; var5 <= p_175928_3_; ++var5)
         {
-            for (int k = -p_175928_3_; k <= p_175928_3_; ++k)
+            for (int var6 = -p_175928_3_; var6 <= p_175928_3_; ++var6)
             {
-                if (j * j + k * k <= i)
+                if (var5 * var5 + var6 * var6 <= var4)
                 {
-                    BlockPos blockpos = p_175928_2_.add(j, 0, k);
-                    Material material = worldIn.getBlockState(blockpos).getBlock().getMaterial();
+                    BlockPos var7 = p_175928_2_.add(var5, 0, var6);
+                    Material var8 = worldIn.getBlockState(var7).getBlock().getMaterial();
 
-                    if (material == Material.air || material == Material.leaves)
+                    if (var8 == Material.air || var8 == Material.leaves)
                     {
-                        this.setBlockAndNotifyAdequately(worldIn, blockpos, this.leavesMetadata);
+                        this.func_175905_a(worldIn, var7, Blocks.leaves, this.leavesMetadata);
                     }
                 }
             }

@@ -19,6 +19,7 @@ public class NpcMerchant implements IMerchant
     /** The MerchantRecipeList instance. */
     private MerchantRecipeList recipeList;
     private IChatComponent field_175548_d;
+    
 
     public NpcMerchant(EntityPlayer p_i45817_1_, IChatComponent p_i45817_2_)
     {
@@ -32,36 +33,29 @@ public class NpcMerchant implements IMerchant
         return this.customer;
     }
 
-    public void setCustomer(EntityPlayer p_70932_1_)
-    {
-    }
+    public void setCustomer(EntityPlayer p_70932_1_) {}
 
     public MerchantRecipeList getRecipes(EntityPlayer p_70934_1_)
     {
         return this.recipeList;
     }
 
-    public void setRecipes(MerchantRecipeList recipeList)
+    public void setRecipes(MerchantRecipeList p_70930_1_)
     {
-        this.recipeList = recipeList;
+        this.recipeList = p_70930_1_;
     }
 
-    public void useRecipe(MerchantRecipe recipe)
+    public void useRecipe(MerchantRecipe p_70933_1_)
     {
-        recipe.incrementToolUses();
+        p_70933_1_.incrementToolUses();
     }
 
     /**
      * Notifies the merchant of a possible merchantrecipe being fulfilled or not. Usually, this is just a sound byte
      * being played depending if the suggested itemstack is not null.
      */
-    public void verifySellingItem(ItemStack stack)
-    {
-    }
+    public void verifySellingItem(ItemStack p_110297_1_) {}
 
-    /**
-     * Get the formatted ChatComponent that will be used for the sender's username in chat
-     */
     public IChatComponent getDisplayName()
     {
         return (IChatComponent)(this.field_175548_d != null ? this.field_175548_d : new ChatComponentTranslation("entity.Villager.name", new Object[0]));

@@ -7,9 +7,9 @@ import net.minecraft.util.ResourceLocation;
 
 public interface IResourceManager
 {
-    Set<String> getResourceDomains();
+    Set getResourceDomains();
 
-    IResource getResource(ResourceLocation location) throws IOException;
+    IResource getResource(ResourceLocation var1) throws IOException;
 
-    List<IResource> getAllResources(ResourceLocation location) throws IOException;
+    List getAllResources(ResourceLocation var1) throws IOException;
 }

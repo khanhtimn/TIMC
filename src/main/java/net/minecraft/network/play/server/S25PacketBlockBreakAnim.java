@@ -1,20 +1,20 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
+import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.util.BlockPos;
 
-public class S25PacketBlockBreakAnim implements Packet<INetHandlerPlayClient>
+public class S25PacketBlockBreakAnim implements Packet
 {
     private int breakerId;
     private BlockPos position;
     private int progress;
+    
 
-    public S25PacketBlockBreakAnim()
-    {
-    }
+    public S25PacketBlockBreakAnim() {}
 
     public S25PacketBlockBreakAnim(int breakerId, BlockPos pos, int progress)
     {
@@ -26,43 +26,48 @@ public class S25PacketBlockBreakAnim implements Packet<INetHandlerPlayClient>
     /**
      * Reads the raw packet data from the data stream.
      */
-    public void readPacketData(PacketBuffer buf) throws IOException
+    public void readPacketData(PacketBuffer data) throws IOException
     {
-        this.breakerId = buf.readVarIntFromBuffer();
-        this.position = buf.readBlockPos();
-        this.progress = buf.readUnsignedByte();
+        this.breakerId = data.readVarIntFromBuffer();
+        this.position = data.readBlockPos();
+        this.progress = data.readUnsignedByte();
     }
 
     /**
      * Writes the raw packet data to the data stream.
      */
-    public void writePacketData(PacketBuffer buf) throws IOException
+    public void writePacketData(PacketBuffer data) throws IOException
     {
-        buf.writeVarIntToBuffer(this.breakerId);
-        buf.writeBlockPos(this.position);
-        buf.writeByte(this.progress);
+        data.writeVarIntToBuffer(this.breakerId);
+        data.writeBlockPos(this.position);
+        data.writeByte(this.progress);
+    }
+
+    public void handle(INetHandlerPlayClient handler)
+    {
+        handler.handleBlockBreakAnim(this);
+    }
+
+    public int func_148845_c()
+    {
+        return this.breakerId;
+    }
+
+    public BlockPos func_179821_b()
+    {
+        return this.position;
+    }
+
+    public int func_148846_g()
+    {
+        return this.progress;
     }
 
     /**
      * Passes this Packet on to the NetHandler for processing.
      */
-    public void processPacket(INetHandlerPlayClient handler)
+    public void processPacket(INetHandler handler)
     {
-        handler.handleBlockBreakAnim(this);
-    }
-
-    public int getBreakerId()
-    {
-        return this.breakerId;
-    }
-
-    public BlockPos getPosition()
-    {
-        return this.position;
-    }
-
-    public int getProgress()
-    {
-        return this.progress;
+        this.handle((INetHandlerPlayClient)handler);
     }
 }

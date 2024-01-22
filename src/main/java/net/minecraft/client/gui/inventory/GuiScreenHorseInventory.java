@@ -10,28 +10,19 @@ import net.minecraft.util.ResourceLocation;
 public class GuiScreenHorseInventory extends GuiContainer
 {
     private static final ResourceLocation horseGuiTextures = new ResourceLocation("textures/gui/container/horse.png");
+    private IInventory field_147030_v;
+    private IInventory field_147029_w;
+    private EntityHorse field_147034_x;
+    private float field_147033_y;
+    private float field_147032_z;
+    
 
-    /** The player inventory bound to this GUI. */
-    private IInventory playerInventory;
-
-    /** The horse inventory bound to this GUI. */
-    private IInventory horseInventory;
-
-    /** The EntityHorse whose inventory is currently being accessed. */
-    private EntityHorse horseEntity;
-
-    /** The mouse x-position recorded during the last rendered frame. */
-    private float mousePosx;
-
-    /** The mouse y-position recorded during the last renderered frame. */
-    private float mousePosY;
-
-    public GuiScreenHorseInventory(IInventory playerInv, IInventory horseInv, EntityHorse horse)
+    public GuiScreenHorseInventory(IInventory p_i1093_1_, IInventory p_i1093_2_, EntityHorse p_i1093_3_)
     {
-        super(new ContainerHorseInventory(playerInv, horseInv, horse, Minecraft.getMinecraft().thePlayer));
-        this.playerInventory = playerInv;
-        this.horseInventory = horseInv;
-        this.horseEntity = horse;
+        super(new ContainerHorseInventory(p_i1093_1_, p_i1093_2_, p_i1093_3_, Minecraft.getMinecraft().thePlayer));
+        this.field_147030_v = p_i1093_1_;
+        this.field_147029_w = p_i1093_2_;
+        this.field_147034_x = p_i1093_3_;
         this.allowUserInput = false;
     }
 
@@ -40,8 +31,8 @@ public class GuiScreenHorseInventory extends GuiContainer
      */
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
-        this.fontRendererObj.drawString(this.horseInventory.getDisplayName().getUnformattedText(), 8, 6, 4210752);
-        this.fontRendererObj.drawString(this.playerInventory.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 4210752);
+        this.fontRendererObj.drawString(this.field_147029_w.getDisplayName().getUnformattedText(), 8, 6, 4210752);
+        this.fontRendererObj.drawString(this.field_147030_v.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 4210752);
     }
 
     /**
@@ -51,21 +42,21 @@ public class GuiScreenHorseInventory extends GuiContainer
     {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(horseGuiTextures);
-        int i = (this.width - this.xSize) / 2;
-        int j = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
+        int var4 = (this.width - this.xSize) / 2;
+        int var5 = (this.height - this.ySize) / 2;
+        this.drawTexturedModalRect(var4, var5, 0, 0, this.xSize, this.ySize);
 
-        if (this.horseEntity.isChested())
+        if (this.field_147034_x.isChested())
         {
-            this.drawTexturedModalRect(i + 79, j + 17, 0, this.ySize, 90, 54);
+            this.drawTexturedModalRect(var4 + 79, var5 + 17, 0, this.ySize, 90, 54);
         }
 
-        if (this.horseEntity.canWearArmor())
+        if (this.field_147034_x.canWearArmor())
         {
-            this.drawTexturedModalRect(i + 7, j + 35, 0, this.ySize + 54, 18, 18);
+            this.drawTexturedModalRect(var4 + 7, var5 + 35, 0, this.ySize + 54, 18, 18);
         }
 
-        GuiInventory.drawEntityOnScreen(i + 51, j + 60, 17, (float)(i + 51) - this.mousePosx, (float)(j + 75 - 50) - this.mousePosY, this.horseEntity);
+        GuiInventory.drawEntityOnScreen(var4 + 51, var5 + 60, 17, (float)(var4 + 51) - this.field_147033_y, (float)(var5 + 75 - 50) - this.field_147032_z, this.field_147034_x);
     }
 
     /**
@@ -73,8 +64,8 @@ public class GuiScreenHorseInventory extends GuiContainer
      */
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
-        this.mousePosx = (float)mouseX;
-        this.mousePosY = (float)mouseY;
+        this.field_147033_y = (float)mouseX;
+        this.field_147032_z = (float)mouseY;
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 }

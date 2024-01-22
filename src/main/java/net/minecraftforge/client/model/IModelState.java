@@ -1,8 +1,8 @@
 package net.minecraftforge.client.model;
 
-import com.google.common.base.Optional;
+import com.google.common.base.Function;
 
-public interface IModelState
+public interface IModelState extends Function<IModelPart, TRSRTransformation>
 {
-    Optional<TRSRTransformation> apply(Optional <? extends IModelPart > var1);
+    TRSRTransformation apply(IModelPart var1);
 }

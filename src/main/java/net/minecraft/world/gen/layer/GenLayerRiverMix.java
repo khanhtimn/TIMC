@@ -6,6 +6,7 @@ public class GenLayerRiverMix extends GenLayer
 {
     private GenLayer biomePatternGeneratorChain;
     private GenLayer riverPatternGeneratorChain;
+    
 
     public GenLayerRiverMix(long p_i2129_1_, GenLayer p_i2129_3_, GenLayer p_i2129_4_)
     {
@@ -18,11 +19,11 @@ public class GenLayerRiverMix extends GenLayer
      * Initialize layer's local worldGenSeed based on its own baseSeed and the world's global seed (passed in as an
      * argument).
      */
-    public void initWorldGenSeed(long seed)
+    public void initWorldGenSeed(long p_75905_1_)
     {
-        this.biomePatternGeneratorChain.initWorldGenSeed(seed);
-        this.riverPatternGeneratorChain.initWorldGenSeed(seed);
-        super.initWorldGenSeed(seed);
+        this.biomePatternGeneratorChain.initWorldGenSeed(p_75905_1_);
+        this.riverPatternGeneratorChain.initWorldGenSeed(p_75905_1_);
+        super.initWorldGenSeed(p_75905_1_);
     }
 
     /**
@@ -31,40 +32,40 @@ public class GenLayerRiverMix extends GenLayer
      */
     public int[] getInts(int areaX, int areaY, int areaWidth, int areaHeight)
     {
-        int[] aint = this.biomePatternGeneratorChain.getInts(areaX, areaY, areaWidth, areaHeight);
-        int[] aint1 = this.riverPatternGeneratorChain.getInts(areaX, areaY, areaWidth, areaHeight);
-        int[] aint2 = IntCache.getIntCache(areaWidth * areaHeight);
+        int[] var5 = this.biomePatternGeneratorChain.getInts(areaX, areaY, areaWidth, areaHeight);
+        int[] var6 = this.riverPatternGeneratorChain.getInts(areaX, areaY, areaWidth, areaHeight);
+        int[] var7 = IntCache.getIntCache(areaWidth * areaHeight);
 
-        for (int i = 0; i < areaWidth * areaHeight; ++i)
+        for (int var8 = 0; var8 < areaWidth * areaHeight; ++var8)
         {
-            if (aint[i] != BiomeGenBase.ocean.biomeID && aint[i] != BiomeGenBase.deepOcean.biomeID)
+            if (var5[var8] != BiomeGenBase.ocean.biomeID && var5[var8] != BiomeGenBase.deepOcean.biomeID)
             {
-                if (aint1[i] == BiomeGenBase.river.biomeID)
+                if (var6[var8] == BiomeGenBase.river.biomeID)
                 {
-                    if (aint[i] == BiomeGenBase.icePlains.biomeID)
+                    if (var5[var8] == BiomeGenBase.icePlains.biomeID)
                     {
-                        aint2[i] = BiomeGenBase.frozenRiver.biomeID;
+                        var7[var8] = BiomeGenBase.frozenRiver.biomeID;
                     }
-                    else if (aint[i] != BiomeGenBase.mushroomIsland.biomeID && aint[i] != BiomeGenBase.mushroomIslandShore.biomeID)
+                    else if (var5[var8] != BiomeGenBase.mushroomIsland.biomeID && var5[var8] != BiomeGenBase.mushroomIslandShore.biomeID)
                     {
-                        aint2[i] = aint1[i] & 255;
+                        var7[var8] = var6[var8] & 255;
                     }
                     else
                     {
-                        aint2[i] = BiomeGenBase.mushroomIslandShore.biomeID;
+                        var7[var8] = BiomeGenBase.mushroomIslandShore.biomeID;
                     }
                 }
                 else
                 {
-                    aint2[i] = aint[i];
+                    var7[var8] = var5[var8];
                 }
             }
             else
             {
-                aint2[i] = aint[i];
+                var7[var8] = var5[var8];
             }
         }
 
-        return aint2;
+        return var7;
     }
 }

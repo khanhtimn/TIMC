@@ -1,14 +1,8 @@
 package net.minecraft.util;
 
-public class Vector3d
-{
-    /** The X coordinate */
+public class Vector3d {
     public double x;
-
-    /** The Y coordinate */
     public double y;
-
-    /** The Z coordinate */
     public double z;
 
     public Vector3d()

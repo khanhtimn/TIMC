@@ -5,6 +5,7 @@ public class FontMetadataSection implements IMetadataSection
     private final float[] charWidths;
     private final float[] charLefts;
     private final float[] charSpacings;
+    
 
     public FontMetadataSection(float[] p_i1310_1_, float[] p_i1310_2_, float[] p_i1310_3_)
     {

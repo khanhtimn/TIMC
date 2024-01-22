@@ -34,7 +34,8 @@ public abstract class CommandBlockLogic implements ICommandSender
 
     /** The custom name of the command block. (defaults to "@") */
     private String customName = "@";
-    private final CommandResultStats resultStats = new CommandResultStats();
+    private final CommandResultStats field_175575_g = new CommandResultStats();
+    
 
     /**
      * returns the successCount int.
@@ -55,68 +56,68 @@ public abstract class CommandBlockLogic implements ICommandSender
     /**
      * Stores data to NBT format.
      */
-    public void writeDataToNBT(NBTTagCompound tagCompound)
+    public void writeDataToNBT(NBTTagCompound p_145758_1_)
     {
-        tagCompound.setString("Command", this.commandStored);
-        tagCompound.setInteger("SuccessCount", this.successCount);
-        tagCompound.setString("CustomName", this.customName);
-        tagCompound.setBoolean("TrackOutput", this.trackOutput);
+        p_145758_1_.setString("Command", this.commandStored);
+        p_145758_1_.setInteger("SuccessCount", this.successCount);
+        p_145758_1_.setString("CustomName", this.customName);
+        p_145758_1_.setBoolean("TrackOutput", this.trackOutput);
 
         if (this.lastOutput != null && this.trackOutput)
         {
-            tagCompound.setString("LastOutput", IChatComponent.Serializer.componentToJson(this.lastOutput));
+            p_145758_1_.setString("LastOutput", IChatComponent.Serializer.componentToJson(this.lastOutput));
         }
 
-        this.resultStats.writeStatsToNBT(tagCompound);
+        this.field_175575_g.func_179670_b(p_145758_1_);
     }
 
     /**
      * Reads NBT formatting and stored data into variables.
      */
-    public void readDataFromNBT(NBTTagCompound nbt)
+    public void readDataFromNBT(NBTTagCompound p_145759_1_)
     {
-        this.commandStored = nbt.getString("Command");
-        this.successCount = nbt.getInteger("SuccessCount");
+        this.commandStored = p_145759_1_.getString("Command");
+        this.successCount = p_145759_1_.getInteger("SuccessCount");
 
-        if (nbt.hasKey("CustomName", 8))
+        if (p_145759_1_.hasKey("CustomName", 8))
         {
-            this.customName = nbt.getString("CustomName");
+            this.customName = p_145759_1_.getString("CustomName");
         }
 
-        if (nbt.hasKey("TrackOutput", 1))
+        if (p_145759_1_.hasKey("TrackOutput", 1))
         {
-            this.trackOutput = nbt.getBoolean("TrackOutput");
+            this.trackOutput = p_145759_1_.getBoolean("TrackOutput");
         }
 
-        if (nbt.hasKey("LastOutput", 8) && this.trackOutput)
+        if (p_145759_1_.hasKey("LastOutput", 8) && this.trackOutput)
         {
-            this.lastOutput = IChatComponent.Serializer.jsonToComponent(nbt.getString("LastOutput"));
+            this.lastOutput = IChatComponent.Serializer.jsonToComponent(p_145759_1_.getString("LastOutput"));
         }
 
-        this.resultStats.readStatsFromNBT(nbt);
+        this.field_175575_g.func_179668_a(p_145759_1_);
     }
 
     /**
-     * Returns {@code true} if the CommandSender is allowed to execute the command, {@code false} if not
+     * Returns true if the command sender is allowed to use the given command.
      */
-    public boolean canCommandSenderUseCommand(int permLevel, String commandName)
+    public boolean canCommandSenderUseCommand(int permissionLevel, String command)
     {
-        return permLevel <= 2;
+        return permissionLevel <= 2;
     }
 
     /**
      * Sets the command.
      */
-    public void setCommand(String command)
+    public void setCommand(String p_145752_1_)
     {
-        this.commandStored = command;
+        this.commandStored = p_145752_1_;
         this.successCount = 0;
     }
 
     /**
-     * Returns the command of the command block.
+     * Returns the customName of the command block.
      */
-    public String getCommand()
+    public String getCustomName()
     {
         return this.commandStored;
     }
@@ -128,36 +129,46 @@ public abstract class CommandBlockLogic implements ICommandSender
             this.successCount = 0;
         }
 
-        MinecraftServer minecraftserver = MinecraftServer.getServer();
+        MinecraftServer var2 = MinecraftServer.getServer();
 
-        if (minecraftserver != null && minecraftserver.isAnvilFileSet() && minecraftserver.isCommandBlockEnabled())
+        if (var2 != null && var2.func_175578_N() && var2.isCommandBlockEnabled())
         {
-            ICommandManager icommandmanager = minecraftserver.getCommandManager();
+            ICommandManager var3 = var2.getCommandManager();
 
             try
             {
                 this.lastOutput = null;
-                this.successCount = icommandmanager.executeCommand(this, this.commandStored);
+                this.successCount = var3.executeCommand(this, this.commandStored);
             }
-            catch (Throwable throwable)
+            catch (Throwable var7)
             {
-                CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Executing command block");
-                CrashReportCategory crashreportcategory = crashreport.makeCategory("Command to be executed");
-                crashreportcategory.addCrashSectionCallable("Command", new Callable<String>()
+                CrashReport var5 = CrashReport.makeCrashReport(var7, "Executing command block");
+                CrashReportCategory var6 = var5.makeCategory("Command to be executed");
+                var6.addCrashSectionCallable("Command", new Callable()
                 {
-                    public String call() throws Exception
+                    
+                    public String func_180324_a()
                     {
-                        return CommandBlockLogic.this.getCommand();
+                        return CommandBlockLogic.this.getCustomName();
+                    }
+                    public Object call()
+                    {
+                        return this.func_180324_a();
                     }
                 });
-                crashreportcategory.addCrashSectionCallable("Name", new Callable<String>()
+                var6.addCrashSectionCallable("Name", new Callable()
                 {
-                    public String call() throws Exception
+                    
+                    public String func_180326_a()
                     {
                         return CommandBlockLogic.this.getName();
                     }
+                    public Object call()
+                    {
+                        return this.func_180326_a();
+                    }
                 });
-                throw new ReportedException(crashreport);
+                throw new ReportedException(var5);
             }
         }
         else
@@ -167,92 +178,89 @@ public abstract class CommandBlockLogic implements ICommandSender
     }
 
     /**
-     * Get the name of this object. For players this returns their username
+     * Gets the name of this command sender (usually username, but possibly "Rcon")
      */
     public String getName()
     {
         return this.customName;
     }
 
-    /**
-     * Get the formatted ChatComponent that will be used for the sender's username in chat
-     */
     public IChatComponent getDisplayName()
     {
         return new ChatComponentText(this.getName());
     }
 
-    public void setName(String p_145754_1_)
+    public void func_145754_b(String p_145754_1_)
     {
         this.customName = p_145754_1_;
     }
 
     /**
-     * Send a chat message to the CommandSender
+     * Notifies this sender of some sort of information.  This is for messages intended to display to the user.  Used
+     * for typical output (like "you asked for whether or not this game rule is set, so here's your answer"), warnings
+     * (like "I fetched this block for you by ID, but I'd like you to know that every time you do this, I die a little
+     * inside"), and errors (like "it's not called iron_pixacke, silly").
      */
-    public void addChatMessage(IChatComponent component)
+    public void addChatMessage(IChatComponent message)
     {
         if (this.trackOutput && this.getEntityWorld() != null && !this.getEntityWorld().isRemote)
         {
-            this.lastOutput = (new ChatComponentText("[" + timestampFormat.format(new Date()) + "] ")).appendSibling(component);
-            this.updateCommand();
+            this.lastOutput = (new ChatComponentText("[" + timestampFormat.format(new Date()) + "] ")).appendSibling(message);
+            this.func_145756_e();
         }
     }
 
-    /**
-     * Returns true if the command sender should be sent feedback about executed commands
-     */
     public boolean sendCommandFeedback()
     {
-        MinecraftServer minecraftserver = MinecraftServer.getServer();
-        return minecraftserver == null || !minecraftserver.isAnvilFileSet() || minecraftserver.worldServers[0].getGameRules().getBoolean("commandBlockOutput");
+        MinecraftServer var1 = MinecraftServer.getServer();
+        return var1 == null || !var1.func_175578_N() || var1.worldServers[0].getGameRules().getGameRuleBooleanValue("commandBlockOutput");
     }
 
-    public void setCommandStat(CommandResultStats.Type type, int amount)
+    public void func_174794_a(CommandResultStats.Type p_174794_1_, int p_174794_2_)
     {
-        this.resultStats.setCommandStatScore(this, type, amount);
+        this.field_175575_g.func_179672_a(this, p_174794_1_, p_174794_2_);
     }
 
-    public abstract void updateCommand();
+    public abstract void func_145756_e();
 
     public abstract int func_145751_f();
 
-    public abstract void func_145757_a(ByteBuf p_145757_1_);
+    public abstract void func_145757_a(ByteBuf var1);
 
-    public void setLastOutput(IChatComponent lastOutputMessage)
+    public void func_145750_b(IChatComponent p_145750_1_)
     {
-        this.lastOutput = lastOutputMessage;
+        this.lastOutput = p_145750_1_;
     }
 
-    public void setTrackOutput(boolean shouldTrackOutput)
+    public void func_175573_a(boolean p_175573_1_)
     {
-        this.trackOutput = shouldTrackOutput;
+        this.trackOutput = p_175573_1_;
     }
 
-    public boolean shouldTrackOutput()
+    public boolean func_175571_m()
     {
         return this.trackOutput;
     }
 
-    public boolean tryOpenEditCommandBlock(EntityPlayer playerIn)
+    public boolean func_175574_a(EntityPlayer p_175574_1_)
     {
-        if (!playerIn.capabilities.isCreativeMode)
+        if (!p_175574_1_.capabilities.isCreativeMode)
         {
             return false;
         }
         else
         {
-            if (playerIn.getEntityWorld().isRemote)
+            if (p_175574_1_.getEntityWorld().isRemote)
             {
-                playerIn.openEditCommandBlock(this);
+                p_175574_1_.func_146095_a(this);
             }
 
             return true;
         }
     }
 
-    public CommandResultStats getCommandResultStats()
+    public CommandResultStats func_175572_n()
     {
-        return this.resultStats;
+        return this.field_175575_g;
     }
 }

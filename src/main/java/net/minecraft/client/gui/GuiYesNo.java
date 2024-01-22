@@ -2,6 +2,7 @@ package net.minecraft.client.gui;
 
 import com.google.common.collect.Lists;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import net.minecraft.client.resources.I18n;
 
@@ -13,7 +14,7 @@ public class GuiYesNo extends GuiScreen
     protected GuiYesNoCallback parentScreen;
     protected String messageLine1;
     private String messageLine2;
-    private final List<String> field_175298_s = Lists.<String>newArrayList();
+    private final List field_175298_s = Lists.newArrayList();
 
     /** The text shown for the first button in GuiYesNo */
     protected String confirmButtonText;
@@ -22,6 +23,7 @@ public class GuiYesNo extends GuiScreen
     protected String cancelButtonText;
     protected int parentButtonClickedId;
     private int ticksUntilEnable;
+    
 
     public GuiYesNo(GuiYesNoCallback p_i1082_1_, String p_i1082_2_, String p_i1082_3_, int p_i1082_4_)
     {
@@ -44,8 +46,7 @@ public class GuiYesNo extends GuiScreen
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
-     * window resizes, the buttonList is cleared beforehand.
+     * Adds the buttons (and other controls) to the screen in question.
      */
     public void initGui()
     {
@@ -55,9 +56,6 @@ public class GuiYesNo extends GuiScreen
         this.field_175298_s.addAll(this.fontRendererObj.listFormattedStringToWidth(this.messageLine2, this.width - 50));
     }
 
-    /**
-     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
-     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
         this.parentScreen.confirmClicked(button.id == 0, this.parentButtonClickedId);
@@ -70,12 +68,12 @@ public class GuiYesNo extends GuiScreen
     {
         this.drawDefaultBackground();
         this.drawCenteredString(this.fontRendererObj, this.messageLine1, this.width / 2, 70, 16777215);
-        int i = 90;
+        int var4 = 90;
 
-        for (String s : this.field_175298_s)
+        for (Iterator var5 = this.field_175298_s.iterator(); var5.hasNext(); var4 += this.fontRendererObj.FONT_HEIGHT)
         {
-            this.drawCenteredString(this.fontRendererObj, s, this.width / 2, i, 16777215);
-            i += this.fontRendererObj.FONT_HEIGHT;
+            String var6 = (String)var5.next();
+            this.drawCenteredString(this.fontRendererObj, var6, this.width / 2, var4, 16777215);
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks);
@@ -87,10 +85,11 @@ public class GuiYesNo extends GuiScreen
     public void setButtonDelay(int p_146350_1_)
     {
         this.ticksUntilEnable = p_146350_1_;
+        GuiButton var3;
 
-        for (GuiButton guibutton : this.buttonList)
+        for (Iterator var2 = this.buttonList.iterator(); var2.hasNext(); var3.enabled = false)
         {
-            guibutton.enabled = false;
+            var3 = (GuiButton)var2.next();
         }
     }
 
@@ -100,12 +99,13 @@ public class GuiYesNo extends GuiScreen
     public void updateScreen()
     {
         super.updateScreen();
+        GuiButton var2;
 
         if (--this.ticksUntilEnable == 0)
         {
-            for (GuiButton guibutton : this.buttonList)
+            for (Iterator var1 = this.buttonList.iterator(); var1.hasNext(); var2.enabled = true)
             {
-                guibutton.enabled = true;
+                var2 = (GuiButton)var1.next();
             }
         }
     }

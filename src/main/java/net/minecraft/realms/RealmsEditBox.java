@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiTextField;
 public class RealmsEditBox
 {
     private final GuiTextField editBox;
+    
 
     public RealmsEditBox(int p_i45743_1_, int p_i45743_2_, int p_i45743_3_, int p_i45743_4_, int p_i45743_5_)
     {

@@ -11,11 +11,12 @@ public class EntityAIMoveTowardsRestriction extends EntityAIBase
     private double movePosY;
     private double movePosZ;
     private double movementSpeed;
+    
 
-    public EntityAIMoveTowardsRestriction(EntityCreature creatureIn, double speedIn)
+    public EntityAIMoveTowardsRestriction(EntityCreature p_i2347_1_, double p_i2347_2_)
     {
-        this.theEntity = creatureIn;
-        this.movementSpeed = speedIn;
+        this.theEntity = p_i2347_1_;
+        this.movementSpeed = p_i2347_2_;
         this.setMutexBits(1);
     }
 
@@ -30,18 +31,18 @@ public class EntityAIMoveTowardsRestriction extends EntityAIBase
         }
         else
         {
-            BlockPos blockpos = this.theEntity.getHomePosition();
-            Vec3 vec3 = RandomPositionGenerator.findRandomTargetBlockTowards(this.theEntity, 16, 7, new Vec3((double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ()));
+            BlockPos var1 = this.theEntity.func_180486_cf();
+            Vec3 var2 = RandomPositionGenerator.findRandomTargetBlockTowards(this.theEntity, 16, 7, new Vec3((double)var1.getX(), (double)var1.getY(), (double)var1.getZ()));
 
-            if (vec3 == null)
+            if (var2 == null)
             {
                 return false;
             }
             else
             {
-                this.movePosX = vec3.xCoord;
-                this.movePosY = vec3.yCoord;
-                this.movePosZ = vec3.zCoord;
+                this.movePosX = var2.xCoord;
+                this.movePosY = var2.yCoord;
+                this.movePosZ = var2.zCoord;
                 return true;
             }
         }

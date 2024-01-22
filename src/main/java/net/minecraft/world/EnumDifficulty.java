@@ -2,19 +2,21 @@ package net.minecraft.world;
 
 public enum EnumDifficulty
 {
-    PEACEFUL(0, "options.difficulty.peaceful"),
-    EASY(1, "options.difficulty.easy"),
-    NORMAL(2, "options.difficulty.normal"),
-    HARD(3, "options.difficulty.hard");
-
+    PEACEFUL("PEACEFUL", 0, 0, "options.difficulty.peaceful"),
+    EASY("EASY", 1, 1, "options.difficulty.easy"),
+    NORMAL("NORMAL", 2, 2, "options.difficulty.normal"),
+    HARD("HARD", 3, 3, "options.difficulty.hard");
     private static final EnumDifficulty[] difficultyEnums = new EnumDifficulty[values().length];
     private final int difficultyId;
     private final String difficultyResourceKey;
 
-    private EnumDifficulty(int difficultyIdIn, String difficultyResourceKeyIn)
+    private static final EnumDifficulty[] $VALUES = new EnumDifficulty[]{PEACEFUL, EASY, NORMAL, HARD};
+    
+
+    private EnumDifficulty(String p_i45312_1_, int p_i45312_2_, int p_i45312_3_, String p_i45312_4_)
     {
-        this.difficultyId = difficultyIdIn;
-        this.difficultyResourceKey = difficultyResourceKeyIn;
+        this.difficultyId = p_i45312_3_;
+        this.difficultyResourceKey = p_i45312_4_;
     }
 
     public int getDifficultyId()
@@ -33,9 +35,13 @@ public enum EnumDifficulty
     }
 
     static {
-        for (EnumDifficulty enumdifficulty : values())
+        EnumDifficulty[] var0 = values();
+        int var1 = var0.length;
+
+        for (int var2 = 0; var2 < var1; ++var2)
         {
-            difficultyEnums[enumdifficulty.difficultyId] = enumdifficulty;
+            EnumDifficulty var3 = var0[var2];
+            difficultyEnums[var3.difficultyId] = var3;
         }
     }
 }

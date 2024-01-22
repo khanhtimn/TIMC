@@ -10,61 +10,65 @@ import net.minecraft.world.World;
 
 public class EntitySmallFireball extends EntityFireball
 {
+    
+
     public EntitySmallFireball(World worldIn)
     {
         super(worldIn);
         this.setSize(0.3125F, 0.3125F);
     }
 
-    public EntitySmallFireball(World worldIn, EntityLivingBase shooter, double accelX, double accelY, double accelZ)
+    public EntitySmallFireball(World worldIn, EntityLivingBase p_i1771_2_, double p_i1771_3_, double p_i1771_5_, double p_i1771_7_)
     {
-        super(worldIn, shooter, accelX, accelY, accelZ);
+        super(worldIn, p_i1771_2_, p_i1771_3_, p_i1771_5_, p_i1771_7_);
         this.setSize(0.3125F, 0.3125F);
     }
 
-    public EntitySmallFireball(World worldIn, double x, double y, double z, double accelX, double accelY, double accelZ)
+    public EntitySmallFireball(World worldIn, double p_i1772_2_, double p_i1772_4_, double p_i1772_6_, double p_i1772_8_, double p_i1772_10_, double p_i1772_12_)
     {
-        super(worldIn, x, y, z, accelX, accelY, accelZ);
+        super(worldIn, p_i1772_2_, p_i1772_4_, p_i1772_6_, p_i1772_8_, p_i1772_10_, p_i1772_12_);
         this.setSize(0.3125F, 0.3125F);
     }
 
     /**
      * Called when this EntityFireball hits a block or entity.
      */
-    protected void onImpact(MovingObjectPosition movingObject)
+    protected void onImpact(MovingObjectPosition p_70227_1_)
     {
         if (!this.worldObj.isRemote)
         {
-            if (movingObject.entityHit != null)
+            boolean var2;
+
+            if (p_70227_1_.entityHit != null)
             {
-                boolean flag = movingObject.entityHit.attackEntityFrom(DamageSource.causeFireballDamage(this, this.shootingEntity), 5.0F);
+                var2 = p_70227_1_.entityHit.attackEntityFrom(DamageSource.causeFireballDamage(this, this.shootingEntity), 5.0F);
 
-                if (flag)
+                if (var2)
                 {
-                    this.applyEnchantments(this.shootingEntity, movingObject.entityHit);
+                    this.func_174815_a(this.shootingEntity, p_70227_1_.entityHit);
 
-                    if (!movingObject.entityHit.isImmuneToFire())
+                    if (!p_70227_1_.entityHit.isImmuneToFire())
                     {
-                        movingObject.entityHit.setFire(5);
+                        p_70227_1_.entityHit.setFire(5);
                     }
                 }
             }
             else
             {
-                boolean flag1 = true;
+                var2 = true;
 
                 if (this.shootingEntity != null && this.shootingEntity instanceof EntityLiving)
                 {
-                    flag1 = this.worldObj.getGameRules().getBoolean("mobGriefing");
+                    var2 = this.worldObj.getGameRules().getGameRuleBooleanValue("mobGriefing");
                 }
 
-                if (flag1)
+                if (var2)
                 {
-                    BlockPos blockpos = movingObject.getBlockPos().offset(movingObject.sideHit);
+                    BlockPos var3 = p_70227_1_.func_178782_a().offset(p_70227_1_.field_178784_b);
 
-                    if (this.worldObj.isAirBlock(blockpos))
+                    if (this.worldObj.isAirBlock(var3))
                     {
-                        this.worldObj.setBlockState(blockpos, Blocks.fire.getDefaultState());
+                        this.worldObj.setBlockState(var3, Blocks.fire.getDefaultState());
                     }
                 }
             }

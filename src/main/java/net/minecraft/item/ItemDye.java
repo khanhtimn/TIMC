@@ -19,6 +19,7 @@ import net.minecraft.world.World;
 public class ItemDye extends Item
 {
     public static final int[] dyeColors = new int[] {1973019, 11743532, 3887386, 5320730, 2437522, 8073150, 2651799, 11250603, 4408131, 14188952, 4312372, 14602026, 6719955, 12801229, 15435844, 15790320};
+    
 
     public ItemDye()
     {
@@ -33,26 +34,29 @@ public class ItemDye extends Item
      */
     public String getUnlocalizedName(ItemStack stack)
     {
-        int i = stack.getMetadata();
-        return super.getUnlocalizedName() + "." + EnumDyeColor.byDyeDamage(i).getUnlocalizedName();
+        int var2 = stack.getMetadata();
+        return super.getUnlocalizedName() + "." + EnumDyeColor.func_176766_a(var2).func_176762_d();
     }
 
     /**
      * Called when a Block is right-clicked with this Item
+     *  
+     * @param pos The block being right-clicked
+     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
-        if (!playerIn.canPlayerEdit(pos.offset(side), side, stack))
+        if (!playerIn.func_175151_a(pos.offset(side), side, stack))
         {
             return false;
         }
         else
         {
-            EnumDyeColor enumdyecolor = EnumDyeColor.byDyeDamage(stack.getMetadata());
+            EnumDyeColor var9 = EnumDyeColor.func_176766_a(stack.getMetadata());
 
-            if (enumdyecolor == EnumDyeColor.WHITE)
+            if (var9 == EnumDyeColor.WHITE)
             {
-                if (applyBonemeal(stack, worldIn, pos))
+                if (func_179234_a(stack, worldIn, pos))
                 {
                     if (!worldIn.isRemote)
                     {
@@ -62,12 +66,12 @@ public class ItemDye extends Item
                     return true;
                 }
             }
-            else if (enumdyecolor == EnumDyeColor.BROWN)
+            else if (var9 == EnumDyeColor.BROWN)
             {
-                IBlockState iblockstate = worldIn.getBlockState(pos);
-                Block block = iblockstate.getBlock();
+                IBlockState var10 = worldIn.getBlockState(pos);
+                Block var11 = var10.getBlock();
 
-                if (block == Blocks.log && iblockstate.getValue(BlockPlanks.VARIANT) == BlockPlanks.EnumType.JUNGLE)
+                if (var11 == Blocks.log && var10.getValue(BlockPlanks.VARIANT_PROP) == BlockPlanks.EnumType.JUNGLE)
                 {
                     if (side == EnumFacing.DOWN)
                     {
@@ -83,8 +87,8 @@ public class ItemDye extends Item
 
                     if (worldIn.isAirBlock(pos))
                     {
-                        IBlockState iblockstate1 = Blocks.cocoa.onBlockPlaced(worldIn, pos, side, hitX, hitY, hitZ, 0, playerIn);
-                        worldIn.setBlockState(pos, iblockstate1, 2);
+                        IBlockState var12 = Blocks.cocoa.onBlockPlaced(worldIn, pos, side, hitX, hitY, hitZ, 0, playerIn);
+                        worldIn.setBlockState(pos, var12, 2);
 
                         if (!playerIn.capabilities.isCreativeMode)
                         {
@@ -100,24 +104,24 @@ public class ItemDye extends Item
         }
     }
 
-    public static boolean applyBonemeal(ItemStack stack, World worldIn, BlockPos target)
+    public static boolean func_179234_a(ItemStack p_179234_0_, World worldIn, BlockPos p_179234_2_)
     {
-        IBlockState iblockstate = worldIn.getBlockState(target);
+        IBlockState var3 = worldIn.getBlockState(p_179234_2_);
 
-        if (iblockstate.getBlock() instanceof IGrowable)
+        if (var3.getBlock() instanceof IGrowable)
         {
-            IGrowable igrowable = (IGrowable)iblockstate.getBlock();
+            IGrowable var4 = (IGrowable)var3.getBlock();
 
-            if (igrowable.canGrow(worldIn, target, iblockstate, worldIn.isRemote))
+            if (var4.isStillGrowing(worldIn, p_179234_2_, var3, worldIn.isRemote))
             {
                 if (!worldIn.isRemote)
                 {
-                    if (igrowable.canUseBonemeal(worldIn, worldIn.rand, target, iblockstate))
+                    if (var4.canUseBonemeal(worldIn, worldIn.rand, p_179234_2_, var3))
                     {
-                        igrowable.grow(worldIn, worldIn.rand, target, iblockstate);
+                        var4.grow(worldIn, worldIn.rand, p_179234_2_, var3);
                     }
 
-                    --stack.stackSize;
+                    --p_179234_0_.stackSize;
                 }
 
                 return true;
@@ -127,25 +131,25 @@ public class ItemDye extends Item
         return false;
     }
 
-    public static void spawnBonemealParticles(World worldIn, BlockPos pos, int amount)
+    public static void func_180617_a(World worldIn, BlockPos p_180617_1_, int p_180617_2_)
     {
-        if (amount == 0)
+        if (p_180617_2_ == 0)
         {
-            amount = 15;
+            p_180617_2_ = 15;
         }
 
-        Block block = worldIn.getBlockState(pos).getBlock();
+        Block var3 = worldIn.getBlockState(p_180617_1_).getBlock();
 
-        if (block.getMaterial() != Material.air)
+        if (var3.getMaterial() != Material.air)
         {
-            block.setBlockBoundsBasedOnState(worldIn, pos);
+            var3.setBlockBoundsBasedOnState(worldIn, p_180617_1_);
 
-            for (int i = 0; i < amount; ++i)
+            for (int var4 = 0; var4 < p_180617_2_; ++var4)
             {
-                double d0 = itemRand.nextGaussian() * 0.02D;
-                double d1 = itemRand.nextGaussian() * 0.02D;
-                double d2 = itemRand.nextGaussian() * 0.02D;
-                worldIn.spawnParticle(EnumParticleTypes.VILLAGER_HAPPY, (double)((float)pos.getX() + itemRand.nextFloat()), (double)pos.getY() + (double)itemRand.nextFloat() * block.getBlockBoundsMaxY(), (double)((float)pos.getZ() + itemRand.nextFloat()), d0, d1, d2, new int[0]);
+                double var5 = itemRand.nextGaussian() * 0.02D;
+                double var7 = itemRand.nextGaussian() * 0.02D;
+                double var9 = itemRand.nextGaussian() * 0.02D;
+                worldIn.spawnParticle(EnumParticleTypes.VILLAGER_HAPPY, (double)((float)p_180617_1_.getX() + itemRand.nextFloat()), (double)p_180617_1_.getY() + (double)itemRand.nextFloat() * var3.getBlockBoundsMaxY(), (double)((float)p_180617_1_.getZ() + itemRand.nextFloat()), var5, var7, var9, new int[0]);
             }
         }
     }
@@ -157,12 +161,12 @@ public class ItemDye extends Item
     {
         if (target instanceof EntitySheep)
         {
-            EntitySheep entitysheep = (EntitySheep)target;
-            EnumDyeColor enumdyecolor = EnumDyeColor.byDyeDamage(stack.getMetadata());
+            EntitySheep var4 = (EntitySheep)target;
+            EnumDyeColor var5 = EnumDyeColor.func_176766_a(stack.getMetadata());
 
-            if (!entitysheep.getSheared() && entitysheep.getFleeceColor() != enumdyecolor)
+            if (!var4.getSheared() && var4.func_175509_cj() != var5)
             {
-                entitysheep.setFleeceColor(enumdyecolor);
+                var4.func_175512_b(var5);
                 --stack.stackSize;
             }
 
@@ -176,12 +180,14 @@ public class ItemDye extends Item
 
     /**
      * returns a list of items with the same ID, but different meta (eg: dye returns 16 items)
+     *  
+     * @param subItems The List of sub-items. This is a List of ItemStacks.
      */
-    public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems)
+    public void getSubItems(Item itemIn, CreativeTabs tab, List subItems)
     {
-        for (int i = 0; i < 16; ++i)
+        for (int var4 = 0; var4 < 16; ++var4)
         {
-            subItems.add(new ItemStack(itemIn, 1, i));
+            subItems.add(new ItemStack(itemIn, 1, var4));
         }
     }
 }

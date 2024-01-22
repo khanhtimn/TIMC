@@ -12,12 +12,13 @@ import net.minecraft.world.World;
 
 public class EntityAIOcelotSit extends EntityAIMoveToBlock
 {
-    private final EntityOcelot ocelot;
+    private final EntityOcelot field_151493_a;
+    
 
-    public EntityAIOcelotSit(EntityOcelot ocelotIn, double p_i45315_2_)
+    public EntityAIOcelotSit(EntityOcelot p_i45315_1_, double p_i45315_2_)
     {
-        super(ocelotIn, p_i45315_2_, 8);
-        this.ocelot = ocelotIn;
+        super(p_i45315_1_, p_i45315_2_, 8);
+        this.field_151493_a = p_i45315_1_;
     }
 
     /**
@@ -25,7 +26,7 @@ public class EntityAIOcelotSit extends EntityAIMoveToBlock
      */
     public boolean shouldExecute()
     {
-        return this.ocelot.isTamed() && !this.ocelot.isSitting() && super.shouldExecute();
+        return this.field_151493_a.isTamed() && !this.field_151493_a.isSitting() && super.shouldExecute();
     }
 
     /**
@@ -42,7 +43,7 @@ public class EntityAIOcelotSit extends EntityAIMoveToBlock
     public void startExecuting()
     {
         super.startExecuting();
-        this.ocelot.getAISit().setSitting(false);
+        this.field_151493_a.getAISit().setSitting(false);
     }
 
     /**
@@ -51,7 +52,7 @@ public class EntityAIOcelotSit extends EntityAIMoveToBlock
     public void resetTask()
     {
         super.resetTask();
-        this.ocelot.setSitting(false);
+        this.field_151493_a.setSitting(false);
     }
 
     /**
@@ -60,49 +61,46 @@ public class EntityAIOcelotSit extends EntityAIMoveToBlock
     public void updateTask()
     {
         super.updateTask();
-        this.ocelot.getAISit().setSitting(false);
+        this.field_151493_a.getAISit().setSitting(false);
 
-        if (!this.getIsAboveDestination())
+        if (!this.func_179487_f())
         {
-            this.ocelot.setSitting(false);
+            this.field_151493_a.setSitting(false);
         }
-        else if (!this.ocelot.isSitting())
+        else if (!this.field_151493_a.isSitting())
         {
-            this.ocelot.setSitting(true);
+            this.field_151493_a.setSitting(true);
         }
     }
 
-    /**
-     * Return true to set given position as destination
-     */
-    protected boolean shouldMoveTo(World worldIn, BlockPos pos)
+    protected boolean func_179488_a(World worldIn, BlockPos p_179488_2_)
     {
-        if (!worldIn.isAirBlock(pos.up()))
+        if (!worldIn.isAirBlock(p_179488_2_.offsetUp()))
         {
             return false;
         }
         else
         {
-            IBlockState iblockstate = worldIn.getBlockState(pos);
-            Block block = iblockstate.getBlock();
+            IBlockState var3 = worldIn.getBlockState(p_179488_2_);
+            Block var4 = var3.getBlock();
 
-            if (block == Blocks.chest)
+            if (var4 == Blocks.chest)
             {
-                TileEntity tileentity = worldIn.getTileEntity(pos);
+                TileEntity var5 = worldIn.getTileEntity(p_179488_2_);
 
-                if (tileentity instanceof TileEntityChest && ((TileEntityChest)tileentity).numPlayersUsing < 1)
+                if (var5 instanceof TileEntityChest && ((TileEntityChest)var5).numPlayersUsing < 1)
                 {
                     return true;
                 }
             }
             else
             {
-                if (block == Blocks.lit_furnace)
+                if (var4 == Blocks.lit_furnace)
                 {
                     return true;
                 }
 
-                if (block == Blocks.bed && iblockstate.getValue(BlockBed.PART) != BlockBed.EnumPartType.HEAD)
+                if (var4 == Blocks.bed && var3.getValue(BlockBed.PART_PROP) != BlockBed.EnumPartType.HEAD)
                 {
                     return true;
                 }

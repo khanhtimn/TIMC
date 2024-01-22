@@ -1,6 +1,5 @@
 package net.minecraft.block;
 
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -11,21 +10,14 @@ import net.minecraft.world.IBlockAccess;
 public class BlockBreakable extends Block
 {
     private boolean ignoreSimilarity;
+    
 
-    protected BlockBreakable(Material materialIn, boolean ignoreSimilarityIn)
+    protected BlockBreakable(Material p_i45712_1_, boolean p_i45712_2_)
     {
-        this(materialIn, ignoreSimilarityIn, materialIn.getMaterialMapColor());
+        super(p_i45712_1_);
+        this.ignoreSimilarity = p_i45712_2_;
     }
 
-    protected BlockBreakable(Material p_i46393_1_, boolean p_i46393_2_, MapColor p_i46393_3_)
-    {
-        super(p_i46393_1_, p_i46393_3_);
-        this.ignoreSimilarity = p_i46393_2_;
-    }
-
-    /**
-     * Used to determine ambient occlusion and culling when rebuilding chunks for render
-     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -33,22 +25,22 @@ public class BlockBreakable extends Block
 
     public boolean shouldSideBeRendered(IBlockAccess worldIn, BlockPos pos, EnumFacing side)
     {
-        IBlockState iblockstate = worldIn.getBlockState(pos);
-        Block block = iblockstate.getBlock();
+        IBlockState var4 = worldIn.getBlockState(pos);
+        Block var5 = var4.getBlock();
 
         if (this == Blocks.glass || this == Blocks.stained_glass)
         {
-            if (worldIn.getBlockState(pos.offset(side.getOpposite())) != iblockstate)
+            if (worldIn.getBlockState(pos.offset(side.getOpposite())) != var4)
             {
                 return true;
             }
 
-            if (block == this)
+            if (var5 == this)
             {
                 return false;
             }
         }
 
-        return !this.ignoreSimilarity && block == this ? false : super.shouldSideBeRendered(worldIn, pos, side);
+        return !this.ignoreSimilarity && var5 == this ? false : super.shouldSideBeRendered(worldIn, pos, side);
     }
 }

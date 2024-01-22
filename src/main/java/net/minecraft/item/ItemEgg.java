@@ -8,6 +8,8 @@ import net.minecraft.world.World;
 
 public class ItemEgg extends Item
 {
+    
+
     public ItemEgg()
     {
         this.maxStackSize = 16;

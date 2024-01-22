@@ -14,18 +14,22 @@ import net.minecraft.world.World;
 
 public class BlockLilyPad extends BlockBush
 {
+    
+
     protected BlockLilyPad()
     {
-        float f = 0.5F;
-        float f1 = 0.015625F;
-        this.setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, f1, 0.5F + f);
+        float var1 = 0.5F;
+        float var2 = 0.015625F;
+        this.setBlockBounds(0.5F - var1, 0.0F, 0.5F - var1, 0.5F + var1, var2, 0.5F + var1);
         this.setCreativeTab(CreativeTabs.tabDecorations);
     }
 
     /**
      * Add all collision boxes of this Block to the list that intersect with the given mask.
+     *  
+     * @param collidingEntity the Entity colliding with this Block
      */
-    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity)
+    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List list, Entity collidingEntity)
     {
         if (collidingEntity == null || !(collidingEntity instanceof EntityBoat))
         {
@@ -61,12 +65,12 @@ public class BlockLilyPad extends BlockBush
         return ground == Blocks.water;
     }
 
-    public boolean canBlockStay(World worldIn, BlockPos pos, IBlockState state)
+    public boolean canBlockStay(World worldIn, BlockPos p_180671_2_, IBlockState p_180671_3_)
     {
-        if (pos.getY() >= 0 && pos.getY() < 256)
+        if (p_180671_2_.getY() >= 0 && p_180671_2_.getY() < 256)
         {
-            IBlockState iblockstate = worldIn.getBlockState(pos.down());
-            return iblockstate.getBlock().getMaterial() == Material.water && ((Integer)iblockstate.getValue(BlockLiquid.LEVEL)).intValue() == 0;
+            IBlockState var4 = worldIn.getBlockState(p_180671_2_.offsetDown());
+            return var4.getBlock().getMaterial() == Material.water && ((Integer)var4.getValue(BlockLiquid.LEVEL)).intValue() == 0;
         }
         else
         {

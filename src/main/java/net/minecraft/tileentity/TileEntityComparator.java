@@ -5,6 +5,7 @@ import net.minecraft.nbt.NBTTagCompound;
 public class TileEntityComparator extends TileEntity
 {
     private int outputSignal;
+    
 
     public void writeToNBT(NBTTagCompound compound)
     {

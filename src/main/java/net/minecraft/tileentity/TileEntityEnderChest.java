@@ -2,70 +2,72 @@ package net.minecraft.tileentity;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.ITickable;
+import net.minecraft.server.gui.IUpdatePlayerListBox;
 
-public class TileEntityEnderChest extends TileEntity implements ITickable
+public class TileEntityEnderChest extends TileEntity implements IUpdatePlayerListBox
 {
-    public float lidAngle;
+    public float field_145972_a;
 
     /** The angle of the ender chest lid last tick */
     public float prevLidAngle;
-    public int numPlayersUsing;
-    private int ticksSinceSync;
+    public int field_145973_j;
+    private int field_145974_k;
+    
 
     /**
-     * Like the old updateEntity(), except more generic.
+     * Updates the JList with a new model.
      */
     public void update()
     {
-        if (++this.ticksSinceSync % 20 * 4 == 0)
+        if (++this.field_145974_k % 20 * 4 == 0)
         {
-            this.worldObj.addBlockEvent(this.pos, Blocks.ender_chest, 1, this.numPlayersUsing);
+            this.worldObj.addBlockEvent(this.pos, Blocks.ender_chest, 1, this.field_145973_j);
         }
 
-        this.prevLidAngle = this.lidAngle;
-        int i = this.pos.getX();
-        int j = this.pos.getY();
-        int k = this.pos.getZ();
-        float f = 0.1F;
+        this.prevLidAngle = this.field_145972_a;
+        int var1 = this.pos.getX();
+        int var2 = this.pos.getY();
+        int var3 = this.pos.getZ();
+        float var4 = 0.1F;
+        double var7;
 
-        if (this.numPlayersUsing > 0 && this.lidAngle == 0.0F)
+        if (this.field_145973_j > 0 && this.field_145972_a == 0.0F)
         {
-            double d0 = (double)i + 0.5D;
-            double d1 = (double)k + 0.5D;
-            this.worldObj.playSoundEffect(d0, (double)j + 0.5D, d1, "random.chestopen", 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
+            double var5 = (double)var1 + 0.5D;
+            var7 = (double)var3 + 0.5D;
+            this.worldObj.playSoundEffect(var5, (double)var2 + 0.5D, var7, "random.chestopen", 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
         }
 
-        if (this.numPlayersUsing == 0 && this.lidAngle > 0.0F || this.numPlayersUsing > 0 && this.lidAngle < 1.0F)
+        if (this.field_145973_j == 0 && this.field_145972_a > 0.0F || this.field_145973_j > 0 && this.field_145972_a < 1.0F)
         {
-            float f2 = this.lidAngle;
+            float var11 = this.field_145972_a;
 
-            if (this.numPlayersUsing > 0)
+            if (this.field_145973_j > 0)
             {
-                this.lidAngle += f;
+                this.field_145972_a += var4;
             }
             else
             {
-                this.lidAngle -= f;
+                this.field_145972_a -= var4;
             }
 
-            if (this.lidAngle > 1.0F)
+            if (this.field_145972_a > 1.0F)
             {
-                this.lidAngle = 1.0F;
+                this.field_145972_a = 1.0F;
             }
 
-            float f1 = 0.5F;
+            float var6 = 0.5F;
 
-            if (this.lidAngle < f1 && f2 >= f1)
+            if (this.field_145972_a < var6 && var11 >= var6)
             {
-                double d3 = (double)i + 0.5D;
-                double d2 = (double)k + 0.5D;
-                this.worldObj.playSoundEffect(d3, (double)j + 0.5D, d2, "random.chestclosed", 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
+                var7 = (double)var1 + 0.5D;
+                double var9 = (double)var3 + 0.5D;
+                this.worldObj.playSoundEffect(var7, (double)var2 + 0.5D, var9, "random.chestclosed", 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
             }
 
-            if (this.lidAngle < 0.0F)
+            if (this.field_145972_a < 0.0F)
             {
-                this.lidAngle = 0.0F;
+                this.field_145972_a = 0.0F;
             }
         }
     }
@@ -74,7 +76,7 @@ public class TileEntityEnderChest extends TileEntity implements ITickable
     {
         if (id == 1)
         {
-            this.numPlayersUsing = type;
+            this.field_145973_j = type;
             return true;
         }
         else
@@ -92,19 +94,19 @@ public class TileEntityEnderChest extends TileEntity implements ITickable
         super.invalidate();
     }
 
-    public void openChest()
+    public void func_145969_a()
     {
-        ++this.numPlayersUsing;
-        this.worldObj.addBlockEvent(this.pos, Blocks.ender_chest, 1, this.numPlayersUsing);
+        ++this.field_145973_j;
+        this.worldObj.addBlockEvent(this.pos, Blocks.ender_chest, 1, this.field_145973_j);
     }
 
-    public void closeChest()
+    public void func_145970_b()
     {
-        --this.numPlayersUsing;
-        this.worldObj.addBlockEvent(this.pos, Blocks.ender_chest, 1, this.numPlayersUsing);
+        --this.field_145973_j;
+        this.worldObj.addBlockEvent(this.pos, Blocks.ender_chest, 1, this.field_145973_j);
     }
 
-    public boolean canBeUsed(EntityPlayer p_145971_1_)
+    public boolean func_145971_a(EntityPlayer p_145971_1_)
     {
         return this.worldObj.getTileEntity(this.pos) != this ? false : p_145971_1_.getDistanceSq((double)this.pos.getX() + 0.5D, (double)this.pos.getY() + 0.5D, (double)this.pos.getZ() + 0.5D) <= 64.0D;
     }

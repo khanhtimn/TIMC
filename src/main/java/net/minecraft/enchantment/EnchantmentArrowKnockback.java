@@ -4,26 +4,28 @@ import net.minecraft.util.ResourceLocation;
 
 public class EnchantmentArrowKnockback extends Enchantment
 {
-    public EnchantmentArrowKnockback(int enchID, ResourceLocation enchName, int enchWeight)
+    
+
+    public EnchantmentArrowKnockback(int p_i45775_1_, ResourceLocation p_i45775_2_, int p_i45775_3_)
     {
-        super(enchID, enchName, enchWeight, EnumEnchantmentType.BOW);
+        super(p_i45775_1_, p_i45775_2_, p_i45775_3_, EnumEnchantmentType.BOW);
         this.setName("arrowKnockback");
     }
 
     /**
      * Returns the minimal value of enchantability needed on the enchantment level passed.
      */
-    public int getMinEnchantability(int enchantmentLevel)
+    public int getMinEnchantability(int p_77321_1_)
     {
-        return 12 + (enchantmentLevel - 1) * 20;
+        return 12 + (p_77321_1_ - 1) * 20;
     }
 
     /**
      * Returns the maximum value of enchantability nedded on the enchantment level passed.
      */
-    public int getMaxEnchantability(int enchantmentLevel)
+    public int getMaxEnchantability(int p_77317_1_)
     {
-        return this.getMinEnchantability(enchantmentLevel) + 25;
+        return this.getMinEnchantability(p_77317_1_) + 25;
     }
 
     /**

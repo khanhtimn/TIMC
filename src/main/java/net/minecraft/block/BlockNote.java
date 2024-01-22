@@ -6,7 +6,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityNote;
 import net.minecraft.util.BlockPos;
@@ -16,7 +15,8 @@ import net.minecraft.world.World;
 
 public class BlockNote extends BlockContainer
 {
-    private static final List<String> INSTRUMENTS = Lists.newArrayList(new String[] {"harp", "bd", "snare", "hat", "bassattack"});
+    private static final List field_176434_a = Lists.newArrayList(new String[] {"harp", "bd", "snare", "hat", "bassattack"});
+    
 
     public BlockNote()
     {
@@ -24,26 +24,23 @@ public class BlockNote extends BlockContainer
         this.setCreativeTab(CreativeTabs.tabRedstone);
     }
 
-    /**
-     * Called when a neighboring block changes.
-     */
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
     {
-        boolean flag = worldIn.isBlockPowered(pos);
-        TileEntity tileentity = worldIn.getTileEntity(pos);
+        boolean var5 = worldIn.isBlockPowered(pos);
+        TileEntity var6 = worldIn.getTileEntity(pos);
 
-        if (tileentity instanceof TileEntityNote)
+        if (var6 instanceof TileEntityNote)
         {
-            TileEntityNote tileentitynote = (TileEntityNote)tileentity;
+            TileEntityNote var7 = (TileEntityNote)var6;
 
-            if (tileentitynote.previousRedstoneState != flag)
+            if (var7.previousRedstoneState != var5)
             {
-                if (flag)
+                if (var5)
                 {
-                    tileentitynote.triggerNote(worldIn, pos);
+                    var7.func_175108_a(worldIn, pos);
                 }
 
-                tileentitynote.previousRedstoneState = flag;
+                var7.previousRedstoneState = var5;
             }
         }
     }
@@ -56,14 +53,13 @@ public class BlockNote extends BlockContainer
         }
         else
         {
-            TileEntity tileentity = worldIn.getTileEntity(pos);
+            TileEntity var9 = worldIn.getTileEntity(pos);
 
-            if (tileentity instanceof TileEntityNote)
+            if (var9 instanceof TileEntityNote)
             {
-                TileEntityNote tileentitynote = (TileEntityNote)tileentity;
-                tileentitynote.changePitch();
-                tileentitynote.triggerNote(worldIn, pos);
-                playerIn.triggerAchievement(StatList.field_181735_S);
+                TileEntityNote var10 = (TileEntityNote)var9;
+                var10.changePitch();
+                var10.func_175108_a(worldIn, pos);
             }
 
             return true;
@@ -74,12 +70,11 @@ public class BlockNote extends BlockContainer
     {
         if (!worldIn.isRemote)
         {
-            TileEntity tileentity = worldIn.getTileEntity(pos);
+            TileEntity var4 = worldIn.getTileEntity(pos);
 
-            if (tileentity instanceof TileEntityNote)
+            if (var4 instanceof TileEntityNote)
             {
-                ((TileEntityNote)tileentity).triggerNote(worldIn, pos);
-                playerIn.triggerAchievement(StatList.field_181734_R);
+                ((TileEntityNote)var4).func_175108_a(worldIn, pos);
             }
         }
     }
@@ -92,14 +87,14 @@ public class BlockNote extends BlockContainer
         return new TileEntityNote();
     }
 
-    private String getInstrument(int id)
+    private String func_176433_b(int p_176433_1_)
     {
-        if (id < 0 || id >= INSTRUMENTS.size())
+        if (p_176433_1_ < 0 || p_176433_1_ >= field_176434_a.size())
         {
-            id = 0;
+            p_176433_1_ = 0;
         }
 
-        return (String)INSTRUMENTS.get(id);
+        return (String)field_176434_a.get(p_176433_1_);
     }
 
     /**
@@ -107,14 +102,14 @@ public class BlockNote extends BlockContainer
      */
     public boolean onBlockEventReceived(World worldIn, BlockPos pos, IBlockState state, int eventID, int eventParam)
     {
-        float f = (float)Math.pow(2.0D, (double)(eventParam - 12) / 12.0D);
-        worldIn.playSoundEffect((double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D, "note." + this.getInstrument(eventID), 3.0F, f);
+        float var6 = (float)Math.pow(2.0D, (double)(eventParam - 12) / 12.0D);
+        worldIn.playSoundEffect((double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D, "note." + this.func_176433_b(eventID), 3.0F, var6);
         worldIn.spawnParticle(EnumParticleTypes.NOTE, (double)pos.getX() + 0.5D, (double)pos.getY() + 1.2D, (double)pos.getZ() + 0.5D, (double)eventParam / 24.0D, 0.0D, 0.0D, new int[0]);
         return true;
     }
 
     /**
-     * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
+     * The type of render function that is called for this block
      */
     public int getRenderType()
     {

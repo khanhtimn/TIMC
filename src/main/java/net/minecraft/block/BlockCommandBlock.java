@@ -1,7 +1,6 @@
 package net.minecraft.block;
 
 import java.util.Random;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -19,12 +18,13 @@ import net.minecraft.world.World;
 
 public class BlockCommandBlock extends BlockContainer
 {
-    public static final PropertyBool TRIGGERED = PropertyBool.create("triggered");
+    public static final PropertyBool TRIGGERED_PROP = PropertyBool.create("triggered");
+    
 
     public BlockCommandBlock()
     {
-        super(Material.iron, MapColor.adobeColor);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(TRIGGERED, Boolean.valueOf(false)));
+        super(Material.iron);
+        this.setDefaultState(this.blockState.getBaseState().withProperty(TRIGGERED_PROP, Boolean.valueOf(false)));
     }
 
     /**
@@ -35,35 +35,32 @@ public class BlockCommandBlock extends BlockContainer
         return new TileEntityCommandBlock();
     }
 
-    /**
-     * Called when a neighboring block changes.
-     */
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
     {
         if (!worldIn.isRemote)
         {
-            boolean flag = worldIn.isBlockPowered(pos);
-            boolean flag1 = ((Boolean)state.getValue(TRIGGERED)).booleanValue();
+            boolean var5 = worldIn.isBlockPowered(pos);
+            boolean var6 = ((Boolean)state.getValue(TRIGGERED_PROP)).booleanValue();
 
-            if (flag && !flag1)
+            if (var5 && !var6)
             {
-                worldIn.setBlockState(pos, state.withProperty(TRIGGERED, Boolean.valueOf(true)), 4);
+                worldIn.setBlockState(pos, state.withProperty(TRIGGERED_PROP, Boolean.valueOf(true)), 4);
                 worldIn.scheduleUpdate(pos, this, this.tickRate(worldIn));
             }
-            else if (!flag && flag1)
+            else if (!var5 && var6)
             {
-                worldIn.setBlockState(pos, state.withProperty(TRIGGERED, Boolean.valueOf(false)), 4);
+                worldIn.setBlockState(pos, state.withProperty(TRIGGERED_PROP, Boolean.valueOf(false)), 4);
             }
         }
     }
 
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
-        TileEntity tileentity = worldIn.getTileEntity(pos);
+        TileEntity var5 = worldIn.getTileEntity(pos);
 
-        if (tileentity instanceof TileEntityCommandBlock)
+        if (var5 instanceof TileEntityCommandBlock)
         {
-            ((TileEntityCommandBlock)tileentity).getCommandBlockLogic().trigger(worldIn);
+            ((TileEntityCommandBlock)var5).getCommandBlockLogic().trigger(worldIn);
             worldIn.updateComparatorOutputLevel(pos, this);
         }
     }
@@ -78,8 +75,8 @@ public class BlockCommandBlock extends BlockContainer
 
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ)
     {
-        TileEntity tileentity = worldIn.getTileEntity(pos);
-        return tileentity instanceof TileEntityCommandBlock ? ((TileEntityCommandBlock)tileentity).getCommandBlockLogic().tryOpenEditCommandBlock(playerIn) : false;
+        TileEntity var9 = worldIn.getTileEntity(pos);
+        return var9 instanceof TileEntityCommandBlock ? ((TileEntityCommandBlock)var9).getCommandBlockLogic().func_175574_a(playerIn) : false;
     }
 
     public boolean hasComparatorInputOverride()
@@ -89,29 +86,26 @@ public class BlockCommandBlock extends BlockContainer
 
     public int getComparatorInputOverride(World worldIn, BlockPos pos)
     {
-        TileEntity tileentity = worldIn.getTileEntity(pos);
-        return tileentity instanceof TileEntityCommandBlock ? ((TileEntityCommandBlock)tileentity).getCommandBlockLogic().getSuccessCount() : 0;
+        TileEntity var3 = worldIn.getTileEntity(pos);
+        return var3 instanceof TileEntityCommandBlock ? ((TileEntityCommandBlock)var3).getCommandBlockLogic().getSuccessCount() : 0;
     }
 
-    /**
-     * Called by ItemBlocks after a block is set in the world, to allow post-place logic
-     */
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
     {
-        TileEntity tileentity = worldIn.getTileEntity(pos);
+        TileEntity var6 = worldIn.getTileEntity(pos);
 
-        if (tileentity instanceof TileEntityCommandBlock)
+        if (var6 instanceof TileEntityCommandBlock)
         {
-            CommandBlockLogic commandblocklogic = ((TileEntityCommandBlock)tileentity).getCommandBlockLogic();
+            CommandBlockLogic var7 = ((TileEntityCommandBlock)var6).getCommandBlockLogic();
 
             if (stack.hasDisplayName())
             {
-                commandblocklogic.setName(stack.getDisplayName());
+                var7.func_145754_b(stack.getDisplayName());
             }
 
             if (!worldIn.isRemote)
             {
-                commandblocklogic.setTrackOutput(worldIn.getGameRules().getBoolean("sendCommandFeedback"));
+                var7.func_175573_a(worldIn.getGameRules().getGameRuleBooleanValue("sendCommandFeedback"));
             }
         }
     }
@@ -125,7 +119,7 @@ public class BlockCommandBlock extends BlockContainer
     }
 
     /**
-     * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
+     * The type of render function that is called for this block
      */
     public int getRenderType()
     {
@@ -137,7 +131,7 @@ public class BlockCommandBlock extends BlockContainer
      */
     public IBlockState getStateFromMeta(int meta)
     {
-        return this.getDefaultState().withProperty(TRIGGERED, Boolean.valueOf((meta & 1) > 0));
+        return this.getDefaultState().withProperty(TRIGGERED_PROP, Boolean.valueOf((meta & 1) > 0));
     }
 
     /**
@@ -145,27 +139,23 @@ public class BlockCommandBlock extends BlockContainer
      */
     public int getMetaFromState(IBlockState state)
     {
-        int i = 0;
+        int var2 = 0;
 
-        if (((Boolean)state.getValue(TRIGGERED)).booleanValue())
+        if (((Boolean)state.getValue(TRIGGERED_PROP)).booleanValue())
         {
-            i |= 1;
+            var2 |= 1;
         }
 
-        return i;
+        return var2;
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {TRIGGERED});
+        return new BlockState(this, new IProperty[] {TRIGGERED_PROP});
     }
 
-    /**
-     * Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
-     * IBlockstate
-     */
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
-        return this.getDefaultState().withProperty(TRIGGERED, Boolean.valueOf(false));
+        return this.getDefaultState().withProperty(TRIGGERED_PROP, Boolean.valueOf(false));
     }
 }

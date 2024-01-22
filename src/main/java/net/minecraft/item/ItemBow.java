@@ -12,6 +12,7 @@ import net.minecraft.world.World;
 public class ItemBow extends Item
 {
     public static final String[] bowPullIconNameArray = new String[] {"pulling_0", "pulling_1", "pulling_2"};
+    
 
     public ItemBow()
     {
@@ -22,59 +23,61 @@ public class ItemBow extends Item
 
     /**
      * Called when the player stops using an Item (stops holding the right mouse button).
+     *  
+     * @param timeLeft The amount of ticks left before the using would have been complete
      */
     public void onPlayerStoppedUsing(ItemStack stack, World worldIn, EntityPlayer playerIn, int timeLeft)
     {
-        boolean flag = playerIn.capabilities.isCreativeMode || EnchantmentHelper.getEnchantmentLevel(Enchantment.infinity.effectId, stack) > 0;
+        boolean var5 = playerIn.capabilities.isCreativeMode || EnchantmentHelper.getEnchantmentLevel(Enchantment.infinity.effectId, stack) > 0;
 
-        if (flag || playerIn.inventory.hasItem(Items.arrow))
+        if (var5 || playerIn.inventory.hasItem(Items.arrow))
         {
-            int i = this.getMaxItemUseDuration(stack) - timeLeft;
-            float f = (float)i / 20.0F;
-            f = (f * f + f * 2.0F) / 3.0F;
+            int var6 = this.getMaxItemUseDuration(stack) - timeLeft;
+            float var7 = (float)var6 / 20.0F;
+            var7 = (var7 * var7 + var7 * 2.0F) / 3.0F;
 
-            if ((double)f < 0.1D)
+            if ((double)var7 < 0.1D)
             {
                 return;
             }
 
-            if (f > 1.0F)
+            if (var7 > 1.0F)
             {
-                f = 1.0F;
+                var7 = 1.0F;
             }
 
-            EntityArrow entityarrow = new EntityArrow(worldIn, playerIn, f * 2.0F);
+            EntityArrow var8 = new EntityArrow(worldIn, playerIn, var7 * 2.0F);
 
-            if (f == 1.0F)
+            if (var7 == 1.0F)
             {
-                entityarrow.setIsCritical(true);
+                var8.setIsCritical(true);
             }
 
-            int j = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, stack);
+            int var9 = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, stack);
 
-            if (j > 0)
+            if (var9 > 0)
             {
-                entityarrow.setDamage(entityarrow.getDamage() + (double)j * 0.5D + 0.5D);
+                var8.setDamage(var8.getDamage() + (double)var9 * 0.5D + 0.5D);
             }
 
-            int k = EnchantmentHelper.getEnchantmentLevel(Enchantment.punch.effectId, stack);
+            int var10 = EnchantmentHelper.getEnchantmentLevel(Enchantment.punch.effectId, stack);
 
-            if (k > 0)
+            if (var10 > 0)
             {
-                entityarrow.setKnockbackStrength(k);
+                var8.setKnockbackStrength(var10);
             }
 
             if (EnchantmentHelper.getEnchantmentLevel(Enchantment.flame.effectId, stack) > 0)
             {
-                entityarrow.setFire(100);
+                var8.setFire(100);
             }
 
             stack.damageItem(1, playerIn);
-            worldIn.playSoundAtEntity(playerIn, "random.bow", 1.0F, 1.0F / (itemRand.nextFloat() * 0.4F + 1.2F) + f * 0.5F);
+            worldIn.playSoundAtEntity(playerIn, "random.bow", 1.0F, 1.0F / (itemRand.nextFloat() * 0.4F + 1.2F) + var7 * 0.5F);
 
-            if (flag)
+            if (var5)
             {
-                entityarrow.canBePickedUp = 2;
+                var8.canBePickedUp = 2;
             }
             else
             {
@@ -85,7 +88,7 @@ public class ItemBow extends Item
 
             if (!worldIn.isRemote)
             {
-                worldIn.spawnEntityInWorld(entityarrow);
+                worldIn.spawnEntityInWorld(var8);
             }
         }
     }

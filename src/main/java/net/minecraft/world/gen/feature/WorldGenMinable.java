@@ -15,69 +15,70 @@ public class WorldGenMinable extends WorldGenerator
 
     /** The number of blocks to generate. */
     private final int numberOfBlocks;
-    private final Predicate<IBlockState> predicate;
+    private final Predicate field_175919_c;
+    
 
-    public WorldGenMinable(IBlockState state, int blockCount)
+    public WorldGenMinable(IBlockState p_i45630_1_, int p_i45630_2_)
     {
-        this(state, blockCount, BlockHelper.forBlock(Blocks.stone));
+        this(p_i45630_1_, p_i45630_2_, BlockHelper.forBlock(Blocks.stone));
     }
 
-    public WorldGenMinable(IBlockState state, int blockCount, Predicate<IBlockState> p_i45631_3_)
+    public WorldGenMinable(IBlockState p_i45631_1_, int p_i45631_2_, Predicate p_i45631_3_)
     {
-        this.oreBlock = state;
-        this.numberOfBlocks = blockCount;
-        this.predicate = p_i45631_3_;
+        this.oreBlock = p_i45631_1_;
+        this.numberOfBlocks = p_i45631_2_;
+        this.field_175919_c = p_i45631_3_;
     }
 
-    public boolean generate(World worldIn, Random rand, BlockPos position)
+    public boolean generate(World worldIn, Random p_180709_2_, BlockPos p_180709_3_)
     {
-        float f = rand.nextFloat() * (float)Math.PI;
-        double d0 = (double)((float)(position.getX() + 8) + MathHelper.sin(f) * (float)this.numberOfBlocks / 8.0F);
-        double d1 = (double)((float)(position.getX() + 8) - MathHelper.sin(f) * (float)this.numberOfBlocks / 8.0F);
-        double d2 = (double)((float)(position.getZ() + 8) + MathHelper.cos(f) * (float)this.numberOfBlocks / 8.0F);
-        double d3 = (double)((float)(position.getZ() + 8) - MathHelper.cos(f) * (float)this.numberOfBlocks / 8.0F);
-        double d4 = (double)(position.getY() + rand.nextInt(3) - 2);
-        double d5 = (double)(position.getY() + rand.nextInt(3) - 2);
+        float var4 = p_180709_2_.nextFloat() * (float)Math.PI;
+        double var5 = (double)((float)(p_180709_3_.getX() + 8) + MathHelper.sin(var4) * (float)this.numberOfBlocks / 8.0F);
+        double var7 = (double)((float)(p_180709_3_.getX() + 8) - MathHelper.sin(var4) * (float)this.numberOfBlocks / 8.0F);
+        double var9 = (double)((float)(p_180709_3_.getZ() + 8) + MathHelper.cos(var4) * (float)this.numberOfBlocks / 8.0F);
+        double var11 = (double)((float)(p_180709_3_.getZ() + 8) - MathHelper.cos(var4) * (float)this.numberOfBlocks / 8.0F);
+        double var13 = (double)(p_180709_3_.getY() + p_180709_2_.nextInt(3) - 2);
+        double var15 = (double)(p_180709_3_.getY() + p_180709_2_.nextInt(3) - 2);
 
-        for (int i = 0; i < this.numberOfBlocks; ++i)
+        for (int var17 = 0; var17 < this.numberOfBlocks; ++var17)
         {
-            float f1 = (float)i / (float)this.numberOfBlocks;
-            double d6 = d0 + (d1 - d0) * (double)f1;
-            double d7 = d4 + (d5 - d4) * (double)f1;
-            double d8 = d2 + (d3 - d2) * (double)f1;
-            double d9 = rand.nextDouble() * (double)this.numberOfBlocks / 16.0D;
-            double d10 = (double)(MathHelper.sin((float)Math.PI * f1) + 1.0F) * d9 + 1.0D;
-            double d11 = (double)(MathHelper.sin((float)Math.PI * f1) + 1.0F) * d9 + 1.0D;
-            int j = MathHelper.floor_double(d6 - d10 / 2.0D);
-            int k = MathHelper.floor_double(d7 - d11 / 2.0D);
-            int l = MathHelper.floor_double(d8 - d10 / 2.0D);
-            int i1 = MathHelper.floor_double(d6 + d10 / 2.0D);
-            int j1 = MathHelper.floor_double(d7 + d11 / 2.0D);
-            int k1 = MathHelper.floor_double(d8 + d10 / 2.0D);
+            float var18 = (float)var17 / (float)this.numberOfBlocks;
+            double var19 = var5 + (var7 - var5) * (double)var18;
+            double var21 = var13 + (var15 - var13) * (double)var18;
+            double var23 = var9 + (var11 - var9) * (double)var18;
+            double var25 = p_180709_2_.nextDouble() * (double)this.numberOfBlocks / 16.0D;
+            double var27 = (double)(MathHelper.sin((float)Math.PI * var18) + 1.0F) * var25 + 1.0D;
+            double var29 = (double)(MathHelper.sin((float)Math.PI * var18) + 1.0F) * var25 + 1.0D;
+            int var31 = MathHelper.floor_double(var19 - var27 / 2.0D);
+            int var32 = MathHelper.floor_double(var21 - var29 / 2.0D);
+            int var33 = MathHelper.floor_double(var23 - var27 / 2.0D);
+            int var34 = MathHelper.floor_double(var19 + var27 / 2.0D);
+            int var35 = MathHelper.floor_double(var21 + var29 / 2.0D);
+            int var36 = MathHelper.floor_double(var23 + var27 / 2.0D);
 
-            for (int l1 = j; l1 <= i1; ++l1)
+            for (int var37 = var31; var37 <= var34; ++var37)
             {
-                double d12 = ((double)l1 + 0.5D - d6) / (d10 / 2.0D);
+                double var38 = ((double)var37 + 0.5D - var19) / (var27 / 2.0D);
 
-                if (d12 * d12 < 1.0D)
+                if (var38 * var38 < 1.0D)
                 {
-                    for (int i2 = k; i2 <= j1; ++i2)
+                    for (int var40 = var32; var40 <= var35; ++var40)
                     {
-                        double d13 = ((double)i2 + 0.5D - d7) / (d11 / 2.0D);
+                        double var41 = ((double)var40 + 0.5D - var21) / (var29 / 2.0D);
 
-                        if (d12 * d12 + d13 * d13 < 1.0D)
+                        if (var38 * var38 + var41 * var41 < 1.0D)
                         {
-                            for (int j2 = l; j2 <= k1; ++j2)
+                            for (int var43 = var33; var43 <= var36; ++var43)
                             {
-                                double d14 = ((double)j2 + 0.5D - d8) / (d10 / 2.0D);
+                                double var44 = ((double)var43 + 0.5D - var23) / (var27 / 2.0D);
 
-                                if (d12 * d12 + d13 * d13 + d14 * d14 < 1.0D)
+                                if (var38 * var38 + var41 * var41 + var44 * var44 < 1.0D)
                                 {
-                                    BlockPos blockpos = new BlockPos(l1, i2, j2);
+                                    BlockPos var46 = new BlockPos(var37, var40, var43);
 
-                                    if (this.predicate.apply(worldIn.getBlockState(blockpos)))
+                                    if (this.field_175919_c.apply(worldIn.getBlockState(var46)))
                                     {
-                                        worldIn.setBlockState(blockpos, this.oreBlock, 2);
+                                        worldIn.setBlockState(var46, this.oreBlock, 2);
                                     }
                                 }
                             }

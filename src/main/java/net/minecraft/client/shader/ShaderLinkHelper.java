@@ -1,6 +1,5 @@
 package net.minecraft.client.shader;
 
-import java.io.IOException;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.util.JsonException;
 import org.apache.logging.log4j.LogManager;
@@ -10,6 +9,7 @@ public class ShaderLinkHelper
 {
     private static final Logger logger = LogManager.getLogger();
     private static ShaderLinkHelper staticShaderLinkHelper;
+    
 
     public static void setNewStaticShaderLinkHelper()
     {
@@ -30,26 +30,26 @@ public class ShaderLinkHelper
 
     public int createProgram() throws JsonException
     {
-        int i = OpenGlHelper.glCreateProgram();
+        int var1 = OpenGlHelper.glCreateProgram();
 
-        if (i <= 0)
+        if (var1 <= 0)
         {
-            throw new JsonException("Could not create shader program (returned program ID " + i + ")");
+            throw new JsonException("Could not create shader program (returned program ID " + var1 + ")");
         }
         else
         {
-            return i;
+            return var1;
         }
     }
 
-    public void linkProgram(ShaderManager manager) throws IOException
+    public void linkProgram(ShaderManager manager)
     {
         manager.getFragmentShaderLoader().attachShader(manager);
         manager.getVertexShaderLoader().attachShader(manager);
         OpenGlHelper.glLinkProgram(manager.getProgram());
-        int i = OpenGlHelper.glGetProgrami(manager.getProgram(), OpenGlHelper.GL_LINK_STATUS);
+        int var2 = OpenGlHelper.glGetProgrami(manager.getProgram(), OpenGlHelper.GL_LINK_STATUS);
 
-        if (i == 0)
+        if (var2 == 0)
         {
             logger.warn("Error encountered when linking program containing VS " + manager.getVertexShaderLoader().getShaderFilename() + " and FS " + manager.getFragmentShaderLoader().getShaderFilename() + ". Log output:");
             logger.warn(OpenGlHelper.glGetProgramInfoLog(manager.getProgram(), 32768));

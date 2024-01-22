@@ -7,97 +7,79 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import java.lang.reflect.Type;
+import javax.vecmath.Vector3f;
 import net.minecraft.util.JsonUtils;
 import net.minecraft.util.MathHelper;
-import org.lwjgl.util.vector.Vector3f;
 
 public class ItemTransformVec3f
 {
-    public static final ItemTransformVec3f DEFAULT = new ItemTransformVec3f(new Vector3f(), new Vector3f(), new Vector3f(1.0F, 1.0F, 1.0F));
-    public final Vector3f rotation;
-    public final Vector3f translation;
-    public final Vector3f scale;
+    public static final ItemTransformVec3f field_178366_a = new ItemTransformVec3f(new Vector3f(), new Vector3f(), new Vector3f(1.0F, 1.0F, 1.0F));
+    public final Vector3f field_178364_b;
+    public final Vector3f field_178365_c;
+    public final Vector3f field_178363_d;
+    
 
-    public ItemTransformVec3f(Vector3f rotation, Vector3f translation, Vector3f scale)
+    public ItemTransformVec3f(Vector3f p_i46214_1_, Vector3f p_i46214_2_, Vector3f p_i46214_3_)
     {
-        this.rotation = new Vector3f(rotation);
-        this.translation = new Vector3f(translation);
-        this.scale = new Vector3f(scale);
+        this.field_178364_b = new Vector3f(p_i46214_1_);
+        this.field_178365_c = new Vector3f(p_i46214_2_);
+        this.field_178363_d = new Vector3f(p_i46214_3_);
     }
 
-    public boolean equals(Object p_equals_1_)
+    static class Deserializer implements JsonDeserializer
     {
-        if (this == p_equals_1_)
-        {
-            return true;
-        }
-        else if (this.getClass() != p_equals_1_.getClass())
-        {
-            return false;
-        }
-        else
-        {
-            ItemTransformVec3f itemtransformvec3f = (ItemTransformVec3f)p_equals_1_;
-            return !this.rotation.equals(itemtransformvec3f.rotation) ? false : (!this.scale.equals(itemtransformvec3f.scale) ? false : this.translation.equals(itemtransformvec3f.translation));
-        }
-    }
+        private static final Vector3f field_178362_a = new Vector3f(0.0F, 0.0F, 0.0F);
+        private static final Vector3f field_178360_b = new Vector3f(0.0F, 0.0F, 0.0F);
+        private static final Vector3f field_178361_c = new Vector3f(1.0F, 1.0F, 1.0F);
+        
 
-    public int hashCode()
-    {
-        int i = this.rotation.hashCode();
-        i = 31 * i + this.translation.hashCode();
-        i = 31 * i + this.scale.hashCode();
-        return i;
-    }
-
-    static class Deserializer implements JsonDeserializer<ItemTransformVec3f>
-    {
-        private static final Vector3f ROTATION_DEFAULT = new Vector3f(0.0F, 0.0F, 0.0F);
-        private static final Vector3f TRANSLATION_DEFAULT = new Vector3f(0.0F, 0.0F, 0.0F);
-        private static final Vector3f SCALE_DEFAULT = new Vector3f(1.0F, 1.0F, 1.0F);
-
-        public ItemTransformVec3f deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_) throws JsonParseException
+        public ItemTransformVec3f func_178359_a(JsonElement p_178359_1_, Type p_178359_2_, JsonDeserializationContext p_178359_3_)
         {
-            JsonObject jsonobject = p_deserialize_1_.getAsJsonObject();
-            Vector3f vector3f = this.parseVector3f(jsonobject, "rotation", ROTATION_DEFAULT);
-            Vector3f vector3f1 = this.parseVector3f(jsonobject, "translation", TRANSLATION_DEFAULT);
-            vector3f1.scale(0.0625F);
-            vector3f1.x = MathHelper.clamp_float(vector3f1.x, -1.5F, 1.5F);
-            vector3f1.y = MathHelper.clamp_float(vector3f1.y, -1.5F, 1.5F);
-            vector3f1.z = MathHelper.clamp_float(vector3f1.z, -1.5F, 1.5F);
-            Vector3f vector3f2 = this.parseVector3f(jsonobject, "scale", SCALE_DEFAULT);
-            vector3f2.x = MathHelper.clamp_float(vector3f2.x, -4.0F, 4.0F);
-            vector3f2.y = MathHelper.clamp_float(vector3f2.y, -4.0F, 4.0F);
-            vector3f2.z = MathHelper.clamp_float(vector3f2.z, -4.0F, 4.0F);
-            return new ItemTransformVec3f(vector3f, vector3f1, vector3f2);
+            JsonObject var4 = p_178359_1_.getAsJsonObject();
+            Vector3f var5 = this.func_178358_a(var4, "rotation", field_178362_a);
+            Vector3f var6 = this.func_178358_a(var4, "translation", field_178360_b);
+            var6.scale(0.0625F);
+            MathHelper.clamp_double((double)var6.x, -1.5D, 1.5D);
+            MathHelper.clamp_double((double)var6.y, -1.5D, 1.5D);
+            MathHelper.clamp_double((double)var6.z, -1.5D, 1.5D);
+            Vector3f var7 = this.func_178358_a(var4, "scale", field_178361_c);
+            MathHelper.clamp_double((double)var7.x, -1.5D, 1.5D);
+            MathHelper.clamp_double((double)var7.y, -1.5D, 1.5D);
+            MathHelper.clamp_double((double)var7.z, -1.5D, 1.5D);
+            return new ItemTransformVec3f(var5, var6, var7);
         }
 
-        private Vector3f parseVector3f(JsonObject jsonObject, String key, Vector3f defaultValue)
+        private Vector3f func_178358_a(JsonObject p_178358_1_, String p_178358_2_, Vector3f p_178358_3_)
         {
-            if (!jsonObject.has(key))
+            if (!p_178358_1_.has(p_178358_2_))
             {
-                return defaultValue;
+                return p_178358_3_;
             }
             else
             {
-                JsonArray jsonarray = JsonUtils.getJsonArray(jsonObject, key);
+                JsonArray var4 = JsonUtils.getJsonObjectJsonArrayField(p_178358_1_, p_178358_2_);
 
-                if (jsonarray.size() != 3)
+                if (var4.size() != 3)
                 {
-                    throw new JsonParseException("Expected 3 " + key + " values, found: " + jsonarray.size());
+                    throw new JsonParseException("Expected 3 " + p_178358_2_ + " values, found: " + var4.size());
                 }
                 else
                 {
-                    float[] afloat = new float[3];
+                    float[] var5 = new float[3];
 
-                    for (int i = 0; i < afloat.length; ++i)
+                    for (int var6 = 0; var6 < var5.length; ++var6)
                     {
-                        afloat[i] = JsonUtils.getFloat(jsonarray.get(i), key + "[" + i + "]");
+                        var5[var6] = JsonUtils.getJsonElementFloatValue(var4.get(var6), p_178358_2_ + "[" + var6 + "]");
                     }
 
-                    return new Vector3f(afloat[0], afloat[1], afloat[2]);
+                    return new Vector3f(var5);
                 }
             }
+        }
+
+        public Object deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_)
+        {
+            return this.func_178359_a(p_deserialize_1_, p_deserialize_2_, p_deserialize_3_);
         }
     }
 }

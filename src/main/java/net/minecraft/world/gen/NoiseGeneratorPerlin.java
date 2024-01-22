@@ -6,30 +6,31 @@ public class NoiseGeneratorPerlin extends NoiseGenerator
 {
     private NoiseGeneratorSimplex[] field_151603_a;
     private int field_151602_b;
+    
 
     public NoiseGeneratorPerlin(Random p_i45470_1_, int p_i45470_2_)
     {
         this.field_151602_b = p_i45470_2_;
         this.field_151603_a = new NoiseGeneratorSimplex[p_i45470_2_];
 
-        for (int i = 0; i < p_i45470_2_; ++i)
+        for (int var3 = 0; var3 < p_i45470_2_; ++var3)
         {
-            this.field_151603_a[i] = new NoiseGeneratorSimplex(p_i45470_1_);
+            this.field_151603_a[var3] = new NoiseGeneratorSimplex(p_i45470_1_);
         }
     }
 
     public double func_151601_a(double p_151601_1_, double p_151601_3_)
     {
-        double d0 = 0.0D;
-        double d1 = 1.0D;
+        double var5 = 0.0D;
+        double var7 = 1.0D;
 
-        for (int i = 0; i < this.field_151602_b; ++i)
+        for (int var9 = 0; var9 < this.field_151602_b; ++var9)
         {
-            d0 += this.field_151603_a[i].func_151605_a(p_151601_1_ * d1, p_151601_3_ * d1) / d1;
-            d1 /= 2.0D;
+            var5 += this.field_151603_a[var9].func_151605_a(p_151601_1_ * var7, p_151601_3_ * var7) / var7;
+            var7 /= 2.0D;
         }
 
-        return d0;
+        return var5;
     }
 
     public double[] func_151599_a(double[] p_151599_1_, double p_151599_2_, double p_151599_4_, int p_151599_6_, int p_151599_7_, double p_151599_8_, double p_151599_10_, double p_151599_12_)
@@ -41,9 +42,9 @@ public class NoiseGeneratorPerlin extends NoiseGenerator
     {
         if (p_151600_1_ != null && p_151600_1_.length >= p_151600_6_ * p_151600_7_)
         {
-            for (int i = 0; i < p_151600_1_.length; ++i)
+            for (int var16 = 0; var16 < p_151600_1_.length; ++var16)
             {
-                p_151600_1_[i] = 0.0D;
+                p_151600_1_[var16] = 0.0D;
             }
         }
         else
@@ -51,14 +52,14 @@ public class NoiseGeneratorPerlin extends NoiseGenerator
             p_151600_1_ = new double[p_151600_6_ * p_151600_7_];
         }
 
-        double d1 = 1.0D;
-        double d0 = 1.0D;
+        double var21 = 1.0D;
+        double var18 = 1.0D;
 
-        for (int j = 0; j < this.field_151602_b; ++j)
+        for (int var20 = 0; var20 < this.field_151602_b; ++var20)
         {
-            this.field_151603_a[j].func_151606_a(p_151600_1_, p_151600_2_, p_151600_4_, p_151600_6_, p_151600_7_, p_151600_8_ * d0 * d1, p_151600_10_ * d0 * d1, 0.55D / d1);
-            d0 *= p_151600_12_;
-            d1 *= p_151600_14_;
+            this.field_151603_a[var20].func_151606_a(p_151600_1_, p_151600_2_, p_151600_4_, p_151600_6_, p_151600_7_, p_151600_8_ * var18 * var21, p_151600_10_ * var18 * var21, 0.55D / var21);
+            var18 *= p_151600_12_;
+            var21 *= p_151600_14_;
         }
 
         return p_151600_1_;

@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface IReloadableResourceManager extends IResourceManager
 {
-    void reloadResources(List<IResourcePack> resourcesPacksList);
+    void reloadResources(List var1);
 
-    void registerReloadListener(IResourceManagerReloadListener reloadListener);
+    void registerReloadListener(IResourceManagerReloadListener var1);
 }

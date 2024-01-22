@@ -14,27 +14,29 @@ public class ContainerMerchant extends Container
 
     /** Instance of World. */
     private final World theWorld;
+    
 
-    public ContainerMerchant(InventoryPlayer playerInventory, IMerchant merchant, World worldIn)
+    public ContainerMerchant(InventoryPlayer p_i1821_1_, IMerchant p_i1821_2_, World worldIn)
     {
-        this.theMerchant = merchant;
+        this.theMerchant = p_i1821_2_;
         this.theWorld = worldIn;
-        this.merchantInventory = new InventoryMerchant(playerInventory.player, merchant);
+        this.merchantInventory = new InventoryMerchant(p_i1821_1_.player, p_i1821_2_);
         this.addSlotToContainer(new Slot(this.merchantInventory, 0, 36, 53));
         this.addSlotToContainer(new Slot(this.merchantInventory, 1, 62, 53));
-        this.addSlotToContainer(new SlotMerchantResult(playerInventory.player, merchant, this.merchantInventory, 2, 120, 53));
+        this.addSlotToContainer(new SlotMerchantResult(p_i1821_1_.player, p_i1821_2_, this.merchantInventory, 2, 120, 53));
+        int var4;
 
-        for (int i = 0; i < 3; ++i)
+        for (var4 = 0; var4 < 3; ++var4)
         {
-            for (int j = 0; j < 9; ++j)
+            for (int var5 = 0; var5 < 9; ++var5)
             {
-                this.addSlotToContainer(new Slot(playerInventory, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
+                this.addSlotToContainer(new Slot(p_i1821_1_, var5 + var4 * 9 + 9, 8 + var5 * 18, 84 + var4 * 18));
             }
         }
 
-        for (int k = 0; k < 9; ++k)
+        for (var4 = 0; var4 < 9; ++var4)
         {
-            this.addSlotToContainer(new Slot(playerInventory, k, 8 + k * 18, 142));
+            this.addSlotToContainer(new Slot(p_i1821_1_, var4, 8 + var4 * 18, 142));
         }
     }
 
@@ -43,9 +45,9 @@ public class ContainerMerchant extends Container
         return this.merchantInventory;
     }
 
-    public void onCraftGuiOpened(ICrafting listener)
+    public void onCraftGuiOpened(ICrafting p_75132_1_)
     {
-        super.onCraftGuiOpened(listener);
+        super.onCraftGuiOpened(p_75132_1_);
     }
 
     /**
@@ -59,20 +61,18 @@ public class ContainerMerchant extends Container
     /**
      * Callback for when the crafting matrix is changed.
      */
-    public void onCraftMatrixChanged(IInventory inventoryIn)
+    public void onCraftMatrixChanged(IInventory p_75130_1_)
     {
         this.merchantInventory.resetRecipeAndSlots();
-        super.onCraftMatrixChanged(inventoryIn);
+        super.onCraftMatrixChanged(p_75130_1_);
     }
 
-    public void setCurrentRecipeIndex(int currentRecipeIndex)
+    public void setCurrentRecipeIndex(int p_75175_1_)
     {
-        this.merchantInventory.setCurrentRecipeIndex(currentRecipeIndex);
+        this.merchantInventory.setCurrentRecipeIndex(p_75175_1_);
     }
 
-    public void updateProgressBar(int id, int data)
-    {
-    }
+    public void updateProgressBar(int p_75137_1_, int p_75137_2_) {}
 
     public boolean canInteractWith(EntityPlayer playerIn)
     {
@@ -84,85 +84,85 @@ public class ContainerMerchant extends Container
      */
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int index)
     {
-        ItemStack itemstack = null;
-        Slot slot = (Slot)this.inventorySlots.get(index);
+        ItemStack var3 = null;
+        Slot var4 = (Slot)this.inventorySlots.get(index);
 
-        if (slot != null && slot.getHasStack())
+        if (var4 != null && var4.getHasStack())
         {
-            ItemStack itemstack1 = slot.getStack();
-            itemstack = itemstack1.copy();
+            ItemStack var5 = var4.getStack();
+            var3 = var5.copy();
 
             if (index == 2)
             {
-                if (!this.mergeItemStack(itemstack1, 3, 39, true))
+                if (!this.mergeItemStack(var5, 3, 39, true))
                 {
                     return null;
                 }
 
-                slot.onSlotChange(itemstack1, itemstack);
+                var4.onSlotChange(var5, var3);
             }
             else if (index != 0 && index != 1)
             {
                 if (index >= 3 && index < 30)
                 {
-                    if (!this.mergeItemStack(itemstack1, 30, 39, false))
+                    if (!this.mergeItemStack(var5, 30, 39, false))
                     {
                         return null;
                     }
                 }
-                else if (index >= 30 && index < 39 && !this.mergeItemStack(itemstack1, 3, 30, false))
+                else if (index >= 30 && index < 39 && !this.mergeItemStack(var5, 3, 30, false))
                 {
                     return null;
                 }
             }
-            else if (!this.mergeItemStack(itemstack1, 3, 39, false))
+            else if (!this.mergeItemStack(var5, 3, 39, false))
             {
                 return null;
             }
 
-            if (itemstack1.stackSize == 0)
+            if (var5.stackSize == 0)
             {
-                slot.putStack((ItemStack)null);
+                var4.putStack((ItemStack)null);
             }
             else
             {
-                slot.onSlotChanged();
+                var4.onSlotChanged();
             }
 
-            if (itemstack1.stackSize == itemstack.stackSize)
+            if (var5.stackSize == var3.stackSize)
             {
                 return null;
             }
 
-            slot.onPickupFromSlot(playerIn, itemstack1);
+            var4.onPickupFromSlot(playerIn, var5);
         }
 
-        return itemstack;
+        return var3;
     }
 
     /**
      * Called when the container is closed.
      */
-    public void onContainerClosed(EntityPlayer playerIn)
+    public void onContainerClosed(EntityPlayer p_75134_1_)
     {
-        super.onContainerClosed(playerIn);
+        super.onContainerClosed(p_75134_1_);
         this.theMerchant.setCustomer((EntityPlayer)null);
-        super.onContainerClosed(playerIn);
+        super.onContainerClosed(p_75134_1_);
 
         if (!this.theWorld.isRemote)
         {
-            ItemStack itemstack = this.merchantInventory.removeStackFromSlot(0);
+            ItemStack var2 = this.merchantInventory.getStackInSlotOnClosing(0);
 
-            if (itemstack != null)
+            if (var2 != null)
             {
-                playerIn.dropPlayerItemWithRandomChoice(itemstack, false);
+                p_75134_1_.dropPlayerItemWithRandomChoice(var2, false);
             }
 
-            itemstack = this.merchantInventory.removeStackFromSlot(1);
+            var2 = this.merchantInventory.getStackInSlotOnClosing(1);
 
-            if (itemstack != null)
+            if (var2 != null)
             {
-                playerIn.dropPlayerItemWithRandomChoice(itemstack, false);
+                p_75134_1_.dropPlayerItemWithRandomChoice(var2, false);
             }
         }
     }

@@ -5,5 +5,5 @@ import net.minecraft.item.ItemStack;
 
 public interface ItemMeshDefinition
 {
-    ModelResourceLocation getModelLocation(ItemStack stack);
+    ModelResourceLocation getModelLocation(ItemStack var1);
 }

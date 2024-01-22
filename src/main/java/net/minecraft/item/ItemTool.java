@@ -12,7 +12,7 @@ import net.minecraft.world.World;
 
 public class ItemTool extends Item
 {
-    private Set<Block> effectiveBlocks;
+    private Set effectiveBlocksTool;
     protected float efficiencyOnProperMaterial = 4.0F;
 
     /** Damage versus entities. */
@@ -20,26 +20,30 @@ public class ItemTool extends Item
 
     /** The material this tool is made from. */
     protected Item.ToolMaterial toolMaterial;
+    
 
-    protected ItemTool(float attackDamage, Item.ToolMaterial material, Set<Block> effectiveBlocks)
+    protected ItemTool(float p_i45333_1_, Item.ToolMaterial p_i45333_2_, Set p_i45333_3_)
     {
-        this.toolMaterial = material;
-        this.effectiveBlocks = effectiveBlocks;
+        this.toolMaterial = p_i45333_2_;
+        this.effectiveBlocksTool = p_i45333_3_;
         this.maxStackSize = 1;
-        this.setMaxDamage(material.getMaxUses());
-        this.efficiencyOnProperMaterial = material.getEfficiencyOnProperMaterial();
-        this.damageVsEntity = attackDamage + material.getDamageVsEntity();
+        this.setMaxDamage(p_i45333_2_.getMaxUses());
+        this.efficiencyOnProperMaterial = p_i45333_2_.getEfficiencyOnProperMaterial();
+        this.damageVsEntity = p_i45333_1_ + p_i45333_2_.getDamageVsEntity();
         this.setCreativeTab(CreativeTabs.tabTools);
     }
 
-    public float getStrVsBlock(ItemStack stack, Block state)
+    public float getStrVsBlock(ItemStack stack, Block p_150893_2_)
     {
-        return this.effectiveBlocks.contains(state) ? this.efficiencyOnProperMaterial : 1.0F;
+        return this.effectiveBlocksTool.contains(p_150893_2_) ? this.efficiencyOnProperMaterial : 1.0F;
     }
 
     /**
      * Current implementations of this method in child classes do not use the entry argument beside ev. They just raise
      * the damage on the stack.
+     *  
+     * @param target The Entity being hit
+     * @param attacker the attacking entity
      */
     public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker)
     {
@@ -91,16 +95,22 @@ public class ItemTool extends Item
 
     /**
      * Return whether this item is repairable in an anvil.
+     *  
+     * @param toRepair The ItemStack to be repaired
+     * @param repair The ItemStack that should repair this Item (leather for leather armor, etc.)
      */
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair)
     {
-        return this.toolMaterial.getRepairItem() == repair.getItem() ? true : super.getIsRepairable(toRepair, repair);
+        return this.toolMaterial.getBaseItemForRepair() == repair.getItem() ? true : super.getIsRepairable(toRepair, repair);
     }
 
-    public Multimap<String, AttributeModifier> getItemAttributeModifiers()
+    /**
+     * Gets a map of item attribute modifiers, used by ItemSword to increase hit damage.
+     */
+    public Multimap getItemAttributeModifiers()
     {
-        Multimap<String, AttributeModifier> multimap = super.getItemAttributeModifiers();
-        multimap.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(), new AttributeModifier(itemModifierUUID, "Tool modifier", (double)this.damageVsEntity, 0));
-        return multimap;
+        Multimap var1 = super.getItemAttributeModifiers();
+        var1.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(), new AttributeModifier(itemModifierUUID, "Tool modifier", (double)this.damageVsEntity, 0));
+        return var1;
     }
 }

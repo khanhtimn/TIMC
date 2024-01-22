@@ -7,10 +7,11 @@ public class TextureOffset
 
     /** The y coordinate offset of the texture */
     public final int textureOffsetY;
+    
 
-    public TextureOffset(int textureOffsetXIn, int textureOffsetYIn)
+    public TextureOffset(int p_i1175_1_, int p_i1175_2_)
     {
-        this.textureOffsetX = textureOffsetXIn;
-        this.textureOffsetY = textureOffsetYIn;
+        this.textureOffsetX = p_i1175_1_;
+        this.textureOffsetY = p_i1175_2_;
     }
 }

@@ -8,21 +8,27 @@ import net.minecraft.item.ItemStack;
 public class RecipesWeapons
 {
     private String[][] recipePatterns = new String[][] {{"X", "X", "#"}};
-    private Object[][] recipeItems = new Object[][] {{Blocks.planks, Blocks.cobblestone, Items.iron_ingot, Items.diamond, Items.gold_ingot}, {Items.wooden_sword, Items.stone_sword, Items.iron_sword, Items.diamond_sword, Items.golden_sword}};
+    private Object[][] recipeItems;
+    
+
+    public RecipesWeapons()
+    {
+        this.recipeItems = new Object[][] {{Blocks.planks, Blocks.cobblestone, Items.iron_ingot, Items.diamond, Items.gold_ingot}, {Items.wooden_sword, Items.stone_sword, Items.iron_sword, Items.diamond_sword, Items.golden_sword}};
+    }
 
     /**
      * Adds the weapon recipes to the CraftingManager.
      */
     public void addRecipes(CraftingManager p_77583_1_)
     {
-        for (int i = 0; i < this.recipeItems[0].length; ++i)
+        for (int var2 = 0; var2 < this.recipeItems[0].length; ++var2)
         {
-            Object object = this.recipeItems[0][i];
+            Object var3 = this.recipeItems[0][var2];
 
-            for (int j = 0; j < this.recipeItems.length - 1; ++j)
+            for (int var4 = 0; var4 < this.recipeItems.length - 1; ++var4)
             {
-                Item item = (Item)this.recipeItems[j + 1][i];
-                p_77583_1_.addRecipe(new ItemStack(item), new Object[] {this.recipePatterns[j], '#', Items.stick, 'X', object});
+                Item var5 = (Item)this.recipeItems[var4 + 1][var2];
+                p_77583_1_.addRecipe(new ItemStack(var5), new Object[] {this.recipePatterns[var4], '#', Items.stick, 'X', var3});
             }
         }
 

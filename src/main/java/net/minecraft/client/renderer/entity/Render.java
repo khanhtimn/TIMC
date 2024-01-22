@@ -1,185 +1,174 @@
 package net.minecraft.client.renderer.entity;
 
+import com.teamti.timc.alts.GuiAltManager;
+import com.teamti.timc.main.TIMC;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.ThreadDownloadImageData;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.src.Config;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.optifine.entity.model.IEntityRenderer;
-import net.optifine.shaders.Shaders;
+import optifine.Config;
 import org.lwjgl.opengl.GL11;
+import shadersmod.client.Shaders;
 
-public abstract class Render<T extends Entity> implements IEntityRenderer
+import java.io.IOException;
+import java.util.Iterator;
+
+public abstract class Render
 {
     private static final ResourceLocation shadowTextures = new ResourceLocation("textures/misc/shadow.png");
     protected final RenderManager renderManager;
-    public float shadowSize;
+    protected float shadowSize;
 
     /**
      * Determines the darkness of the object's shadow. Higher value makes a darker shadow.
      */
     protected float shadowOpaque = 1.0F;
-    private Class entityClass = null;
-    private ResourceLocation locationTextureCustom = null;
 
-    protected Render(RenderManager renderManager)
+    protected Render(RenderManager p_i46179_1_)
     {
-        this.renderManager = renderManager;
+        this.renderManager = p_i46179_1_;
     }
 
-    public boolean shouldRender(T livingEntity, ICamera camera, double camX, double camY, double camZ)
+    public boolean func_177071_a(Entity p_177071_1_, ICamera p_177071_2_, double p_177071_3_, double p_177071_5_, double p_177071_7_)
     {
-        AxisAlignedBB axisalignedbb = livingEntity.getEntityBoundingBox();
-
-        if (axisalignedbb.hasNaN() || axisalignedbb.getAverageEdgeLength() == 0.0D)
-        {
-            axisalignedbb = new AxisAlignedBB(livingEntity.posX - 2.0D, livingEntity.posY - 2.0D, livingEntity.posZ - 2.0D, livingEntity.posX + 2.0D, livingEntity.posY + 2.0D, livingEntity.posZ + 2.0D);
-        }
-
-        return livingEntity.isInRangeToRender3d(camX, camY, camZ) && (livingEntity.ignoreFrustumCheck || camera.isBoundingBoxInFrustum(axisalignedbb));
+        return p_177071_1_.isInRangeToRender3d(p_177071_3_, p_177071_5_, p_177071_7_) && (p_177071_1_.ignoreFrustumCheck || p_177071_2_.isBoundingBoxInFrustum(p_177071_1_.getEntityBoundingBox()));
     }
 
     /**
-     * Renders the desired {@code T} type Entity.
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
      */
-    public void doRender(T entity, double x, double y, double z, float entityYaw, float partialTicks)
+    public void doRender(Entity p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
     {
-        this.renderName(entity, x, y, z);
+        this.func_177067_a(p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_);
     }
 
-    protected void renderName(T entity, double x, double y, double z)
+    protected void func_177067_a(Entity p_177067_1_, double p_177067_2_, double p_177067_4_, double p_177067_6_)
     {
-        if (this.canRenderName(entity))
+        if (this.func_177070_b(p_177067_1_))
         {
-            this.renderLivingLabel(entity, entity.getDisplayName().getFormattedText(), x, y, z, 64);
+            this.renderLivingLabel(p_177067_1_, p_177067_1_.getDisplayName().getFormattedText(), p_177067_2_, p_177067_4_, p_177067_6_, 64);
         }
     }
 
-    protected boolean canRenderName(T entity)
+    protected boolean func_177070_b(Entity p_177070_1_)
     {
-        return entity.getAlwaysRenderNameTagForRender() && entity.hasCustomName();
+        return p_177070_1_.getAlwaysRenderNameTagForRender() && p_177070_1_.hasCustomName();
     }
 
-    protected void renderOffsetLivingLabel(T entityIn, double x, double y, double z, String str, float p_177069_9_, double p_177069_10_)
+    protected void func_177069_a(Entity p_177069_1_, double p_177069_2_, double p_177069_4_, double p_177069_6_, String p_177069_8_, float p_177069_9_, double p_177069_10_)
     {
-        this.renderLivingLabel(entityIn, str, x, y, z, 64);
+        this.renderLivingLabel(p_177069_1_, p_177069_8_, p_177069_2_, p_177069_4_, p_177069_6_, 64);
     }
 
     /**
      * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
      */
-    protected abstract ResourceLocation getEntityTexture(T entity);
+    protected abstract ResourceLocation getEntityTexture(Entity var1);
 
-    protected boolean bindEntityTexture(T entity)
+    protected boolean bindEntityTexture(Entity p_180548_1_)
     {
-        ResourceLocation resourcelocation = this.getEntityTexture(entity);
+        ResourceLocation var2 = this.getEntityTexture(p_180548_1_);
 
-        if (this.locationTextureCustom != null)
-        {
-            resourcelocation = this.locationTextureCustom;
-        }
-
-        if (resourcelocation == null)
+        if (var2 == null)
         {
             return false;
         }
         else
         {
-            this.bindTexture(resourcelocation);
+        	if(Minecraft.getMinecraft().currentScreen instanceof GuiAltManager){
+        	ThreadDownloadImageData ab = AbstractClientPlayer.getDownloadImageSkin(AbstractClientPlayer.getLocationSkin(TIMC.altmanagergui.selectedAlt.uuid+"-skin"), TIMC.altmanagergui.selectedAlt.uuid);
+        	try {
+				ab.loadTexture(Minecraft.getMinecraft().getResourceManager());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Minecraft.getMinecraft().getTextureManager().bindTexture(AbstractClientPlayer.getLocationSkin(TIMC.altmanagergui.selectedAlt.uuid+"-skin"));
+
+            }else{
+            this.bindTexture(var2);
+        	}
             return true;
         }
     }
 
-    public void bindTexture(ResourceLocation location)
+    public void bindTexture(ResourceLocation p_110776_1_)
     {
-        this.renderManager.renderEngine.bindTexture(location);
+        this.renderManager.renderEngine.bindTexture(p_110776_1_);
     }
 
     /**
      * Renders fire on top of the entity. Args: entity, x, y, z, partialTickTime
      */
-    private void renderEntityOnFire(Entity entity, double x, double y, double z, float partialTicks)
+    private void renderEntityOnFire(Entity p_76977_1_, double p_76977_2_, double p_76977_4_, double p_76977_6_, float p_76977_8_)
     {
         GlStateManager.disableLighting();
-        TextureMap texturemap = Minecraft.getMinecraft().getTextureMapBlocks();
-        TextureAtlasSprite textureatlassprite = texturemap.getAtlasSprite("minecraft:blocks/fire_layer_0");
-        TextureAtlasSprite textureatlassprite1 = texturemap.getAtlasSprite("minecraft:blocks/fire_layer_1");
+        TextureMap var9 = Minecraft.getMinecraft().getTextureMapBlocks();
+        TextureAtlasSprite var10 = var9.getAtlasSprite("minecraft:blocks/fire_layer_0");
+        TextureAtlasSprite var11 = var9.getAtlasSprite("minecraft:blocks/fire_layer_1");
         GlStateManager.pushMatrix();
-        GlStateManager.translate((float)x, (float)y, (float)z);
-        float f = entity.width * 1.4F;
-        GlStateManager.scale(f, f, f);
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        float f1 = 0.5F;
-        float f2 = 0.0F;
-        float f3 = entity.height / f;
-        float f4 = (float)(entity.posY - entity.getEntityBoundingBox().minY);
+        GlStateManager.translate((float)p_76977_2_, (float)p_76977_4_, (float)p_76977_6_);
+        float var12 = p_76977_1_.width * 1.4F;
+        GlStateManager.scale(var12, var12, var12);
+        Tessellator var13 = Tessellator.getInstance();
+        WorldRenderer var14 = var13.getWorldRenderer();
+        float var15 = 0.5F;
+        float var16 = 0.0F;
+        float var17 = p_76977_1_.height / var12;
+        float var18 = (float)(p_76977_1_.posY - p_76977_1_.getEntityBoundingBox().minY);
         GlStateManager.rotate(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-        GlStateManager.translate(0.0F, 0.0F, -0.3F + (float)((int)f3) * 0.02F);
+        GlStateManager.translate(0.0F, 0.0F, -0.3F + (float)((int)var17) * 0.02F);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        float f5 = 0.0F;
-        int i = 0;
-        boolean flag = Config.isMultiTexture();
+        float var19 = 0.0F;
+        int var20 = 0;
+        var14.startDrawingQuads();
 
-        if (flag)
+        while (var17 > 0.0F)
         {
-            worldrenderer.setBlockLayer(EnumWorldBlockLayer.SOLID);
-        }
-
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
-
-        while (f3 > 0.0F)
-        {
-            TextureAtlasSprite textureatlassprite2 = i % 2 == 0 ? textureatlassprite : textureatlassprite1;
-            worldrenderer.setSprite(textureatlassprite2);
+            TextureAtlasSprite var21 = var20 % 2 == 0 ? var10 : var11;
             this.bindTexture(TextureMap.locationBlocksTexture);
-            float f6 = textureatlassprite2.getMinU();
-            float f7 = textureatlassprite2.getMinV();
-            float f8 = textureatlassprite2.getMaxU();
-            float f9 = textureatlassprite2.getMaxV();
+            float var22 = var21.getMinU();
+            float var23 = var21.getMinV();
+            float var24 = var21.getMaxU();
+            float var25 = var21.getMaxV();
 
-            if (i / 2 % 2 == 0)
+            if (var20 / 2 % 2 == 0)
             {
-                float f10 = f8;
-                f8 = f6;
-                f6 = f10;
+                float var26 = var24;
+                var24 = var22;
+                var22 = var26;
             }
 
-            worldrenderer.pos((double)(f1 - f2), (double)(0.0F - f4), (double)f5).tex((double)f8, (double)f9).endVertex();
-            worldrenderer.pos((double)(-f1 - f2), (double)(0.0F - f4), (double)f5).tex((double)f6, (double)f9).endVertex();
-            worldrenderer.pos((double)(-f1 - f2), (double)(1.4F - f4), (double)f5).tex((double)f6, (double)f7).endVertex();
-            worldrenderer.pos((double)(f1 - f2), (double)(1.4F - f4), (double)f5).tex((double)f8, (double)f7).endVertex();
-            f3 -= 0.45F;
-            f4 -= 0.45F;
-            f1 *= 0.9F;
-            f5 += 0.03F;
-            ++i;
+            var14.addVertexWithUV((double)(var15 - var16), (double)(0.0F - var18), (double)var19, (double)var24, (double)var25);
+            var14.addVertexWithUV((double)(-var15 - var16), (double)(0.0F - var18), (double)var19, (double)var22, (double)var25);
+            var14.addVertexWithUV((double)(-var15 - var16), (double)(1.4F - var18), (double)var19, (double)var22, (double)var23);
+            var14.addVertexWithUV((double)(var15 - var16), (double)(1.4F - var18), (double)var19, (double)var24, (double)var23);
+            var17 -= 0.45F;
+            var18 -= 0.45F;
+            var15 *= 0.9F;
+            var19 += 0.03F;
+            ++var20;
         }
 
-        tessellator.draw();
-
-        if (flag)
-        {
-            worldrenderer.setBlockLayer((EnumWorldBlockLayer)null);
-            GlStateManager.bindCurrentTexture();
-        }
-
+        var13.draw();
         GlStateManager.popMatrix();
         GlStateManager.enableLighting();
     }
@@ -188,55 +177,57 @@ public abstract class Render<T extends Entity> implements IEntityRenderer
      * Renders the entity shadows at the position, shadow alpha and partialTickTime. Args: entity, x, y, z, shadowAlpha,
      * partialTickTime
      */
-    private void renderShadow(Entity entityIn, double x, double y, double z, float shadowAlpha, float partialTicks)
+    private void renderShadow(Entity p_76975_1_, double p_76975_2_, double p_76975_4_, double p_76975_6_, float p_76975_8_, float p_76975_9_)
     {
         if (!Config.isShaders() || !Shaders.shouldSkipDefaultShadow)
         {
             GlStateManager.enableBlend();
             GlStateManager.blendFunc(770, 771);
             this.renderManager.renderEngine.bindTexture(shadowTextures);
-            World world = this.getWorldFromRenderManager();
+            World var10 = this.getWorldFromRenderManager();
             GlStateManager.depthMask(false);
-            float f = this.shadowSize;
+            float var11 = this.shadowSize;
 
-            if (entityIn instanceof EntityLiving)
+            if (p_76975_1_ instanceof EntityLiving)
             {
-                EntityLiving entityliving = (EntityLiving)entityIn;
-                f *= entityliving.getRenderSizeModifier();
+                EntityLiving var35 = (EntityLiving)p_76975_1_;
+                var11 *= var35.getRenderSizeModifier();
 
-                if (entityliving.isChild())
+                if (var35.isChild())
                 {
-                    f *= 0.5F;
+                    var11 *= 0.5F;
                 }
             }
 
-            double d5 = entityIn.lastTickPosX + (entityIn.posX - entityIn.lastTickPosX) * (double)partialTicks;
-            double d0 = entityIn.lastTickPosY + (entityIn.posY - entityIn.lastTickPosY) * (double)partialTicks;
-            double d1 = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double)partialTicks;
-            int i = MathHelper.floor_double(d5 - (double)f);
-            int j = MathHelper.floor_double(d5 + (double)f);
-            int k = MathHelper.floor_double(d0 - (double)f);
-            int l = MathHelper.floor_double(d0);
-            int i1 = MathHelper.floor_double(d1 - (double)f);
-            int j1 = MathHelper.floor_double(d1 + (double)f);
-            double d2 = x - d5;
-            double d3 = y - d0;
-            double d4 = z - d1;
-            Tessellator tessellator = Tessellator.getInstance();
-            WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-            worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+            double var351 = p_76975_1_.lastTickPosX + (p_76975_1_.posX - p_76975_1_.lastTickPosX) * (double)p_76975_9_;
+            double var14 = p_76975_1_.lastTickPosY + (p_76975_1_.posY - p_76975_1_.lastTickPosY) * (double)p_76975_9_;
+            double var16 = p_76975_1_.lastTickPosZ + (p_76975_1_.posZ - p_76975_1_.lastTickPosZ) * (double)p_76975_9_;
+            int var18 = MathHelper.floor_double(var351 - (double)var11);
+            int var19 = MathHelper.floor_double(var351 + (double)var11);
+            int var20 = MathHelper.floor_double(var14 - (double)var11);
+            int var21 = MathHelper.floor_double(var14);
+            int var22 = MathHelper.floor_double(var16 - (double)var11);
+            int var23 = MathHelper.floor_double(var16 + (double)var11);
+            double var24 = p_76975_2_ - var351;
+            double var26 = p_76975_4_ - var14;
+            double var28 = p_76975_6_ - var16;
+            Tessellator var30 = Tessellator.getInstance();
+            WorldRenderer var31 = var30.getWorldRenderer();
+            var31.startDrawingQuads();
+            Iterator var32 = BlockPos.getAllInBox(new BlockPos(var18, var20, var22), new BlockPos(var19, var21, var23)).iterator();
 
-            for (BlockPos blockpos : BlockPos.getAllInBoxMutable(new BlockPos(i, k, i1), new BlockPos(j, l, j1)))
+            while (var32.hasNext())
             {
-                Block block = world.getBlockState(blockpos.down()).getBlock();
+                BlockPos var33 = (BlockPos)var32.next();
+                Block var34 = var10.getBlockState(var33.offsetDown()).getBlock();
 
-                if (block.getRenderType() != -1 && world.getLightFromNeighbors(blockpos) > 3)
+                if (var34.getRenderType() != -1 && var10.getLightFromNeighbors(var33) > 3)
                 {
-                    this.renderShadowBlock(block, x, y, z, blockpos, shadowAlpha, f, d2, d3, d4);
+                    this.func_180549_a(var34, p_76975_2_, p_76975_4_, p_76975_6_, var33, p_76975_8_, var11, var24, var26, var28);
                 }
             }
 
-            tessellator.draw();
+            var30.draw();
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             GlStateManager.disableBlend();
             GlStateManager.depthMask(true);
@@ -251,34 +242,35 @@ public abstract class Render<T extends Entity> implements IEntityRenderer
         return this.renderManager.worldObj;
     }
 
-    private void renderShadowBlock(Block blockIn, double p_180549_2_, double p_180549_4_, double p_180549_6_, BlockPos pos, float p_180549_9_, float p_180549_10_, double p_180549_11_, double p_180549_13_, double p_180549_15_)
+    private void func_180549_a(Block p_180549_1_, double p_180549_2_, double p_180549_4_, double p_180549_6_, BlockPos p_180549_8_, float p_180549_9_, float p_180549_10_, double p_180549_11_, double p_180549_13_, double p_180549_15_)
     {
-        if (blockIn.isFullCube())
+        if (p_180549_1_.isFullCube())
         {
-            Tessellator tessellator = Tessellator.getInstance();
-            WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-            double d0 = ((double)p_180549_9_ - (p_180549_4_ - ((double)pos.getY() + p_180549_13_)) / 2.0D) * 0.5D * (double)this.getWorldFromRenderManager().getLightBrightness(pos);
+            Tessellator var17 = Tessellator.getInstance();
+            WorldRenderer var18 = var17.getWorldRenderer();
+            double var19 = ((double)p_180549_9_ - (p_180549_4_ - ((double)p_180549_8_.getY() + p_180549_13_)) / 2.0D) * 0.5D * (double)this.getWorldFromRenderManager().getLightBrightness(p_180549_8_);
 
-            if (d0 >= 0.0D)
+            if (var19 >= 0.0D)
             {
-                if (d0 > 1.0D)
+                if (var19 > 1.0D)
                 {
-                    d0 = 1.0D;
+                    var19 = 1.0D;
                 }
 
-                double d1 = (double)pos.getX() + blockIn.getBlockBoundsMinX() + p_180549_11_;
-                double d2 = (double)pos.getX() + blockIn.getBlockBoundsMaxX() + p_180549_11_;
-                double d3 = (double)pos.getY() + blockIn.getBlockBoundsMinY() + p_180549_13_ + 0.015625D;
-                double d4 = (double)pos.getZ() + blockIn.getBlockBoundsMinZ() + p_180549_15_;
-                double d5 = (double)pos.getZ() + blockIn.getBlockBoundsMaxZ() + p_180549_15_;
-                float f = (float)((p_180549_2_ - d1) / 2.0D / (double)p_180549_10_ + 0.5D);
-                float f1 = (float)((p_180549_2_ - d2) / 2.0D / (double)p_180549_10_ + 0.5D);
-                float f2 = (float)((p_180549_6_ - d4) / 2.0D / (double)p_180549_10_ + 0.5D);
-                float f3 = (float)((p_180549_6_ - d5) / 2.0D / (double)p_180549_10_ + 0.5D);
-                worldrenderer.pos(d1, d3, d4).tex((double)f, (double)f2).color(1.0F, 1.0F, 1.0F, (float)d0).endVertex();
-                worldrenderer.pos(d1, d3, d5).tex((double)f, (double)f3).color(1.0F, 1.0F, 1.0F, (float)d0).endVertex();
-                worldrenderer.pos(d2, d3, d5).tex((double)f1, (double)f3).color(1.0F, 1.0F, 1.0F, (float)d0).endVertex();
-                worldrenderer.pos(d2, d3, d4).tex((double)f1, (double)f2).color(1.0F, 1.0F, 1.0F, (float)d0).endVertex();
+                var18.func_178960_a(1.0F, 1.0F, 1.0F, (float)var19);
+                double var21 = (double)p_180549_8_.getX() + p_180549_1_.getBlockBoundsMinX() + p_180549_11_;
+                double var23 = (double)p_180549_8_.getX() + p_180549_1_.getBlockBoundsMaxX() + p_180549_11_;
+                double var25 = (double)p_180549_8_.getY() + p_180549_1_.getBlockBoundsMinY() + p_180549_13_ + 0.015625D;
+                double var27 = (double)p_180549_8_.getZ() + p_180549_1_.getBlockBoundsMinZ() + p_180549_15_;
+                double var29 = (double)p_180549_8_.getZ() + p_180549_1_.getBlockBoundsMaxZ() + p_180549_15_;
+                float var31 = (float)((p_180549_2_ - var21) / 2.0D / (double)p_180549_10_ + 0.5D);
+                float var32 = (float)((p_180549_2_ - var23) / 2.0D / (double)p_180549_10_ + 0.5D);
+                float var33 = (float)((p_180549_6_ - var27) / 2.0D / (double)p_180549_10_ + 0.5D);
+                float var34 = (float)((p_180549_6_ - var29) / 2.0D / (double)p_180549_10_ + 0.5D);
+                var18.addVertexWithUV(var21, var25, var27, (double)var31, (double)var33);
+                var18.addVertexWithUV(var21, var25, var29, (double)var31, (double)var34);
+                var18.addVertexWithUV(var23, var25, var29, (double)var32, (double)var34);
+                var18.addVertexWithUV(var23, var25, var27, (double)var32, (double)var33);
             }
         }
     }
@@ -286,64 +278,70 @@ public abstract class Render<T extends Entity> implements IEntityRenderer
     /**
      * Renders a white box with the bounds of the AABB translated by the offset. Args: aabb, x, y, z
      */
-    public static void renderOffsetAABB(AxisAlignedBB boundingBox, double x, double y, double z)
+    public static void renderOffsetAABB(AxisAlignedBB p_76978_0_, double p_76978_1_, double p_76978_3_, double p_76978_5_)
     {
         GlStateManager.disableTexture2D();
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        Tessellator var7 = Tessellator.getInstance();
+        WorldRenderer var8 = var7.getWorldRenderer();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        worldrenderer.setTranslation(x, y, z);
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_NORMAL);
-        worldrenderer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.minZ).normal(0.0F, 0.0F, -1.0F).endVertex();
-        worldrenderer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ).normal(0.0F, 0.0F, -1.0F).endVertex();
-        worldrenderer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.minZ).normal(0.0F, 0.0F, -1.0F).endVertex();
-        worldrenderer.pos(boundingBox.minX, boundingBox.minY, boundingBox.minZ).normal(0.0F, 0.0F, -1.0F).endVertex();
-        worldrenderer.pos(boundingBox.minX, boundingBox.minY, boundingBox.maxZ).normal(0.0F, 0.0F, 1.0F).endVertex();
-        worldrenderer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ).normal(0.0F, 0.0F, 1.0F).endVertex();
-        worldrenderer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ).normal(0.0F, 0.0F, 1.0F).endVertex();
-        worldrenderer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ).normal(0.0F, 0.0F, 1.0F).endVertex();
-        worldrenderer.pos(boundingBox.minX, boundingBox.minY, boundingBox.minZ).normal(0.0F, -1.0F, 0.0F).endVertex();
-        worldrenderer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.minZ).normal(0.0F, -1.0F, 0.0F).endVertex();
-        worldrenderer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ).normal(0.0F, -1.0F, 0.0F).endVertex();
-        worldrenderer.pos(boundingBox.minX, boundingBox.minY, boundingBox.maxZ).normal(0.0F, -1.0F, 0.0F).endVertex();
-        worldrenderer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ).normal(0.0F, 1.0F, 0.0F).endVertex();
-        worldrenderer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ).normal(0.0F, 1.0F, 0.0F).endVertex();
-        worldrenderer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ).normal(0.0F, 1.0F, 0.0F).endVertex();
-        worldrenderer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.minZ).normal(0.0F, 1.0F, 0.0F).endVertex();
-        worldrenderer.pos(boundingBox.minX, boundingBox.minY, boundingBox.maxZ).normal(-1.0F, 0.0F, 0.0F).endVertex();
-        worldrenderer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ).normal(-1.0F, 0.0F, 0.0F).endVertex();
-        worldrenderer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.minZ).normal(-1.0F, 0.0F, 0.0F).endVertex();
-        worldrenderer.pos(boundingBox.minX, boundingBox.minY, boundingBox.minZ).normal(-1.0F, 0.0F, 0.0F).endVertex();
-        worldrenderer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.minZ).normal(1.0F, 0.0F, 0.0F).endVertex();
-        worldrenderer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ).normal(1.0F, 0.0F, 0.0F).endVertex();
-        worldrenderer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ).normal(1.0F, 0.0F, 0.0F).endVertex();
-        worldrenderer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ).normal(1.0F, 0.0F, 0.0F).endVertex();
-        tessellator.draw();
-        worldrenderer.setTranslation(0.0D, 0.0D, 0.0D);
+        var8.startDrawingQuads();
+        var8.setTranslation(p_76978_1_, p_76978_3_, p_76978_5_);
+        var8.func_178980_d(0.0F, 0.0F, -1.0F);
+        var8.addVertex(p_76978_0_.minX, p_76978_0_.maxY, p_76978_0_.minZ);
+        var8.addVertex(p_76978_0_.maxX, p_76978_0_.maxY, p_76978_0_.minZ);
+        var8.addVertex(p_76978_0_.maxX, p_76978_0_.minY, p_76978_0_.minZ);
+        var8.addVertex(p_76978_0_.minX, p_76978_0_.minY, p_76978_0_.minZ);
+        var8.func_178980_d(0.0F, 0.0F, 1.0F);
+        var8.addVertex(p_76978_0_.minX, p_76978_0_.minY, p_76978_0_.maxZ);
+        var8.addVertex(p_76978_0_.maxX, p_76978_0_.minY, p_76978_0_.maxZ);
+        var8.addVertex(p_76978_0_.maxX, p_76978_0_.maxY, p_76978_0_.maxZ);
+        var8.addVertex(p_76978_0_.minX, p_76978_0_.maxY, p_76978_0_.maxZ);
+        var8.func_178980_d(0.0F, -1.0F, 0.0F);
+        var8.addVertex(p_76978_0_.minX, p_76978_0_.minY, p_76978_0_.minZ);
+        var8.addVertex(p_76978_0_.maxX, p_76978_0_.minY, p_76978_0_.minZ);
+        var8.addVertex(p_76978_0_.maxX, p_76978_0_.minY, p_76978_0_.maxZ);
+        var8.addVertex(p_76978_0_.minX, p_76978_0_.minY, p_76978_0_.maxZ);
+        var8.func_178980_d(0.0F, 1.0F, 0.0F);
+        var8.addVertex(p_76978_0_.minX, p_76978_0_.maxY, p_76978_0_.maxZ);
+        var8.addVertex(p_76978_0_.maxX, p_76978_0_.maxY, p_76978_0_.maxZ);
+        var8.addVertex(p_76978_0_.maxX, p_76978_0_.maxY, p_76978_0_.minZ);
+        var8.addVertex(p_76978_0_.minX, p_76978_0_.maxY, p_76978_0_.minZ);
+        var8.func_178980_d(-1.0F, 0.0F, 0.0F);
+        var8.addVertex(p_76978_0_.minX, p_76978_0_.minY, p_76978_0_.maxZ);
+        var8.addVertex(p_76978_0_.minX, p_76978_0_.maxY, p_76978_0_.maxZ);
+        var8.addVertex(p_76978_0_.minX, p_76978_0_.maxY, p_76978_0_.minZ);
+        var8.addVertex(p_76978_0_.minX, p_76978_0_.minY, p_76978_0_.minZ);
+        var8.func_178980_d(1.0F, 0.0F, 0.0F);
+        var8.addVertex(p_76978_0_.maxX, p_76978_0_.minY, p_76978_0_.minZ);
+        var8.addVertex(p_76978_0_.maxX, p_76978_0_.maxY, p_76978_0_.minZ);
+        var8.addVertex(p_76978_0_.maxX, p_76978_0_.maxY, p_76978_0_.maxZ);
+        var8.addVertex(p_76978_0_.maxX, p_76978_0_.minY, p_76978_0_.maxZ);
+        var8.setTranslation(0.0D, 0.0D, 0.0D);
+        var7.draw();
         GlStateManager.enableTexture2D();
     }
 
     /**
      * Renders the entity's shadow and fire (if its on fire). Args: entity, x, y, z, yaw, partialTickTime
      */
-    public void doRenderShadowAndFire(Entity entityIn, double x, double y, double z, float yaw, float partialTicks)
+    public void doRenderShadowAndFire(Entity p_76979_1_, double p_76979_2_, double p_76979_4_, double p_76979_6_, float p_76979_8_, float p_76979_9_)
     {
         if (this.renderManager.options != null)
         {
-            if (this.renderManager.options.entityShadows && this.shadowSize > 0.0F && !entityIn.isInvisible() && this.renderManager.isRenderShadow())
+            if (this.renderManager.options.fancyGraphics && this.shadowSize > 0.0F && !p_76979_1_.isInvisible() && this.renderManager.func_178627_a())
             {
-                double d0 = this.renderManager.getDistanceToCamera(entityIn.posX, entityIn.posY, entityIn.posZ);
-                float f = (float)((1.0D - d0 / 256.0D) * (double)this.shadowOpaque);
+                double var10 = this.renderManager.getDistanceToCamera(p_76979_1_.posX, p_76979_1_.posY, p_76979_1_.posZ);
+                float var12 = (float)((1.0D - var10 / 256.0D) * (double)this.shadowOpaque);
 
-                if (f > 0.0F)
+                if (var12 > 0.0F)
                 {
-                    this.renderShadow(entityIn, x, y, z, f, partialTicks);
+                    this.renderShadow(p_76979_1_, p_76979_2_, p_76979_4_, p_76979_6_, var12, p_76979_9_);
                 }
             }
 
-            if (entityIn.canRenderOnFire() && (!(entityIn instanceof EntityPlayer) || !((EntityPlayer)entityIn).isSpectator()))
+            if (p_76979_1_.canRenderOnFire() && (!(p_76979_1_ instanceof EntityPlayer) || !((EntityPlayer)p_76979_1_).func_175149_v()))
             {
-                this.renderEntityOnFire(entityIn, x, y, z, partialTicks);
+                this.renderEntityOnFire(p_76979_1_, p_76979_2_, p_76979_4_, p_76979_6_, p_76979_9_);
             }
         }
     }
@@ -359,48 +357,49 @@ public abstract class Render<T extends Entity> implements IEntityRenderer
     /**
      * Renders an entity's name above its head
      */
-    protected void renderLivingLabel(T entityIn, String str, double x, double y, double z, int maxDistance)
+    protected void renderLivingLabel(Entity p_147906_1_, String p_147906_2_, double p_147906_3_, double p_147906_5_, double p_147906_7_, int p_147906_9_)
     {
-        double d0 = entityIn.getDistanceSqToEntity(this.renderManager.livingPlayer);
+        double var10 = p_147906_1_.getDistanceSqToEntity(this.renderManager.livingPlayer);
 
-        if (d0 <= (double)(maxDistance * maxDistance))
+        if (var10 <= (double)(p_147906_9_ * p_147906_9_))
         {
-            FontRenderer fontrenderer = this.getFontRendererFromRenderManager();
-            float f = 1.6F;
-            float f1 = 0.016666668F * f;
+            FontRenderer var12 = this.getFontRendererFromRenderManager();
+            float var13 = 1.6F;
+            float var14 = 0.016666668F * var13;
             GlStateManager.pushMatrix();
-            GlStateManager.translate((float)x + 0.0F, (float)y + entityIn.height + 0.5F, (float)z);
+            GlStateManager.translate((float)p_147906_3_ + 0.0F, (float)p_147906_5_ + p_147906_1_.height + 0.5F, (float)p_147906_7_);
             GL11.glNormal3f(0.0F, 1.0F, 0.0F);
             GlStateManager.rotate(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
             GlStateManager.rotate(this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-            GlStateManager.scale(-f1, -f1, f1);
+            GlStateManager.scale(-var14, -var14, var14);
             GlStateManager.disableLighting();
             GlStateManager.depthMask(false);
             GlStateManager.disableDepth();
             GlStateManager.enableBlend();
             GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-            Tessellator tessellator = Tessellator.getInstance();
-            WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-            int i = 0;
+            Tessellator var15 = Tessellator.getInstance();
+            WorldRenderer var16 = var15.getWorldRenderer();
+            byte var17 = 0;
 
-            if (str.equals("deadmau5"))
+            if (p_147906_2_.equals("deadmau5"))
             {
-                i = -10;
+                var17 = -10;
             }
 
-            int j = fontrenderer.getStringWidth(str) / 2;
             GlStateManager.disableTexture2D();
-            worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-            worldrenderer.pos((double)(-j - 1), (double)(-1 + i), 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
-            worldrenderer.pos((double)(-j - 1), (double)(8 + i), 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
-            worldrenderer.pos((double)(j + 1), (double)(8 + i), 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
-            worldrenderer.pos((double)(j + 1), (double)(-1 + i), 0.0D).color(0.0F, 0.0F, 0.0F, 0.25F).endVertex();
-            tessellator.draw();
+            var16.startDrawingQuads();
+            int var18 = var12.getStringWidth(p_147906_2_) / 2;
+            var16.func_178960_a(0.0F, 0.0F, 0.0F, 0.25F);
+            var16.addVertex((double)(-var18 - 1), (double)(-1 + var17), 0.0D);
+            var16.addVertex((double)(-var18 - 1), (double)(8 + var17), 0.0D);
+            var16.addVertex((double)(var18 + 1), (double)(8 + var17), 0.0D);
+            var16.addVertex((double)(var18 + 1), (double)(-1 + var17), 0.0D);
+            var15.draw();
             GlStateManager.enableTexture2D();
-            fontrenderer.drawString(str, -fontrenderer.getStringWidth(str) / 2, i, 553648127);
+            var12.drawString(p_147906_2_, -var12.getStringWidth(p_147906_2_) / 2, var17, 553648127);
             GlStateManager.enableDepth();
             GlStateManager.depthMask(true);
-            fontrenderer.drawString(str, -fontrenderer.getStringWidth(str) / 2, i, -1);
+            var12.drawString(p_147906_2_, -var12.getStringWidth(p_147906_2_) / 2, var17, -1);
             GlStateManager.enableLighting();
             GlStateManager.disableBlend();
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
@@ -408,42 +407,8 @@ public abstract class Render<T extends Entity> implements IEntityRenderer
         }
     }
 
-    public RenderManager getRenderManager()
+    public RenderManager func_177068_d()
     {
         return this.renderManager;
-    }
-
-    public boolean isMultipass()
-    {
-        return false;
-    }
-
-    public void renderMultipass(T p_renderMultipass_1_, double p_renderMultipass_2_, double p_renderMultipass_4_, double p_renderMultipass_6_, float p_renderMultipass_8_, float p_renderMultipass_9_)
-    {
-    }
-
-    public Class getEntityClass()
-    {
-        return this.entityClass;
-    }
-
-    public void setEntityClass(Class p_setEntityClass_1_)
-    {
-        this.entityClass = p_setEntityClass_1_;
-    }
-
-    public ResourceLocation getLocationTextureCustom()
-    {
-        return this.locationTextureCustom;
-    }
-
-    public void setLocationTextureCustom(ResourceLocation p_setLocationTextureCustom_1_)
-    {
-        this.locationTextureCustom = p_setLocationTextureCustom_1_;
-    }
-
-    public static void setModelBipedMain(RenderBiped p_setModelBipedMain_0_, ModelBiped p_setModelBipedMain_1_)
-    {
-        p_setModelBipedMain_0_.modelBipedMain = p_setModelBipedMain_1_;
     }
 }

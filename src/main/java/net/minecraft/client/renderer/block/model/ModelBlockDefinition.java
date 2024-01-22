@@ -11,7 +11,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import java.io.Reader;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -21,41 +23,48 @@ import net.minecraft.util.ResourceLocation;
 
 public class ModelBlockDefinition
 {
-    static final Gson GSON = (new GsonBuilder()).registerTypeAdapter(ModelBlockDefinition.class, new ModelBlockDefinition.Deserializer()).registerTypeAdapter(ModelBlockDefinition.Variant.class, new ModelBlockDefinition.Variant.Deserializer()).create();
-    private final Map<String, ModelBlockDefinition.Variants> mapVariants = Maps.<String, ModelBlockDefinition.Variants>newHashMap();
+    static final Gson field_178333_a = (new GsonBuilder()).registerTypeAdapter(ModelBlockDefinition.class, new ModelBlockDefinition.Deserializer()).registerTypeAdapter(ModelBlockDefinition.Variant.class, new ModelBlockDefinition.Variant.Deserializer()).create();
+    private final Map field_178332_b = Maps.newHashMap();
+    
 
-    public static ModelBlockDefinition parseFromReader(Reader p_178331_0_)
+    public static ModelBlockDefinition func_178331_a(Reader p_178331_0_)
     {
-        return (ModelBlockDefinition)GSON.fromJson(p_178331_0_, ModelBlockDefinition.class);
+        return (ModelBlockDefinition)field_178333_a.fromJson(p_178331_0_, ModelBlockDefinition.class);
     }
 
-    public ModelBlockDefinition(Collection<ModelBlockDefinition.Variants> p_i46221_1_)
+    public ModelBlockDefinition(Collection p_i46221_1_)
     {
-        for (ModelBlockDefinition.Variants modelblockdefinition$variants : p_i46221_1_)
+        Iterator var2 = p_i46221_1_.iterator();
+
+        while (var2.hasNext())
         {
-            this.mapVariants.put(modelblockdefinition$variants.name, modelblockdefinition$variants);
+            ModelBlockDefinition.Variants var3 = (ModelBlockDefinition.Variants)var2.next();
+            this.field_178332_b.put(var3.field_178423_a, var3);
         }
     }
 
-    public ModelBlockDefinition(List<ModelBlockDefinition> p_i46222_1_)
+    public ModelBlockDefinition(List p_i46222_1_)
     {
-        for (ModelBlockDefinition modelblockdefinition : p_i46222_1_)
+        Iterator var2 = p_i46222_1_.iterator();
+
+        while (var2.hasNext())
         {
-            this.mapVariants.putAll(modelblockdefinition.mapVariants);
+            ModelBlockDefinition var3 = (ModelBlockDefinition)var2.next();
+            this.field_178332_b.putAll(var3.field_178332_b);
         }
     }
 
-    public ModelBlockDefinition.Variants getVariants(String p_178330_1_)
+    public ModelBlockDefinition.Variants func_178330_b(String p_178330_1_)
     {
-        ModelBlockDefinition.Variants modelblockdefinition$variants = (ModelBlockDefinition.Variants)this.mapVariants.get(p_178330_1_);
+        ModelBlockDefinition.Variants var2 = (ModelBlockDefinition.Variants)this.field_178332_b.get(p_178330_1_);
 
-        if (modelblockdefinition$variants == null)
+        if (var2 == null)
         {
             throw new ModelBlockDefinition.MissingVariantException();
         }
         else
         {
-            return modelblockdefinition$variants;
+            return var2;
         }
     }
 
@@ -67,8 +76,8 @@ public class ModelBlockDefinition
         }
         else if (p_equals_1_ instanceof ModelBlockDefinition)
         {
-            ModelBlockDefinition modelblockdefinition = (ModelBlockDefinition)p_equals_1_;
-            return this.mapVariants.equals(modelblockdefinition.mapVariants);
+            ModelBlockDefinition var2 = (ModelBlockDefinition)p_equals_1_;
+            return this.field_178332_b.equals(var2.field_178332_b);
         }
         else
         {
@@ -78,90 +87,104 @@ public class ModelBlockDefinition
 
     public int hashCode()
     {
-        return this.mapVariants.hashCode();
+        return this.field_178332_b.hashCode();
     }
 
-    public static class Deserializer implements JsonDeserializer<ModelBlockDefinition>
+    public static class Deserializer implements JsonDeserializer
     {
-        public ModelBlockDefinition deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_) throws JsonParseException
+        
+
+        public ModelBlockDefinition func_178336_a(JsonElement p_178336_1_, Type p_178336_2_, JsonDeserializationContext p_178336_3_)
         {
-            JsonObject jsonobject = p_deserialize_1_.getAsJsonObject();
-            List<ModelBlockDefinition.Variants> list = this.parseVariantsList(p_deserialize_3_, jsonobject);
-            return new ModelBlockDefinition(list);
+            JsonObject var4 = p_178336_1_.getAsJsonObject();
+            List var5 = this.func_178334_a(p_178336_3_, var4);
+            return new ModelBlockDefinition((Collection)var5);
         }
 
-        protected List<ModelBlockDefinition.Variants> parseVariantsList(JsonDeserializationContext p_178334_1_, JsonObject p_178334_2_)
+        protected List func_178334_a(JsonDeserializationContext p_178334_1_, JsonObject p_178334_2_)
         {
-            JsonObject jsonobject = JsonUtils.getJsonObject(p_178334_2_, "variants");
-            List<ModelBlockDefinition.Variants> list = Lists.<ModelBlockDefinition.Variants>newArrayList();
+            JsonObject var3 = JsonUtils.getJsonObject(p_178334_2_, "variants");
+            ArrayList var4 = Lists.newArrayList();
+            Iterator var5 = var3.entrySet().iterator();
 
-            for (Entry<String, JsonElement> entry : jsonobject.entrySet())
+            while (var5.hasNext())
             {
-                list.add(this.parseVariants(p_178334_1_, entry));
+                Entry var6 = (Entry)var5.next();
+                var4.add(this.func_178335_a(p_178334_1_, var6));
             }
 
-            return list;
+            return var4;
         }
 
-        protected ModelBlockDefinition.Variants parseVariants(JsonDeserializationContext p_178335_1_, Entry<String, JsonElement> p_178335_2_)
+        protected ModelBlockDefinition.Variants func_178335_a(JsonDeserializationContext p_178335_1_, Entry p_178335_2_)
         {
-            String s = (String)p_178335_2_.getKey();
-            List<ModelBlockDefinition.Variant> list = Lists.<ModelBlockDefinition.Variant>newArrayList();
-            JsonElement jsonelement = (JsonElement)p_178335_2_.getValue();
+            String var3 = (String)p_178335_2_.getKey();
+            ArrayList var4 = Lists.newArrayList();
+            JsonElement var5 = (JsonElement)p_178335_2_.getValue();
 
-            if (jsonelement.isJsonArray())
+            if (var5.isJsonArray())
             {
-                for (JsonElement jsonelement1 : jsonelement.getAsJsonArray())
+                Iterator var6 = var5.getAsJsonArray().iterator();
+
+                while (var6.hasNext())
                 {
-                    list.add((ModelBlockDefinition.Variant)p_178335_1_.deserialize(jsonelement1, ModelBlockDefinition.Variant.class));
+                    JsonElement var7 = (JsonElement)var6.next();
+                    var4.add((ModelBlockDefinition.Variant)p_178335_1_.deserialize(var7, ModelBlockDefinition.Variant.class));
                 }
             }
             else
             {
-                list.add((ModelBlockDefinition.Variant)p_178335_1_.deserialize(jsonelement, ModelBlockDefinition.Variant.class));
+                var4.add((ModelBlockDefinition.Variant)p_178335_1_.deserialize(var5, ModelBlockDefinition.Variant.class));
             }
 
-            return new ModelBlockDefinition.Variants(s, list);
+            return new ModelBlockDefinition.Variants(var3, var4);
+        }
+
+        public Object deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_)
+        {
+            return this.func_178336_a(p_deserialize_1_, p_deserialize_2_, p_deserialize_3_);
         }
     }
 
     public class MissingVariantException extends RuntimeException
     {
+        
     }
 
     public static class Variant
     {
-        private final ResourceLocation modelLocation;
-        private final ModelRotation modelRotation;
-        private final boolean uvLock;
-        private final int weight;
+        private final ResourceLocation field_178437_a;
+        private final ModelRotation field_178435_b;
+        private final boolean field_178436_c;
+        private final int field_178434_d;
+        
 
-        public Variant(ResourceLocation modelLocationIn, ModelRotation modelRotationIn, boolean uvLockIn, int weightIn)
+        public Variant(ResourceLocation p_i46219_1_, ModelRotation p_i46219_2_, boolean p_i46219_3_, int p_i46219_4_)
         {
-            this.modelLocation = modelLocationIn;
-            this.modelRotation = modelRotationIn;
-            this.uvLock = uvLockIn;
-            this.weight = weightIn;
+            this.field_178437_a = p_i46219_1_;
+            this.field_178435_b = p_i46219_2_;
+            this.field_178436_c = p_i46219_3_;
+            this.field_178434_d = p_i46219_4_;
         }
 
         public ResourceLocation getModelLocation()
         {
-            return this.modelLocation;
+            return this.field_178437_a;
         }
 
         public ModelRotation getRotation()
         {
-            return this.modelRotation;
+            return this.field_178435_b;
         }
 
         public boolean isUvLocked()
         {
-            return this.uvLock;
+            return this.field_178436_c;
         }
 
         public int getWeight()
         {
-            return this.weight;
+            return this.field_178434_d;
         }
 
         public boolean equals(Object p_equals_1_)
@@ -176,85 +199,93 @@ public class ModelBlockDefinition
             }
             else
             {
-                ModelBlockDefinition.Variant modelblockdefinition$variant = (ModelBlockDefinition.Variant)p_equals_1_;
-                return this.modelLocation.equals(modelblockdefinition$variant.modelLocation) && this.modelRotation == modelblockdefinition$variant.modelRotation && this.uvLock == modelblockdefinition$variant.uvLock;
+                ModelBlockDefinition.Variant var2 = (ModelBlockDefinition.Variant)p_equals_1_;
+                return this.field_178437_a.equals(var2.field_178437_a) && this.field_178435_b == var2.field_178435_b && this.field_178436_c == var2.field_178436_c;
             }
         }
 
         public int hashCode()
         {
-            int i = this.modelLocation.hashCode();
-            i = 31 * i + (this.modelRotation != null ? this.modelRotation.hashCode() : 0);
-            i = 31 * i + (this.uvLock ? 1 : 0);
-            return i;
+            int var1 = this.field_178437_a.hashCode();
+            var1 = 31 * var1 + (this.field_178435_b != null ? this.field_178435_b.hashCode() : 0);
+            var1 = 31 * var1 + (this.field_178436_c ? 1 : 0);
+            return var1;
         }
 
-        public static class Deserializer implements JsonDeserializer<ModelBlockDefinition.Variant>
+        public static class Deserializer implements JsonDeserializer
         {
-            public ModelBlockDefinition.Variant deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_) throws JsonParseException
+            
+
+            public ModelBlockDefinition.Variant func_178425_a(JsonElement p_178425_1_, Type p_178425_2_, JsonDeserializationContext p_178425_3_)
             {
-                JsonObject jsonobject = p_deserialize_1_.getAsJsonObject();
-                String s = this.parseModel(jsonobject);
-                ModelRotation modelrotation = this.parseRotation(jsonobject);
-                boolean flag = this.parseUvLock(jsonobject);
-                int i = this.parseWeight(jsonobject);
-                return new ModelBlockDefinition.Variant(this.makeModelLocation(s), modelrotation, flag, i);
+                JsonObject var4 = p_178425_1_.getAsJsonObject();
+                String var5 = this.func_178424_b(var4);
+                ModelRotation var6 = this.func_178428_a(var4);
+                boolean var7 = this.func_178429_d(var4);
+                int var8 = this.func_178427_c(var4);
+                return new ModelBlockDefinition.Variant(this.func_178426_a(var5), var6, var7, var8);
             }
 
-            private ResourceLocation makeModelLocation(String p_178426_1_)
+            private ResourceLocation func_178426_a(String p_178426_1_)
             {
-                ResourceLocation resourcelocation = new ResourceLocation(p_178426_1_);
-                resourcelocation = new ResourceLocation(resourcelocation.getResourceDomain(), "block/" + resourcelocation.getResourcePath());
-                return resourcelocation;
+                ResourceLocation var2 = new ResourceLocation(p_178426_1_);
+                var2 = new ResourceLocation(var2.getResourceDomain(), "block/" + var2.getResourcePath());
+                return var2;
             }
 
-            private boolean parseUvLock(JsonObject p_178429_1_)
+            private boolean func_178429_d(JsonObject p_178429_1_)
             {
-                return JsonUtils.getBoolean(p_178429_1_, "uvlock", false);
+                return JsonUtils.getJsonObjectBooleanFieldValueOrDefault(p_178429_1_, "uvlock", false);
             }
 
-            protected ModelRotation parseRotation(JsonObject p_178428_1_)
+            protected ModelRotation func_178428_a(JsonObject p_178428_1_)
             {
-                int i = JsonUtils.getInt(p_178428_1_, "x", 0);
-                int j = JsonUtils.getInt(p_178428_1_, "y", 0);
-                ModelRotation modelrotation = ModelRotation.getModelRotation(i, j);
+                int var2 = JsonUtils.getJsonObjectIntegerFieldValueOrDefault(p_178428_1_, "x", 0);
+                int var3 = JsonUtils.getJsonObjectIntegerFieldValueOrDefault(p_178428_1_, "y", 0);
+                ModelRotation var4 = ModelRotation.func_177524_a(var2, var3);
 
-                if (modelrotation == null)
+                if (var4 == null)
                 {
-                    throw new JsonParseException("Invalid BlockModelRotation x: " + i + ", y: " + j);
+                    throw new JsonParseException("Invalid BlockModelRotation x: " + var2 + ", y: " + var3);
                 }
                 else
                 {
-                    return modelrotation;
+                    return var4;
                 }
             }
 
-            protected String parseModel(JsonObject p_178424_1_)
+            protected String func_178424_b(JsonObject p_178424_1_)
             {
-                return JsonUtils.getString(p_178424_1_, "model");
+                return JsonUtils.getJsonObjectStringFieldValue(p_178424_1_, "model");
             }
 
-            protected int parseWeight(JsonObject p_178427_1_)
+            protected int func_178427_c(JsonObject p_178427_1_)
             {
-                return JsonUtils.getInt(p_178427_1_, "weight", 1);
+                return JsonUtils.getJsonObjectIntegerFieldValueOrDefault(p_178427_1_, "weight", 1);
+            }
+
+            public Object deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_)
+            {
+                return this.func_178425_a(p_deserialize_1_, p_deserialize_2_, p_deserialize_3_);
             }
         }
     }
 
     public static class Variants
     {
-        private final String name;
-        private final List<ModelBlockDefinition.Variant> listVariants;
+        private final String field_178423_a;
+        private final List field_178422_b;
+        
 
-        public Variants(String nameIn, List<ModelBlockDefinition.Variant> listVariantsIn)
+        public Variants(String p_i46218_1_, List p_i46218_2_)
         {
-            this.name = nameIn;
-            this.listVariants = listVariantsIn;
+            this.field_178423_a = p_i46218_1_;
+            this.field_178422_b = p_i46218_2_;
         }
 
-        public List<ModelBlockDefinition.Variant> getVariants()
+        public List getVariants()
         {
-            return this.listVariants;
+            return this.field_178422_b;
         }
 
         public boolean equals(Object p_equals_1_)
@@ -269,16 +300,16 @@ public class ModelBlockDefinition
             }
             else
             {
-                ModelBlockDefinition.Variants modelblockdefinition$variants = (ModelBlockDefinition.Variants)p_equals_1_;
-                return !this.name.equals(modelblockdefinition$variants.name) ? false : this.listVariants.equals(modelblockdefinition$variants.listVariants);
+                ModelBlockDefinition.Variants var2 = (ModelBlockDefinition.Variants)p_equals_1_;
+                return !this.field_178423_a.equals(var2.field_178423_a) ? false : this.field_178422_b.equals(var2.field_178422_b);
             }
         }
 
         public int hashCode()
         {
-            int i = this.name.hashCode();
-            i = 31 * i + this.listVariants.hashCode();
-            return i;
+            int var1 = this.field_178423_a.hashCode();
+            var1 = 31 * var1 + this.field_178422_b.hashCode();
+            return var1;
         }
     }
 }

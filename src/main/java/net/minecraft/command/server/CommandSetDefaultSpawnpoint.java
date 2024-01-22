@@ -11,9 +11,8 @@ import net.minecraft.util.BlockPos;
 
 public class CommandSetDefaultSpawnpoint extends CommandBase
 {
-    /**
-     * Gets the name of the command
-     */
+    
+
     public String getCommandName()
     {
         return "setworldspawn";
@@ -27,24 +26,18 @@ public class CommandSetDefaultSpawnpoint extends CommandBase
         return 2;
     }
 
-    /**
-     * Gets the usage string for the command.
-     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.setworldspawn.usage";
     }
 
-    /**
-     * Callback when the command is invoked
-     */
     public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
-        BlockPos blockpos;
+        BlockPos var3;
 
         if (args.length == 0)
         {
-            blockpos = getCommandSenderAsPlayer(sender).getPosition();
+            var3 = getCommandSenderAsPlayer(sender).getPosition();
         }
         else
         {
@@ -53,15 +46,15 @@ public class CommandSetDefaultSpawnpoint extends CommandBase
                 throw new WrongUsageException("commands.setworldspawn.usage", new Object[0]);
             }
 
-            blockpos = parseBlockPos(sender, args, 0, true);
+            var3 = func_175757_a(sender, args, 0, true);
         }
 
-        sender.getEntityWorld().setSpawnPoint(blockpos);
-        MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayers(new S05PacketSpawnPosition(blockpos));
-        notifyOperators(sender, this, "commands.setworldspawn.success", new Object[] {Integer.valueOf(blockpos.getX()), Integer.valueOf(blockpos.getY()), Integer.valueOf(blockpos.getZ())});
+        sender.getEntityWorld().setSpawnLocation(var3);
+        MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayers(new S05PacketSpawnPosition(var3));
+        notifyOperators(sender, this, "commands.setworldspawn.success", new Object[] {Integer.valueOf(var3.getX()), Integer.valueOf(var3.getY()), Integer.valueOf(var3.getZ())});
     }
 
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         return args.length > 0 && args.length <= 3 ? func_175771_a(args, 0, pos) : null;
     }

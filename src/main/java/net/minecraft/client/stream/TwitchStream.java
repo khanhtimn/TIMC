@@ -8,6 +8,7 @@ import com.mojang.authlib.properties.Property;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import net.minecraft.client.Minecraft;
@@ -16,7 +17,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.event.ClickEvent;
@@ -51,87 +51,87 @@ import tv.twitch.chat.ChatUserSubscription;
 
 public class TwitchStream implements BroadcastController.BroadcastListener, ChatController.ChatListener, IngestServerTester.IngestTestListener, IStream
 {
-    private static final Logger LOGGER = LogManager.getLogger();
-    public static final Marker STREAM_MARKER = MarkerManager.getMarker("STREAM");
+    private static final Logger field_152950_b = LogManager.getLogger();
+    public static final Marker field_152949_a = MarkerManager.getMarker("STREAM");
     private final BroadcastController broadcastController;
-    private final ChatController chatController;
+    private final ChatController field_152952_d;
     private String field_176029_e;
-
-    /** the minecraft instance */
-    private final Minecraft mc;
-    private final IChatComponent twitchComponent = new ChatComponentText("Twitch");
-    private final Map<String, ChatUserInfo> field_152955_g = Maps.<String, ChatUserInfo>newHashMap();
-    private Framebuffer framebuffer;
+    private final Minecraft field_152953_e;
+    private final IChatComponent field_152954_f = new ChatComponentText("Twitch");
+    private final Map field_152955_g = Maps.newHashMap();
+    private Framebuffer field_152956_h;
     private boolean field_152957_i;
-
-    /** stream's target fps */
-    private int targetFPS = 30;
+    private int field_152958_j = 30;
     private long field_152959_k = 0L;
     private boolean field_152960_l = false;
-    private boolean loggedIn;
+    private boolean field_152961_m;
     private boolean field_152962_n;
     private boolean field_152963_o;
-    private IStream.AuthFailureReason authFailureReason = IStream.AuthFailureReason.ERROR;
+    private IStream.AuthFailureReason field_152964_p;
     private static boolean field_152965_q;
+    
 
-    public TwitchStream(Minecraft mcIn, final Property streamProperty)
+    public TwitchStream(Minecraft mcIn, final Property p_i46057_2_)
     {
-        this.mc = mcIn;
+        this.field_152964_p = IStream.AuthFailureReason.ERROR;
+        this.field_152953_e = mcIn;
         this.broadcastController = new BroadcastController();
-        this.chatController = new ChatController();
-        this.broadcastController.setBroadcastListener(this);
-        this.chatController.func_152990_a(this);
+        this.field_152952_d = new ChatController();
+        this.broadcastController.func_152841_a(this);
+        this.field_152952_d.func_152990_a(this);
         this.broadcastController.func_152842_a("nmt37qblda36pvonovdkbopzfzw3wlq");
-        this.chatController.func_152984_a("nmt37qblda36pvonovdkbopzfzw3wlq");
-        this.twitchComponent.getChatStyle().setColor(EnumChatFormatting.DARK_PURPLE);
+        this.field_152952_d.func_152984_a("nmt37qblda36pvonovdkbopzfzw3wlq");
+        this.field_152954_f.getChatStyle().setColor(EnumChatFormatting.DARK_PURPLE);
 
-        if (streamProperty != null && !Strings.isNullOrEmpty(streamProperty.getValue()) && OpenGlHelper.framebufferSupported)
+        if (p_i46057_2_ != null && !Strings.isNullOrEmpty(p_i46057_2_.getValue()) && OpenGlHelper.framebufferSupported)
         {
-            Thread thread = new Thread("Twitch authenticator")
+            Thread var3 = new Thread("Twitch authenticator")
             {
+                
                 public void run()
                 {
                     try
                     {
-                        URL url = new URL("https://api.twitch.tv/kraken?oauth_token=" + URLEncoder.encode(streamProperty.getValue(), "UTF-8"));
-                        String s = HttpUtil.get(url);
-                        JsonObject jsonobject = JsonUtils.getJsonObject((new JsonParser()).parse(s), "Response");
-                        JsonObject jsonobject1 = JsonUtils.getJsonObject(jsonobject, "token");
+                        URL var1 = new URL("https://api.twitch.tv/kraken?oauth_token=" + URLEncoder.encode(p_i46057_2_.getValue(), "UTF-8"));
+                        String var2 = HttpUtil.get(var1);
+                        JsonObject var3 = JsonUtils.getElementAsJsonObject((new JsonParser()).parse(var2), "Response");
+                        JsonObject var4 = JsonUtils.getJsonObject(var3, "token");
 
-                        if (JsonUtils.getBoolean(jsonobject1, "valid"))
+                        if (JsonUtils.getJsonObjectBooleanFieldValue(var4, "valid"))
                         {
-                            String s1 = JsonUtils.getString(jsonobject1, "user_name");
-                            TwitchStream.LOGGER.debug(TwitchStream.STREAM_MARKER, "Authenticated with twitch; username is {}", new Object[] {s1});
-                            AuthToken authtoken = new AuthToken();
-                            authtoken.data = streamProperty.getValue();
-                            TwitchStream.this.broadcastController.func_152818_a(s1, authtoken);
-                            TwitchStream.this.chatController.func_152998_c(s1);
-                            TwitchStream.this.chatController.func_152994_a(authtoken);
+                            String var5 = JsonUtils.getJsonObjectStringFieldValue(var4, "user_name");
+                            TwitchStream.field_152950_b.debug(TwitchStream.field_152949_a, "Authenticated with twitch; username is {}", new Object[] {var5});
+                            AuthToken var6 = new AuthToken();
+                            var6.data = p_i46057_2_.getValue();
+                            TwitchStream.this.broadcastController.func_152818_a(var5, var6);
+                            TwitchStream.this.field_152952_d.func_152998_c(var5);
+                            TwitchStream.this.field_152952_d.func_152994_a(var6);
                             Runtime.getRuntime().addShutdownHook(new Thread("Twitch shutdown hook")
                             {
+                                
                                 public void run()
                                 {
                                     TwitchStream.this.shutdownStream();
                                 }
                             });
                             TwitchStream.this.broadcastController.func_152817_A();
-                            TwitchStream.this.chatController.func_175984_n();
+                            TwitchStream.this.field_152952_d.func_175984_n();
                         }
                         else
                         {
-                            TwitchStream.this.authFailureReason = IStream.AuthFailureReason.INVALID_TOKEN;
-                            TwitchStream.LOGGER.error(TwitchStream.STREAM_MARKER, "Given twitch access token is invalid");
+                            TwitchStream.this.field_152964_p = IStream.AuthFailureReason.INVALID_TOKEN;
+                            TwitchStream.field_152950_b.error(TwitchStream.field_152949_a, "Given twitch access token is invalid");
                         }
                     }
-                    catch (IOException ioexception)
+                    catch (IOException var7)
                     {
-                        TwitchStream.this.authFailureReason = IStream.AuthFailureReason.ERROR;
-                        TwitchStream.LOGGER.error(TwitchStream.STREAM_MARKER, (String)"Could not authenticate with twitch", (Throwable)ioexception);
+                        TwitchStream.this.field_152964_p = IStream.AuthFailureReason.ERROR;
+                        TwitchStream.field_152950_b.error(TwitchStream.field_152949_a, "Could not authenticate with twitch", var7);
                     }
                 }
             };
-            thread.setDaemon(true);
-            thread.start();
+            var3.setDaemon(true);
+            var3.start();
         }
     }
 
@@ -140,68 +140,68 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
      */
     public void shutdownStream()
     {
-        LOGGER.debug(STREAM_MARKER, "Shutdown streaming");
+        field_152950_b.debug(field_152949_a, "Shutdown streaming");
         this.broadcastController.statCallback();
-        this.chatController.func_175988_p();
+        this.field_152952_d.func_175988_p();
     }
 
     public void func_152935_j()
     {
-        int i = this.mc.gameSettings.streamChatEnabled;
-        boolean flag = this.field_176029_e != null && this.chatController.func_175990_d(this.field_176029_e);
-        boolean flag1 = this.chatController.func_153000_j() == ChatController.ChatState.Initialized && (this.field_176029_e == null || this.chatController.func_175989_e(this.field_176029_e) == ChatController.EnumChannelState.Disconnected);
+        int var1 = this.field_152953_e.gameSettings.streamChatEnabled;
+        boolean var2 = this.field_176029_e != null && this.field_152952_d.func_175990_d(this.field_176029_e);
+        boolean var3 = this.field_152952_d.func_153000_j() == ChatController.ChatState.Initialized && (this.field_176029_e == null || this.field_152952_d.func_175989_e(this.field_176029_e) == ChatController.EnumChannelState.Disconnected);
 
-        if (i == 2)
+        if (var1 == 2)
         {
-            if (flag)
+            if (var2)
             {
-                LOGGER.debug(STREAM_MARKER, "Disconnecting from twitch chat per user options");
-                this.chatController.func_175991_l(this.field_176029_e);
+                field_152950_b.debug(field_152949_a, "Disconnecting from twitch chat per user options");
+                this.field_152952_d.func_175991_l(this.field_176029_e);
             }
         }
-        else if (i == 1)
+        else if (var1 == 1)
         {
-            if (flag1 && this.broadcastController.func_152849_q())
+            if (var3 && this.broadcastController.func_152849_q())
             {
-                LOGGER.debug(STREAM_MARKER, "Connecting to twitch chat per user options");
+                field_152950_b.debug(field_152949_a, "Connecting to twitch chat per user options");
                 this.func_152942_I();
             }
         }
-        else if (i == 0)
+        else if (var1 == 0)
         {
-            if (flag && !this.isBroadcasting())
+            if (var2 && !this.func_152934_n())
             {
-                LOGGER.debug(STREAM_MARKER, "Disconnecting from twitch chat as user is no longer streaming");
-                this.chatController.func_175991_l(this.field_176029_e);
+                field_152950_b.debug(field_152949_a, "Disconnecting from twitch chat as user is no longer streaming");
+                this.field_152952_d.func_175991_l(this.field_176029_e);
             }
-            else if (flag1 && this.isBroadcasting())
+            else if (var3 && this.func_152934_n())
             {
-                LOGGER.debug(STREAM_MARKER, "Connecting to twitch chat as user is streaming");
+                field_152950_b.debug(field_152949_a, "Connecting to twitch chat as user is streaming");
                 this.func_152942_I();
             }
         }
 
         this.broadcastController.func_152821_H();
-        this.chatController.func_152997_n();
+        this.field_152952_d.func_152997_n();
     }
 
     protected void func_152942_I()
     {
-        ChatController.ChatState chatcontroller$chatstate = this.chatController.func_153000_j();
-        String s = this.broadcastController.getChannelInfo().name;
-        this.field_176029_e = s;
+        ChatController.ChatState var1 = this.field_152952_d.func_153000_j();
+        String var2 = this.broadcastController.func_152843_l().name;
+        this.field_176029_e = var2;
 
-        if (chatcontroller$chatstate != ChatController.ChatState.Initialized)
+        if (var1 != ChatController.ChatState.Initialized)
         {
-            LOGGER.warn("Invalid twitch chat state {}", new Object[] {chatcontroller$chatstate});
+            field_152950_b.warn("Invalid twitch chat state {}", new Object[] {var1});
         }
-        else if (this.chatController.func_175989_e(this.field_176029_e) == ChatController.EnumChannelState.Disconnected)
+        else if (this.field_152952_d.func_175989_e(this.field_176029_e) == ChatController.EnumChannelState.Disconnected)
         {
-            this.chatController.func_152986_d(s);
+            this.field_152952_d.func_152986_d(var2);
         }
         else
         {
-            LOGGER.warn("Invalid twitch chat state {}", new Object[] {chatcontroller$chatstate});
+            field_152950_b.warn("Invalid twitch chat state {}", new Object[] {var1});
         }
     }
 
@@ -209,53 +209,53 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
     {
         if (this.broadcastController.isBroadcasting() && !this.broadcastController.isBroadcastPaused())
         {
-            long i = System.nanoTime();
-            long j = (long)(1000000000 / this.targetFPS);
-            long k = i - this.field_152959_k;
-            boolean flag = k >= j;
+            long var1 = System.nanoTime();
+            long var3 = (long)(1000000000 / this.field_152958_j);
+            long var5 = var1 - this.field_152959_k;
+            boolean var7 = var5 >= var3;
 
-            if (flag)
+            if (var7)
             {
-                FrameBuffer framebuffer = this.broadcastController.func_152822_N();
-                Framebuffer framebuffer1 = this.mc.getFramebuffer();
-                this.framebuffer.bindFramebuffer(true);
+                FrameBuffer var8 = this.broadcastController.func_152822_N();
+                Framebuffer var9 = this.field_152953_e.getFramebuffer();
+                this.field_152956_h.bindFramebuffer(true);
                 GlStateManager.matrixMode(5889);
                 GlStateManager.pushMatrix();
                 GlStateManager.loadIdentity();
-                GlStateManager.ortho(0.0D, (double)this.framebuffer.framebufferWidth, (double)this.framebuffer.framebufferHeight, 0.0D, 1000.0D, 3000.0D);
+                GlStateManager.ortho(0.0D, (double)this.field_152956_h.framebufferWidth, (double)this.field_152956_h.framebufferHeight, 0.0D, 1000.0D, 3000.0D);
                 GlStateManager.matrixMode(5888);
                 GlStateManager.pushMatrix();
                 GlStateManager.loadIdentity();
                 GlStateManager.translate(0.0F, 0.0F, -2000.0F);
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                GlStateManager.viewport(0, 0, this.framebuffer.framebufferWidth, this.framebuffer.framebufferHeight);
+                GlStateManager.viewport(0, 0, this.field_152956_h.framebufferWidth, this.field_152956_h.framebufferHeight);
                 GlStateManager.enableTexture2D();
                 GlStateManager.disableAlpha();
                 GlStateManager.disableBlend();
-                float f = (float)this.framebuffer.framebufferWidth;
-                float f1 = (float)this.framebuffer.framebufferHeight;
-                float f2 = (float)framebuffer1.framebufferWidth / (float)framebuffer1.framebufferTextureWidth;
-                float f3 = (float)framebuffer1.framebufferHeight / (float)framebuffer1.framebufferTextureHeight;
-                framebuffer1.bindFramebufferTexture();
+                float var10 = (float)this.field_152956_h.framebufferWidth;
+                float var11 = (float)this.field_152956_h.framebufferHeight;
+                float var12 = (float)var9.framebufferWidth / (float)var9.framebufferTextureWidth;
+                float var13 = (float)var9.framebufferHeight / (float)var9.framebufferTextureHeight;
+                var9.bindFramebufferTexture();
                 GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, 9729.0F);
                 GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, 9729.0F);
-                Tessellator tessellator = Tessellator.getInstance();
-                WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-                worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
-                worldrenderer.pos(0.0D, (double)f1, 0.0D).tex(0.0D, (double)f3).endVertex();
-                worldrenderer.pos((double)f, (double)f1, 0.0D).tex((double)f2, (double)f3).endVertex();
-                worldrenderer.pos((double)f, 0.0D, 0.0D).tex((double)f2, 0.0D).endVertex();
-                worldrenderer.pos(0.0D, 0.0D, 0.0D).tex(0.0D, 0.0D).endVertex();
-                tessellator.draw();
-                framebuffer1.unbindFramebufferTexture();
+                Tessellator var14 = Tessellator.getInstance();
+                WorldRenderer var15 = var14.getWorldRenderer();
+                var15.startDrawingQuads();
+                var15.addVertexWithUV(0.0D, (double)var11, 0.0D, 0.0D, (double)var13);
+                var15.addVertexWithUV((double)var10, (double)var11, 0.0D, (double)var12, (double)var13);
+                var15.addVertexWithUV((double)var10, 0.0D, 0.0D, (double)var12, 0.0D);
+                var15.addVertexWithUV(0.0D, 0.0D, 0.0D, 0.0D, 0.0D);
+                var14.draw();
+                var9.unbindFramebufferTexture();
                 GlStateManager.popMatrix();
                 GlStateManager.matrixMode(5889);
                 GlStateManager.popMatrix();
                 GlStateManager.matrixMode(5888);
-                this.broadcastController.captureFramebuffer(framebuffer);
-                this.framebuffer.unbindFramebuffer();
-                this.broadcastController.submitStreamFrame(framebuffer);
-                this.field_152959_k = i;
+                this.broadcastController.func_152846_a(var8);
+                this.field_152956_h.unbindFramebuffer();
+                this.broadcastController.func_152859_b(var8);
+                this.field_152959_k = var1;
             }
         }
     }
@@ -265,53 +265,53 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
         return this.broadcastController.func_152849_q();
     }
 
-    public boolean isReadyToBroadcast()
+    public boolean func_152924_m()
     {
-        return this.broadcastController.isReadyToBroadcast();
+        return this.broadcastController.func_152857_n();
     }
 
-    public boolean isBroadcasting()
+    public boolean func_152934_n()
     {
         return this.broadcastController.isBroadcasting();
     }
 
     public void func_152911_a(Metadata p_152911_1_, long p_152911_2_)
     {
-        if (this.isBroadcasting() && this.field_152957_i)
+        if (this.func_152934_n() && this.field_152957_i)
         {
-            long i = this.broadcastController.getStreamTime();
+            long var4 = this.broadcastController.func_152844_x();
 
-            if (!this.broadcastController.func_152840_a(p_152911_1_.func_152810_c(), i + p_152911_2_, p_152911_1_.func_152809_a(), p_152911_1_.func_152806_b()))
+            if (!this.broadcastController.func_152840_a(p_152911_1_.func_152810_c(), var4 + p_152911_2_, p_152911_1_.func_152809_a(), p_152911_1_.func_152806_b()))
             {
-                LOGGER.warn(STREAM_MARKER, "Couldn\'t send stream metadata action at {}: {}", new Object[] {Long.valueOf(i + p_152911_2_), p_152911_1_});
+                field_152950_b.warn(field_152949_a, "Couldn\'t send stream metadata action at {}: {}", new Object[] {Long.valueOf(var4 + p_152911_2_), p_152911_1_});
             }
             else
             {
-                LOGGER.debug(STREAM_MARKER, "Sent stream metadata action at {}: {}", new Object[] {Long.valueOf(i + p_152911_2_), p_152911_1_});
+                field_152950_b.debug(field_152949_a, "Sent stream metadata action at {}: {}", new Object[] {Long.valueOf(var4 + p_152911_2_), p_152911_1_});
             }
         }
     }
 
     public void func_176026_a(Metadata p_176026_1_, long p_176026_2_, long p_176026_4_)
     {
-        if (this.isBroadcasting() && this.field_152957_i)
+        if (this.func_152934_n() && this.field_152957_i)
         {
-            long i = this.broadcastController.getStreamTime();
-            String s = p_176026_1_.func_152809_a();
-            String s1 = p_176026_1_.func_152806_b();
-            long j = this.broadcastController.func_177946_b(p_176026_1_.func_152810_c(), i + p_176026_2_, s, s1);
+            long var6 = this.broadcastController.func_152844_x();
+            String var8 = p_176026_1_.func_152809_a();
+            String var9 = p_176026_1_.func_152806_b();
+            long var10 = this.broadcastController.func_177946_b(p_176026_1_.func_152810_c(), var6 + p_176026_2_, var8, var9);
 
-            if (j < 0L)
+            if (var10 < 0L)
             {
-                LOGGER.warn(STREAM_MARKER, "Could not send stream metadata sequence from {} to {}: {}", new Object[] {Long.valueOf(i + p_176026_2_), Long.valueOf(i + p_176026_4_), p_176026_1_});
+                field_152950_b.warn(field_152949_a, "Could not send stream metadata sequence from {} to {}: {}", new Object[] {Long.valueOf(var6 + p_176026_2_), Long.valueOf(var6 + p_176026_4_), p_176026_1_});
             }
-            else if (this.broadcastController.func_177947_a(p_176026_1_.func_152810_c(), i + p_176026_4_, j, s, s1))
+            else if (this.broadcastController.func_177947_a(p_176026_1_.func_152810_c(), var6 + p_176026_4_, var10, var8, var9))
             {
-                LOGGER.debug(STREAM_MARKER, "Sent stream metadata sequence from {} to {}: {}", new Object[] {Long.valueOf(i + p_176026_2_), Long.valueOf(i + p_176026_4_), p_176026_1_});
+                field_152950_b.debug(field_152949_a, "Sent stream metadata sequence from {} to {}: {}", new Object[] {Long.valueOf(var6 + p_176026_2_), Long.valueOf(var6 + p_176026_4_), p_176026_1_});
             }
             else
             {
-                LOGGER.warn(STREAM_MARKER, "Half-sent stream metadata sequence from {} to {}: {}", new Object[] {Long.valueOf(i + p_176026_2_), Long.valueOf(i + p_176026_4_), p_176026_1_});
+                field_152950_b.warn(field_152949_a, "Half-sent stream metadata sequence from {} to {}: {}", new Object[] {Long.valueOf(var6 + p_176026_2_), Long.valueOf(var6 + p_176026_4_), p_176026_1_});
             }
         }
     }
@@ -321,133 +321,128 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
         return this.broadcastController.isBroadcastPaused();
     }
 
-    public void requestCommercial()
+    public void func_152931_p()
     {
-        if (this.broadcastController.requestCommercial())
+        if (this.broadcastController.func_152830_D())
         {
-            LOGGER.debug(STREAM_MARKER, "Requested commercial from Twitch");
+            field_152950_b.debug(field_152949_a, "Requested commercial from Twitch");
         }
         else
         {
-            LOGGER.warn(STREAM_MARKER, "Could not request commercial from Twitch");
+            field_152950_b.warn(field_152949_a, "Could not request commercial from Twitch");
         }
     }
 
-    /**
-     * pauses a stream
-     */
-    public void pause()
+    public void func_152916_q()
     {
         this.broadcastController.func_152847_F();
         this.field_152962_n = true;
-        this.updateStreamVolume();
+        this.func_152915_s();
     }
 
-    /**
-     * unpauses a stream
-     */
-    public void unpause()
+    public void func_152933_r()
     {
         this.broadcastController.func_152854_G();
         this.field_152962_n = false;
-        this.updateStreamVolume();
+        this.func_152915_s();
     }
 
-    public void updateStreamVolume()
+    public void func_152915_s()
     {
-        if (this.isBroadcasting())
+        if (this.func_152934_n())
         {
-            float f = this.mc.gameSettings.streamGameVolume;
-            boolean flag = this.field_152962_n || f <= 0.0F;
-            this.broadcastController.setPlaybackDeviceVolume(flag ? 0.0F : f);
-            this.broadcastController.setRecordingDeviceVolume(this.func_152929_G() ? 0.0F : this.mc.gameSettings.streamMicVolume);
+            float var1 = this.field_152953_e.gameSettings.streamGameVolume;
+            boolean var2 = this.field_152962_n || var1 <= 0.0F;
+            this.broadcastController.func_152837_b(var2 ? 0.0F : var1);
+            this.broadcastController.func_152829_a(this.func_152929_G() ? 0.0F : this.field_152953_e.gameSettings.streamMicVolume);
         }
     }
 
     public void func_152930_t()
     {
-        GameSettings gamesettings = this.mc.gameSettings;
-        VideoParams videoparams = this.broadcastController.func_152834_a(formatStreamKbps(gamesettings.streamKbps), formatStreamFps(gamesettings.streamFps), formatStreamBps(gamesettings.streamBytesPerPixel), (float)this.mc.displayWidth / (float)this.mc.displayHeight);
+        GameSettings var1 = this.field_152953_e.gameSettings;
+        VideoParams var2 = this.broadcastController.func_152834_a(func_152946_b(var1.streamKbps), func_152948_a(var1.streamFps), func_152947_c(var1.streamBytesPerPixel), (float)this.field_152953_e.displayWidth / (float)this.field_152953_e.displayHeight);
 
-        switch (gamesettings.streamCompression)
+        switch (var1.streamCompression)
         {
             case 0:
-                videoparams.encodingCpuUsage = EncodingCpuUsage.TTV_ECU_LOW;
+                var2.encodingCpuUsage = EncodingCpuUsage.TTV_ECU_LOW;
                 break;
 
             case 1:
-                videoparams.encodingCpuUsage = EncodingCpuUsage.TTV_ECU_MEDIUM;
+                var2.encodingCpuUsage = EncodingCpuUsage.TTV_ECU_MEDIUM;
                 break;
 
             case 2:
-                videoparams.encodingCpuUsage = EncodingCpuUsage.TTV_ECU_HIGH;
+                var2.encodingCpuUsage = EncodingCpuUsage.TTV_ECU_HIGH;
         }
 
-        if (this.framebuffer == null)
+        if (this.field_152956_h == null)
         {
-            this.framebuffer = new Framebuffer(videoparams.outputWidth, videoparams.outputHeight, false);
+            this.field_152956_h = new Framebuffer(var2.outputWidth, var2.outputHeight, false);
         }
         else
         {
-            this.framebuffer.createBindFramebuffer(videoparams.outputWidth, videoparams.outputHeight);
+            this.field_152956_h.createBindFramebuffer(var2.outputWidth, var2.outputHeight);
         }
 
-        if (gamesettings.streamPreferredServer != null && gamesettings.streamPreferredServer.length() > 0)
+        if (var1.streamPreferredServer != null && var1.streamPreferredServer.length() > 0)
         {
-            for (IngestServer ingestserver : this.func_152925_v())
+            IngestServer[] var3 = this.func_152925_v();
+            int var4 = var3.length;
+
+            for (int var5 = 0; var5 < var4; ++var5)
             {
-                if (ingestserver.serverUrl.equals(gamesettings.streamPreferredServer))
+                IngestServer var6 = var3[var5];
+
+                if (var6.serverUrl.equals(var1.streamPreferredServer))
                 {
-                    this.broadcastController.setIngestServer(ingestserver);
+                    this.broadcastController.func_152824_a(var6);
                     break;
                 }
             }
         }
 
-        this.targetFPS = videoparams.targetFps;
-        this.field_152957_i = gamesettings.streamSendMetadata;
-        this.broadcastController.func_152836_a(videoparams);
-        LOGGER.info(STREAM_MARKER, "Streaming at {}/{} at {} kbps to {}", new Object[] {Integer.valueOf(videoparams.outputWidth), Integer.valueOf(videoparams.outputHeight), Integer.valueOf(videoparams.maxKbps), this.broadcastController.getIngestServer().serverUrl});
+        this.field_152958_j = var2.targetFps;
+        this.field_152957_i = var1.streamSendMetadata;
+        this.broadcastController.func_152836_a(var2);
+        field_152950_b.info(field_152949_a, "Streaming at {}/{} at {} kbps to {}", new Object[] {Integer.valueOf(var2.outputWidth), Integer.valueOf(var2.outputHeight), Integer.valueOf(var2.maxKbps), this.broadcastController.func_152833_s().serverUrl});
         this.broadcastController.func_152828_a((String)null, "Minecraft", (String)null);
     }
 
-    public void stopBroadcasting()
+    public void func_152914_u()
     {
-        if (this.broadcastController.stopBroadcasting())
+        if (this.broadcastController.func_152819_E())
         {
-            LOGGER.info(STREAM_MARKER, "Stopped streaming to Twitch");
+            field_152950_b.info(field_152949_a, "Stopped streaming to Twitch");
         }
         else
         {
-            LOGGER.warn(STREAM_MARKER, "Could not stop streaming to Twitch");
+            field_152950_b.warn(field_152949_a, "Could not stop streaming to Twitch");
         }
     }
 
-    public void func_152900_a(ErrorCode p_152900_1_, AuthToken p_152900_2_)
-    {
-    }
+    public void func_152900_a(ErrorCode p_152900_1_, AuthToken p_152900_2_) {}
 
     public void func_152897_a(ErrorCode p_152897_1_)
     {
         if (ErrorCode.succeeded(p_152897_1_))
         {
-            LOGGER.debug(STREAM_MARKER, "Login attempt successful");
-            this.loggedIn = true;
+            field_152950_b.debug(field_152949_a, "Login attempt successful");
+            this.field_152961_m = true;
         }
         else
         {
-            LOGGER.warn(STREAM_MARKER, "Login attempt unsuccessful: {} (error code {})", new Object[] {ErrorCode.getString(p_152897_1_), Integer.valueOf(p_152897_1_.getValue())});
-            this.loggedIn = false;
+            field_152950_b.warn(field_152949_a, "Login attempt unsuccessful: {} (error code {})", new Object[] {ErrorCode.getString(p_152897_1_), Integer.valueOf(p_152897_1_.getValue())});
+            this.field_152961_m = false;
         }
     }
 
-    public void func_152898_a(ErrorCode p_152898_1_, GameInfo[] p_152898_2_)
-    {
-    }
+    public void func_152898_a(ErrorCode p_152898_1_, GameInfo[] p_152898_2_) {}
 
     public void func_152891_a(BroadcastController.BroadcastState p_152891_1_)
     {
-        LOGGER.debug(STREAM_MARKER, "Broadcast state changed to {}", new Object[] {p_152891_1_});
+        field_152950_b.debug(field_152949_a, "Broadcast state changed to {}", new Object[] {p_152891_1_});
 
         if (p_152891_1_ == BroadcastController.BroadcastState.Initialized)
         {
@@ -457,57 +452,57 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
 
     public void func_152895_a()
     {
-        LOGGER.info(STREAM_MARKER, "Logged out of twitch");
+        field_152950_b.info(field_152949_a, "Logged out of twitch");
     }
 
     public void func_152894_a(StreamInfo p_152894_1_)
     {
-        LOGGER.debug(STREAM_MARKER, "Stream info updated; {} viewers on stream ID {}", new Object[] {Integer.valueOf(p_152894_1_.viewers), Long.valueOf(p_152894_1_.streamId)});
+        field_152950_b.debug(field_152949_a, "Stream info updated; {} viewers on stream ID {}", new Object[] {Integer.valueOf(p_152894_1_.viewers), Long.valueOf(p_152894_1_.streamId)});
     }
 
-    public void func_152896_a(IngestList p_152896_1_)
-    {
-    }
+    public void func_152896_a(IngestList p_152896_1_) {}
 
     public void func_152893_b(ErrorCode p_152893_1_)
     {
-        LOGGER.warn(STREAM_MARKER, "Issue submitting frame: {} (Error code {})", new Object[] {ErrorCode.getString(p_152893_1_), Integer.valueOf(p_152893_1_.getValue())});
-        this.mc.ingameGUI.getChatGUI().printChatMessageWithOptionalDeletion(new ChatComponentText("Issue streaming frame: " + p_152893_1_ + " (" + ErrorCode.getString(p_152893_1_) + ")"), 2);
+        field_152950_b.warn(field_152949_a, "Issue submitting frame: {} (Error code {})", new Object[] {ErrorCode.getString(p_152893_1_), Integer.valueOf(p_152893_1_.getValue())});
+        this.field_152953_e.ingameGUI.getChatGUI().printChatMessageWithOptionalDeletion(new ChatComponentText("Issue streaming frame: " + p_152893_1_ + " (" + ErrorCode.getString(p_152893_1_) + ")"), 2);
     }
 
     public void func_152899_b()
     {
-        this.updateStreamVolume();
-        LOGGER.info(STREAM_MARKER, "Broadcast to Twitch has started");
+        this.func_152915_s();
+        field_152950_b.info(field_152949_a, "Broadcast to Twitch has started");
     }
 
     public void func_152901_c()
     {
-        LOGGER.info(STREAM_MARKER, "Broadcast to Twitch has stopped");
+        field_152950_b.info(field_152949_a, "Broadcast to Twitch has stopped");
     }
 
     public void func_152892_c(ErrorCode p_152892_1_)
     {
+        ChatComponentTranslation var2;
+
         if (p_152892_1_ == ErrorCode.TTV_EC_SOUNDFLOWER_NOT_INSTALLED)
         {
-            IChatComponent ichatcomponent = new ChatComponentTranslation("stream.unavailable.soundflower.chat.link", new Object[0]);
-            ichatcomponent.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://help.mojang.com/customer/portal/articles/1374877-configuring-soundflower-for-streaming-on-apple-computers"));
-            ichatcomponent.getChatStyle().setUnderlined(Boolean.valueOf(true));
-            IChatComponent ichatcomponent1 = new ChatComponentTranslation("stream.unavailable.soundflower.chat", new Object[] {ichatcomponent});
-            ichatcomponent1.getChatStyle().setColor(EnumChatFormatting.DARK_RED);
-            this.mc.ingameGUI.getChatGUI().printChatMessage(ichatcomponent1);
+            var2 = new ChatComponentTranslation("stream.unavailable.soundflower.chat.link", new Object[0]);
+            var2.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://help.mojang.com/customer/portal/articles/1374877-configuring-soundflower-for-streaming-on-apple-computers"));
+            var2.getChatStyle().setUnderlined(Boolean.valueOf(true));
+            ChatComponentTranslation var3 = new ChatComponentTranslation("stream.unavailable.soundflower.chat", new Object[] {var2});
+            var3.getChatStyle().setColor(EnumChatFormatting.DARK_RED);
+            this.field_152953_e.ingameGUI.getChatGUI().printChatMessage(var3);
         }
         else
         {
-            IChatComponent ichatcomponent2 = new ChatComponentTranslation("stream.unavailable.unknown.chat", new Object[] {ErrorCode.getString(p_152892_1_)});
-            ichatcomponent2.getChatStyle().setColor(EnumChatFormatting.DARK_RED);
-            this.mc.ingameGUI.getChatGUI().printChatMessage(ichatcomponent2);
+            var2 = new ChatComponentTranslation("stream.unavailable.unknown.chat", new Object[] {ErrorCode.getString(p_152892_1_)});
+            var2.getChatStyle().setColor(EnumChatFormatting.DARK_RED);
+            this.field_152953_e.ingameGUI.getChatGUI().printChatMessage(var2);
         }
     }
 
     public void func_152907_a(IngestServerTester p_152907_1_, IngestServerTester.IngestTestState p_152907_2_)
     {
-        LOGGER.debug(STREAM_MARKER, "Ingest test state changed to {}", new Object[] {p_152907_2_});
+        field_152950_b.debug(field_152949_a, "Ingest test state changed to {}", new Object[] {p_152907_2_});
 
         if (p_152907_2_ == IngestServerTester.IngestTestState.Finished)
         {
@@ -515,33 +510,33 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
         }
     }
 
-    public static int formatStreamFps(float p_152948_0_)
+    public static int func_152948_a(float p_152948_0_)
     {
         return MathHelper.floor_float(10.0F + p_152948_0_ * 50.0F);
     }
 
-    public static int formatStreamKbps(float p_152946_0_)
+    public static int func_152946_b(float p_152946_0_)
     {
         return MathHelper.floor_float(230.0F + p_152946_0_ * 3270.0F);
     }
 
-    public static float formatStreamBps(float p_152947_0_)
+    public static float func_152947_c(float p_152947_0_)
     {
         return 0.1F + p_152947_0_ * 0.1F;
     }
 
     public IngestServer[] func_152925_v()
     {
-        return this.broadcastController.getIngestList().getServers();
+        return this.broadcastController.func_152855_t().getServers();
     }
 
     public void func_152909_x()
     {
-        IngestServerTester ingestservertester = this.broadcastController.func_152838_J();
+        IngestServerTester var1 = this.broadcastController.func_152838_J();
 
-        if (ingestservertester != null)
+        if (var1 != null)
         {
-            ingestservertester.func_153042_a(this);
+            var1.func_153042_a(this);
         }
     }
 
@@ -557,14 +552,14 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
 
     public int func_152920_A()
     {
-        return this.isBroadcasting() ? this.broadcastController.getStreamInfo().viewers : 0;
+        return this.func_152934_n() ? this.broadcastController.func_152816_j().viewers : 0;
     }
 
     public void func_176023_d(ErrorCode p_176023_1_)
     {
         if (ErrorCode.failed(p_176023_1_))
         {
-            LOGGER.error(STREAM_MARKER, "Chat failed to initialize");
+            field_152950_b.error(field_152949_a, "Chat failed to initialize");
         }
     }
 
@@ -572,123 +567,129 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
     {
         if (ErrorCode.failed(p_176022_1_))
         {
-            LOGGER.error(STREAM_MARKER, "Chat failed to shutdown");
+            field_152950_b.error(field_152949_a, "Chat failed to shutdown");
         }
     }
 
-    public void func_176017_a(ChatController.ChatState p_176017_1_)
-    {
-    }
+    public void func_176017_a(ChatController.ChatState p_176017_1_) {}
 
     public void func_180605_a(String p_180605_1_, ChatRawMessage[] p_180605_2_)
     {
-        for (ChatRawMessage chatrawmessage : p_180605_2_)
+        ChatRawMessage[] var3 = p_180605_2_;
+        int var4 = p_180605_2_.length;
+
+        for (int var5 = 0; var5 < var4; ++var5)
         {
-            this.func_176027_a(chatrawmessage.userName, chatrawmessage);
+            ChatRawMessage var6 = var3[var5];
+            this.func_176027_a(var6.userName, var6);
 
-            if (this.func_176028_a(chatrawmessage.modes, chatrawmessage.subscriptions, this.mc.gameSettings.streamChatUserFilter))
+            if (this.func_176028_a(var6.modes, var6.subscriptions, this.field_152953_e.gameSettings.streamChatUserFilter))
             {
-                IChatComponent ichatcomponent = new ChatComponentText(chatrawmessage.userName);
-                IChatComponent ichatcomponent1 = new ChatComponentTranslation("chat.stream." + (chatrawmessage.action ? "emote" : "text"), new Object[] {this.twitchComponent, ichatcomponent, EnumChatFormatting.getTextWithoutFormattingCodes(chatrawmessage.message)});
+                ChatComponentText var7 = new ChatComponentText(var6.userName);
+                ChatComponentTranslation var8 = new ChatComponentTranslation("chat.stream." + (var6.action ? "emote" : "text"), new Object[] {this.field_152954_f, var7, EnumChatFormatting.getTextWithoutFormattingCodes(var6.message)});
 
-                if (chatrawmessage.action)
+                if (var6.action)
                 {
-                    ichatcomponent1.getChatStyle().setItalic(Boolean.valueOf(true));
+                    var8.getChatStyle().setItalic(Boolean.valueOf(true));
                 }
 
-                IChatComponent ichatcomponent2 = new ChatComponentText("");
-                ichatcomponent2.appendSibling(new ChatComponentTranslation("stream.userinfo.chatTooltip", new Object[0]));
+                ChatComponentText var9 = new ChatComponentText("");
+                var9.appendSibling(new ChatComponentTranslation("stream.userinfo.chatTooltip", new Object[0]));
+                Iterator var10 = GuiTwitchUserMode.func_152328_a(var6.modes, var6.subscriptions, (IStream)null).iterator();
 
-                for (IChatComponent ichatcomponent3 : GuiTwitchUserMode.func_152328_a(chatrawmessage.modes, chatrawmessage.subscriptions, (IStream)null))
+                while (var10.hasNext())
                 {
-                    ichatcomponent2.appendText("\n");
-                    ichatcomponent2.appendSibling(ichatcomponent3);
+                    IChatComponent var11 = (IChatComponent)var10.next();
+                    var9.appendText("\n");
+                    var9.appendSibling(var11);
                 }
 
-                ichatcomponent.getChatStyle().setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, ichatcomponent2));
-                ichatcomponent.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.TWITCH_USER_INFO, chatrawmessage.userName));
-                this.mc.ingameGUI.getChatGUI().printChatMessage(ichatcomponent1);
+                var7.getChatStyle().setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, var9));
+                var7.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.TWITCH_USER_INFO, var6.userName));
+                this.field_152953_e.ingameGUI.getChatGUI().printChatMessage(var8);
             }
         }
     }
 
-    public void func_176025_a(String p_176025_1_, ChatTokenizedMessage[] p_176025_2_)
-    {
-    }
+    public void func_176025_a(String p_176025_1_, ChatTokenizedMessage[] p_176025_2_) {}
 
     private void func_176027_a(String p_176027_1_, ChatRawMessage p_176027_2_)
     {
-        ChatUserInfo chatuserinfo = (ChatUserInfo)this.field_152955_g.get(p_176027_1_);
+        ChatUserInfo var3 = (ChatUserInfo)this.field_152955_g.get(p_176027_1_);
 
-        if (chatuserinfo == null)
+        if (var3 == null)
         {
-            chatuserinfo = new ChatUserInfo();
-            chatuserinfo.displayName = p_176027_1_;
-            this.field_152955_g.put(p_176027_1_, chatuserinfo);
+            var3 = new ChatUserInfo();
+            var3.displayName = p_176027_1_;
+            this.field_152955_g.put(p_176027_1_, var3);
         }
 
-        chatuserinfo.subscriptions = p_176027_2_.subscriptions;
-        chatuserinfo.modes = p_176027_2_.modes;
-        chatuserinfo.nameColorARGB = p_176027_2_.nameColorARGB;
+        var3.subscriptions = p_176027_2_.subscriptions;
+        var3.modes = p_176027_2_.modes;
+        var3.nameColorARGB = p_176027_2_.nameColorARGB;
     }
 
-    private boolean func_176028_a(Set<ChatUserMode> p_176028_1_, Set<ChatUserSubscription> p_176028_2_, int p_176028_3_)
+    private boolean func_176028_a(Set p_176028_1_, Set p_176028_2_, int p_176028_3_)
     {
         return p_176028_1_.contains(ChatUserMode.TTV_CHAT_USERMODE_BANNED) ? false : (p_176028_1_.contains(ChatUserMode.TTV_CHAT_USERMODE_ADMINSTRATOR) ? true : (p_176028_1_.contains(ChatUserMode.TTV_CHAT_USERMODE_MODERATOR) ? true : (p_176028_1_.contains(ChatUserMode.TTV_CHAT_USERMODE_STAFF) ? true : (p_176028_3_ == 0 ? true : (p_176028_3_ == 1 ? p_176028_2_.contains(ChatUserSubscription.TTV_CHAT_USERSUB_SUBSCRIBER) : false)))));
     }
 
     public void func_176018_a(String p_176018_1_, ChatUserInfo[] p_176018_2_, ChatUserInfo[] p_176018_3_, ChatUserInfo[] p_176018_4_)
     {
-        for (ChatUserInfo chatuserinfo : p_176018_3_)
+        ChatUserInfo[] var5 = p_176018_3_;
+        int var6 = p_176018_3_.length;
+        int var7;
+        ChatUserInfo var8;
+
+        for (var7 = 0; var7 < var6; ++var7)
         {
-            this.field_152955_g.remove(chatuserinfo.displayName);
+            var8 = var5[var7];
+            this.field_152955_g.remove(var8.displayName);
         }
 
-        for (ChatUserInfo chatuserinfo1 : p_176018_4_)
+        var5 = p_176018_4_;
+        var6 = p_176018_4_.length;
+
+        for (var7 = 0; var7 < var6; ++var7)
         {
-            this.field_152955_g.put(chatuserinfo1.displayName, chatuserinfo1);
+            var8 = var5[var7];
+            this.field_152955_g.put(var8.displayName, var8);
         }
 
-        for (ChatUserInfo chatuserinfo2 : p_176018_2_)
+        var5 = p_176018_2_;
+        var6 = p_176018_2_.length;
+
+        for (var7 = 0; var7 < var6; ++var7)
         {
-            this.field_152955_g.put(chatuserinfo2.displayName, chatuserinfo2);
+            var8 = var5[var7];
+            this.field_152955_g.put(var8.displayName, var8);
         }
     }
 
     public void func_180606_a(String p_180606_1_)
     {
-        LOGGER.debug(STREAM_MARKER, "Chat connected");
+        field_152950_b.debug(field_152949_a, "Chat connected");
     }
 
     public void func_180607_b(String p_180607_1_)
     {
-        LOGGER.debug(STREAM_MARKER, "Chat disconnected");
+        field_152950_b.debug(field_152949_a, "Chat disconnected");
         this.field_152955_g.clear();
     }
 
-    public void func_176019_a(String p_176019_1_, String p_176019_2_)
-    {
-    }
+    public void func_176019_a(String p_176019_1_, String p_176019_2_) {}
 
-    public void func_176021_d()
-    {
-    }
+    public void func_176021_d() {}
 
-    public void func_176024_e()
-    {
-    }
+    public void func_176024_e() {}
 
-    public void func_176016_c(String p_176016_1_)
-    {
-    }
+    public void func_176016_c(String p_176016_1_) {}
 
-    public void func_176020_d(String p_176020_1_)
-    {
-    }
+    public void func_176020_d(String p_176020_1_) {}
 
     public boolean func_152927_B()
     {
-        return this.field_176029_e != null && this.field_176029_e.equals(this.broadcastController.getChannelInfo().name);
+        return this.field_176029_e != null && this.field_176029_e.equals(this.broadcastController.func_152843_l().name);
     }
 
     public String func_152921_C()
@@ -703,7 +704,7 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
 
     public void func_152917_b(String p_152917_1_)
     {
-        this.chatController.func_175986_a(this.field_176029_e, p_152917_1_);
+        this.field_152952_d.func_175986_a(this.field_176029_e, p_152917_1_);
     }
 
     public boolean func_152928_D()
@@ -713,32 +714,29 @@ public class TwitchStream implements BroadcastController.BroadcastListener, Chat
 
     public ErrorCode func_152912_E()
     {
-        return !field_152965_q ? ErrorCode.TTV_EC_OS_TOO_OLD : this.broadcastController.getErrorCode();
+        return !field_152965_q ? ErrorCode.TTV_EC_OS_TOO_OLD : this.broadcastController.func_152852_P();
     }
 
     public boolean func_152913_F()
     {
-        return this.loggedIn;
+        return this.field_152961_m;
     }
 
-    /**
-     * mutes or unmutes the microphone based on the boolean parameter passed into the method
-     */
-    public void muteMicrophone(boolean p_152910_1_)
+    public void func_152910_a(boolean p_152910_1_)
     {
         this.field_152963_o = p_152910_1_;
-        this.updateStreamVolume();
+        this.func_152915_s();
     }
 
     public boolean func_152929_G()
     {
-        boolean flag = this.mc.gameSettings.streamMicToggleBehavior == 1;
-        return this.field_152962_n || this.mc.gameSettings.streamMicVolume <= 0.0F || flag != this.field_152963_o;
+        boolean var1 = this.field_152953_e.gameSettings.streamMicToggleBehavior == 1;
+        return this.field_152962_n || this.field_152953_e.gameSettings.streamMicVolume <= 0.0F || var1 != this.field_152963_o;
     }
 
     public IStream.AuthFailureReason func_152918_H()
     {
-        return this.authFailureReason;
+        return this.field_152964_p;
     }
 
     static

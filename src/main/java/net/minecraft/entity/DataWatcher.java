@@ -3,6 +3,8 @@ package net.minecraft.entity;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -14,7 +16,6 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.Rotations;
-import net.minecraft.world.biome.BiomeGenBase;
 import org.apache.commons.lang3.ObjectUtils;
 
 public class DataWatcher
@@ -23,25 +24,28 @@ public class DataWatcher
 
     /** When isBlank is true the DataWatcher is not watching any objects */
     private boolean isBlank = true;
-    private static final Map < Class<?>, Integer > dataTypes = Maps. < Class<?>, Integer > newHashMap();
-    private final Map<Integer, DataWatcher.WatchableObject> watchedObjects = Maps.<Integer, DataWatcher.WatchableObject>newHashMap();
+    private static final Map dataTypes = Maps.newHashMap();
+    private final Map watchedObjects = Maps.newHashMap();
 
     /** true if one or more object was changed */
     private boolean objectChanged;
     private ReadWriteLock lock = new ReentrantReadWriteLock();
-    public BiomeGenBase spawnBiome = BiomeGenBase.plains;
-    public BlockPos spawnPosition = BlockPos.ORIGIN;
+    
 
     public DataWatcher(Entity owner)
     {
         this.owner = owner;
     }
 
-    public <T> void addObject(int id, T object)
+    /**
+     * adds a new object to dataWatcher to watch, to update an already existing object see updateObject. Arguments: data
+     * Value Id, Object to add
+     */
+    public void addObject(int id, Object object)
     {
-        Integer integer = (Integer)dataTypes.get(object.getClass());
+        Integer var3 = (Integer)dataTypes.get(object.getClass());
 
-        if (integer == null)
+        if (var3 == null)
         {
             throw new IllegalArgumentException("Unknown data type: " + object.getClass());
         }
@@ -55,9 +59,9 @@ public class DataWatcher
         }
         else
         {
-            DataWatcher.WatchableObject datawatcher$watchableobject = new DataWatcher.WatchableObject(integer.intValue(), id, object);
+            DataWatcher.WatchableObject var4 = new DataWatcher.WatchableObject(var3.intValue(), id, object);
             this.lock.writeLock().lock();
-            this.watchedObjects.put(Integer.valueOf(id), datawatcher$watchableobject);
+            this.watchedObjects.put(Integer.valueOf(id), var4);
             this.lock.writeLock().unlock();
             this.isBlank = false;
         }
@@ -68,9 +72,9 @@ public class DataWatcher
      */
     public void addObjectByDataType(int id, int type)
     {
-        DataWatcher.WatchableObject datawatcher$watchableobject = new DataWatcher.WatchableObject(type, id, (Object)null);
+        DataWatcher.WatchableObject var3 = new DataWatcher.WatchableObject(type, id, (Object)null);
         this.lock.writeLock().lock();
-        this.watchedObjects.put(Integer.valueOf(id), datawatcher$watchableobject);
+        this.watchedObjects.put(Integer.valueOf(id), var3);
         this.lock.writeLock().unlock();
         this.isBlank = false;
     }
@@ -123,22 +127,22 @@ public class DataWatcher
     private DataWatcher.WatchableObject getWatchedObject(int id)
     {
         this.lock.readLock().lock();
-        DataWatcher.WatchableObject datawatcher$watchableobject;
+        DataWatcher.WatchableObject var2;
 
         try
         {
-            datawatcher$watchableobject = (DataWatcher.WatchableObject)this.watchedObjects.get(Integer.valueOf(id));
+            var2 = (DataWatcher.WatchableObject)this.watchedObjects.get(Integer.valueOf(id));
         }
-        catch (Throwable throwable)
+        catch (Throwable var6)
         {
-            CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Getting synched entity data");
-            CrashReportCategory crashreportcategory = crashreport.makeCategory("Synched entity data");
-            crashreportcategory.addCrashSection("Data ID", Integer.valueOf(id));
-            throw new ReportedException(crashreport);
+            CrashReport var4 = CrashReport.makeCrashReport(var6, "Getting synched entity data");
+            CrashReportCategory var5 = var4.makeCategory("Synched entity data");
+            var5.addCrashSection("Data ID", Integer.valueOf(id));
+            throw new ReportedException(var4);
         }
 
         this.lock.readLock().unlock();
-        return datawatcher$watchableobject;
+        return var2;
     }
 
     public Rotations getWatchableObjectRotations(int id)
@@ -146,15 +150,18 @@ public class DataWatcher
         return (Rotations)this.getWatchedObject(id).getObject();
     }
 
-    public <T> void updateObject(int id, T newData)
+    /**
+     * updates an already existing object
+     */
+    public void updateObject(int id, Object newData)
     {
-        DataWatcher.WatchableObject datawatcher$watchableobject = this.getWatchedObject(id);
+        DataWatcher.WatchableObject var3 = this.getWatchedObject(id);
 
-        if (ObjectUtils.notEqual(newData, datawatcher$watchableobject.getObject()))
+        if (ObjectUtils.notEqual(newData, var3.getObject()))
         {
-            datawatcher$watchableobject.setObject(newData);
-            this.owner.onDataWatcherUpdate(id);
-            datawatcher$watchableobject.setWatched(true);
+            var3.setObject(newData);
+            this.owner.func_145781_i(id);
+            var3.setWatched(true);
             this.objectChanged = true;
         }
     }
@@ -177,39 +184,45 @@ public class DataWatcher
      * Writes the list of watched objects (entity attribute of type {byte, short, int, float, string, ItemStack,
      * ChunkCoordinates}) to the specified PacketBuffer
      */
-    public static void writeWatchedListToPacketBuffer(List<DataWatcher.WatchableObject> objectsList, PacketBuffer buffer) throws IOException
+    public static void writeWatchedListToPacketBuffer(List objectsList, PacketBuffer buffer) throws IOException
     {
         if (objectsList != null)
         {
-            for (DataWatcher.WatchableObject datawatcher$watchableobject : objectsList)
+            Iterator var2 = objectsList.iterator();
+
+            while (var2.hasNext())
             {
-                writeWatchableObjectToPacketBuffer(buffer, datawatcher$watchableobject);
+                DataWatcher.WatchableObject var3 = (DataWatcher.WatchableObject)var2.next();
+                writeWatchableObjectToPacketBuffer(buffer, var3);
             }
         }
 
         buffer.writeByte(127);
     }
 
-    public List<DataWatcher.WatchableObject> getChanged()
+    public List getChanged()
     {
-        List<DataWatcher.WatchableObject> list = null;
+        ArrayList var1 = null;
 
         if (this.objectChanged)
         {
             this.lock.readLock().lock();
+            Iterator var2 = this.watchedObjects.values().iterator();
 
-            for (DataWatcher.WatchableObject datawatcher$watchableobject : this.watchedObjects.values())
+            while (var2.hasNext())
             {
-                if (datawatcher$watchableobject.isWatched())
-                {
-                    datawatcher$watchableobject.setWatched(false);
+                DataWatcher.WatchableObject var3 = (DataWatcher.WatchableObject)var2.next();
 
-                    if (list == null)
+                if (var3.isWatched())
+                {
+                    var3.setWatched(false);
+
+                    if (var1 == null)
                     {
-                        list = Lists.<DataWatcher.WatchableObject>newArrayList();
+                        var1 = Lists.newArrayList();
                     }
 
-                    list.add(datawatcher$watchableobject);
+                    var1.add(var3);
                 }
             }
 
@@ -217,39 +230,42 @@ public class DataWatcher
         }
 
         this.objectChanged = false;
-        return list;
+        return var1;
     }
 
     public void writeTo(PacketBuffer buffer) throws IOException
     {
         this.lock.readLock().lock();
+        Iterator var2 = this.watchedObjects.values().iterator();
 
-        for (DataWatcher.WatchableObject datawatcher$watchableobject : this.watchedObjects.values())
+        while (var2.hasNext())
         {
-            writeWatchableObjectToPacketBuffer(buffer, datawatcher$watchableobject);
+            DataWatcher.WatchableObject var3 = (DataWatcher.WatchableObject)var2.next();
+            writeWatchableObjectToPacketBuffer(buffer, var3);
         }
 
         this.lock.readLock().unlock();
         buffer.writeByte(127);
     }
 
-    public List<DataWatcher.WatchableObject> getAllWatched()
+    public List getAllWatched()
     {
-        List<DataWatcher.WatchableObject> list = null;
+        ArrayList var1 = null;
         this.lock.readLock().lock();
+        DataWatcher.WatchableObject var3;
 
-        for (DataWatcher.WatchableObject datawatcher$watchableobject : this.watchedObjects.values())
+        for (Iterator var2 = this.watchedObjects.values().iterator(); var2.hasNext(); var1.add(var3))
         {
-            if (list == null)
-            {
-                list = Lists.<DataWatcher.WatchableObject>newArrayList();
-            }
+            var3 = (DataWatcher.WatchableObject)var2.next();
 
-            list.add(datawatcher$watchableobject);
+            if (var1 == null)
+            {
+                var1 = Lists.newArrayList();
+            }
         }
 
         this.lock.readLock().unlock();
-        return list;
+        return var1;
     }
 
     /**
@@ -258,8 +274,8 @@ public class DataWatcher
      */
     private static void writeWatchableObjectToPacketBuffer(PacketBuffer buffer, DataWatcher.WatchableObject object) throws IOException
     {
-        int i = (object.getObjectType() << 5 | object.getDataValueId() & 31) & 255;
-        buffer.writeByte(i);
+        int var2 = (object.getObjectType() << 5 | object.getDataValueId() & 31) & 255;
+        buffer.writeByte(var2);
 
         switch (object.getObjectType())
         {
@@ -284,98 +300,104 @@ public class DataWatcher
                 break;
 
             case 5:
-                ItemStack itemstack = (ItemStack)object.getObject();
-                buffer.writeItemStackToBuffer(itemstack);
+                ItemStack var3 = (ItemStack)object.getObject();
+                buffer.writeItemStackToBuffer(var3);
                 break;
 
             case 6:
-                BlockPos blockpos = (BlockPos)object.getObject();
-                buffer.writeInt(blockpos.getX());
-                buffer.writeInt(blockpos.getY());
-                buffer.writeInt(blockpos.getZ());
+                BlockPos var4 = (BlockPos)object.getObject();
+                buffer.writeInt(var4.getX());
+                buffer.writeInt(var4.getY());
+                buffer.writeInt(var4.getZ());
                 break;
 
             case 7:
-                Rotations rotations = (Rotations)object.getObject();
-                buffer.writeFloat(rotations.getX());
-                buffer.writeFloat(rotations.getY());
-                buffer.writeFloat(rotations.getZ());
+                Rotations var5 = (Rotations)object.getObject();
+                buffer.writeFloat(var5.func_179415_b());
+                buffer.writeFloat(var5.func_179416_c());
+                buffer.writeFloat(var5.func_179413_d());
         }
     }
 
-    public static List<DataWatcher.WatchableObject> readWatchedListFromPacketBuffer(PacketBuffer buffer) throws IOException
+    /**
+     * Reads a list of watched objects (entity attribute of type {byte, short, int, float, string, ItemStack,
+     * ChunkCoordinates}) from the supplied PacketBuffer
+     */
+    public static List readWatchedListFromPacketBuffer(PacketBuffer buffer) throws IOException
     {
-        List<DataWatcher.WatchableObject> list = null;
+        ArrayList var1 = null;
 
-        for (int i = buffer.readByte(); i != 127; i = buffer.readByte())
+        for (byte var2 = buffer.readByte(); var2 != 127; var2 = buffer.readByte())
         {
-            if (list == null)
+            if (var1 == null)
             {
-                list = Lists.<DataWatcher.WatchableObject>newArrayList();
+                var1 = Lists.newArrayList();
             }
 
-            int j = (i & 224) >> 5;
-            int k = i & 31;
-            DataWatcher.WatchableObject datawatcher$watchableobject = null;
+            int var3 = (var2 & 224) >> 5;
+            int var4 = var2 & 31;
+            DataWatcher.WatchableObject var5 = null;
 
-            switch (j)
+            switch (var3)
             {
                 case 0:
-                    datawatcher$watchableobject = new DataWatcher.WatchableObject(j, k, Byte.valueOf(buffer.readByte()));
+                    var5 = new DataWatcher.WatchableObject(var3, var4, Byte.valueOf(buffer.readByte()));
                     break;
 
                 case 1:
-                    datawatcher$watchableobject = new DataWatcher.WatchableObject(j, k, Short.valueOf(buffer.readShort()));
+                    var5 = new DataWatcher.WatchableObject(var3, var4, Short.valueOf(buffer.readShort()));
                     break;
 
                 case 2:
-                    datawatcher$watchableobject = new DataWatcher.WatchableObject(j, k, Integer.valueOf(buffer.readInt()));
+                    var5 = new DataWatcher.WatchableObject(var3, var4, Integer.valueOf(buffer.readInt()));
                     break;
 
                 case 3:
-                    datawatcher$watchableobject = new DataWatcher.WatchableObject(j, k, Float.valueOf(buffer.readFloat()));
+                    var5 = new DataWatcher.WatchableObject(var3, var4, Float.valueOf(buffer.readFloat()));
                     break;
 
                 case 4:
-                    datawatcher$watchableobject = new DataWatcher.WatchableObject(j, k, buffer.readStringFromBuffer(32767));
+                    var5 = new DataWatcher.WatchableObject(var3, var4, buffer.readStringFromBuffer(32767));
                     break;
 
                 case 5:
-                    datawatcher$watchableobject = new DataWatcher.WatchableObject(j, k, buffer.readItemStackFromBuffer());
+                    var5 = new DataWatcher.WatchableObject(var3, var4, buffer.readItemStackFromBuffer());
                     break;
 
                 case 6:
-                    int l = buffer.readInt();
-                    int i1 = buffer.readInt();
-                    int j1 = buffer.readInt();
-                    datawatcher$watchableobject = new DataWatcher.WatchableObject(j, k, new BlockPos(l, i1, j1));
+                    int var6 = buffer.readInt();
+                    int var7 = buffer.readInt();
+                    int var8 = buffer.readInt();
+                    var5 = new DataWatcher.WatchableObject(var3, var4, new BlockPos(var6, var7, var8));
                     break;
 
                 case 7:
-                    float f = buffer.readFloat();
-                    float f1 = buffer.readFloat();
-                    float f2 = buffer.readFloat();
-                    datawatcher$watchableobject = new DataWatcher.WatchableObject(j, k, new Rotations(f, f1, f2));
+                    float var9 = buffer.readFloat();
+                    float var10 = buffer.readFloat();
+                    float var11 = buffer.readFloat();
+                    var5 = new DataWatcher.WatchableObject(var3, var4, new Rotations(var9, var10, var11));
             }
 
-            list.add(datawatcher$watchableobject);
+            var1.add(var5);
         }
 
-        return list;
+        return var1;
     }
 
-    public void updateWatchedObjectsFromList(List<DataWatcher.WatchableObject> p_75687_1_)
+    public void updateWatchedObjectsFromList(List p_75687_1_)
     {
         this.lock.writeLock().lock();
+        Iterator var2 = p_75687_1_.iterator();
 
-        for (DataWatcher.WatchableObject datawatcher$watchableobject : p_75687_1_)
+        while (var2.hasNext())
         {
-            DataWatcher.WatchableObject datawatcher$watchableobject1 = (DataWatcher.WatchableObject)this.watchedObjects.get(Integer.valueOf(datawatcher$watchableobject.getDataValueId()));
+            DataWatcher.WatchableObject var3 = (DataWatcher.WatchableObject)var2.next();
+            DataWatcher.WatchableObject var4 = (DataWatcher.WatchableObject)this.watchedObjects.get(Integer.valueOf(var3.getDataValueId()));
 
-            if (datawatcher$watchableobject1 != null)
+            if (var4 != null)
             {
-                datawatcher$watchableobject1.setObject(datawatcher$watchableobject.getObject());
-                this.owner.onDataWatcherUpdate(datawatcher$watchableobject.getDataValueId());
+                var4.setObject(var3.getObject());
+                this.owner.func_145781_i(var3.getDataValueId());
             }
         }
 
@@ -411,6 +433,7 @@ public class DataWatcher
         private final int dataValueId;
         private Object watchedObject;
         private boolean watched;
+        
 
         public WatchableObject(int type, int id, Object object)
         {

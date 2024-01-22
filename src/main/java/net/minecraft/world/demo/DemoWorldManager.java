@@ -15,6 +15,7 @@ public class DemoWorldManager extends ItemInWorldManager
     private boolean demoTimeExpired;
     private int field_73104_e;
     private int field_73102_f;
+    
 
     public DemoWorldManager(World worldIn)
     {
@@ -25,8 +26,8 @@ public class DemoWorldManager extends ItemInWorldManager
     {
         super.updateBlockRemoving();
         ++this.field_73102_f;
-        long i = this.theWorld.getTotalWorldTime();
-        long j = i / 24000L + 1L;
+        long var1 = this.theWorld.getTotalWorldTime();
+        long var3 = var1 / 24000L + 1L;
 
         if (!this.field_73105_c && this.field_73102_f > 20)
         {
@@ -34,36 +35,36 @@ public class DemoWorldManager extends ItemInWorldManager
             this.thisPlayerMP.playerNetServerHandler.sendPacket(new S2BPacketChangeGameState(5, 0.0F));
         }
 
-        this.demoTimeExpired = i > 120500L;
+        this.demoTimeExpired = var1 > 120500L;
 
         if (this.demoTimeExpired)
         {
             ++this.field_73104_e;
         }
 
-        if (i % 24000L == 500L)
+        if (var1 % 24000L == 500L)
         {
-            if (j <= 6L)
+            if (var3 <= 6L)
             {
-                this.thisPlayerMP.addChatMessage(new ChatComponentTranslation("demo.day." + j, new Object[0]));
+                this.thisPlayerMP.addChatMessage(new ChatComponentTranslation("demo.day." + var3, new Object[0]));
             }
         }
-        else if (j == 1L)
+        else if (var3 == 1L)
         {
-            if (i == 100L)
+            if (var1 == 100L)
             {
                 this.thisPlayerMP.playerNetServerHandler.sendPacket(new S2BPacketChangeGameState(5, 101.0F));
             }
-            else if (i == 175L)
+            else if (var1 == 175L)
             {
                 this.thisPlayerMP.playerNetServerHandler.sendPacket(new S2BPacketChangeGameState(5, 102.0F));
             }
-            else if (i == 250L)
+            else if (var1 == 250L)
             {
                 this.thisPlayerMP.playerNetServerHandler.sendPacket(new S2BPacketChangeGameState(5, 103.0F));
             }
         }
-        else if (j == 5L && i % 24000L == 22000L)
+        else if (var3 == 5L && var1 % 24000L == 22000L)
         {
             this.thisPlayerMP.addChatMessage(new ChatComponentTranslation("demo.day.warning", new Object[0]));
         }
@@ -81,11 +82,7 @@ public class DemoWorldManager extends ItemInWorldManager
         }
     }
 
-    /**
-     * If not creative, it calls sendBlockBreakProgress until the block is broken first. tryHarvestBlock can also be the
-     * result of this call.
-     */
-    public void onBlockClicked(BlockPos pos, EnumFacing side)
+    public void func_180784_a(BlockPos p_180784_1_, EnumFacing p_180784_2_)
     {
         if (this.demoTimeExpired)
         {
@@ -93,30 +90,27 @@ public class DemoWorldManager extends ItemInWorldManager
         }
         else
         {
-            super.onBlockClicked(pos, side);
+            super.func_180784_a(p_180784_1_, p_180784_2_);
         }
     }
 
-    public void blockRemoving(BlockPos pos)
+    public void func_180785_a(BlockPos p_180785_1_)
     {
         if (!this.demoTimeExpired)
         {
-            super.blockRemoving(pos);
+            super.func_180785_a(p_180785_1_);
         }
     }
 
-    /**
-     * Attempts to harvest a block
-     */
-    public boolean tryHarvestBlock(BlockPos pos)
+    public boolean func_180237_b(BlockPos p_180237_1_)
     {
-        return this.demoTimeExpired ? false : super.tryHarvestBlock(pos);
+        return this.demoTimeExpired ? false : super.func_180237_b(p_180237_1_);
     }
 
     /**
      * Attempts to right-click use an item by the given EntityPlayer in the given World
      */
-    public boolean tryUseItem(EntityPlayer player, World worldIn, ItemStack stack)
+    public boolean tryUseItem(EntityPlayer p_73085_1_, World worldIn, ItemStack p_73085_3_)
     {
         if (this.demoTimeExpired)
         {
@@ -125,14 +119,11 @@ public class DemoWorldManager extends ItemInWorldManager
         }
         else
         {
-            return super.tryUseItem(player, worldIn, stack);
+            return super.tryUseItem(p_73085_1_, worldIn, p_73085_3_);
         }
     }
 
-    /**
-     * Activate the clicked on block, otherwise use the held item.
-     */
-    public boolean activateBlockOrUseItem(EntityPlayer player, World worldIn, ItemStack stack, BlockPos pos, EnumFacing side, float offsetX, float offsetY, float offsetZ)
+    public boolean func_180236_a(EntityPlayer p_180236_1_, World worldIn, ItemStack p_180236_3_, BlockPos p_180236_4_, EnumFacing p_180236_5_, float p_180236_6_, float p_180236_7_, float p_180236_8_)
     {
         if (this.demoTimeExpired)
         {
@@ -141,7 +132,7 @@ public class DemoWorldManager extends ItemInWorldManager
         }
         else
         {
-            return super.activateBlockOrUseItem(player, worldIn, stack, pos, side, offsetX, offsetY, offsetZ);
+            return super.func_180236_a(p_180236_1_, worldIn, p_180236_3_, p_180236_4_, p_180236_5_, p_180236_6_, p_180236_7_, p_180236_8_);
         }
     }
 }

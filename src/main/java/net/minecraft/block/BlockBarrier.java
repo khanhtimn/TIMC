@@ -7,6 +7,8 @@ import net.minecraft.world.World;
 
 public class BlockBarrier extends Block
 {
+    
+
     protected BlockBarrier()
     {
         super(Material.barrier);
@@ -17,16 +19,13 @@ public class BlockBarrier extends Block
     }
 
     /**
-     * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
+     * The type of render function that is called for this block
      */
     public int getRenderType()
     {
         return -1;
     }
 
-    /**
-     * Used to determine ambient occlusion and culling when rebuilding chunks for render
-     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -42,8 +41,9 @@ public class BlockBarrier extends Block
 
     /**
      * Spawns this Block's drops into the World as EntityItems.
+     *  
+     * @param chance The chance that each Item is actually spawned (1.0 = always, 0.0 = never)
+     * @param fortune The player's fortune level
      */
-    public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
-    {
-    }
+    public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune) {}
 }

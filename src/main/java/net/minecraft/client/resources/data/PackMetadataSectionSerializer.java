@@ -10,30 +10,32 @@ import java.lang.reflect.Type;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.JsonUtils;
 
-public class PackMetadataSectionSerializer extends BaseMetadataSectionSerializer<PackMetadataSection> implements JsonSerializer<PackMetadataSection>
+public class PackMetadataSectionSerializer extends BaseMetadataSectionSerializer implements JsonSerializer
 {
-    public PackMetadataSection deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_) throws JsonParseException
-    {
-        JsonObject jsonobject = p_deserialize_1_.getAsJsonObject();
-        IChatComponent ichatcomponent = (IChatComponent)p_deserialize_3_.deserialize(jsonobject.get("description"), IChatComponent.class);
+    
 
-        if (ichatcomponent == null)
+    public PackMetadataSection deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_)
+    {
+        JsonObject var4 = p_deserialize_1_.getAsJsonObject();
+        IChatComponent var5 = (IChatComponent)p_deserialize_3_.deserialize(var4.get("description"), IChatComponent.class);
+
+        if (var5 == null)
         {
             throw new JsonParseException("Invalid/missing description!");
         }
         else
         {
-            int i = JsonUtils.getInt(jsonobject, "pack_format");
-            return new PackMetadataSection(ichatcomponent, i);
+            int var6 = JsonUtils.getJsonObjectIntegerFieldValue(var4, "pack_format");
+            return new PackMetadataSection(var5, var6);
         }
     }
 
     public JsonElement serialize(PackMetadataSection p_serialize_1_, Type p_serialize_2_, JsonSerializationContext p_serialize_3_)
     {
-        JsonObject jsonobject = new JsonObject();
-        jsonobject.addProperty("pack_format", (Number)Integer.valueOf(p_serialize_1_.getPackFormat()));
-        jsonobject.add("description", p_serialize_3_.serialize(p_serialize_1_.getPackDescription()));
-        return jsonobject;
+        JsonObject var4 = new JsonObject();
+        var4.addProperty("pack_format", Integer.valueOf(p_serialize_1_.getPackFormat()));
+        var4.add("description", p_serialize_3_.serialize(p_serialize_1_.func_152805_a()));
+        return var4;
     }
 
     /**
@@ -42,5 +44,11 @@ public class PackMetadataSectionSerializer extends BaseMetadataSectionSerializer
     public String getSectionName()
     {
         return "pack";
+    }
+
+
+    public JsonElement serialize(Object p_serialize_1_, Type p_serialize_2_, JsonSerializationContext p_serialize_3_)
+    {
+        return this.serialize((PackMetadataSection)p_serialize_1_, p_serialize_2_, p_serialize_3_);
     }
 }

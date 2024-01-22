@@ -6,6 +6,8 @@ import net.minecraft.world.World;
 
 public class ItemMapBase extends Item
 {
+    
+
     /**
      * false for all Items except sub-classes of ItemMapBase
      */
@@ -14,7 +16,7 @@ public class ItemMapBase extends Item
         return true;
     }
 
-    public Packet createMapDataPacket(ItemStack stack, World worldIn, EntityPlayer player)
+    public Packet createMapDataPacket(ItemStack p_150911_1_, World worldIn, EntityPlayer p_150911_3_)
     {
         return null;
     }

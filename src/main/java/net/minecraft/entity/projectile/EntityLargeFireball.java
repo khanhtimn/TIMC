@@ -9,38 +9,39 @@ import net.minecraft.world.World;
 
 public class EntityLargeFireball extends EntityFireball
 {
-    public int explosionPower = 1;
+    public int field_92057_e = 1;
+    
 
     public EntityLargeFireball(World worldIn)
     {
         super(worldIn);
     }
 
-    public EntityLargeFireball(World worldIn, double x, double y, double z, double accelX, double accelY, double accelZ)
+    public EntityLargeFireball(World worldIn, double p_i1768_2_, double p_i1768_4_, double p_i1768_6_, double p_i1768_8_, double p_i1768_10_, double p_i1768_12_)
     {
-        super(worldIn, x, y, z, accelX, accelY, accelZ);
+        super(worldIn, p_i1768_2_, p_i1768_4_, p_i1768_6_, p_i1768_8_, p_i1768_10_, p_i1768_12_);
     }
 
-    public EntityLargeFireball(World worldIn, EntityLivingBase shooter, double accelX, double accelY, double accelZ)
+    public EntityLargeFireball(World worldIn, EntityLivingBase p_i1769_2_, double p_i1769_3_, double p_i1769_5_, double p_i1769_7_)
     {
-        super(worldIn, shooter, accelX, accelY, accelZ);
+        super(worldIn, p_i1769_2_, p_i1769_3_, p_i1769_5_, p_i1769_7_);
     }
 
     /**
      * Called when this EntityFireball hits a block or entity.
      */
-    protected void onImpact(MovingObjectPosition movingObject)
+    protected void onImpact(MovingObjectPosition p_70227_1_)
     {
         if (!this.worldObj.isRemote)
         {
-            if (movingObject.entityHit != null)
+            if (p_70227_1_.entityHit != null)
             {
-                movingObject.entityHit.attackEntityFrom(DamageSource.causeFireballDamage(this, this.shootingEntity), 6.0F);
-                this.applyEnchantments(this.shootingEntity, movingObject.entityHit);
+                p_70227_1_.entityHit.attackEntityFrom(DamageSource.causeFireballDamage(this, this.shootingEntity), 6.0F);
+                this.func_174815_a(this.shootingEntity, p_70227_1_.entityHit);
             }
 
-            boolean flag = this.worldObj.getGameRules().getBoolean("mobGriefing");
-            this.worldObj.newExplosion((Entity)null, this.posX, this.posY, this.posZ, (float)this.explosionPower, flag, flag);
+            boolean var2 = this.worldObj.getGameRules().getGameRuleBooleanValue("mobGriefing");
+            this.worldObj.newExplosion((Entity)null, this.posX, this.posY, this.posZ, (float)this.field_92057_e, var2, var2);
             this.setDead();
         }
     }
@@ -51,7 +52,7 @@ public class EntityLargeFireball extends EntityFireball
     public void writeEntityToNBT(NBTTagCompound tagCompound)
     {
         super.writeEntityToNBT(tagCompound);
-        tagCompound.setInteger("ExplosionPower", this.explosionPower);
+        tagCompound.setInteger("ExplosionPower", this.field_92057_e);
     }
 
     /**
@@ -63,7 +64,7 @@ public class EntityLargeFireball extends EntityFireball
 
         if (tagCompund.hasKey("ExplosionPower", 99))
         {
-            this.explosionPower = tagCompund.getInteger("ExplosionPower");
+            this.field_92057_e = tagCompund.getInteger("ExplosionPower");
         }
     }
 }

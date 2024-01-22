@@ -9,46 +9,47 @@ public class WeightedRandomFishable extends WeightedRandom.Item
     private final ItemStack returnStack;
     private float maxDamagePercent;
     private boolean enchantable;
+    
 
-    public WeightedRandomFishable(ItemStack returnStackIn, int itemWeightIn)
+    public WeightedRandomFishable(ItemStack p_i45317_1_, int p_i45317_2_)
     {
-        super(itemWeightIn);
-        this.returnStack = returnStackIn;
+        super(p_i45317_2_);
+        this.returnStack = p_i45317_1_;
     }
 
-    public ItemStack getItemStack(Random random)
+    public ItemStack getItemStack(Random p_150708_1_)
     {
-        ItemStack itemstack = this.returnStack.copy();
+        ItemStack var2 = this.returnStack.copy();
 
         if (this.maxDamagePercent > 0.0F)
         {
-            int i = (int)(this.maxDamagePercent * (float)this.returnStack.getMaxDamage());
-            int j = itemstack.getMaxDamage() - random.nextInt(random.nextInt(i) + 1);
+            int var3 = (int)(this.maxDamagePercent * (float)this.returnStack.getMaxDamage());
+            int var4 = var2.getMaxDamage() - p_150708_1_.nextInt(p_150708_1_.nextInt(var3) + 1);
 
-            if (j > i)
+            if (var4 > var3)
             {
-                j = i;
+                var4 = var3;
             }
 
-            if (j < 1)
+            if (var4 < 1)
             {
-                j = 1;
+                var4 = 1;
             }
 
-            itemstack.setItemDamage(j);
+            var2.setItemDamage(var4);
         }
 
         if (this.enchantable)
         {
-            EnchantmentHelper.addRandomEnchantment(random, itemstack, 30);
+            EnchantmentHelper.addRandomEnchantment(p_150708_1_, var2, 30);
         }
 
-        return itemstack;
+        return var2;
     }
 
-    public WeightedRandomFishable setMaxDamagePercent(float maxDamagePercentIn)
+    public WeightedRandomFishable setMaxDamagePercent(float p_150709_1_)
     {
-        this.maxDamagePercent = maxDamagePercentIn;
+        this.maxDamagePercent = p_150709_1_;
         return this;
     }
 

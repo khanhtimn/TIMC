@@ -9,19 +9,17 @@ import net.minecraft.world.World;
 
 public class BlockStandingSign extends BlockSign
 {
-    public static final PropertyInteger ROTATION = PropertyInteger.create("rotation", 0, 15);
+    public static final PropertyInteger ROTATION_PROP = PropertyInteger.create("rotation", 0, 15);
+    
 
     public BlockStandingSign()
     {
-        this.setDefaultState(this.blockState.getBaseState().withProperty(ROTATION, Integer.valueOf(0)));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(ROTATION_PROP, Integer.valueOf(0)));
     }
 
-    /**
-     * Called when a neighboring block changes.
-     */
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
     {
-        if (!worldIn.getBlockState(pos.down()).getBlock().getMaterial().isSolid())
+        if (!worldIn.getBlockState(pos.offsetDown()).getBlock().getMaterial().isSolid())
         {
             this.dropBlockAsItem(worldIn, pos, state, 0);
             worldIn.setBlockToAir(pos);
@@ -35,7 +33,7 @@ public class BlockStandingSign extends BlockSign
      */
     public IBlockState getStateFromMeta(int meta)
     {
-        return this.getDefaultState().withProperty(ROTATION, Integer.valueOf(meta));
+        return this.getDefaultState().withProperty(ROTATION_PROP, Integer.valueOf(meta));
     }
 
     /**
@@ -43,11 +41,11 @@ public class BlockStandingSign extends BlockSign
      */
     public int getMetaFromState(IBlockState state)
     {
-        return ((Integer)state.getValue(ROTATION)).intValue();
+        return ((Integer)state.getValue(ROTATION_PROP)).intValue();
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {ROTATION});
+        return new BlockState(this, new IProperty[] {ROTATION_PROP});
     }
 }

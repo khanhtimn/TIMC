@@ -7,10 +7,11 @@ import net.minecraft.inventory.Container;
 public class EntityAITradePlayer extends EntityAIBase
 {
     private EntityVillager villager;
+    
 
-    public EntityAITradePlayer(EntityVillager villagerIn)
+    public EntityAITradePlayer(EntityVillager p_i1658_1_)
     {
-        this.villager = villagerIn;
+        this.villager = p_i1658_1_;
         this.setMutexBits(5);
     }
 
@@ -37,8 +38,8 @@ public class EntityAITradePlayer extends EntityAIBase
         }
         else
         {
-            EntityPlayer entityplayer = this.villager.getCustomer();
-            return entityplayer == null ? false : (this.villager.getDistanceSqToEntity(entityplayer) > 16.0D ? false : entityplayer.openContainer instanceof Container);
+            EntityPlayer var1 = this.villager.getCustomer();
+            return var1 == null ? false : (this.villager.getDistanceSqToEntity(var1) > 16.0D ? false : var1.openContainer instanceof Container);
         }
     }
 

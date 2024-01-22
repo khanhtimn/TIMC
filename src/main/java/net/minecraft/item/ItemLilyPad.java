@@ -13,9 +13,11 @@ import net.minecraft.world.World;
 
 public class ItemLilyPad extends ItemColored
 {
-    public ItemLilyPad(Block block)
+    
+
+    public ItemLilyPad(Block p_i45357_1_)
     {
-        super(block, false);
+        super(p_i45357_1_, false);
     }
 
     /**
@@ -23,34 +25,34 @@ public class ItemLilyPad extends ItemColored
      */
     public ItemStack onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn)
     {
-        MovingObjectPosition movingobjectposition = this.getMovingObjectPositionFromPlayer(worldIn, playerIn, true);
+        MovingObjectPosition var4 = this.getMovingObjectPositionFromPlayer(worldIn, playerIn, true);
 
-        if (movingobjectposition == null)
+        if (var4 == null)
         {
             return itemStackIn;
         }
         else
         {
-            if (movingobjectposition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
+            if (var4.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
             {
-                BlockPos blockpos = movingobjectposition.getBlockPos();
+                BlockPos var5 = var4.func_178782_a();
 
-                if (!worldIn.isBlockModifiable(playerIn, blockpos))
+                if (!worldIn.isBlockModifiable(playerIn, var5))
                 {
                     return itemStackIn;
                 }
 
-                if (!playerIn.canPlayerEdit(blockpos.offset(movingobjectposition.sideHit), movingobjectposition.sideHit, itemStackIn))
+                if (!playerIn.func_175151_a(var5.offset(var4.field_178784_b), var4.field_178784_b, itemStackIn))
                 {
                     return itemStackIn;
                 }
 
-                BlockPos blockpos1 = blockpos.up();
-                IBlockState iblockstate = worldIn.getBlockState(blockpos);
+                BlockPos var6 = var5.offsetUp();
+                IBlockState var7 = worldIn.getBlockState(var5);
 
-                if (iblockstate.getBlock().getMaterial() == Material.water && ((Integer)iblockstate.getValue(BlockLiquid.LEVEL)).intValue() == 0 && worldIn.isAirBlock(blockpos1))
+                if (var7.getBlock().getMaterial() == Material.water && ((Integer)var7.getValue(BlockLiquid.LEVEL)).intValue() == 0 && worldIn.isAirBlock(var6))
                 {
-                    worldIn.setBlockState(blockpos1, Blocks.waterlily.getDefaultState());
+                    worldIn.setBlockState(var6, Blocks.waterlily.getDefaultState());
 
                     if (!playerIn.capabilities.isCreativeMode)
                     {

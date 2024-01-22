@@ -16,6 +16,7 @@ public class TileEntitySkull extends TileEntity
     private int skullType;
     private int skullRotation;
     private GameProfile playerProfile = null;
+    
 
     public void writeToNBT(NBTTagCompound compound)
     {
@@ -25,9 +26,9 @@ public class TileEntitySkull extends TileEntity
 
         if (this.playerProfile != null)
         {
-            NBTTagCompound nbttagcompound = new NBTTagCompound();
-            NBTUtil.writeGameProfile(nbttagcompound, this.playerProfile);
-            compound.setTag("Owner", nbttagcompound);
+            NBTTagCompound var2 = new NBTTagCompound();
+            NBTUtil.writeGameProfile(var2, this.playerProfile);
+            compound.setTag("Owner", var2);
         }
     }
 
@@ -45,12 +46,12 @@ public class TileEntitySkull extends TileEntity
             }
             else if (compound.hasKey("ExtraType", 8))
             {
-                String s = compound.getString("ExtraType");
+                String var2 = compound.getString("ExtraType");
 
-                if (!StringUtils.isNullOrEmpty(s))
+                if (!StringUtils.isNullOrEmpty(var2))
                 {
-                    this.playerProfile = new GameProfile((UUID)null, s);
-                    this.updatePlayerProfile();
+                    this.playerProfile = new GameProfile((UUID)null, var2);
+                    this.func_152109_d();
                 }
             }
         }
@@ -62,14 +63,13 @@ public class TileEntitySkull extends TileEntity
     }
 
     /**
-     * Allows for a specialized description packet to be created. This is often used to sync tile entity data from the
-     * server to the client easily. For example this is used by signs to synchronise the text to be displayed.
+     * Overriden in a sign to provide the text.
      */
     public Packet getDescriptionPacket()
     {
-        NBTTagCompound nbttagcompound = new NBTTagCompound();
-        this.writeToNBT(nbttagcompound);
-        return new S35PacketUpdateTileEntity(this.pos, 4, nbttagcompound);
+        NBTTagCompound var1 = new NBTTagCompound();
+        this.writeToNBT(var1);
+        return new S35PacketUpdateTileEntity(this.pos, 4, var1);
     }
 
     public void setType(int type)
@@ -82,10 +82,10 @@ public class TileEntitySkull extends TileEntity
     {
         this.skullType = 3;
         this.playerProfile = playerProfile;
-        this.updatePlayerProfile();
+        this.func_152109_d();
     }
 
-    private void updatePlayerProfile()
+    private void func_152109_d()
     {
         this.playerProfile = updateGameprofile(this.playerProfile);
         this.markDirty();
@@ -105,22 +105,22 @@ public class TileEntitySkull extends TileEntity
             }
             else
             {
-                GameProfile gameprofile = MinecraftServer.getServer().getPlayerProfileCache().getGameProfileForUsername(input.getName());
+                GameProfile var1 = MinecraftServer.getServer().getPlayerProfileCache().getGameProfileForUsername(input.getName());
 
-                if (gameprofile == null)
+                if (var1 == null)
                 {
                     return input;
                 }
                 else
                 {
-                    Property property = (Property)Iterables.getFirst(gameprofile.getProperties().get("textures"), null);
+                    Property var2 = (Property)Iterables.getFirst(var1.getProperties().get("textures"), (Object)null);
 
-                    if (property == null)
+                    if (var2 == null)
                     {
-                        gameprofile = MinecraftServer.getServer().getMinecraftSessionService().fillProfileProperties(gameprofile, true);
+                        var1 = MinecraftServer.getServer().getMinecraftSessionService().fillProfileProperties(var1, true);
                     }
 
-                    return gameprofile;
+                    return var1;
                 }
             }
         }

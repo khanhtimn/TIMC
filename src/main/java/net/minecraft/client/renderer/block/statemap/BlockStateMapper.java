@@ -4,39 +4,43 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 
 public class BlockStateMapper
 {
-    private Map<Block, IStateMapper> blockStateMap = Maps.<Block, IStateMapper>newIdentityHashMap();
-    private Set<Block> setBuiltInBlocks = Sets.<Block>newIdentityHashSet();
+    private Map field_178450_a = Maps.newIdentityHashMap();
+    private Set field_178449_b = Sets.newIdentityHashSet();
+    
 
-    public void registerBlockStateMapper(Block p_178447_1_, IStateMapper p_178447_2_)
+    public void func_178447_a(Block p_178447_1_, IStateMapper p_178447_2_)
     {
-        this.blockStateMap.put(p_178447_1_, p_178447_2_);
+        this.field_178450_a.put(p_178447_1_, p_178447_2_);
     }
 
-    public void registerBuiltInBlocks(Block... p_178448_1_)
+    public void registerBuiltInBlocks(Block ... p_178448_1_)
     {
-        Collections.addAll(this.setBuiltInBlocks, p_178448_1_);
+        Collections.addAll(this.field_178449_b, p_178448_1_);
     }
 
-    public Map<IBlockState, ModelResourceLocation> putAllStateModelLocations()
+    public Map func_178446_a()
     {
-        Map<IBlockState, ModelResourceLocation> map = Maps.<IBlockState, ModelResourceLocation>newIdentityHashMap();
+        IdentityHashMap var1 = Maps.newIdentityHashMap();
+        Iterator var2 = Block.blockRegistry.iterator();
 
-        for (Block block : Block.blockRegistry)
+        while (var2.hasNext())
         {
-            if (!this.setBuiltInBlocks.contains(block))
+            Block var3 = (Block)var2.next();
+
+            if (!this.field_178449_b.contains(var3))
             {
-                map.putAll(((IStateMapper)Objects.firstNonNull(this.blockStateMap.get(block), new DefaultStateMapper())).putStateModelLocations(block));
+                var1.putAll(((IStateMapper)Objects.firstNonNull(this.field_178450_a.get(var3), new DefaultStateMapper())).func_178130_a(var3));
             }
         }
 
-        return map;
+        return var1;
     }
 }

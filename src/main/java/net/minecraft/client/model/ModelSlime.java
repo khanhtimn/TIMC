@@ -15,6 +15,7 @@ public class ModelSlime extends ModelBase
 
     /** The slime's mouth */
     ModelRenderer slimeMouth;
+    
 
     public ModelSlime(int p_i1157_1_)
     {
@@ -37,16 +38,16 @@ public class ModelSlime extends ModelBase
     /**
      * Sets the models various rotation angles then renders the model.
      */
-    public void render(Entity entityIn, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float scale)
+    public void render(Entity p_78088_1_, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float p_78088_7_)
     {
-        this.setRotationAngles(p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, scale, entityIn);
-        this.slimeBodies.render(scale);
+        this.setRotationAngles(p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, p_78088_7_, p_78088_1_);
+        this.slimeBodies.render(p_78088_7_);
 
         if (this.slimeRightEye != null)
         {
-            this.slimeRightEye.render(scale);
-            this.slimeLeftEye.render(scale);
-            this.slimeMouth.render(scale);
+            this.slimeRightEye.render(p_78088_7_);
+            this.slimeLeftEye.render(p_78088_7_);
+            this.slimeMouth.render(p_78088_7_);
         }
     }
 }

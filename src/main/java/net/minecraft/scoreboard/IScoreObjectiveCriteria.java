@@ -3,14 +3,13 @@ package net.minecraft.scoreboard;
 import com.google.common.collect.Maps;
 import java.util.List;
 import java.util.Map;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumChatFormatting;
 
 public interface IScoreObjectiveCriteria
 {
-    Map<String, IScoreObjectiveCriteria> INSTANCES = Maps.<String, IScoreObjectiveCriteria>newHashMap();
+    Map INSTANCES = Maps.newHashMap();
     IScoreObjectiveCriteria DUMMY = new ScoreDummyCriteria("dummy");
-    IScoreObjectiveCriteria TRIGGER = new ScoreDummyCriteria("trigger");
+    IScoreObjectiveCriteria field_178791_c = new ScoreDummyCriteria("trigger");
     IScoreObjectiveCriteria deathCount = new ScoreDummyCriteria("deathCount");
     IScoreObjectiveCriteria playerKillCount = new ScoreDummyCriteria("playerKillCount");
     IScoreObjectiveCriteria totalKillCount = new ScoreDummyCriteria("totalKillCount");
@@ -20,21 +19,23 @@ public interface IScoreObjectiveCriteria
 
     String getName();
 
-    int setScore(List<EntityPlayer> p_96635_1_);
+    int func_96635_a(List var1);
 
     boolean isReadOnly();
 
-    IScoreObjectiveCriteria.EnumRenderType getRenderType();
+    IScoreObjectiveCriteria.EnumRenderType func_178790_c();
 
     public static enum EnumRenderType
     {
-        INTEGER("integer"),
-        HEARTS("hearts");
-
-        private static final Map<String, IScoreObjectiveCriteria.EnumRenderType> field_178801_c = Maps.<String, IScoreObjectiveCriteria.EnumRenderType>newHashMap();
+        INTEGER("INTEGER", 0, "integer"),
+        HEARTS("HEARTS", 1, "hearts");
+        private static final Map field_178801_c = Maps.newHashMap();
         private final String field_178798_d;
 
-        private EnumRenderType(String p_i45548_3_)
+        private static final IScoreObjectiveCriteria.EnumRenderType[] $VALUES = new IScoreObjectiveCriteria.EnumRenderType[]{INTEGER, HEARTS};
+        
+
+        private EnumRenderType(String p_i45548_1_, int p_i45548_2_, String p_i45548_3_)
         {
             this.field_178798_d = p_i45548_3_;
         }
@@ -46,14 +47,18 @@ public interface IScoreObjectiveCriteria
 
         public static IScoreObjectiveCriteria.EnumRenderType func_178795_a(String p_178795_0_)
         {
-            IScoreObjectiveCriteria.EnumRenderType iscoreobjectivecriteria$enumrendertype = (IScoreObjectiveCriteria.EnumRenderType)field_178801_c.get(p_178795_0_);
-            return iscoreobjectivecriteria$enumrendertype == null ? INTEGER : iscoreobjectivecriteria$enumrendertype;
+            IScoreObjectiveCriteria.EnumRenderType var1 = (IScoreObjectiveCriteria.EnumRenderType)field_178801_c.get(p_178795_0_);
+            return var1 == null ? INTEGER : var1;
         }
 
         static {
-            for (IScoreObjectiveCriteria.EnumRenderType iscoreobjectivecriteria$enumrendertype : values())
+            IScoreObjectiveCriteria.EnumRenderType[] var0 = values();
+            int var1 = var0.length;
+
+            for (int var2 = 0; var2 < var1; ++var2)
             {
-                field_178801_c.put(iscoreobjectivecriteria$enumrendertype.func_178796_a(), iscoreobjectivecriteria$enumrendertype);
+                IScoreObjectiveCriteria.EnumRenderType var3 = var0[var2];
+                field_178801_c.put(var3.func_178796_a(), var3);
             }
         }
     }

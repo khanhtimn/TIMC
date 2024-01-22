@@ -2,59 +2,64 @@ package net.minecraft.network.play.server;
 
 import java.io.IOException;
 import net.minecraft.entity.Entity;
+import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.world.World;
 
-public class S19PacketEntityStatus implements Packet<INetHandlerPlayClient>
+public class S19PacketEntityStatus implements Packet
 {
-    private int entityId;
-    private byte logicOpcode;
+    private int field_149164_a;
+    private byte field_149163_b;
+    
 
-    public S19PacketEntityStatus()
-    {
-    }
+    public S19PacketEntityStatus() {}
 
-    public S19PacketEntityStatus(Entity entityIn, byte opCodeIn)
+    public S19PacketEntityStatus(Entity p_i46335_1_, byte p_i46335_2_)
     {
-        this.entityId = entityIn.getEntityId();
-        this.logicOpcode = opCodeIn;
+        this.field_149164_a = p_i46335_1_.getEntityId();
+        this.field_149163_b = p_i46335_2_;
     }
 
     /**
      * Reads the raw packet data from the data stream.
      */
-    public void readPacketData(PacketBuffer buf) throws IOException
+    public void readPacketData(PacketBuffer data) throws IOException
     {
-        this.entityId = buf.readInt();
-        this.logicOpcode = buf.readByte();
+        this.field_149164_a = data.readInt();
+        this.field_149163_b = data.readByte();
     }
 
     /**
      * Writes the raw packet data to the data stream.
      */
-    public void writePacketData(PacketBuffer buf) throws IOException
+    public void writePacketData(PacketBuffer data) throws IOException
     {
-        buf.writeInt(this.entityId);
-        buf.writeByte(this.logicOpcode);
+        data.writeInt(this.field_149164_a);
+        data.writeByte(this.field_149163_b);
+    }
+
+    public void func_180736_a(INetHandlerPlayClient p_180736_1_)
+    {
+        p_180736_1_.handleEntityStatus(this);
+    }
+
+    public Entity func_149161_a(World worldIn)
+    {
+        return worldIn.getEntityByID(this.field_149164_a);
+    }
+
+    public byte func_149160_c()
+    {
+        return this.field_149163_b;
     }
 
     /**
      * Passes this Packet on to the NetHandler for processing.
      */
-    public void processPacket(INetHandlerPlayClient handler)
+    public void processPacket(INetHandler handler)
     {
-        handler.handleEntityStatus(this);
-    }
-
-    public Entity getEntity(World worldIn)
-    {
-        return worldIn.getEntityByID(this.entityId);
-    }
-
-    public byte getOpCode()
-    {
-        return this.logicOpcode;
+        this.func_180736_a((INetHandlerPlayClient)handler);
     }
 }

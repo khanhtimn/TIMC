@@ -13,7 +13,6 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.BlockPos;
@@ -25,17 +24,20 @@ public class BlockFurnace extends BlockContainer
 {
     public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
     private final boolean isBurning;
-    private static boolean keepInventory;
+    private static boolean field_149934_M;
+    
 
-    protected BlockFurnace(boolean isBurning)
+    protected BlockFurnace(boolean p_i45407_1_)
     {
         super(Material.rock);
         this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
-        this.isBurning = isBurning;
+        this.isBurning = p_i45407_1_;
     }
 
     /**
      * Get the Item that this Block should drop when harvested.
+     *  
+     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -44,72 +46,71 @@ public class BlockFurnace extends BlockContainer
 
     public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state)
     {
-        this.setDefaultFacing(worldIn, pos, state);
+        this.func_176445_e(worldIn, pos, state);
     }
 
-    private void setDefaultFacing(World worldIn, BlockPos pos, IBlockState state)
+    private void func_176445_e(World worldIn, BlockPos p_176445_2_, IBlockState p_176445_3_)
     {
         if (!worldIn.isRemote)
         {
-            Block block = worldIn.getBlockState(pos.north()).getBlock();
-            Block block1 = worldIn.getBlockState(pos.south()).getBlock();
-            Block block2 = worldIn.getBlockState(pos.west()).getBlock();
-            Block block3 = worldIn.getBlockState(pos.east()).getBlock();
-            EnumFacing enumfacing = (EnumFacing)state.getValue(FACING);
+            Block var4 = worldIn.getBlockState(p_176445_2_.offsetNorth()).getBlock();
+            Block var5 = worldIn.getBlockState(p_176445_2_.offsetSouth()).getBlock();
+            Block var6 = worldIn.getBlockState(p_176445_2_.offsetWest()).getBlock();
+            Block var7 = worldIn.getBlockState(p_176445_2_.offsetEast()).getBlock();
+            EnumFacing var8 = (EnumFacing)p_176445_3_.getValue(FACING);
 
-            if (enumfacing == EnumFacing.NORTH && block.isFullBlock() && !block1.isFullBlock())
+            if (var8 == EnumFacing.NORTH && var4.isFullBlock() && !var5.isFullBlock())
             {
-                enumfacing = EnumFacing.SOUTH;
+                var8 = EnumFacing.SOUTH;
             }
-            else if (enumfacing == EnumFacing.SOUTH && block1.isFullBlock() && !block.isFullBlock())
+            else if (var8 == EnumFacing.SOUTH && var5.isFullBlock() && !var4.isFullBlock())
             {
-                enumfacing = EnumFacing.NORTH;
+                var8 = EnumFacing.NORTH;
             }
-            else if (enumfacing == EnumFacing.WEST && block2.isFullBlock() && !block3.isFullBlock())
+            else if (var8 == EnumFacing.WEST && var6.isFullBlock() && !var7.isFullBlock())
             {
-                enumfacing = EnumFacing.EAST;
+                var8 = EnumFacing.EAST;
             }
-            else if (enumfacing == EnumFacing.EAST && block3.isFullBlock() && !block2.isFullBlock())
+            else if (var8 == EnumFacing.EAST && var7.isFullBlock() && !var6.isFullBlock())
             {
-                enumfacing = EnumFacing.WEST;
+                var8 = EnumFacing.WEST;
             }
 
-            worldIn.setBlockState(pos, state.withProperty(FACING, enumfacing), 2);
+            worldIn.setBlockState(p_176445_2_, p_176445_3_.withProperty(FACING, var8), 2);
         }
     }
 
-    @SuppressWarnings("incomplete-switch")
     public void randomDisplayTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
         if (this.isBurning)
         {
-            EnumFacing enumfacing = (EnumFacing)state.getValue(FACING);
-            double d0 = (double)pos.getX() + 0.5D;
-            double d1 = (double)pos.getY() + rand.nextDouble() * 6.0D / 16.0D;
-            double d2 = (double)pos.getZ() + 0.5D;
-            double d3 = 0.52D;
-            double d4 = rand.nextDouble() * 0.6D - 0.3D;
+            EnumFacing var5 = (EnumFacing)state.getValue(FACING);
+            double var6 = (double)pos.getX() + 0.5D;
+            double var8 = (double)pos.getY() + rand.nextDouble() * 6.0D / 16.0D;
+            double var10 = (double)pos.getZ() + 0.5D;
+            double var12 = 0.52D;
+            double var14 = rand.nextDouble() * 0.6D - 0.3D;
 
-            switch (enumfacing)
+            switch (BlockFurnace.SwitchEnumFacing.field_180356_a[var5.ordinal()])
             {
-                case WEST:
-                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0 - d3, d1, d2 + d4, 0.0D, 0.0D, 0.0D, new int[0]);
-                    worldIn.spawnParticle(EnumParticleTypes.FLAME, d0 - d3, d1, d2 + d4, 0.0D, 0.0D, 0.0D, new int[0]);
+                case 1:
+                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, var6 - var12, var8, var10 + var14, 0.0D, 0.0D, 0.0D, new int[0]);
+                    worldIn.spawnParticle(EnumParticleTypes.FLAME, var6 - var12, var8, var10 + var14, 0.0D, 0.0D, 0.0D, new int[0]);
                     break;
 
-                case EAST:
-                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0 + d3, d1, d2 + d4, 0.0D, 0.0D, 0.0D, new int[0]);
-                    worldIn.spawnParticle(EnumParticleTypes.FLAME, d0 + d3, d1, d2 + d4, 0.0D, 0.0D, 0.0D, new int[0]);
+                case 2:
+                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, var6 + var12, var8, var10 + var14, 0.0D, 0.0D, 0.0D, new int[0]);
+                    worldIn.spawnParticle(EnumParticleTypes.FLAME, var6 + var12, var8, var10 + var14, 0.0D, 0.0D, 0.0D, new int[0]);
                     break;
 
-                case NORTH:
-                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0 + d4, d1, d2 - d3, 0.0D, 0.0D, 0.0D, new int[0]);
-                    worldIn.spawnParticle(EnumParticleTypes.FLAME, d0 + d4, d1, d2 - d3, 0.0D, 0.0D, 0.0D, new int[0]);
+                case 3:
+                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, var6 + var14, var8, var10 - var12, 0.0D, 0.0D, 0.0D, new int[0]);
+                    worldIn.spawnParticle(EnumParticleTypes.FLAME, var6 + var14, var8, var10 - var12, 0.0D, 0.0D, 0.0D, new int[0]);
                     break;
 
-                case SOUTH:
-                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0 + d4, d1, d2 + d3, 0.0D, 0.0D, 0.0D, new int[0]);
-                    worldIn.spawnParticle(EnumParticleTypes.FLAME, d0 + d4, d1, d2 + d3, 0.0D, 0.0D, 0.0D, new int[0]);
+                case 4:
+                    worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, var6 + var14, var8, var10 + var12, 0.0D, 0.0D, 0.0D, new int[0]);
+                    worldIn.spawnParticle(EnumParticleTypes.FLAME, var6 + var14, var8, var10 + var12, 0.0D, 0.0D, 0.0D, new int[0]);
             }
         }
     }
@@ -122,41 +123,40 @@ public class BlockFurnace extends BlockContainer
         }
         else
         {
-            TileEntity tileentity = worldIn.getTileEntity(pos);
+            TileEntity var9 = worldIn.getTileEntity(pos);
 
-            if (tileentity instanceof TileEntityFurnace)
+            if (var9 instanceof TileEntityFurnace)
             {
-                playerIn.displayGUIChest((TileEntityFurnace)tileentity);
-                playerIn.triggerAchievement(StatList.field_181741_Y);
+                playerIn.displayGUIChest((TileEntityFurnace)var9);
             }
 
             return true;
         }
     }
 
-    public static void setState(boolean active, World worldIn, BlockPos pos)
+    public static void func_176446_a(boolean p_176446_0_, World worldIn, BlockPos p_176446_2_)
     {
-        IBlockState iblockstate = worldIn.getBlockState(pos);
-        TileEntity tileentity = worldIn.getTileEntity(pos);
-        keepInventory = true;
+        IBlockState var3 = worldIn.getBlockState(p_176446_2_);
+        TileEntity var4 = worldIn.getTileEntity(p_176446_2_);
+        field_149934_M = true;
 
-        if (active)
+        if (p_176446_0_)
         {
-            worldIn.setBlockState(pos, Blocks.lit_furnace.getDefaultState().withProperty(FACING, iblockstate.getValue(FACING)), 3);
-            worldIn.setBlockState(pos, Blocks.lit_furnace.getDefaultState().withProperty(FACING, iblockstate.getValue(FACING)), 3);
+            worldIn.setBlockState(p_176446_2_, Blocks.lit_furnace.getDefaultState().withProperty(FACING, var3.getValue(FACING)), 3);
+            worldIn.setBlockState(p_176446_2_, Blocks.lit_furnace.getDefaultState().withProperty(FACING, var3.getValue(FACING)), 3);
         }
         else
         {
-            worldIn.setBlockState(pos, Blocks.furnace.getDefaultState().withProperty(FACING, iblockstate.getValue(FACING)), 3);
-            worldIn.setBlockState(pos, Blocks.furnace.getDefaultState().withProperty(FACING, iblockstate.getValue(FACING)), 3);
+            worldIn.setBlockState(p_176446_2_, Blocks.furnace.getDefaultState().withProperty(FACING, var3.getValue(FACING)), 3);
+            worldIn.setBlockState(p_176446_2_, Blocks.furnace.getDefaultState().withProperty(FACING, var3.getValue(FACING)), 3);
         }
 
-        keepInventory = false;
+        field_149934_M = false;
 
-        if (tileentity != null)
+        if (var4 != null)
         {
-            tileentity.validate();
-            worldIn.setTileEntity(pos, tileentity);
+            var4.validate();
+            worldIn.setTileEntity(p_176446_2_, var4);
         }
     }
 
@@ -168,42 +168,35 @@ public class BlockFurnace extends BlockContainer
         return new TileEntityFurnace();
     }
 
-    /**
-     * Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
-     * IBlockstate
-     */
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
-        return this.getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite());
+        return this.getDefaultState().withProperty(FACING, placer.func_174811_aO().getOpposite());
     }
 
-    /**
-     * Called by ItemBlocks after a block is set in the world, to allow post-place logic
-     */
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
     {
-        worldIn.setBlockState(pos, state.withProperty(FACING, placer.getHorizontalFacing().getOpposite()), 2);
+        worldIn.setBlockState(pos, state.withProperty(FACING, placer.func_174811_aO().getOpposite()), 2);
 
         if (stack.hasDisplayName())
         {
-            TileEntity tileentity = worldIn.getTileEntity(pos);
+            TileEntity var6 = worldIn.getTileEntity(pos);
 
-            if (tileentity instanceof TileEntityFurnace)
+            if (var6 instanceof TileEntityFurnace)
             {
-                ((TileEntityFurnace)tileentity).setCustomInventoryName(stack.getDisplayName());
+                ((TileEntityFurnace)var6).setCustomInventoryName(stack.getDisplayName());
             }
         }
     }
 
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
     {
-        if (!keepInventory)
+        if (!field_149934_M)
         {
-            TileEntity tileentity = worldIn.getTileEntity(pos);
+            TileEntity var4 = worldIn.getTileEntity(pos);
 
-            if (tileentity instanceof TileEntityFurnace)
+            if (var4 instanceof TileEntityFurnace)
             {
-                InventoryHelper.dropInventoryItems(worldIn, pos, (TileEntityFurnace)tileentity);
+                InventoryHelper.dropInventoryItems(worldIn, pos, (TileEntityFurnace)var4);
                 worldIn.updateComparatorOutputLevel(pos, this);
             }
         }
@@ -218,7 +211,7 @@ public class BlockFurnace extends BlockContainer
 
     public int getComparatorInputOverride(World worldIn, BlockPos pos)
     {
-        return Container.calcRedstone(worldIn.getTileEntity(pos));
+        return Container.calcRedstoneFromInventory(worldIn.getTileEntity(pos));
     }
 
     public Item getItem(World worldIn, BlockPos pos)
@@ -227,7 +220,7 @@ public class BlockFurnace extends BlockContainer
     }
 
     /**
-     * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
+     * The type of render function that is called for this block
      */
     public int getRenderType()
     {
@@ -247,14 +240,14 @@ public class BlockFurnace extends BlockContainer
      */
     public IBlockState getStateFromMeta(int meta)
     {
-        EnumFacing enumfacing = EnumFacing.getFront(meta);
+        EnumFacing var2 = EnumFacing.getFront(meta);
 
-        if (enumfacing.getAxis() == EnumFacing.Axis.Y)
+        if (var2.getAxis() == EnumFacing.Axis.Y)
         {
-            enumfacing = EnumFacing.NORTH;
+            var2 = EnumFacing.NORTH;
         }
 
-        return this.getDefaultState().withProperty(FACING, enumfacing);
+        return this.getDefaultState().withProperty(FACING, var2);
     }
 
     /**
@@ -268,5 +261,50 @@ public class BlockFurnace extends BlockContainer
     protected BlockState createBlockState()
     {
         return new BlockState(this, new IProperty[] {FACING});
+    }
+
+    static final class SwitchEnumFacing
+    {
+        static final int[] field_180356_a = new int[EnumFacing.values().length];
+        
+
+        static
+        {
+            try
+            {
+                field_180356_a[EnumFacing.WEST.ordinal()] = 1;
+            }
+            catch (NoSuchFieldError var4)
+            {
+                ;
+            }
+
+            try
+            {
+                field_180356_a[EnumFacing.EAST.ordinal()] = 2;
+            }
+            catch (NoSuchFieldError var3)
+            {
+                ;
+            }
+
+            try
+            {
+                field_180356_a[EnumFacing.NORTH.ordinal()] = 3;
+            }
+            catch (NoSuchFieldError var2)
+            {
+                ;
+            }
+
+            try
+            {
+                field_180356_a[EnumFacing.SOUTH.ordinal()] = 4;
+            }
+            catch (NoSuchFieldError var1)
+            {
+                ;
+            }
+        }
     }
 }

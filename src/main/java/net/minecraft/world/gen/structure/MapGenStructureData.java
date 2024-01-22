@@ -5,11 +5,12 @@ import net.minecraft.world.WorldSavedData;
 
 public class MapGenStructureData extends WorldSavedData
 {
-    private NBTTagCompound tagCompound = new NBTTagCompound();
+    private NBTTagCompound field_143044_a = new NBTTagCompound();
+    
 
-    public MapGenStructureData(String name)
+    public MapGenStructureData(String p_i43001_1_)
     {
-        super(name);
+        super(p_i43001_1_);
     }
 
     /**
@@ -17,7 +18,7 @@ public class MapGenStructureData extends WorldSavedData
      */
     public void readFromNBT(NBTTagCompound nbt)
     {
-        this.tagCompound = nbt.getCompoundTag("Features");
+        this.field_143044_a = nbt.getCompoundTag("Features");
     }
 
     /**
@@ -25,25 +26,21 @@ public class MapGenStructureData extends WorldSavedData
      */
     public void writeToNBT(NBTTagCompound nbt)
     {
-        nbt.setTag("Features", this.tagCompound);
+        nbt.setTag("Features", this.field_143044_a);
     }
 
-    /**
-     * Writes the NBT tag of an instance of this structure type to the internal NBT tag, using the chunkcoordinates as
-     * the key
-     */
-    public void writeInstance(NBTTagCompound tagCompoundIn, int chunkX, int chunkZ)
+    public void func_143043_a(NBTTagCompound p_143043_1_, int p_143043_2_, int p_143043_3_)
     {
-        this.tagCompound.setTag(formatChunkCoords(chunkX, chunkZ), tagCompoundIn);
+        this.field_143044_a.setTag(func_143042_b(p_143043_2_, p_143043_3_), p_143043_1_);
     }
 
-    public static String formatChunkCoords(int chunkX, int chunkZ)
+    public static String func_143042_b(int p_143042_0_, int p_143042_1_)
     {
-        return "[" + chunkX + "," + chunkZ + "]";
+        return "[" + p_143042_0_ + "," + p_143042_1_ + "]";
     }
 
-    public NBTTagCompound getTagCompound()
+    public NBTTagCompound func_143041_a()
     {
-        return this.tagCompound;
+        return this.field_143044_a;
     }
 }

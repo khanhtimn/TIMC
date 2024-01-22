@@ -8,47 +8,49 @@ import net.minecraft.world.World;
 
 public class WorldGenIcePath extends WorldGenerator
 {
-    private Block block = Blocks.packed_ice;
-    private int basePathWidth;
+    private Block field_150555_a;
+    private int field_150554_b;
+    
 
     public WorldGenIcePath(int p_i45454_1_)
     {
-        this.basePathWidth = p_i45454_1_;
+        this.field_150555_a = Blocks.packed_ice;
+        this.field_150554_b = p_i45454_1_;
     }
 
-    public boolean generate(World worldIn, Random rand, BlockPos position)
+    public boolean generate(World worldIn, Random p_180709_2_, BlockPos p_180709_3_)
     {
-        while (worldIn.isAirBlock(position) && position.getY() > 2)
+        while (worldIn.isAirBlock(p_180709_3_) && p_180709_3_.getY() > 2)
         {
-            position = position.down();
+            p_180709_3_ = p_180709_3_.offsetDown();
         }
 
-        if (worldIn.getBlockState(position).getBlock() != Blocks.snow)
+        if (worldIn.getBlockState(p_180709_3_).getBlock() != Blocks.snow)
         {
             return false;
         }
         else
         {
-            int i = rand.nextInt(this.basePathWidth - 2) + 2;
-            int j = 1;
+            int var4 = p_180709_2_.nextInt(this.field_150554_b - 2) + 2;
+            byte var5 = 1;
 
-            for (int k = position.getX() - i; k <= position.getX() + i; ++k)
+            for (int var6 = p_180709_3_.getX() - var4; var6 <= p_180709_3_.getX() + var4; ++var6)
             {
-                for (int l = position.getZ() - i; l <= position.getZ() + i; ++l)
+                for (int var7 = p_180709_3_.getZ() - var4; var7 <= p_180709_3_.getZ() + var4; ++var7)
                 {
-                    int i1 = k - position.getX();
-                    int j1 = l - position.getZ();
+                    int var8 = var6 - p_180709_3_.getX();
+                    int var9 = var7 - p_180709_3_.getZ();
 
-                    if (i1 * i1 + j1 * j1 <= i * i)
+                    if (var8 * var8 + var9 * var9 <= var4 * var4)
                     {
-                        for (int k1 = position.getY() - j; k1 <= position.getY() + j; ++k1)
+                        for (int var10 = p_180709_3_.getY() - var5; var10 <= p_180709_3_.getY() + var5; ++var10)
                         {
-                            BlockPos blockpos = new BlockPos(k, k1, l);
-                            Block block = worldIn.getBlockState(blockpos).getBlock();
+                            BlockPos var11 = new BlockPos(var6, var10, var7);
+                            Block var12 = worldIn.getBlockState(var11).getBlock();
 
-                            if (block == Blocks.dirt || block == Blocks.snow || block == Blocks.ice)
+                            if (var12 == Blocks.dirt || var12 == Blocks.snow || var12 == Blocks.ice)
                             {
-                                worldIn.setBlockState(blockpos, this.block.getDefaultState(), 2);
+                                worldIn.setBlockState(var11, this.field_150555_a.getDefaultState(), 2);
                             }
                         }
                     }

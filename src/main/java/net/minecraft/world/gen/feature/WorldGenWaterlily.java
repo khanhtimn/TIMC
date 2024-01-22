@@ -7,17 +7,19 @@ import net.minecraft.world.World;
 
 public class WorldGenWaterlily extends WorldGenerator
 {
-    public boolean generate(World worldIn, Random rand, BlockPos position)
-    {
-        for (int i = 0; i < 10; ++i)
-        {
-            int j = position.getX() + rand.nextInt(8) - rand.nextInt(8);
-            int k = position.getY() + rand.nextInt(4) - rand.nextInt(4);
-            int l = position.getZ() + rand.nextInt(8) - rand.nextInt(8);
+    
 
-            if (worldIn.isAirBlock(new BlockPos(j, k, l)) && Blocks.waterlily.canPlaceBlockAt(worldIn, new BlockPos(j, k, l)))
+    public boolean generate(World worldIn, Random p_180709_2_, BlockPos p_180709_3_)
+    {
+        for (int var4 = 0; var4 < 10; ++var4)
+        {
+            int var5 = p_180709_3_.getX() + p_180709_2_.nextInt(8) - p_180709_2_.nextInt(8);
+            int var6 = p_180709_3_.getY() + p_180709_2_.nextInt(4) - p_180709_2_.nextInt(4);
+            int var7 = p_180709_3_.getZ() + p_180709_2_.nextInt(8) - p_180709_2_.nextInt(8);
+
+            if (worldIn.isAirBlock(new BlockPos(var5, var6, var7)) && Blocks.waterlily.canPlaceBlockAt(worldIn, new BlockPos(var5, var6, var7)))
             {
-                worldIn.setBlockState(new BlockPos(j, k, l), Blocks.waterlily.getDefaultState(), 2);
+                worldIn.setBlockState(new BlockPos(var5, var6, var7), Blocks.waterlily.getDefaultState(), 2);
             }
         }
 

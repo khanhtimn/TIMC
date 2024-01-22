@@ -8,6 +8,8 @@ import net.minecraft.world.World;
 
 public class EntityExpBottle extends EntityThrowable
 {
+    
+
     public EntityExpBottle(World worldIn)
     {
         super(worldIn);
@@ -18,9 +20,9 @@ public class EntityExpBottle extends EntityThrowable
         super(worldIn, p_i1786_2_);
     }
 
-    public EntityExpBottle(World worldIn, double x, double y, double z)
+    public EntityExpBottle(World worldIn, double p_i1787_2_, double p_i1787_4_, double p_i1787_6_)
     {
-        super(worldIn, x, y, z);
+        super(worldIn, p_i1787_2_, p_i1787_4_, p_i1787_6_);
     }
 
     /**
@@ -31,12 +33,12 @@ public class EntityExpBottle extends EntityThrowable
         return 0.07F;
     }
 
-    protected float getVelocity()
+    protected float func_70182_d()
     {
         return 0.7F;
     }
 
-    protected float getInaccuracy()
+    protected float func_70183_g()
     {
         return -20.0F;
     }
@@ -49,13 +51,13 @@ public class EntityExpBottle extends EntityThrowable
         if (!this.worldObj.isRemote)
         {
             this.worldObj.playAuxSFX(2002, new BlockPos(this), 0);
-            int i = 3 + this.worldObj.rand.nextInt(5) + this.worldObj.rand.nextInt(5);
+            int var2 = 3 + this.worldObj.rand.nextInt(5) + this.worldObj.rand.nextInt(5);
 
-            while (i > 0)
+            while (var2 > 0)
             {
-                int j = EntityXPOrb.getXPSplit(i);
-                i -= j;
-                this.worldObj.spawnEntityInWorld(new EntityXPOrb(this.worldObj, this.posX, this.posY, this.posZ, j));
+                int var3 = EntityXPOrb.getXPSplit(var2);
+                var2 -= var3;
+                this.worldObj.spawnEntityInWorld(new EntityXPOrb(this.worldObj, this.posX, this.posY, this.posZ, var3));
             }
 
             this.setDead();

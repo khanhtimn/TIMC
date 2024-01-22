@@ -21,11 +21,13 @@ import net.minecraft.world.World;
 
 public class EntityCow extends EntityAnimal
 {
+    
+
     public EntityCow(World worldIn)
     {
         super(worldIn);
         this.setSize(0.9F, 1.3F);
-        ((PathNavigateGround)this.getNavigator()).setAvoidsWater(true);
+        ((PathNavigateGround)this.getNavigator()).func_179690_a(true);
         this.tasks.addTask(0, new EntityAISwimming(this));
         this.tasks.addTask(1, new EntityAIPanic(this, 2.0D));
         this.tasks.addTask(2, new EntityAIMate(this, 1.0D));
@@ -67,7 +69,7 @@ public class EntityCow extends EntityAnimal
         return "mob.cow.hurt";
     }
 
-    protected void playStepSound(BlockPos pos, Block blockIn)
+    protected void func_180429_a(BlockPos p_180429_1_, Block p_180429_2_)
     {
         this.playSound("mob.cow.step", 0.15F, 1.0F);
     }
@@ -87,23 +89,20 @@ public class EntityCow extends EntityAnimal
 
     /**
      * Drop 0-2 items of this living's type
-     *  
-     * @param wasRecentlyHit true if this this entity was recently hit by appropriate entity (generally only if player
-     * or tameable)
-     * @param lootingModifier level of enchanment to be applied to this drop
      */
-    protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier)
+    protected void dropFewItems(boolean p_70628_1_, int p_70628_2_)
     {
-        int i = this.rand.nextInt(3) + this.rand.nextInt(1 + lootingModifier);
+        int var3 = this.rand.nextInt(3) + this.rand.nextInt(1 + p_70628_2_);
+        int var4;
 
-        for (int j = 0; j < i; ++j)
+        for (var4 = 0; var4 < var3; ++var4)
         {
             this.dropItem(Items.leather, 1);
         }
 
-        i = this.rand.nextInt(3) + 1 + this.rand.nextInt(1 + lootingModifier);
+        var3 = this.rand.nextInt(3) + 1 + this.rand.nextInt(1 + p_70628_2_);
 
-        for (int k = 0; k < i; ++k)
+        for (var4 = 0; var4 < var3; ++var4)
         {
             if (this.isBurning())
             {
@@ -119,30 +118,30 @@ public class EntityCow extends EntityAnimal
     /**
      * Called when a player interacts with a mob. e.g. gets milk from a cow, gets into the saddle on a pig.
      */
-    public boolean interact(EntityPlayer player)
+    public boolean interact(EntityPlayer p_70085_1_)
     {
-        ItemStack itemstack = player.inventory.getCurrentItem();
+        ItemStack var2 = p_70085_1_.inventory.getCurrentItem();
 
-        if (itemstack != null && itemstack.getItem() == Items.bucket && !player.capabilities.isCreativeMode && !this.isChild())
+        if (var2 != null && var2.getItem() == Items.bucket && !p_70085_1_.capabilities.isCreativeMode)
         {
-            if (itemstack.stackSize-- == 1)
+            if (var2.stackSize-- == 1)
             {
-                player.inventory.setInventorySlotContents(player.inventory.currentItem, new ItemStack(Items.milk_bucket));
+                p_70085_1_.inventory.setInventorySlotContents(p_70085_1_.inventory.currentItem, new ItemStack(Items.milk_bucket));
             }
-            else if (!player.inventory.addItemStackToInventory(new ItemStack(Items.milk_bucket)))
+            else if (!p_70085_1_.inventory.addItemStackToInventory(new ItemStack(Items.milk_bucket)))
             {
-                player.dropPlayerItemWithRandomChoice(new ItemStack(Items.milk_bucket, 1, 0), false);
+                p_70085_1_.dropPlayerItemWithRandomChoice(new ItemStack(Items.milk_bucket, 1, 0), false);
             }
 
             return true;
         }
         else
         {
-            return super.interact(player);
+            return super.interact(p_70085_1_);
         }
     }
 
-    public EntityCow createChild(EntityAgeable ageable)
+    public EntityCow createChild(EntityAgeable p_90011_1_)
     {
         return new EntityCow(this.worldObj);
     }
@@ -151,4 +150,5 @@ public class EntityCow extends EntityAnimal
     {
         return this.height;
     }
+
 }

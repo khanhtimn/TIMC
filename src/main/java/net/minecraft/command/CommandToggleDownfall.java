@@ -5,9 +5,8 @@ import net.minecraft.world.storage.WorldInfo;
 
 public class CommandToggleDownfall extends CommandBase
 {
-    /**
-     * Gets the name of the command
-     */
+    
+
     public String getCommandName()
     {
         return "toggledownfall";
@@ -21,17 +20,11 @@ public class CommandToggleDownfall extends CommandBase
         return 2;
     }
 
-    /**
-     * Gets the usage string for the command.
-     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.downfall.usage";
     }
 
-    /**
-     * Callback when the command is invoked
-     */
     public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         this.toggleDownfall();
@@ -43,7 +36,7 @@ public class CommandToggleDownfall extends CommandBase
      */
     protected void toggleDownfall()
     {
-        WorldInfo worldinfo = MinecraftServer.getServer().worldServers[0].getWorldInfo();
-        worldinfo.setRaining(!worldinfo.isRaining());
+        WorldInfo var1 = MinecraftServer.getServer().worldServers[0].getWorldInfo();
+        var1.setRaining(!var1.isRaining());
     }
 }

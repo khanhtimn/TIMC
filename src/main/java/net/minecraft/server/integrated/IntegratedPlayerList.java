@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import java.net.SocketAddress;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.ServerConfigurationManager;
 
 public class IntegratedPlayerList extends ServerConfigurationManager
@@ -12,10 +13,11 @@ public class IntegratedPlayerList extends ServerConfigurationManager
      * Holds the NBT data for the host player's save file, so this can be written to level.dat.
      */
     private NBTTagCompound hostPlayerData;
+    
 
-    public IntegratedPlayerList(IntegratedServer server)
+    public IntegratedPlayerList(IntegratedServer p_i1314_1_)
     {
-        super(server);
+        super(p_i1314_1_);
         this.setViewDistance(10);
     }
 
@@ -24,7 +26,7 @@ public class IntegratedPlayerList extends ServerConfigurationManager
      */
     protected void writePlayerData(EntityPlayerMP playerIn)
     {
-        if (playerIn.getName().equals(this.getServerInstance().getServerOwner()))
+        if (playerIn.getName().equals(this.func_180603_b().getServerOwner()))
         {
             this.hostPlayerData = new NBTTagCompound();
             playerIn.writeToNBT(this.hostPlayerData);
@@ -38,10 +40,10 @@ public class IntegratedPlayerList extends ServerConfigurationManager
      */
     public String allowUserToConnect(SocketAddress address, GameProfile profile)
     {
-        return profile.getName().equalsIgnoreCase(this.getServerInstance().getServerOwner()) && this.getPlayerByUsername(profile.getName()) != null ? "That name is already taken." : super.allowUserToConnect(address, profile);
+        return profile.getName().equalsIgnoreCase(this.func_180603_b().getServerOwner()) && this.getPlayerByUsername(profile.getName()) != null ? "That name is already taken." : super.allowUserToConnect(address, profile);
     }
 
-    public IntegratedServer getServerInstance()
+    public IntegratedServer func_180603_b()
     {
         return (IntegratedServer)super.getServerInstance();
     }
@@ -52,5 +54,10 @@ public class IntegratedPlayerList extends ServerConfigurationManager
     public NBTTagCompound getHostPlayerData()
     {
         return this.hostPlayerData;
+    }
+
+    public MinecraftServer getServerInstance()
+    {
+        return this.func_180603_b();
     }
 }

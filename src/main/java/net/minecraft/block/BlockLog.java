@@ -1,5 +1,6 @@
 package net.minecraft.block;
 
+import java.util.Iterator;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
@@ -12,7 +13,8 @@ import net.minecraft.world.World;
 
 public abstract class BlockLog extends BlockRotatedPillar
 {
-    public static final PropertyEnum<BlockLog.EnumAxis> LOG_AXIS = PropertyEnum.<BlockLog.EnumAxis>create("axis", BlockLog.EnumAxis.class);
+    public static final PropertyEnum AXIS_PROP = PropertyEnum.create("axis", BlockLog.EnumAxis.class);
+    
 
     public BlockLog()
     {
@@ -24,62 +26,63 @@ public abstract class BlockLog extends BlockRotatedPillar
 
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
     {
-        int i = 4;
-        int j = i + 1;
+        byte var4 = 4;
+        int var5 = var4 + 1;
 
-        if (worldIn.isAreaLoaded(pos.add(-j, -j, -j), pos.add(j, j, j)))
+        if (worldIn.isAreaLoaded(pos.add(-var5, -var5, -var5), pos.add(var5, var5, var5)))
         {
-            for (BlockPos blockpos : BlockPos.getAllInBox(pos.add(-i, -i, -i), pos.add(i, i, i)))
-            {
-                IBlockState iblockstate = worldIn.getBlockState(blockpos);
+            Iterator var6 = BlockPos.getAllInBox(pos.add(-var4, -var4, -var4), pos.add(var4, var4, var4)).iterator();
 
-                if (iblockstate.getBlock().getMaterial() == Material.leaves && !((Boolean)iblockstate.getValue(BlockLeaves.CHECK_DECAY)).booleanValue())
+            while (var6.hasNext())
+            {
+                BlockPos var7 = (BlockPos)var6.next();
+                IBlockState var8 = worldIn.getBlockState(var7);
+
+                if (var8.getBlock().getMaterial() == Material.leaves && !((Boolean)var8.getValue(BlockLeaves.field_176236_b)).booleanValue())
                 {
-                    worldIn.setBlockState(blockpos, iblockstate.withProperty(BlockLeaves.CHECK_DECAY, Boolean.valueOf(true)), 4);
+                    worldIn.setBlockState(var7, var8.withProperty(BlockLeaves.field_176236_b, Boolean.valueOf(true)), 4);
                 }
             }
         }
     }
 
-    /**
-     * Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
-     * IBlockstate
-     */
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
-        return super.onBlockPlaced(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer).withProperty(LOG_AXIS, BlockLog.EnumAxis.fromFacingAxis(facing.getAxis()));
+        return super.onBlockPlaced(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer).withProperty(AXIS_PROP, BlockLog.EnumAxis.func_176870_a(facing.getAxis()));
     }
 
     public static enum EnumAxis implements IStringSerializable
     {
-        X("x"),
-        Y("y"),
-        Z("z"),
-        NONE("none");
+        X("X", 0, "x"),
+        Y("Y", 1, "y"),
+        Z("Z", 2, "z"),
+        NONE("NONE", 3, "none");
+        private final String field_176874_e;
 
-        private final String name;
+        private static final BlockLog.EnumAxis[] $VALUES = new BlockLog.EnumAxis[]{X, Y, Z, NONE};
+        
 
-        private EnumAxis(String name)
+        private EnumAxis(String p_i45708_1_, int p_i45708_2_, String p_i45708_3_)
         {
-            this.name = name;
+            this.field_176874_e = p_i45708_3_;
         }
 
         public String toString()
         {
-            return this.name;
+            return this.field_176874_e;
         }
 
-        public static BlockLog.EnumAxis fromFacingAxis(EnumFacing.Axis axis)
+        public static BlockLog.EnumAxis func_176870_a(EnumFacing.Axis p_176870_0_)
         {
-            switch (axis)
+            switch (BlockLog.SwitchAxis.field_180167_a[p_176870_0_.ordinal()])
             {
-                case X:
+                case 1:
                     return X;
 
-                case Y:
+                case 2:
                     return Y;
 
-                case Z:
+                case 3:
                     return Z;
 
                 default:
@@ -89,7 +92,43 @@ public abstract class BlockLog extends BlockRotatedPillar
 
         public String getName()
         {
-            return this.name;
+            return this.field_176874_e;
+        }
+    }
+
+    static final class SwitchAxis
+    {
+        static final int[] field_180167_a = new int[EnumFacing.Axis.values().length];
+        
+
+        static
+        {
+            try
+            {
+                field_180167_a[EnumFacing.Axis.X.ordinal()] = 1;
+            }
+            catch (NoSuchFieldError var3)
+            {
+                ;
+            }
+
+            try
+            {
+                field_180167_a[EnumFacing.Axis.Y.ordinal()] = 2;
+            }
+            catch (NoSuchFieldError var2)
+            {
+                ;
+            }
+
+            try
+            {
+                field_180167_a[EnumFacing.Axis.Z.ordinal()] = 3;
+            }
+            catch (NoSuchFieldError var1)
+            {
+                ;
+            }
         }
     }
 }

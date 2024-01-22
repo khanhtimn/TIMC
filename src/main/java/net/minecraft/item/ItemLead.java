@@ -1,5 +1,7 @@
 package net.minecraft.item;
 
+import java.util.Iterator;
+import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.creativetab.CreativeTabs;
@@ -13,6 +15,8 @@ import net.minecraft.world.World;
 
 public class ItemLead extends Item
 {
+    
+
     public ItemLead()
     {
         this.setCreativeTab(CreativeTabs.tabTools);
@@ -20,12 +24,15 @@ public class ItemLead extends Item
 
     /**
      * Called when a Block is right-clicked with this Item
+     *  
+     * @param pos The block being right-clicked
+     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
-        Block block = worldIn.getBlockState(pos).getBlock();
+        Block var9 = worldIn.getBlockState(pos).getBlock();
 
-        if (block instanceof BlockFence)
+        if (var9 instanceof BlockFence)
         {
             if (worldIn.isRemote)
             {
@@ -33,7 +40,7 @@ public class ItemLead extends Item
             }
             else
             {
-                attachToFence(playerIn, worldIn, pos);
+                func_180618_a(playerIn, worldIn, pos);
                 return true;
             }
         }
@@ -43,29 +50,33 @@ public class ItemLead extends Item
         }
     }
 
-    public static boolean attachToFence(EntityPlayer player, World worldIn, BlockPos fence)
+    public static boolean func_180618_a(EntityPlayer p_180618_0_, World worldIn, BlockPos p_180618_2_)
     {
-        EntityLeashKnot entityleashknot = EntityLeashKnot.getKnotForPosition(worldIn, fence);
-        boolean flag = false;
-        double d0 = 7.0D;
-        int i = fence.getX();
-        int j = fence.getY();
-        int k = fence.getZ();
+        EntityLeashKnot var3 = EntityLeashKnot.func_174863_b(worldIn, p_180618_2_);
+        boolean var4 = false;
+        double var5 = 7.0D;
+        int var7 = p_180618_2_.getX();
+        int var8 = p_180618_2_.getY();
+        int var9 = p_180618_2_.getZ();
+        List var10 = worldIn.getEntitiesWithinAABB(EntityLiving.class, new AxisAlignedBB((double)var7 - var5, (double)var8 - var5, (double)var9 - var5, (double)var7 + var5, (double)var8 + var5, (double)var9 + var5));
+        Iterator var11 = var10.iterator();
 
-        for (EntityLiving entityliving : worldIn.getEntitiesWithinAABB(EntityLiving.class, new AxisAlignedBB((double)i - d0, (double)j - d0, (double)k - d0, (double)i + d0, (double)j + d0, (double)k + d0)))
+        while (var11.hasNext())
         {
-            if (entityliving.getLeashed() && entityliving.getLeashedToEntity() == player)
+            EntityLiving var12 = (EntityLiving)var11.next();
+
+            if (var12.getLeashed() && var12.getLeashedToEntity() == p_180618_0_)
             {
-                if (entityleashknot == null)
+                if (var3 == null)
                 {
-                    entityleashknot = EntityLeashKnot.createKnot(worldIn, fence);
+                    var3 = EntityLeashKnot.func_174862_a(worldIn, p_180618_2_);
                 }
 
-                entityliving.setLeashedToEntity(entityleashknot, true);
-                flag = true;
+                var12.setLeashedToEntity(var3, true);
+                var4 = true;
             }
         }
 
-        return flag;
+        return var4;
     }
 }

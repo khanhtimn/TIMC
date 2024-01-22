@@ -10,9 +10,11 @@ import net.minecraft.world.World;
 
 public class EntityRainFX extends EntityFX
 {
-    protected EntityRainFX(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn)
+    
+
+    protected EntityRainFX(World worldIn, double p_i1235_2_, double p_i1235_4_, double p_i1235_6_)
     {
-        super(worldIn, xCoordIn, yCoordIn, zCoordIn, 0.0D, 0.0D, 0.0D);
+        super(worldIn, p_i1235_2_, p_i1235_4_, p_i1235_6_, 0.0D, 0.0D, 0.0D);
         this.motionX *= 0.30000001192092896D;
         this.motionY = Math.random() * 0.20000000298023224D + 0.10000000149011612D;
         this.motionZ *= 0.30000001192092896D;
@@ -55,28 +57,28 @@ public class EntityRainFX extends EntityFX
             this.motionZ *= 0.699999988079071D;
         }
 
-        BlockPos blockpos = new BlockPos(this);
-        IBlockState iblockstate = this.worldObj.getBlockState(blockpos);
-        Block block = iblockstate.getBlock();
-        block.setBlockBoundsBasedOnState(this.worldObj, blockpos);
-        Material material = iblockstate.getBlock().getMaterial();
+        BlockPos var1 = new BlockPos(this);
+        IBlockState var2 = this.worldObj.getBlockState(var1);
+        Block var3 = var2.getBlock();
+        var3.setBlockBoundsBasedOnState(this.worldObj, var1);
+        Material var4 = var2.getBlock().getMaterial();
 
-        if (material.isLiquid() || material.isSolid())
+        if (var4.isLiquid() || var4.isSolid())
         {
-            double d0 = 0.0D;
+            double var5 = 0.0D;
 
-            if (iblockstate.getBlock() instanceof BlockLiquid)
+            if (var2.getBlock() instanceof BlockLiquid)
             {
-                d0 = (double)(1.0F - BlockLiquid.getLiquidHeightPercent(((Integer)iblockstate.getValue(BlockLiquid.LEVEL)).intValue()));
+                var5 = (double)(1.0F - BlockLiquid.getLiquidHeightPercent(((Integer)var2.getValue(BlockLiquid.LEVEL)).intValue()));
             }
             else
             {
-                d0 = block.getBlockBoundsMaxY();
+                var5 = var3.getBlockBoundsMaxY();
             }
 
-            double d1 = (double)MathHelper.floor_double(this.posY) + d0;
+            double var7 = (double)MathHelper.floor_double(this.posY) + var5;
 
-            if (this.posY < d1)
+            if (this.posY < var7)
             {
                 this.setDead();
             }
@@ -85,9 +87,11 @@ public class EntityRainFX extends EntityFX
 
     public static class Factory implements IParticleFactory
     {
-        public EntityFX getEntityFX(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn, int... p_178902_15_)
+        
+
+        public EntityFX func_178902_a(int p_178902_1_, World worldIn, double p_178902_3_, double p_178902_5_, double p_178902_7_, double p_178902_9_, double p_178902_11_, double p_178902_13_, int ... p_178902_15_)
         {
-            return new EntityRainFX(worldIn, xCoordIn, yCoordIn, zCoordIn);
+            return new EntityRainFX(worldIn, p_178902_3_, p_178902_5_, p_178902_7_);
         }
     }
 }

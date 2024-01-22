@@ -8,26 +8,26 @@ import net.minecraft.util.ResourceLocation;
 
 public class GuiChest extends GuiContainer
 {
-    /** The ResourceLocation containing the chest GUI texture. */
-    private static final ResourceLocation CHEST_GUI_TEXTURE = new ResourceLocation("textures/gui/container/generic_54.png");
+    private static final ResourceLocation field_147017_u = new ResourceLocation("textures/gui/container/generic_54.png");
     private IInventory upperChestInventory;
-    private IInventory lowerChestInventory;
+    public IInventory lowerChestInventory;
 
     /**
      * window height is calculated with these values; the more rows, the heigher
      */
     private int inventoryRows;
+    
 
-    public GuiChest(IInventory upperInv, IInventory lowerInv)
+    public GuiChest(IInventory p_i46315_1_, IInventory p_i46315_2_)
     {
-        super(new ContainerChest(upperInv, lowerInv, Minecraft.getMinecraft().thePlayer));
-        this.upperChestInventory = upperInv;
-        this.lowerChestInventory = lowerInv;
+        super(new ContainerChest(p_i46315_1_, p_i46315_2_, Minecraft.getMinecraft().thePlayer));
+        this.upperChestInventory = p_i46315_1_;
+        this.lowerChestInventory = p_i46315_2_;
         this.allowUserInput = false;
-        int i = 222;
-        int j = i - 108;
-        this.inventoryRows = lowerInv.getSizeInventory() / 9;
-        this.ySize = j + this.inventoryRows * 18;
+        short var3 = 222;
+        int var4 = var3 - 108;
+        this.inventoryRows = p_i46315_2_.getSizeInventory() / 9;
+        this.ySize = var4 + this.inventoryRows * 18;
     }
 
     /**
@@ -45,10 +45,10 @@ public class GuiChest extends GuiContainer
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
     {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(CHEST_GUI_TEXTURE);
-        int i = (this.width - this.xSize) / 2;
-        int j = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.inventoryRows * 18 + 17);
-        this.drawTexturedModalRect(i, j + this.inventoryRows * 18 + 17, 0, 126, this.xSize, 96);
+        this.mc.getTextureManager().bindTexture(field_147017_u);
+        int var4 = (this.width - this.xSize) / 2;
+        int var5 = (this.height - this.ySize) / 2;
+        this.drawTexturedModalRect(var4, var5, 0, 0, this.xSize, this.inventoryRows * 18 + 17);
+        this.drawTexturedModalRect(var4, var5 + this.inventoryRows * 18 + 17, 0, 126, this.xSize, 96);
     }
 }

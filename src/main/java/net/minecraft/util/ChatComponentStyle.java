@@ -8,8 +8,13 @@ import java.util.List;
 
 public abstract class ChatComponentStyle implements IChatComponent
 {
-    protected List<IChatComponent> siblings = Lists.<IChatComponent>newArrayList();
+    /**
+     * The later siblings of this component.  If this component turns the text bold, that will apply to all the siblings
+     * until a later sibling turns the text something else.
+     */
+    protected List siblings = Lists.newArrayList();
     private ChatStyle style;
+    
 
     /**
      * Appends the given component to the end of this one.
@@ -21,7 +26,10 @@ public abstract class ChatComponentStyle implements IChatComponent
         return this;
     }
 
-    public List<IChatComponent> getSiblings()
+    /**
+     * Gets the sibling components of this one.
+     */
+    public List getSiblings()
     {
         return this.siblings;
     }
@@ -37,10 +45,12 @@ public abstract class ChatComponentStyle implements IChatComponent
     public IChatComponent setChatStyle(ChatStyle style)
     {
         this.style = style;
+        Iterator var2 = this.siblings.iterator();
 
-        for (IChatComponent ichatcomponent : this.siblings)
+        while (var2.hasNext())
         {
-            ichatcomponent.getChatStyle().setParentStyle(this.getChatStyle());
+            IChatComponent var3 = (IChatComponent)var2.next();
+            var3.getChatStyle().setParentStyle(this.getChatStyle());
         }
 
         return this;
@@ -51,34 +61,39 @@ public abstract class ChatComponentStyle implements IChatComponent
         if (this.style == null)
         {
             this.style = new ChatStyle();
+            Iterator var1 = this.siblings.iterator();
 
-            for (IChatComponent ichatcomponent : this.siblings)
+            while (var1.hasNext())
             {
-                ichatcomponent.getChatStyle().setParentStyle(this.style);
+                IChatComponent var2 = (IChatComponent)var1.next();
+                var2.getChatStyle().setParentStyle(this.style);
             }
         }
 
         return this.style;
     }
 
-    public Iterator<IChatComponent> iterator()
+    public Iterator iterator()
     {
-        return Iterators.<IChatComponent>concat(Iterators.<IChatComponent>forArray(new ChatComponentStyle[] {this}), createDeepCopyIterator(this.siblings));
+        return Iterators.concat(Iterators.forArray(new ChatComponentStyle[] {this}), createDeepCopyIterator(this.siblings));
     }
 
     /**
-     * Get the text of this component, <em>and all child components</em>, with all special formatting codes removed.
+     * Gets the text of this component, without any special formatting codes added.  TODO: why is this two different
+     * methods?
      */
     public final String getUnformattedText()
     {
-        StringBuilder stringbuilder = new StringBuilder();
+        StringBuilder var1 = new StringBuilder();
+        Iterator var2 = this.iterator();
 
-        for (IChatComponent ichatcomponent : this)
+        while (var2.hasNext())
         {
-            stringbuilder.append(ichatcomponent.getUnformattedTextForChat());
+            IChatComponent var3 = (IChatComponent)var2.next();
+            var1.append(var3.getUnformattedTextForChat());
         }
 
-        return stringbuilder.toString();
+        return var1.toString();
     }
 
     /**
@@ -86,37 +101,53 @@ public abstract class ChatComponentStyle implements IChatComponent
      */
     public final String getFormattedText()
     {
-        StringBuilder stringbuilder = new StringBuilder();
+        StringBuilder var1 = new StringBuilder();
+        Iterator var2 = this.iterator();
 
-        for (IChatComponent ichatcomponent : this)
+        while (var2.hasNext())
         {
-            stringbuilder.append(ichatcomponent.getChatStyle().getFormattingCode());
-            stringbuilder.append(ichatcomponent.getUnformattedTextForChat());
-            stringbuilder.append((Object)EnumChatFormatting.RESET);
+            IChatComponent var3 = (IChatComponent)var2.next();
+            var1.append(var3.getChatStyle().getFormattingCode());
+            var1.append(var3.getUnformattedTextForChat());
+            var1.append(EnumChatFormatting.RESET);
         }
 
-        return stringbuilder.toString();
+        return var1.toString();
     }
 
-    public static Iterator<IChatComponent> createDeepCopyIterator(Iterable<IChatComponent> components)
+    /**
+     * Creates an iterator that iterates over the given components, returning deep copies of each component in turn so
+     * that the properties of the returned objects will remain externally consistent after being returned.
+     */
+    public static Iterator createDeepCopyIterator(Iterable components)
     {
-        Iterator<IChatComponent> iterator = Iterators.concat(Iterators.transform(components.iterator(), new Function<IChatComponent, Iterator<IChatComponent>>()
+        Iterator var1 = Iterators.concat(Iterators.transform(components.iterator(), new Function()
         {
-            public Iterator<IChatComponent> apply(IChatComponent p_apply_1_)
+            
+            public Iterator apply(IChatComponent p_apply_1_)
             {
                 return p_apply_1_.iterator();
             }
+            public Object apply(Object p_apply_1_)
+            {
+                return this.apply((IChatComponent)p_apply_1_);
+            }
         }));
-        iterator = Iterators.transform(iterator, new Function<IChatComponent, IChatComponent>()
+        var1 = Iterators.transform(var1, new Function()
         {
+            
             public IChatComponent apply(IChatComponent p_apply_1_)
             {
-                IChatComponent ichatcomponent = p_apply_1_.createCopy();
-                ichatcomponent.setChatStyle(ichatcomponent.getChatStyle().createDeepCopy());
-                return ichatcomponent;
+                IChatComponent var2 = p_apply_1_.createCopy();
+                var2.setChatStyle(var2.getChatStyle().createDeepCopy());
+                return var2;
+            }
+            public Object apply(Object p_apply_1_)
+            {
+                return this.apply((IChatComponent)p_apply_1_);
             }
         });
-        return iterator;
+        return var1;
     }
 
     public boolean equals(Object p_equals_1_)
@@ -131,8 +162,8 @@ public abstract class ChatComponentStyle implements IChatComponent
         }
         else
         {
-            ChatComponentStyle chatcomponentstyle = (ChatComponentStyle)p_equals_1_;
-            return this.siblings.equals(chatcomponentstyle.siblings) && this.getChatStyle().equals(chatcomponentstyle.getChatStyle());
+            ChatComponentStyle var2 = (ChatComponentStyle)p_equals_1_;
+            return this.siblings.equals(var2.siblings) && this.getChatStyle().equals(var2.getChatStyle());
         }
     }
 

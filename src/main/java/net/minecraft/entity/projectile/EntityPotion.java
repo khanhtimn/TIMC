@@ -1,5 +1,6 @@
 package net.minecraft.entity.projectile;
 
+import java.util.Iterator;
 import java.util.List;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Items;
@@ -18,32 +19,33 @@ public class EntityPotion extends EntityThrowable
      * The damage value of the thrown potion that this EntityPotion represents.
      */
     private ItemStack potionDamage;
+    
 
     public EntityPotion(World worldIn)
     {
         super(worldIn);
     }
 
-    public EntityPotion(World worldIn, EntityLivingBase throwerIn, int meta)
+    public EntityPotion(World worldIn, EntityLivingBase p_i1789_2_, int p_i1789_3_)
     {
-        this(worldIn, throwerIn, new ItemStack(Items.potionitem, 1, meta));
+        this(worldIn, p_i1789_2_, new ItemStack(Items.potionitem, 1, p_i1789_3_));
     }
 
-    public EntityPotion(World worldIn, EntityLivingBase throwerIn, ItemStack potionDamageIn)
+    public EntityPotion(World worldIn, EntityLivingBase p_i1790_2_, ItemStack p_i1790_3_)
     {
-        super(worldIn, throwerIn);
-        this.potionDamage = potionDamageIn;
+        super(worldIn, p_i1790_2_);
+        this.potionDamage = p_i1790_3_;
     }
 
-    public EntityPotion(World worldIn, double x, double y, double z, int p_i1791_8_)
+    public EntityPotion(World worldIn, double p_i1791_2_, double p_i1791_4_, double p_i1791_6_, int p_i1791_8_)
     {
-        this(worldIn, x, y, z, new ItemStack(Items.potionitem, 1, p_i1791_8_));
+        this(worldIn, p_i1791_2_, p_i1791_4_, p_i1791_6_, new ItemStack(Items.potionitem, 1, p_i1791_8_));
     }
 
-    public EntityPotion(World worldIn, double x, double y, double z, ItemStack potionDamageIn)
+    public EntityPotion(World worldIn, double p_i1792_2_, double p_i1792_4_, double p_i1792_6_, ItemStack p_i1792_8_)
     {
-        super(worldIn, x, y, z);
-        this.potionDamage = potionDamageIn;
+        super(worldIn, p_i1792_2_, p_i1792_4_, p_i1792_6_);
+        this.potionDamage = p_i1792_8_;
     }
 
     /**
@@ -54,27 +56,24 @@ public class EntityPotion extends EntityThrowable
         return 0.05F;
     }
 
-    protected float getVelocity()
+    protected float func_70182_d()
     {
         return 0.5F;
     }
 
-    protected float getInaccuracy()
+    protected float func_70183_g()
     {
         return -20.0F;
     }
 
-    /**
-     * Sets the PotionEffect by the given id of the potion effect.
-     */
-    public void setPotionDamage(int potionId)
+    public void setPotionDamage(int p_82340_1_)
     {
         if (this.potionDamage == null)
         {
             this.potionDamage = new ItemStack(Items.potionitem, 1, 0);
         }
 
-        this.potionDamage.setItemDamage(potionId);
+        this.potionDamage.setItemDamage(p_82340_1_);
     }
 
     /**
@@ -97,43 +96,49 @@ public class EntityPotion extends EntityThrowable
     {
         if (!this.worldObj.isRemote)
         {
-            List<PotionEffect> list = Items.potionitem.getEffects(this.potionDamage);
+            List var2 = Items.potionitem.getEffects(this.potionDamage);
 
-            if (list != null && !list.isEmpty())
+            if (var2 != null && !var2.isEmpty())
             {
-                AxisAlignedBB axisalignedbb = this.getEntityBoundingBox().expand(4.0D, 2.0D, 4.0D);
-                List<EntityLivingBase> list1 = this.worldObj.<EntityLivingBase>getEntitiesWithinAABB(EntityLivingBase.class, axisalignedbb);
+                AxisAlignedBB var3 = this.getEntityBoundingBox().expand(4.0D, 2.0D, 4.0D);
+                List var4 = this.worldObj.getEntitiesWithinAABB(EntityLivingBase.class, var3);
 
-                if (!list1.isEmpty())
+                if (!var4.isEmpty())
                 {
-                    for (EntityLivingBase entitylivingbase : list1)
+                    Iterator var5 = var4.iterator();
+
+                    while (var5.hasNext())
                     {
-                        double d0 = this.getDistanceSqToEntity(entitylivingbase);
+                        EntityLivingBase var6 = (EntityLivingBase)var5.next();
+                        double var7 = this.getDistanceSqToEntity(var6);
 
-                        if (d0 < 16.0D)
+                        if (var7 < 16.0D)
                         {
-                            double d1 = 1.0D - Math.sqrt(d0) / 4.0D;
+                            double var9 = 1.0D - Math.sqrt(var7) / 4.0D;
 
-                            if (entitylivingbase == p_70184_1_.entityHit)
+                            if (var6 == p_70184_1_.entityHit)
                             {
-                                d1 = 1.0D;
+                                var9 = 1.0D;
                             }
 
-                            for (PotionEffect potioneffect : list)
-                            {
-                                int i = potioneffect.getPotionID();
+                            Iterator var11 = var2.iterator();
 
-                                if (Potion.potionTypes[i].isInstant())
+                            while (var11.hasNext())
+                            {
+                                PotionEffect var12 = (PotionEffect)var11.next();
+                                int var13 = var12.getPotionID();
+
+                                if (Potion.potionTypes[var13].isInstant())
                                 {
-                                    Potion.potionTypes[i].affectEntity(this, this.getThrower(), entitylivingbase, potioneffect.getAmplifier(), d1);
+                                    Potion.potionTypes[var13].func_180793_a(this, this.getThrower(), var6, var12.getAmplifier(), var9);
                                 }
                                 else
                                 {
-                                    int j = (int)(d1 * (double)potioneffect.getDuration() + 0.5D);
+                                    int var14 = (int)(var9 * (double)var12.getDuration() + 0.5D);
 
-                                    if (j > 20)
+                                    if (var14 > 20)
                                     {
-                                        entitylivingbase.addPotionEffect(new PotionEffect(i, j, potioneffect.getAmplifier()));
+                                        var6.addPotionEffect(new PotionEffect(var13, var14, var12.getAmplifier()));
                                     }
                                 }
                             }

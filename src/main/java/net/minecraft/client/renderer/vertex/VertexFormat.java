@@ -1,178 +1,169 @@
 package net.minecraft.client.renderer.vertex;
 
 import com.google.common.collect.Lists;
+import java.util.Iterator;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class VertexFormat
 {
-    private static final Logger LOGGER = LogManager.getLogger();
-    private final List<VertexFormatElement> elements;
-    private final List<Integer> offsets;
+    private static final Logger field_177357_a = LogManager.getLogger();
+    private final List field_177355_b;
+    private final List field_177356_c;
+    private int field_177353_d;
+    private int field_177354_e;
+    private List field_177351_f;
+    private int field_177352_g;
+    
 
-    /** The next available offset in this vertex format */
-    private int nextOffset;
-    private int colorElementOffset;
-    private List<Integer> uvOffsetsById;
-    private int normalElementOffset;
-
-    public VertexFormat(VertexFormat vertexFormatIn)
+    public VertexFormat(VertexFormat p_i46097_1_)
     {
         this();
 
-        for (int i = 0; i < vertexFormatIn.getElementCount(); ++i)
+        for (int var2 = 0; var2 < p_i46097_1_.func_177345_h(); ++var2)
         {
-            this.addElement(vertexFormatIn.getElement(i));
+            this.func_177349_a(p_i46097_1_.func_177348_c(var2));
         }
 
-        this.nextOffset = vertexFormatIn.getNextOffset();
+        this.field_177353_d = p_i46097_1_.func_177338_f();
     }
 
     public VertexFormat()
     {
-        this.elements = Lists.<VertexFormatElement>newArrayList();
-        this.offsets = Lists.<Integer>newArrayList();
-        this.nextOffset = 0;
-        this.colorElementOffset = -1;
-        this.uvOffsetsById = Lists.<Integer>newArrayList();
-        this.normalElementOffset = -1;
+        this.field_177355_b = Lists.newArrayList();
+        this.field_177356_c = Lists.newArrayList();
+        this.field_177353_d = 0;
+        this.field_177354_e = -1;
+        this.field_177351_f = Lists.newArrayList();
+        this.field_177352_g = -1;
     }
 
     public void clear()
     {
-        this.elements.clear();
-        this.offsets.clear();
-        this.colorElementOffset = -1;
-        this.uvOffsetsById.clear();
-        this.normalElementOffset = -1;
-        this.nextOffset = 0;
+        this.field_177355_b.clear();
+        this.field_177356_c.clear();
+        this.field_177354_e = -1;
+        this.field_177351_f.clear();
+        this.field_177352_g = -1;
+        this.field_177353_d = 0;
     }
 
-    @SuppressWarnings("incomplete-switch")
-    public VertexFormat addElement(VertexFormatElement element)
+    public VertexFormatElement func_177349_a(VertexFormatElement p_177349_1_)
     {
-        if (element.isPositionElement() && this.hasPosition())
+        if (p_177349_1_.func_177374_g() && this.func_177341_i())
         {
-            LOGGER.warn("VertexFormat error: Trying to add a position VertexFormatElement when one already exists, ignoring.");
-            return this;
+            field_177357_a.warn("VertexFormat error: Trying to add a position VertexFormatElement when one already exists, ignoring.");
         }
         else
         {
-            this.elements.add(element);
-            this.offsets.add(Integer.valueOf(this.nextOffset));
+            this.field_177355_b.add(p_177349_1_);
+            this.field_177356_c.add(Integer.valueOf(this.field_177353_d));
+            p_177349_1_.func_177371_a(this.field_177353_d);
+            this.field_177353_d += p_177349_1_.func_177368_f();
 
-            switch (element.getUsage())
+            switch (VertexFormat.SwitchEnumUseage.field_177382_a[p_177349_1_.func_177375_c().ordinal()])
             {
-                case NORMAL:
-                    this.normalElementOffset = this.nextOffset;
+                case 1:
+                    this.field_177352_g = p_177349_1_.func_177373_a();
                     break;
 
-                case COLOR:
-                    this.colorElementOffset = this.nextOffset;
+                case 2:
+                    this.field_177354_e = p_177349_1_.func_177373_a();
                     break;
 
-                case UV:
-                    this.uvOffsetsById.add(element.getIndex(), Integer.valueOf(this.nextOffset));
+                case 3:
+                    this.field_177351_f.add(p_177349_1_.func_177369_e(), Integer.valueOf(p_177349_1_.func_177373_a()));
             }
-
-            this.nextOffset += element.getSize();
-            return this;
         }
+        //TODO: delete
+        return p_177349_1_;
     }
 
-    public boolean hasNormal()
+    public boolean func_177350_b()
     {
-        return this.normalElementOffset >= 0;
+        return this.field_177352_g >= 0;
     }
 
-    public int getNormalOffset()
+    public int func_177342_c()
     {
-        return this.normalElementOffset;
+        return this.field_177352_g;
     }
 
-    public boolean hasColor()
+    public boolean func_177346_d()
     {
-        return this.colorElementOffset >= 0;
+        return this.field_177354_e >= 0;
     }
 
-    public int getColorOffset()
+    public int func_177340_e()
     {
-        return this.colorElementOffset;
+        return this.field_177354_e;
     }
 
-    public boolean hasUvOffset(int id)
+    public boolean func_177347_a(int p_177347_1_)
     {
-        return this.uvOffsetsById.size() - 1 >= id;
+        return this.field_177351_f.size() - 1 >= p_177347_1_;
     }
 
-    public int getUvOffsetById(int id)
+    public int func_177344_b(int p_177344_1_)
     {
-        return ((Integer)this.uvOffsetsById.get(id)).intValue();
+        return ((Integer)this.field_177351_f.get(p_177344_1_)).intValue();
     }
 
     public String toString()
     {
-        String s = "format: " + this.elements.size() + " elements: ";
+        String var1 = "format: " + this.field_177355_b.size() + " elements: ";
 
-        for (int i = 0; i < this.elements.size(); ++i)
+        for (int var2 = 0; var2 < this.field_177355_b.size(); ++var2)
         {
-            s = s + ((VertexFormatElement)this.elements.get(i)).toString();
+            var1 = var1 + ((VertexFormatElement)this.field_177355_b.get(var2)).toString();
 
-            if (i != this.elements.size() - 1)
+            if (var2 != this.field_177355_b.size() - 1)
             {
-                s = s + " ";
+                var1 = var1 + " ";
             }
         }
 
-        return s;
+        return var1;
     }
 
-    private boolean hasPosition()
+    private boolean func_177341_i()
     {
-        int i = 0;
+        Iterator var1 = this.field_177355_b.iterator();
+        VertexFormatElement var2;
 
-        for (int j = this.elements.size(); i < j; ++i)
+        do
         {
-            VertexFormatElement vertexformatelement = (VertexFormatElement)this.elements.get(i);
-
-            if (vertexformatelement.isPositionElement())
+            if (!var1.hasNext())
             {
-                return true;
+                return false;
             }
+
+            var2 = (VertexFormatElement)var1.next();
         }
+        while (!var2.func_177374_g());
 
-        return false;
+        return true;
     }
 
-    public int getIntegerSize()
+    public int func_177338_f()
     {
-        return this.getNextOffset() / 4;
+        return this.field_177353_d;
     }
 
-    public int getNextOffset()
+    public List func_177343_g()
     {
-        return this.nextOffset;
+        return this.field_177355_b;
     }
 
-    public List<VertexFormatElement> getElements()
+    public int func_177345_h()
     {
-        return this.elements;
+        return this.field_177355_b.size();
     }
 
-    public int getElementCount()
+    public VertexFormatElement func_177348_c(int p_177348_1_)
     {
-        return this.elements.size();
-    }
-
-    public VertexFormatElement getElement(int index)
-    {
-        return (VertexFormatElement)this.elements.get(index);
-    }
-
-    public int getOffset(int p_181720_1_)
-    {
-        return ((Integer)this.offsets.get(p_181720_1_)).intValue();
+        return (VertexFormatElement)this.field_177355_b.get(p_177348_1_);
     }
 
     public boolean equals(Object p_equals_1_)
@@ -183,8 +174,8 @@ public class VertexFormat
         }
         else if (p_equals_1_ != null && this.getClass() == p_equals_1_.getClass())
         {
-            VertexFormat vertexformat = (VertexFormat)p_equals_1_;
-            return this.nextOffset != vertexformat.nextOffset ? false : (!this.elements.equals(vertexformat.elements) ? false : this.offsets.equals(vertexformat.offsets));
+            VertexFormat var2 = (VertexFormat)p_equals_1_;
+            return this.field_177353_d != var2.field_177353_d ? false : (!this.field_177355_b.equals(var2.field_177355_b) ? false : this.field_177356_c.equals(var2.field_177356_c));
         }
         else
         {
@@ -194,9 +185,45 @@ public class VertexFormat
 
     public int hashCode()
     {
-        int i = this.elements.hashCode();
-        i = 31 * i + this.offsets.hashCode();
-        i = 31 * i + this.nextOffset;
-        return i;
+        int var1 = this.field_177355_b.hashCode();
+        var1 = 31 * var1 + this.field_177356_c.hashCode();
+        var1 = 31 * var1 + this.field_177353_d;
+        return var1;
+    }
+
+    static final class SwitchEnumUseage
+    {
+        static final int[] field_177382_a = new int[VertexFormatElement.EnumUseage.values().length];
+        
+
+        static
+        {
+            try
+            {
+                field_177382_a[VertexFormatElement.EnumUseage.NORMAL.ordinal()] = 1;
+            }
+            catch (NoSuchFieldError var3)
+            {
+                ;
+            }
+
+            try
+            {
+                field_177382_a[VertexFormatElement.EnumUseage.COLOR.ordinal()] = 2;
+            }
+            catch (NoSuchFieldError var2)
+            {
+                ;
+            }
+
+            try
+            {
+                field_177382_a[VertexFormatElement.EnumUseage.UV.ordinal()] = 3;
+            }
+            catch (NoSuchFieldError var1)
+            {
+                ;
+            }
+        }
     }
 }

@@ -1,27 +1,32 @@
 package net.minecraft.client.renderer.tileentity;
 
+import com.teamti.timc.modules.ChestESP;
+import com.teamti.timc.util.OutlineRenderer;
 import net.minecraft.client.model.ModelChest;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityEnderChest;
 import net.minecraft.util.ResourceLocation;
 
-public class TileEntityEnderChestRenderer extends TileEntitySpecialRenderer<TileEntityEnderChest>
+public class TileEntityEnderChestRenderer extends TileEntitySpecialRenderer
 {
-    private static final ResourceLocation ENDER_CHEST_TEXTURE = new ResourceLocation("textures/entity/chest/ender.png");
+
+    private static final ResourceLocation field_147520_b = new ResourceLocation("textures/entity/chest/ender.png");
     private ModelChest field_147521_c = new ModelChest();
+    
 
-    public void renderTileEntityAt(TileEntityEnderChest te, double x, double y, double z, float partialTicks, int destroyStage)
+    public void func_180540_a(TileEntityEnderChest p_180540_1_, double p_180540_2_, double p_180540_4_, double p_180540_6_, float p_180540_8_, int p_180540_9_)
     {
-        int i = 0;
+        int var10 = 0;
 
-        if (te.hasWorldObj())
+        if (p_180540_1_.hasWorldObj())
         {
-            i = te.getBlockMetadata();
+            var10 = p_180540_1_.getBlockMetadata();
         }
 
-        if (destroyStage >= 0)
+        if (p_180540_9_ >= 0)
         {
-            this.bindTexture(DESTROY_STAGES[destroyStage]);
+            this.bindTexture(DESTROY_STAGES[p_180540_9_]);
             GlStateManager.matrixMode(5890);
             GlStateManager.pushMatrix();
             GlStateManager.scale(4.0F, 4.0F, 1.0F);
@@ -30,53 +35,70 @@ public class TileEntityEnderChestRenderer extends TileEntitySpecialRenderer<Tile
         }
         else
         {
-            this.bindTexture(ENDER_CHEST_TEXTURE);
+            this.bindTexture(field_147520_b);
         }
 
         GlStateManager.pushMatrix();
         GlStateManager.enableRescaleNormal();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager.translate((float)x, (float)y + 1.0F, (float)z + 1.0F);
+        GlStateManager.translate((float)p_180540_2_, (float)p_180540_4_ + 1.0F, (float)p_180540_6_ + 1.0F);
         GlStateManager.scale(1.0F, -1.0F, -1.0F);
         GlStateManager.translate(0.5F, 0.5F, 0.5F);
-        int j = 0;
+        short var11 = 0;
 
-        if (i == 2)
+        if (var10 == 2)
         {
-            j = 180;
+            var11 = 180;
         }
 
-        if (i == 3)
+        if (var10 == 3)
         {
-            j = 0;
+            var11 = 0;
         }
 
-        if (i == 4)
+        if (var10 == 4)
         {
-            j = 90;
+            var11 = 90;
         }
 
-        if (i == 5)
+        if (var10 == 5)
         {
-            j = -90;
+            var11 = -90;
         }
 
-        GlStateManager.rotate((float)j, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate((float)var11, 0.0F, 1.0F, 0.0F);
         GlStateManager.translate(-0.5F, -0.5F, -0.5F);
-        float f = te.prevLidAngle + (te.lidAngle - te.prevLidAngle) * partialTicks;
-        f = 1.0F - f;
-        f = 1.0F - f * f * f;
-        this.field_147521_c.chestLid.rotateAngleX = -(f * (float)Math.PI / 2.0F);
+        float var12 = p_180540_1_.prevLidAngle + (p_180540_1_.field_145972_a - p_180540_1_.prevLidAngle) * p_180540_8_;
+        var12 = 1.0F - var12;
+        var12 = 1.0F - var12 * var12 * var12;
+        //TODO: Chest opening animation
+        this.field_147521_c.chestLid.rotateAngleX = -(var12 * (float)Math.PI / 8.0F);
         this.field_147521_c.renderAll();
+        if(ChestESP.isEnabled){
+            this.field_147521_c.renderAll();
+            OutlineRenderer.renderOneChest();
+            this.field_147521_c.renderAll();
+            OutlineRenderer.renderTwo();
+            this.field_147521_c.renderAll();
+            OutlineRenderer.renderThree();
+            OutlineRenderer.renderFour(true);
+            this.field_147521_c.renderAll();
+            OutlineRenderer.renderFive();
+        }
         GlStateManager.disableRescaleNormal();
         GlStateManager.popMatrix();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-        if (destroyStage >= 0)
+        if (p_180540_9_ >= 0)
         {
             GlStateManager.matrixMode(5890);
             GlStateManager.popMatrix();
             GlStateManager.matrixMode(5888);
         }
+    }
+
+    public void renderTileEntityAt(TileEntity p_180535_1_, double p_180535_2_, double p_180535_4_, double p_180535_6_, float p_180535_8_, int p_180535_9_)
+    {
+        this.func_180540_a((TileEntityEnderChest)p_180535_1_, p_180535_2_, p_180535_4_, p_180535_6_, p_180535_8_, p_180535_9_);
     }
 }

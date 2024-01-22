@@ -3,59 +3,59 @@ package net.minecraft.world.gen.feature;
 import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
 public class WorldGenShrub extends WorldGenTrees
 {
-    private final IBlockState leavesMetadata;
-    private final IBlockState woodMetadata;
+    private int field_150528_a;
+    private int field_150527_b;
+    
 
-    public WorldGenShrub(IBlockState p_i46450_1_, IBlockState p_i46450_2_)
+    public WorldGenShrub(int p_i2015_1_, int p_i2015_2_)
     {
         super(false);
-        this.woodMetadata = p_i46450_1_;
-        this.leavesMetadata = p_i46450_2_;
+        this.field_150527_b = p_i2015_1_;
+        this.field_150528_a = p_i2015_2_;
     }
 
-    public boolean generate(World worldIn, Random rand, BlockPos position)
+    public boolean generate(World worldIn, Random p_180709_2_, BlockPos p_180709_3_)
     {
-        Block block;
+        Block var4;
 
-        while (((block = worldIn.getBlockState(position).getBlock()).getMaterial() == Material.air || block.getMaterial() == Material.leaves) && position.getY() > 0)
+        while (((var4 = worldIn.getBlockState(p_180709_3_).getBlock()).getMaterial() == Material.air || var4.getMaterial() == Material.leaves) && p_180709_3_.getY() > 0)
         {
-            position = position.down();
+            p_180709_3_ = p_180709_3_.offsetDown();
         }
 
-        Block block1 = worldIn.getBlockState(position).getBlock();
+        Block var5 = worldIn.getBlockState(p_180709_3_).getBlock();
 
-        if (block1 == Blocks.dirt || block1 == Blocks.grass)
+        if (var5 == Blocks.dirt || var5 == Blocks.grass)
         {
-            position = position.up();
-            this.setBlockAndNotifyAdequately(worldIn, position, this.woodMetadata);
+            p_180709_3_ = p_180709_3_.offsetUp();
+            this.func_175905_a(worldIn, p_180709_3_, Blocks.log, this.field_150527_b);
 
-            for (int i = position.getY(); i <= position.getY() + 2; ++i)
+            for (int var6 = p_180709_3_.getY(); var6 <= p_180709_3_.getY() + 2; ++var6)
             {
-                int j = i - position.getY();
-                int k = 2 - j;
+                int var7 = var6 - p_180709_3_.getY();
+                int var8 = 2 - var7;
 
-                for (int l = position.getX() - k; l <= position.getX() + k; ++l)
+                for (int var9 = p_180709_3_.getX() - var8; var9 <= p_180709_3_.getX() + var8; ++var9)
                 {
-                    int i1 = l - position.getX();
+                    int var10 = var9 - p_180709_3_.getX();
 
-                    for (int j1 = position.getZ() - k; j1 <= position.getZ() + k; ++j1)
+                    for (int var11 = p_180709_3_.getZ() - var8; var11 <= p_180709_3_.getZ() + var8; ++var11)
                     {
-                        int k1 = j1 - position.getZ();
+                        int var12 = var11 - p_180709_3_.getZ();
 
-                        if (Math.abs(i1) != k || Math.abs(k1) != k || rand.nextInt(2) != 0)
+                        if (Math.abs(var10) != var8 || Math.abs(var12) != var8 || p_180709_2_.nextInt(2) != 0)
                         {
-                            BlockPos blockpos = new BlockPos(l, i, j1);
+                            BlockPos var13 = new BlockPos(var9, var6, var11);
 
-                            if (!worldIn.getBlockState(blockpos).getBlock().isFullBlock())
+                            if (!worldIn.getBlockState(var13).getBlock().isFullBlock())
                             {
-                                this.setBlockAndNotifyAdequately(worldIn, blockpos, this.leavesMetadata);
+                                this.func_175905_a(worldIn, var13, Blocks.leaves, this.field_150528_a);
                             }
                         }
                     }

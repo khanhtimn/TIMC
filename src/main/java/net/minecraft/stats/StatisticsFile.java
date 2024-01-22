@@ -9,6 +9,9 @@ import com.google.gson.JsonParser;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -26,221 +29,232 @@ import org.apache.logging.log4j.Logger;
 public class StatisticsFile extends StatFileWriter
 {
     private static final Logger logger = LogManager.getLogger();
-    private final MinecraftServer mcServer;
-    private final File statsFile;
-    private final Set<StatBase> field_150888_e = Sets.<StatBase>newHashSet();
+    private final MinecraftServer field_150890_c;
+    private final File field_150887_d;
+    private final Set field_150888_e = Sets.newHashSet();
     private int field_150885_f = -300;
     private boolean field_150886_g = false;
+    
 
-    public StatisticsFile(MinecraftServer serverIn, File statsFileIn)
+    public StatisticsFile(MinecraftServer p_i45306_1_, File p_i45306_2_)
     {
-        this.mcServer = serverIn;
-        this.statsFile = statsFileIn;
+        this.field_150890_c = p_i45306_1_;
+        this.field_150887_d = p_i45306_2_;
     }
 
-    public void readStatFile()
+    public void func_150882_a()
     {
-        if (this.statsFile.isFile())
+        if (this.field_150887_d.isFile())
         {
             try
             {
-                this.statsData.clear();
-                this.statsData.putAll(this.parseJson(FileUtils.readFileToString(this.statsFile)));
+                this.field_150875_a.clear();
+                this.field_150875_a.putAll(this.func_150881_a(FileUtils.readFileToString(this.field_150887_d)));
             }
-            catch (IOException ioexception)
+            catch (IOException var2)
             {
-                logger.error((String)("Couldn\'t read statistics file " + this.statsFile), (Throwable)ioexception);
+                logger.error("Couldn\'t read statistics file " + this.field_150887_d, var2);
             }
-            catch (JsonParseException jsonparseexception)
+            catch (JsonParseException var3)
             {
-                logger.error((String)("Couldn\'t parse statistics file " + this.statsFile), (Throwable)jsonparseexception);
+                logger.error("Couldn\'t parse statistics file " + this.field_150887_d, var3);
             }
         }
     }
 
-    public void saveStatFile()
+    public void func_150883_b()
     {
         try
         {
-            FileUtils.writeStringToFile(this.statsFile, dumpJson(this.statsData));
+            FileUtils.writeStringToFile(this.field_150887_d, func_150880_a(this.field_150875_a));
         }
-        catch (IOException ioexception)
+        catch (IOException var2)
         {
-            logger.error((String)"Couldn\'t save stats", (Throwable)ioexception);
+            logger.error("Couldn\'t save stats", var2);
         }
     }
 
-    /**
-     * Triggers the logging of an achievement and attempts to announce to server
-     */
-    public void unlockAchievement(EntityPlayer playerIn, StatBase statIn, int p_150873_3_)
+    public void func_150873_a(EntityPlayer p_150873_1_, StatBase p_150873_2_, int p_150873_3_)
     {
-        int i = statIn.isAchievement() ? this.readStat(statIn) : 0;
-        super.unlockAchievement(playerIn, statIn, p_150873_3_);
-        this.field_150888_e.add(statIn);
+        int var4 = p_150873_2_.isAchievement() ? this.writeStat(p_150873_2_) : 0;
+        super.func_150873_a(p_150873_1_, p_150873_2_, p_150873_3_);
+        this.field_150888_e.add(p_150873_2_);
 
-        if (statIn.isAchievement() && i == 0 && p_150873_3_ > 0)
+        if (p_150873_2_.isAchievement() && var4 == 0 && p_150873_3_ > 0)
         {
             this.field_150886_g = true;
 
-            if (this.mcServer.isAnnouncingPlayerAchievements())
+            if (this.field_150890_c.isAnnouncingPlayerAchievements())
             {
-                this.mcServer.getConfigurationManager().sendChatMsg(new ChatComponentTranslation("chat.type.achievement", new Object[] {playerIn.getDisplayName(), statIn.createChatComponent()}));
+                this.field_150890_c.getConfigurationManager().sendChatMsg(new ChatComponentTranslation("chat.type.achievement", new Object[] {p_150873_1_.getDisplayName(), p_150873_2_.func_150955_j()}));
             }
         }
 
-        if (statIn.isAchievement() && i > 0 && p_150873_3_ == 0)
+        if (p_150873_2_.isAchievement() && var4 > 0 && p_150873_3_ == 0)
         {
             this.field_150886_g = true;
 
-            if (this.mcServer.isAnnouncingPlayerAchievements())
+            if (this.field_150890_c.isAnnouncingPlayerAchievements())
             {
-                this.mcServer.getConfigurationManager().sendChatMsg(new ChatComponentTranslation("chat.type.achievement.taken", new Object[] {playerIn.getDisplayName(), statIn.createChatComponent()}));
+                this.field_150890_c.getConfigurationManager().sendChatMsg(new ChatComponentTranslation("chat.type.achievement.taken", new Object[] {p_150873_1_.getDisplayName(), p_150873_2_.func_150955_j()}));
             }
         }
     }
 
-    public Set<StatBase> func_150878_c()
+    public Set func_150878_c()
     {
-        Set<StatBase> set = Sets.newHashSet(this.field_150888_e);
+        HashSet var1 = Sets.newHashSet(this.field_150888_e);
         this.field_150888_e.clear();
         this.field_150886_g = false;
-        return set;
+        return var1;
     }
 
-    public Map<StatBase, TupleIntJsonSerializable> parseJson(String p_150881_1_)
+    public Map func_150881_a(String p_150881_1_)
     {
-        JsonElement jsonelement = (new JsonParser()).parse(p_150881_1_);
+        JsonElement var2 = (new JsonParser()).parse(p_150881_1_);
 
-        if (!jsonelement.isJsonObject())
+        if (!var2.isJsonObject())
         {
-            return Maps.<StatBase, TupleIntJsonSerializable>newHashMap();
+            return Maps.newHashMap();
         }
         else
         {
-            JsonObject jsonobject = jsonelement.getAsJsonObject();
-            Map<StatBase, TupleIntJsonSerializable> map = Maps.<StatBase, TupleIntJsonSerializable>newHashMap();
+            JsonObject var3 = var2.getAsJsonObject();
+            HashMap var4 = Maps.newHashMap();
+            Iterator var5 = var3.entrySet().iterator();
 
-            for (Entry<String, JsonElement> entry : jsonobject.entrySet())
+            while (var5.hasNext())
             {
-                StatBase statbase = StatList.getOneShotStat((String)entry.getKey());
+                Entry var6 = (Entry)var5.next();
+                StatBase var7 = StatList.getOneShotStat((String)var6.getKey());
 
-                if (statbase != null)
+                if (var7 != null)
                 {
-                    TupleIntJsonSerializable tupleintjsonserializable = new TupleIntJsonSerializable();
+                    TupleIntJsonSerializable var8 = new TupleIntJsonSerializable();
 
-                    if (((JsonElement)entry.getValue()).isJsonPrimitive() && ((JsonElement)entry.getValue()).getAsJsonPrimitive().isNumber())
+                    if (((JsonElement)var6.getValue()).isJsonPrimitive() && ((JsonElement)var6.getValue()).getAsJsonPrimitive().isNumber())
                     {
-                        tupleintjsonserializable.setIntegerValue(((JsonElement)entry.getValue()).getAsInt());
+                        var8.setIntegerValue(((JsonElement)var6.getValue()).getAsInt());
                     }
-                    else if (((JsonElement)entry.getValue()).isJsonObject())
+                    else if (((JsonElement)var6.getValue()).isJsonObject())
                     {
-                        JsonObject jsonobject1 = ((JsonElement)entry.getValue()).getAsJsonObject();
+                        JsonObject var9 = ((JsonElement)var6.getValue()).getAsJsonObject();
 
-                        if (jsonobject1.has("value") && jsonobject1.get("value").isJsonPrimitive() && jsonobject1.get("value").getAsJsonPrimitive().isNumber())
+                        if (var9.has("value") && var9.get("value").isJsonPrimitive() && var9.get("value").getAsJsonPrimitive().isNumber())
                         {
-                            tupleintjsonserializable.setIntegerValue(jsonobject1.getAsJsonPrimitive("value").getAsInt());
+                            var8.setIntegerValue(var9.getAsJsonPrimitive("value").getAsInt());
                         }
 
-                        if (jsonobject1.has("progress") && statbase.func_150954_l() != null)
+                        if (var9.has("progress") && var7.func_150954_l() != null)
                         {
                             try
                             {
-                                Constructor <? extends IJsonSerializable > constructor = statbase.func_150954_l().getConstructor(new Class[0]);
-                                IJsonSerializable ijsonserializable = (IJsonSerializable)constructor.newInstance(new Object[0]);
-                                ijsonserializable.fromJson(jsonobject1.get("progress"));
-                                tupleintjsonserializable.setJsonSerializableValue(ijsonserializable);
+                                Constructor var10 = var7.func_150954_l().getConstructor(new Class[0]);
+                                IJsonSerializable var11 = (IJsonSerializable)var10.newInstance(new Object[0]);
+                                var11.func_152753_a(var9.get("progress"));
+                                var8.setJsonSerializableValue(var11);
                             }
-                            catch (Throwable throwable)
+                            catch (Throwable var12)
                             {
-                                logger.warn("Invalid statistic progress in " + this.statsFile, throwable);
+                                logger.warn("Invalid statistic progress in " + this.field_150887_d, var12);
                             }
                         }
                     }
 
-                    map.put(statbase, tupleintjsonserializable);
+                    var4.put(var7, var8);
                 }
                 else
                 {
-                    logger.warn("Invalid statistic in " + this.statsFile + ": Don\'t know what " + (String)entry.getKey() + " is");
+                    logger.warn("Invalid statistic in " + this.field_150887_d + ": Don\'t know what " + (String)var6.getKey() + " is");
                 }
             }
 
-            return map;
+            return var4;
         }
     }
 
-    public static String dumpJson(Map<StatBase, TupleIntJsonSerializable> p_150880_0_)
+    public static String func_150880_a(Map p_150880_0_)
     {
-        JsonObject jsonobject = new JsonObject();
+        JsonObject var1 = new JsonObject();
+        Iterator var2 = p_150880_0_.entrySet().iterator();
 
-        for (Entry<StatBase, TupleIntJsonSerializable> entry : p_150880_0_.entrySet())
+        while (var2.hasNext())
         {
-            if (((TupleIntJsonSerializable)entry.getValue()).getJsonSerializableValue() != null)
+            Entry var3 = (Entry)var2.next();
+
+            if (((TupleIntJsonSerializable)var3.getValue()).getJsonSerializableValue() != null)
             {
-                JsonObject jsonobject1 = new JsonObject();
-                jsonobject1.addProperty("value", (Number)Integer.valueOf(((TupleIntJsonSerializable)entry.getValue()).getIntegerValue()));
+                JsonObject var4 = new JsonObject();
+                var4.addProperty("value", Integer.valueOf(((TupleIntJsonSerializable)var3.getValue()).getIntegerValue()));
 
                 try
                 {
-                    jsonobject1.add("progress", ((TupleIntJsonSerializable)entry.getValue()).getJsonSerializableValue().getSerializableElement());
+                    var4.add("progress", ((TupleIntJsonSerializable)var3.getValue()).getJsonSerializableValue().getSerializableElement());
                 }
-                catch (Throwable throwable)
+                catch (Throwable var6)
                 {
-                    logger.warn("Couldn\'t save statistic " + ((StatBase)entry.getKey()).getStatName() + ": error serializing progress", throwable);
+                    logger.warn("Couldn\'t save statistic " + ((StatBase)var3.getKey()).getStatName() + ": error serializing progress", var6);
                 }
 
-                jsonobject.add(((StatBase)entry.getKey()).statId, jsonobject1);
+                var1.add(((StatBase)var3.getKey()).statId, var4);
             }
             else
             {
-                jsonobject.addProperty(((StatBase)entry.getKey()).statId, (Number)Integer.valueOf(((TupleIntJsonSerializable)entry.getValue()).getIntegerValue()));
+                var1.addProperty(((StatBase)var3.getKey()).statId, Integer.valueOf(((TupleIntJsonSerializable)var3.getValue()).getIntegerValue()));
             }
         }
 
-        return jsonobject.toString();
+        return var1.toString();
     }
 
     public void func_150877_d()
     {
-        for (StatBase statbase : this.statsData.keySet())
+        Iterator var1 = this.field_150875_a.keySet().iterator();
+
+        while (var1.hasNext())
         {
-            this.field_150888_e.add(statbase);
+            StatBase var2 = (StatBase)var1.next();
+            this.field_150888_e.add(var2);
         }
     }
 
     public void func_150876_a(EntityPlayerMP p_150876_1_)
     {
-        int i = this.mcServer.getTickCounter();
-        Map<StatBase, Integer> map = Maps.<StatBase, Integer>newHashMap();
+        int var2 = this.field_150890_c.getTickCounter();
+        HashMap var3 = Maps.newHashMap();
 
-        if (this.field_150886_g || i - this.field_150885_f > 300)
+        if (this.field_150886_g || var2 - this.field_150885_f > 300)
         {
-            this.field_150885_f = i;
+            this.field_150885_f = var2;
+            Iterator var4 = this.func_150878_c().iterator();
 
-            for (StatBase statbase : this.func_150878_c())
+            while (var4.hasNext())
             {
-                map.put(statbase, Integer.valueOf(this.readStat(statbase)));
+                StatBase var5 = (StatBase)var4.next();
+                var3.put(var5, Integer.valueOf(this.writeStat(var5)));
             }
         }
 
-        p_150876_1_.playerNetServerHandler.sendPacket(new S37PacketStatistics(map));
+        p_150876_1_.playerNetServerHandler.sendPacket(new S37PacketStatistics(var3));
     }
 
-    public void sendAchievements(EntityPlayerMP player)
+    public void func_150884_b(EntityPlayerMP p_150884_1_)
     {
-        Map<StatBase, Integer> map = Maps.<StatBase, Integer>newHashMap();
+        HashMap var2 = Maps.newHashMap();
+        Iterator var3 = AchievementList.achievementList.iterator();
 
-        for (Achievement achievement : AchievementList.achievementList)
+        while (var3.hasNext())
         {
-            if (this.hasAchievementUnlocked(achievement))
+            Achievement var4 = (Achievement)var3.next();
+
+            if (this.hasAchievementUnlocked(var4))
             {
-                map.put(achievement, Integer.valueOf(this.readStat(achievement)));
-                this.field_150888_e.remove(achievement);
+                var2.put(var4, Integer.valueOf(this.writeStat(var4)));
+                this.field_150888_e.remove(var4);
             }
         }
 
-        player.playerNetServerHandler.sendPacket(new S37PacketStatistics(map));
+        p_150884_1_.playerNetServerHandler.sendPacket(new S37PacketStatistics(var2));
     }
 
     public boolean func_150879_e()

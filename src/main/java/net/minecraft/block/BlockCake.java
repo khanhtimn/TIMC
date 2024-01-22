@@ -9,7 +9,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
-import net.minecraft.stats.StatList;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -20,6 +19,7 @@ import net.minecraft.world.World;
 public class BlockCake extends Block
 {
     public static final PropertyInteger BITES = PropertyInteger.create("bites", 0, 6);
+    
 
     protected BlockCake()
     {
@@ -28,12 +28,12 @@ public class BlockCake extends Block
         this.setTickRandomly(true);
     }
 
-    public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
+    public void setBlockBoundsBasedOnState(IBlockAccess access, BlockPos pos)
     {
-        float f = 0.0625F;
-        float f1 = (float)(1 + ((Integer)worldIn.getBlockState(pos).getValue(BITES)).intValue() * 2) / 16.0F;
-        float f2 = 0.5F;
-        this.setBlockBounds(f1, 0.0F, f, 1.0F - f, f2, 1.0F - f);
+        float var3 = 0.0625F;
+        float var4 = (float)(1 + ((Integer)access.getBlockState(pos).getValue(BITES)).intValue() * 2) / 16.0F;
+        float var5 = 0.5F;
+        this.setBlockBounds(var4, 0.0F, var3, 1.0F - var3, var5, 1.0F - var3);
     }
 
     /**
@@ -41,17 +41,17 @@ public class BlockCake extends Block
      */
     public void setBlockBoundsForItemRender()
     {
-        float f = 0.0625F;
-        float f1 = 0.5F;
-        this.setBlockBounds(f, 0.0F, f, 1.0F - f, f1, 1.0F - f);
+        float var1 = 0.0625F;
+        float var2 = 0.5F;
+        this.setBlockBounds(var1, 0.0F, var1, 1.0F - var1, var2, 1.0F - var1);
     }
 
     public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state)
     {
-        float f = 0.0625F;
-        float f1 = (float)(1 + ((Integer)state.getValue(BITES)).intValue() * 2) / 16.0F;
-        float f2 = 0.5F;
-        return new AxisAlignedBB((double)((float)pos.getX() + f1), (double)pos.getY(), (double)((float)pos.getZ() + f), (double)((float)(pos.getX() + 1) - f), (double)((float)pos.getY() + f2), (double)((float)(pos.getZ() + 1) - f));
+        float var4 = 0.0625F;
+        float var5 = (float)(1 + ((Integer)state.getValue(BITES)).intValue() * 2) / 16.0F;
+        float var6 = 0.5F;
+        return new AxisAlignedBB((double)((float)pos.getX() + var5), (double)pos.getY(), (double)((float)pos.getZ() + var4), (double)((float)(pos.getX() + 1) - var4), (double)((float)pos.getY() + var6), (double)((float)(pos.getZ() + 1) - var4));
     }
 
     public AxisAlignedBB getSelectedBoundingBox(World worldIn, BlockPos pos)
@@ -64,9 +64,6 @@ public class BlockCake extends Block
         return false;
     }
 
-    /**
-     * Used to determine ambient occlusion and culling when rebuilding chunks for render
-     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -83,21 +80,20 @@ public class BlockCake extends Block
         this.eatCake(worldIn, pos, worldIn.getBlockState(pos), playerIn);
     }
 
-    private void eatCake(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player)
+    private void eatCake(World worldIn, BlockPos p_180682_2_, IBlockState p_180682_3_, EntityPlayer p_180682_4_)
     {
-        if (player.canEat(false))
+        if (p_180682_4_.canEat(false))
         {
-            player.triggerAchievement(StatList.field_181724_H);
-            player.getFoodStats().addStats(2, 0.1F);
-            int i = ((Integer)state.getValue(BITES)).intValue();
+            p_180682_4_.getFoodStats().addStats(2, 0.1F);
+            int var5 = ((Integer)p_180682_3_.getValue(BITES)).intValue();
 
-            if (i < 6)
+            if (var5 < 6)
             {
-                worldIn.setBlockState(pos, state.withProperty(BITES, Integer.valueOf(i + 1)), 3);
+                worldIn.setBlockState(p_180682_2_, p_180682_3_.withProperty(BITES, Integer.valueOf(var5 + 1)), 3);
             }
             else
             {
-                worldIn.setBlockToAir(pos);
+                worldIn.setBlockToAir(p_180682_2_);
             }
         }
     }
@@ -107,9 +103,6 @@ public class BlockCake extends Block
         return super.canPlaceBlockAt(worldIn, pos) ? this.canBlockStay(worldIn, pos) : false;
     }
 
-    /**
-     * Called when a neighboring block changes.
-     */
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
     {
         if (!this.canBlockStay(worldIn, pos))
@@ -118,9 +111,9 @@ public class BlockCake extends Block
         }
     }
 
-    private boolean canBlockStay(World worldIn, BlockPos pos)
+    private boolean canBlockStay(World worldIn, BlockPos p_176588_2_)
     {
-        return worldIn.getBlockState(pos.down()).getBlock().getMaterial().isSolid();
+        return worldIn.getBlockState(p_176588_2_.offsetDown()).getBlock().getMaterial().isSolid();
     }
 
     /**
@@ -133,6 +126,8 @@ public class BlockCake extends Block
 
     /**
      * Get the Item that this Block should drop when harvested.
+     *  
+     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {

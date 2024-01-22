@@ -1,12 +1,15 @@
+/*
+ * Decompiled with CFR 0.150.
+ */
 package net.minecraftforge.fml.common.registry;
 
 import net.minecraft.util.ResourceLocation;
 
-public interface RegistryDelegate<T>
-{
-    T get();
+public interface RegistryDelegate<T> {
+    public T get();
 
-    ResourceLocation name();
+    public ResourceLocation name();
 
-    Class<T> type();
+    public Class<T> type();
 }
+

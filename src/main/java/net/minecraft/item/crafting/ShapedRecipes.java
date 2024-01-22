@@ -18,14 +18,15 @@ public class ShapedRecipes implements IRecipe
 
     /** Is the ItemStack that you get when craft the recipe. */
     private final ItemStack recipeOutput;
-    private boolean copyIngredientNBT;
+    private boolean field_92101_f;
+    
 
-    public ShapedRecipes(int width, int height, ItemStack[] p_i1917_3_, ItemStack output)
+    public ShapedRecipes(int p_i1917_1_, int p_i1917_2_, ItemStack[] p_i1917_3_, ItemStack p_i1917_4_)
     {
-        this.recipeWidth = width;
-        this.recipeHeight = height;
+        this.recipeWidth = p_i1917_1_;
+        this.recipeHeight = p_i1917_2_;
         this.recipeItems = p_i1917_3_;
-        this.recipeOutput = output;
+        this.recipeOutput = p_i1917_4_;
     }
 
     public ItemStack getRecipeOutput()
@@ -33,38 +34,38 @@ public class ShapedRecipes implements IRecipe
         return this.recipeOutput;
     }
 
-    public ItemStack[] getRemainingItems(InventoryCrafting inv)
+    public ItemStack[] func_179532_b(InventoryCrafting p_179532_1_)
     {
-        ItemStack[] aitemstack = new ItemStack[inv.getSizeInventory()];
+        ItemStack[] var2 = new ItemStack[p_179532_1_.getSizeInventory()];
 
-        for (int i = 0; i < aitemstack.length; ++i)
+        for (int var3 = 0; var3 < var2.length; ++var3)
         {
-            ItemStack itemstack = inv.getStackInSlot(i);
+            ItemStack var4 = p_179532_1_.getStackInSlot(var3);
 
-            if (itemstack != null && itemstack.getItem().hasContainerItem())
+            if (var4 != null && var4.getItem().hasContainerItem())
             {
-                aitemstack[i] = new ItemStack(itemstack.getItem().getContainerItem());
+                var2[var3] = new ItemStack(var4.getItem().getContainerItem());
             }
         }
 
-        return aitemstack;
+        return var2;
     }
 
     /**
      * Used to check if a recipe matches current crafting inventory
      */
-    public boolean matches(InventoryCrafting inv, World worldIn)
+    public boolean matches(InventoryCrafting p_77569_1_, World worldIn)
     {
-        for (int i = 0; i <= 3 - this.recipeWidth; ++i)
+        for (int var3 = 0; var3 <= 3 - this.recipeWidth; ++var3)
         {
-            for (int j = 0; j <= 3 - this.recipeHeight; ++j)
+            for (int var4 = 0; var4 <= 3 - this.recipeHeight; ++var4)
             {
-                if (this.checkMatch(inv, i, j, true))
+                if (this.checkMatch(p_77569_1_, var3, var4, true))
                 {
                     return true;
                 }
 
-                if (this.checkMatch(inv, i, j, false))
+                if (this.checkMatch(p_77569_1_, var3, var4, false))
                 {
                     return true;
                 }
@@ -79,41 +80,41 @@ public class ShapedRecipes implements IRecipe
      */
     private boolean checkMatch(InventoryCrafting p_77573_1_, int p_77573_2_, int p_77573_3_, boolean p_77573_4_)
     {
-        for (int i = 0; i < 3; ++i)
+        for (int var5 = 0; var5 < 3; ++var5)
         {
-            for (int j = 0; j < 3; ++j)
+            for (int var6 = 0; var6 < 3; ++var6)
             {
-                int k = i - p_77573_2_;
-                int l = j - p_77573_3_;
-                ItemStack itemstack = null;
+                int var7 = var5 - p_77573_2_;
+                int var8 = var6 - p_77573_3_;
+                ItemStack var9 = null;
 
-                if (k >= 0 && l >= 0 && k < this.recipeWidth && l < this.recipeHeight)
+                if (var7 >= 0 && var8 >= 0 && var7 < this.recipeWidth && var8 < this.recipeHeight)
                 {
                     if (p_77573_4_)
                     {
-                        itemstack = this.recipeItems[this.recipeWidth - k - 1 + l * this.recipeWidth];
+                        var9 = this.recipeItems[this.recipeWidth - var7 - 1 + var8 * this.recipeWidth];
                     }
                     else
                     {
-                        itemstack = this.recipeItems[k + l * this.recipeWidth];
+                        var9 = this.recipeItems[var7 + var8 * this.recipeWidth];
                     }
                 }
 
-                ItemStack itemstack1 = p_77573_1_.getStackInRowAndColumn(i, j);
+                ItemStack var10 = p_77573_1_.getStackInRowAndColumn(var5, var6);
 
-                if (itemstack1 != null || itemstack != null)
+                if (var10 != null || var9 != null)
                 {
-                    if (itemstack1 == null && itemstack != null || itemstack1 != null && itemstack == null)
+                    if (var10 == null && var9 != null || var10 != null && var9 == null)
                     {
                         return false;
                     }
 
-                    if (itemstack.getItem() != itemstack1.getItem())
+                    if (var9.getItem() != var10.getItem())
                     {
                         return false;
                     }
 
-                    if (itemstack.getMetadata() != 32767 && itemstack.getMetadata() != itemstack1.getMetadata())
+                    if (var9.getMetadata() != 32767 && var9.getMetadata() != var10.getMetadata())
                     {
                         return false;
                     }
@@ -127,24 +128,24 @@ public class ShapedRecipes implements IRecipe
     /**
      * Returns an Item that is the result of this recipe
      */
-    public ItemStack getCraftingResult(InventoryCrafting inv)
+    public ItemStack getCraftingResult(InventoryCrafting p_77572_1_)
     {
-        ItemStack itemstack = this.getRecipeOutput().copy();
+        ItemStack var2 = this.getRecipeOutput().copy();
 
-        if (this.copyIngredientNBT)
+        if (this.field_92101_f)
         {
-            for (int i = 0; i < inv.getSizeInventory(); ++i)
+            for (int var3 = 0; var3 < p_77572_1_.getSizeInventory(); ++var3)
             {
-                ItemStack itemstack1 = inv.getStackInSlot(i);
+                ItemStack var4 = p_77572_1_.getStackInSlot(var3);
 
-                if (itemstack1 != null && itemstack1.hasTagCompound())
+                if (var4 != null && var4.hasTagCompound())
                 {
-                    itemstack.setTagCompound((NBTTagCompound)itemstack1.getTagCompound().copy());
+                    var2.setTagCompound((NBTTagCompound)var4.getTagCompound().copy());
                 }
             }
         }
 
-        return itemstack;
+        return var2;
     }
 
     /**
@@ -153,5 +154,11 @@ public class ShapedRecipes implements IRecipe
     public int getRecipeSize()
     {
         return this.recipeWidth * this.recipeHeight;
+    }
+
+    public ShapedRecipes func_92100_c()
+    {
+        this.field_92101_f = true;
+        return this;
     }
 }

@@ -5,19 +5,26 @@ import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Set;
 
-public class JsonSerializableSet extends ForwardingSet<String> implements IJsonSerializable
+public class JsonSerializableSet extends ForwardingSet implements IJsonSerializable
 {
-    private final Set<String> underlyingSet = Sets.<String>newHashSet();
+    /** The set for this ForwardingSet to forward methods to. */
+    private final Set underlyingSet = Sets.newHashSet();
+    
 
-    public void fromJson(JsonElement json)
+    public void func_152753_a(JsonElement p_152753_1_)
     {
-        if (json.isJsonArray())
+        if (p_152753_1_.isJsonArray())
         {
-            for (JsonElement jsonelement : json.getAsJsonArray())
+            Iterator var2 = p_152753_1_.getAsJsonArray().iterator();
+
+            while (var2.hasNext())
             {
-                this.add(jsonelement.getAsString());
+                JsonElement var3 = (JsonElement)var2.next();
+                this.add(var3.getAsString());
             }
         }
     }
@@ -27,18 +34,23 @@ public class JsonSerializableSet extends ForwardingSet<String> implements IJsonS
      */
     public JsonElement getSerializableElement()
     {
-        JsonArray jsonarray = new JsonArray();
+        JsonArray var1 = new JsonArray();
+        Iterator var2 = this.iterator();
 
-        for (String s : this)
+        while (var2.hasNext())
         {
-            jsonarray.add(new JsonPrimitive(s));
+            String var3 = (String)var2.next();
+            var1.add(new JsonPrimitive(var3));
         }
 
-        return jsonarray;
+        return var1;
     }
 
-    protected Set<String> delegate()
+    protected Set delegate()
     {
         return this.underlyingSet;
     }
+
+ 
+
 }

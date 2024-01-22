@@ -10,6 +10,7 @@ public class InventoryCraftResult implements IInventory
 {
     /** A list of one item containing the result of the crafting formula */
     private ItemStack[] stackResult = new ItemStack[1];
+    
 
     /**
      * Returns the number of slots in the inventory.
@@ -20,15 +21,15 @@ public class InventoryCraftResult implements IInventory
     }
 
     /**
-     * Returns the stack in the given slot.
+     * Returns the stack in slot i
      */
-    public ItemStack getStackInSlot(int index)
+    public ItemStack getStackInSlot(int slotIn)
     {
         return this.stackResult[0];
     }
 
     /**
-     * Get the name of this object. For players this returns their username
+     * Gets the name of this command sender (usually username, but possibly "Rcon")
      */
     public String getName()
     {
@@ -43,24 +44,22 @@ public class InventoryCraftResult implements IInventory
         return false;
     }
 
-    /**
-     * Get the formatted ChatComponent that will be used for the sender's username in chat
-     */
     public IChatComponent getDisplayName()
     {
         return (IChatComponent)(this.hasCustomName() ? new ChatComponentText(this.getName()) : new ChatComponentTranslation(this.getName(), new Object[0]));
     }
 
     /**
-     * Removes up to a specified number of items from an inventory slot and returns them in a new stack.
+     * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a
+     * new stack.
      */
     public ItemStack decrStackSize(int index, int count)
     {
         if (this.stackResult[0] != null)
         {
-            ItemStack itemstack = this.stackResult[0];
+            ItemStack var3 = this.stackResult[0];
             this.stackResult[0] = null;
-            return itemstack;
+            return var3;
         }
         else
         {
@@ -69,15 +68,16 @@ public class InventoryCraftResult implements IInventory
     }
 
     /**
-     * Removes a stack from the given slot and returns it.
+     * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem -
+     * like when you close a workbench GUI.
      */
-    public ItemStack removeStackFromSlot(int index)
+    public ItemStack getStackInSlotOnClosing(int index)
     {
         if (this.stackResult[0] != null)
         {
-            ItemStack itemstack = this.stackResult[0];
+            ItemStack var2 = this.stackResult[0];
             this.stackResult[0] = null;
-            return itemstack;
+            return var2;
         }
         else
         {
@@ -94,7 +94,8 @@ public class InventoryCraftResult implements IInventory
     }
 
     /**
-     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended.
+     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't
+     * this more of a set than a get?*
      */
     public int getInventoryStackLimit()
     {
@@ -105,25 +106,19 @@ public class InventoryCraftResult implements IInventory
      * For tile entities, ensures the chunk containing the tile entity is saved to disk later - the game won't think it
      * hasn't changed and skip it.
      */
-    public void markDirty()
-    {
-    }
+    public void markDirty() {}
 
     /**
      * Do not make give this method the name canInteractWith because it clashes with Container
      */
-    public boolean isUseableByPlayer(EntityPlayer player)
+    public boolean isUseableByPlayer(EntityPlayer playerIn)
     {
         return true;
     }
 
-    public void openInventory(EntityPlayer player)
-    {
-    }
+    public void openInventory(EntityPlayer playerIn) {}
 
-    public void closeInventory(EntityPlayer player)
-    {
-    }
+    public void closeInventory(EntityPlayer playerIn) {}
 
     /**
      * Returns true if automation is allowed to insert the given stack (ignoring stack size) into the given slot.
@@ -138,20 +133,18 @@ public class InventoryCraftResult implements IInventory
         return 0;
     }
 
-    public void setField(int id, int value)
-    {
-    }
+    public void setField(int id, int value) {}
 
     public int getFieldCount()
     {
         return 0;
     }
 
-    public void clear()
+    public void clearInventory()
     {
-        for (int i = 0; i < this.stackResult.length; ++i)
+        for (int var1 = 0; var1 < this.stackResult.length; ++var1)
         {
-            this.stackResult[i] = null;
+            this.stackResult[var1] = null;
         }
     }
 }

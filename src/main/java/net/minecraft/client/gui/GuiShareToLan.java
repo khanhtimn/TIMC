@@ -14,6 +14,7 @@ public class GuiShareToLan extends GuiScreen
     private GuiButton field_146597_g;
     private String field_146599_h = "survival";
     private boolean field_146600_i;
+    
 
     public GuiShareToLan(GuiScreen p_i1055_1_)
     {
@@ -21,8 +22,7 @@ public class GuiShareToLan extends GuiScreen
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
-     * window resizes, the buttonList is cleared beforehand.
+     * Adds the buttons (and other controls) to the screen in question.
      */
     public void initGui()
     {
@@ -49,9 +49,6 @@ public class GuiShareToLan extends GuiScreen
         }
     }
 
-    /**
-     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
-     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
         if (button.id == 102)
@@ -87,19 +84,19 @@ public class GuiShareToLan extends GuiScreen
         else if (button.id == 101)
         {
             this.mc.displayGuiScreen((GuiScreen)null);
-            String s = this.mc.getIntegratedServer().shareToLAN(WorldSettings.GameType.getByName(this.field_146599_h), this.field_146600_i);
-            IChatComponent ichatcomponent;
+            String var2 = this.mc.getIntegratedServer().shareToLAN(WorldSettings.GameType.getByName(this.field_146599_h), this.field_146600_i);
+            Object var3;
 
-            if (s != null)
+            if (var2 != null)
             {
-                ichatcomponent = new ChatComponentTranslation("commands.publish.started", new Object[] {s});
+                var3 = new ChatComponentTranslation("commands.publish.started", new Object[] {var2});
             }
             else
             {
-                ichatcomponent = new ChatComponentText("commands.publish.failed");
+                var3 = new ChatComponentText("commands.publish.failed");
             }
 
-            this.mc.ingameGUI.getChatGUI().printChatMessage(ichatcomponent);
+            this.mc.ingameGUI.getChatGUI().printChatMessage((IChatComponent)var3);
         }
     }
 

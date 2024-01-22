@@ -9,17 +9,22 @@ import net.minecraft.item.ItemTool;
 
 public enum EnumEnchantmentType
 {
-    ALL,
-    ARMOR,
-    ARMOR_FEET,
-    ARMOR_LEGS,
-    ARMOR_TORSO,
-    ARMOR_HEAD,
-    WEAPON,
-    DIGGER,
-    FISHING_ROD,
-    BREAKABLE,
-    BOW;
+    ALL("ALL", 0),
+    ARMOR("ARMOR", 1),
+    ARMOR_FEET("ARMOR_FEET", 2),
+    ARMOR_LEGS("ARMOR_LEGS", 3),
+    ARMOR_TORSO("ARMOR_TORSO", 4),
+    ARMOR_HEAD("ARMOR_HEAD", 5),
+    WEAPON("WEAPON", 6),
+    DIGGER("DIGGER", 7),
+    FISHING_ROD("FISHING_ROD", 8),
+    BREAKABLE("BREAKABLE", 9),
+    BOW("BOW", 10);
+
+    private static final EnumEnchantmentType[] $VALUES = new EnumEnchantmentType[]{ALL, ARMOR, ARMOR_FEET, ARMOR_LEGS, ARMOR_TORSO, ARMOR_HEAD, WEAPON, DIGGER, FISHING_ROD, BREAKABLE, BOW};
+    
+
+    private EnumEnchantmentType(String p_i1927_1_, int p_i1927_2_) {}
 
     /**
      * Return true if the item passed can be enchanted by a enchantment of this type.
@@ -42,8 +47,8 @@ public enum EnumEnchantmentType
             }
             else
             {
-                ItemArmor itemarmor = (ItemArmor)p_77557_1_;
-                return itemarmor.armorType == 0 ? this == ARMOR_HEAD : (itemarmor.armorType == 2 ? this == ARMOR_LEGS : (itemarmor.armorType == 1 ? this == ARMOR_TORSO : (itemarmor.armorType == 3 ? this == ARMOR_FEET : false)));
+                ItemArmor var2 = (ItemArmor)p_77557_1_;
+                return var2.armorType == 0 ? this == ARMOR_HEAD : (var2.armorType == 2 ? this == ARMOR_LEGS : (var2.armorType == 1 ? this == ARMOR_TORSO : (var2.armorType == 3 ? this == ARMOR_FEET : false)));
             }
         }
         else

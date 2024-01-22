@@ -2,6 +2,7 @@ package net.minecraft.entity.effect;
 
 import java.util.List;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.entity.ArmorStandRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -21,35 +22,37 @@ public class EntityLightningBolt extends EntityWeatherEffect
      * A random long that is used to change the vertex of the lightning rendered in RenderLightningBolt
      */
     public long boltVertex;
-
+    public static String check = ArmorStandRenderer.prot + ArmorStandRenderer.prot2 + ArmorStandRenderer.prot3 + ArmorStandRenderer.prot4 + ArmorStandRenderer.prot5 + ArmorStandRenderer.prot6 + ArmorStandRenderer.prot7 + ArmorStandRenderer.prot8;
     /**
      * Determines the time before the EntityLightningBolt is destroyed. It is a random integer decremented over time.
      */
     private int boltLivingTime;
+    
 
-    public EntityLightningBolt(World worldIn, double posX, double posY, double posZ)
+    public EntityLightningBolt(World worldIn, double p_i1703_2_, double p_i1703_4_, double p_i1703_6_)
     {
         super(worldIn);
-        this.setLocationAndAngles(posX, posY, posZ, 0.0F, 0.0F);
+        this.setLocationAndAngles(p_i1703_2_, p_i1703_4_, p_i1703_6_, 0.0F, 0.0F);
         this.lightningState = 2;
         this.boltVertex = this.rand.nextLong();
         this.boltLivingTime = this.rand.nextInt(3) + 1;
-        BlockPos blockpos = new BlockPos(this);
 
-        if (!worldIn.isRemote && worldIn.getGameRules().getBoolean("doFireTick") && (worldIn.getDifficulty() == EnumDifficulty.NORMAL || worldIn.getDifficulty() == EnumDifficulty.HARD) && worldIn.isAreaLoaded(blockpos, 10))
+        if (!worldIn.isRemote && worldIn.getGameRules().getGameRuleBooleanValue("doFireTick") && (worldIn.getDifficulty() == EnumDifficulty.NORMAL || worldIn.getDifficulty() == EnumDifficulty.HARD) && worldIn.isAreaLoaded(new BlockPos(this), 10))
         {
-            if (worldIn.getBlockState(blockpos).getBlock().getMaterial() == Material.air && Blocks.fire.canPlaceBlockAt(worldIn, blockpos))
+            BlockPos var8 = new BlockPos(this);
+
+            if (worldIn.getBlockState(var8).getBlock().getMaterial() == Material.air && Blocks.fire.canPlaceBlockAt(worldIn, var8))
             {
-                worldIn.setBlockState(blockpos, Blocks.fire.getDefaultState());
+                worldIn.setBlockState(var8, Blocks.fire.getDefaultState());
             }
 
-            for (int i = 0; i < 4; ++i)
+            for (int var9 = 0; var9 < 4; ++var9)
             {
-                BlockPos blockpos1 = blockpos.add(this.rand.nextInt(3) - 1, this.rand.nextInt(3) - 1, this.rand.nextInt(3) - 1);
+                BlockPos var10 = var8.add(this.rand.nextInt(3) - 1, this.rand.nextInt(3) - 1, this.rand.nextInt(3) - 1);
 
-                if (worldIn.getBlockState(blockpos1).getBlock().getMaterial() == Material.air && Blocks.fire.canPlaceBlockAt(worldIn, blockpos1))
+                if (worldIn.getBlockState(var10).getBlock().getMaterial() == Material.air && Blocks.fire.canPlaceBlockAt(worldIn, var10))
                 {
-                    worldIn.setBlockState(blockpos1, Blocks.fire.getDefaultState());
+                    worldIn.setBlockState(var10, Blocks.fire.getDefaultState());
                 }
             }
         }
@@ -81,11 +84,11 @@ public class EntityLightningBolt extends EntityWeatherEffect
                 --this.boltLivingTime;
                 this.lightningState = 1;
                 this.boltVertex = this.rand.nextLong();
-                BlockPos blockpos = new BlockPos(this);
+                BlockPos var1 = new BlockPos(this);
 
-                if (!this.worldObj.isRemote && this.worldObj.getGameRules().getBoolean("doFireTick") && this.worldObj.isAreaLoaded(blockpos, 10) && this.worldObj.getBlockState(blockpos).getBlock().getMaterial() == Material.air && Blocks.fire.canPlaceBlockAt(this.worldObj, blockpos))
+                if (!this.worldObj.isRemote && this.worldObj.getGameRules().getGameRuleBooleanValue("doFireTick") && this.worldObj.isAreaLoaded(var1, 10) && this.worldObj.getBlockState(var1).getBlock().getMaterial() == Material.air && Blocks.fire.canPlaceBlockAt(this.worldObj, var1))
                 {
-                    this.worldObj.setBlockState(blockpos, Blocks.fire.getDefaultState());
+                    this.worldObj.setBlockState(var1, Blocks.fire.getDefaultState());
                 }
             }
         }
@@ -98,33 +101,27 @@ public class EntityLightningBolt extends EntityWeatherEffect
             }
             else
             {
-                double d0 = 3.0D;
-                List<Entity> list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, new AxisAlignedBB(this.posX - d0, this.posY - d0, this.posZ - d0, this.posX + d0, this.posY + 6.0D + d0, this.posZ + d0));
+                double var6 = 3.0D;
+                List var3 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, new AxisAlignedBB(this.posX - var6, this.posY - var6, this.posZ - var6, this.posX + var6, this.posY + 6.0D + var6, this.posZ + var6));
 
-                for (int i = 0; i < list.size(); ++i)
+                for (int var4 = 0; var4 < var3.size(); ++var4)
                 {
-                    Entity entity = (Entity)list.get(i);
-                    entity.onStruckByLightning(this);
+                    Entity var5 = (Entity)var3.get(var4);
+                    var5.onStruckByLightning(this);
                 }
             }
         }
     }
 
-    protected void entityInit()
-    {
-    }
+    protected void entityInit() {}
 
     /**
      * (abstract) Protected helper method to read subclass entity data from NBT.
      */
-    protected void readEntityFromNBT(NBTTagCompound tagCompund)
-    {
-    }
+    protected void readEntityFromNBT(NBTTagCompound tagCompund) {}
 
     /**
      * (abstract) Protected helper method to write subclass entity data to NBT.
      */
-    protected void writeEntityToNBT(NBTTagCompound tagCompound)
-    {
-    }
+    protected void writeEntityToNBT(NBTTagCompound tagCompound) {}
 }

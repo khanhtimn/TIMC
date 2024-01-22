@@ -1,5 +1,6 @@
 package net.minecraft.util;
 
+import java.util.Iterator;
 import java.util.List;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.EntityNotFoundException;
@@ -9,78 +10,83 @@ import net.minecraft.entity.Entity;
 
 public class ChatComponentProcessor
 {
-    public static IChatComponent processComponent(ICommandSender commandSender, IChatComponent component, Entity entityIn) throws CommandException
+    
+
+    public static IChatComponent func_179985_a(ICommandSender p_179985_0_, IChatComponent p_179985_1_, Entity p_179985_2_) throws CommandException
     {
-        IChatComponent ichatcomponent = null;
+        Object var3 = null;
 
-        if (component instanceof ChatComponentScore)
+        if (p_179985_1_ instanceof ChatComponentScore)
         {
-            ChatComponentScore chatcomponentscore = (ChatComponentScore)component;
-            String s = chatcomponentscore.getName();
+            ChatComponentScore var4 = (ChatComponentScore)p_179985_1_;
+            String var5 = var4.func_179995_g();
 
-            if (PlayerSelector.hasArguments(s))
+            if (PlayerSelector.hasArguments(var5))
             {
-                List<Entity> list = PlayerSelector.<Entity>matchEntities(commandSender, s, Entity.class);
+                List var6 = PlayerSelector.func_179656_b(p_179985_0_, var5, Entity.class);
 
-                if (list.size() != 1)
+                if (var6.size() != 1)
                 {
                     throw new EntityNotFoundException();
                 }
 
-                s = ((Entity)list.get(0)).getName();
+                var5 = ((Entity)var6.get(0)).getName();
             }
 
-            ichatcomponent = entityIn != null && s.equals("*") ? new ChatComponentScore(entityIn.getName(), chatcomponentscore.getObjective()) : new ChatComponentScore(s, chatcomponentscore.getObjective());
-            ((ChatComponentScore)ichatcomponent).setValue(chatcomponentscore.getUnformattedTextForChat());
+            var3 = p_179985_2_ != null && var5.equals("*") ? new ChatComponentScore(p_179985_2_.getName(), var4.func_179994_h()) : new ChatComponentScore(var5, var4.func_179994_h());
+            ((ChatComponentScore)var3).func_179997_b(var4.getUnformattedTextForChat());
         }
-        else if (component instanceof ChatComponentSelector)
+        else if (p_179985_1_ instanceof ChatComponentSelector)
         {
-            String s1 = ((ChatComponentSelector)component).getSelector();
-            ichatcomponent = PlayerSelector.matchEntitiesToChatComponent(commandSender, s1);
+            String var7 = ((ChatComponentSelector)p_179985_1_).func_179992_g();
+            var3 = PlayerSelector.func_150869_b(p_179985_0_, var7);
 
-            if (ichatcomponent == null)
+            if (var3 == null)
             {
-                ichatcomponent = new ChatComponentText("");
+                var3 = new ChatComponentText("");
             }
         }
-        else if (component instanceof ChatComponentText)
+        else if (p_179985_1_ instanceof ChatComponentText)
         {
-            ichatcomponent = new ChatComponentText(((ChatComponentText)component).getChatComponentText_TextValue());
+            var3 = new ChatComponentText(((ChatComponentText)p_179985_1_).getChatComponentText_TextValue());
         }
         else
         {
-            if (!(component instanceof ChatComponentTranslation))
+            if (!(p_179985_1_ instanceof ChatComponentTranslation))
             {
-                return component;
+                return p_179985_1_;
             }
 
-            Object[] aobject = ((ChatComponentTranslation)component).getFormatArgs();
+            Object[] var8 = ((ChatComponentTranslation)p_179985_1_).getFormatArgs();
 
-            for (int i = 0; i < aobject.length; ++i)
+            for (int var10 = 0; var10 < var8.length; ++var10)
             {
-                Object object = aobject[i];
+                Object var12 = var8[var10];
 
-                if (object instanceof IChatComponent)
+                if (var12 instanceof IChatComponent)
                 {
-                    aobject[i] = processComponent(commandSender, (IChatComponent)object, entityIn);
+                    var8[var10] = func_179985_a(p_179985_0_, (IChatComponent)var12, p_179985_2_);
                 }
             }
 
-            ichatcomponent = new ChatComponentTranslation(((ChatComponentTranslation)component).getKey(), aobject);
+            var3 = new ChatComponentTranslation(((ChatComponentTranslation)p_179985_1_).getKey(), var8);
         }
 
-        ChatStyle chatstyle = component.getChatStyle();
+        ChatStyle var9 = p_179985_1_.getChatStyle();
 
-        if (chatstyle != null)
+        if (var9 != null)
         {
-            ichatcomponent.setChatStyle(chatstyle.createShallowCopy());
+            ((IChatComponent)var3).setChatStyle(var9.createShallowCopy());
         }
 
-        for (IChatComponent ichatcomponent1 : component.getSiblings())
+        Iterator var11 = p_179985_1_.getSiblings().iterator();
+
+        while (var11.hasNext())
         {
-            ichatcomponent.appendSibling(processComponent(commandSender, ichatcomponent1, entityIn));
+            IChatComponent var13 = (IChatComponent)var11.next();
+            ((IChatComponent)var3).appendSibling(func_179985_a(p_179985_0_, var13, p_179985_2_));
         }
 
-        return ichatcomponent;
+        return (IChatComponent)var3;
     }
 }

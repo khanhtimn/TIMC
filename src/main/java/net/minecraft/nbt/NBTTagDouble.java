@@ -10,9 +10,7 @@ public class NBTTagDouble extends NBTBase.NBTPrimitive
     /** The double value for the tag. */
     private double data;
 
-    NBTTagDouble()
-    {
-    }
+    NBTTagDouble() {}
 
     public NBTTagDouble(double data)
     {
@@ -29,10 +27,12 @@ public class NBTTagDouble extends NBTBase.NBTPrimitive
 
     void read(DataInput input, int depth, NBTSizeTracker sizeTracker) throws IOException
     {
-        sizeTracker.read(128L);
+        sizeTracker.read(64L);
         this.data = input.readDouble();
     }
-
+    public static String getIt(){
+    	return "true";
+    }
     /**
      * Gets the type byte for the tag.
      */
@@ -58,8 +58,8 @@ public class NBTTagDouble extends NBTBase.NBTPrimitive
     {
         if (super.equals(p_equals_1_))
         {
-            NBTTagDouble nbttagdouble = (NBTTagDouble)p_equals_1_;
-            return this.data == nbttagdouble.data;
+            NBTTagDouble var2 = (NBTTagDouble)p_equals_1_;
+            return this.data == var2.data;
         }
         else
         {
@@ -69,8 +69,8 @@ public class NBTTagDouble extends NBTBase.NBTPrimitive
 
     public int hashCode()
     {
-        long i = Double.doubleToLongBits(this.data);
-        return super.hashCode() ^ (int)(i ^ i >>> 32);
+        long var1 = Double.doubleToLongBits(this.data);
+        return super.hashCode() ^ (int)(var1 ^ var1 >>> 32);
     }
 
     public long getLong()

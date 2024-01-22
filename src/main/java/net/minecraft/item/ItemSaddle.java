@@ -7,6 +7,8 @@ import net.minecraft.entity.player.EntityPlayer;
 
 public class ItemSaddle extends Item
 {
+    
+
     public ItemSaddle()
     {
         this.maxStackSize = 1;
@@ -20,12 +22,12 @@ public class ItemSaddle extends Item
     {
         if (target instanceof EntityPig)
         {
-            EntityPig entitypig = (EntityPig)target;
+            EntityPig var4 = (EntityPig)target;
 
-            if (!entitypig.getSaddled() && !entitypig.isChild())
+            if (!var4.getSaddled() && !var4.isChild())
             {
-                entitypig.setSaddled(true);
-                entitypig.worldObj.playSoundAtEntity(entitypig, "mob.horse.leather", 0.5F, 1.0F);
+                var4.setSaddled(true);
+                var4.worldObj.playSoundAtEntity(var4, "mob.horse.leather", 0.5F, 1.0F);
                 --stack.stackSize;
             }
 
@@ -40,6 +42,9 @@ public class ItemSaddle extends Item
     /**
      * Current implementations of this method in child classes do not use the entry argument beside ev. They just raise
      * the damage on the stack.
+     *  
+     * @param target The Entity being hit
+     * @param attacker the attacking entity
      */
     public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker)
     {

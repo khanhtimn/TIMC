@@ -5,18 +5,19 @@ import net.minecraft.realms.RealmsButton;
 
 public class GuiButtonRealmsProxy extends GuiButton
 {
-    private RealmsButton realmsButton;
+    private RealmsButton field_154318_o;
+    
 
-    public GuiButtonRealmsProxy(RealmsButton realmsButtonIn, int buttonId, int x, int y, String text)
+    public GuiButtonRealmsProxy(RealmsButton p_i46321_1_, int p_i46321_2_, int p_i46321_3_, int p_i46321_4_, String p_i46321_5_)
     {
-        super(buttonId, x, y, text);
-        this.realmsButton = realmsButtonIn;
+        super(p_i46321_2_, p_i46321_3_, p_i46321_4_, p_i46321_5_);
+        this.field_154318_o = p_i46321_1_;
     }
 
-    public GuiButtonRealmsProxy(RealmsButton realmsButtonIn, int buttonId, int x, int y, String text, int widthIn, int heightIn)
+    public GuiButtonRealmsProxy(RealmsButton p_i1090_1_, int p_i1090_2_, int p_i1090_3_, int p_i1090_4_, String p_i1090_5_, int p_i1090_6_, int p_i1090_7_)
     {
-        super(buttonId, x, y, widthIn, heightIn, text);
-        this.realmsButton = realmsButtonIn;
+        super(p_i1090_2_, p_i1090_3_, p_i1090_4_, p_i1090_6_, p_i1090_7_, p_i1090_5_);
+        this.field_154318_o = p_i1090_1_;
     }
 
     public int getId()
@@ -29,14 +30,14 @@ public class GuiButtonRealmsProxy extends GuiButton
         return super.enabled;
     }
 
-    public void setEnabled(boolean isEnabled)
+    public void setEnabled(boolean p_154313_1_)
     {
-        super.enabled = isEnabled;
+        super.enabled = p_154313_1_;
     }
 
-    public void setText(String text)
+    public void setText(String p_154311_1_)
     {
-        super.displayString = text;
+        super.displayString = p_154311_1_;
     }
 
     public int getButtonWidth()
@@ -57,7 +58,7 @@ public class GuiButtonRealmsProxy extends GuiButton
     {
         if (super.mousePressed(mc, mouseX, mouseY))
         {
-            this.realmsButton.clicked(mouseX, mouseY);
+            this.field_154318_o.clicked(mouseX, mouseY);
         }
 
         return super.mousePressed(mc, mouseX, mouseY);
@@ -68,7 +69,7 @@ public class GuiButtonRealmsProxy extends GuiButton
      */
     public void mouseReleased(int mouseX, int mouseY)
     {
-        this.realmsButton.released(mouseX, mouseY);
+        this.field_154318_o.released(mouseX, mouseY);
     }
 
     /**
@@ -76,12 +77,12 @@ public class GuiButtonRealmsProxy extends GuiButton
      */
     public void mouseDragged(Minecraft mc, int mouseX, int mouseY)
     {
-        this.realmsButton.renderBg(mouseX, mouseY);
+        this.field_154318_o.renderBg(mouseX, mouseY);
     }
 
     public RealmsButton getRealmsButton()
     {
-        return this.realmsButton;
+        return this.field_154318_o;
     }
 
     /**
@@ -90,7 +91,7 @@ public class GuiButtonRealmsProxy extends GuiButton
      */
     public int getHoverState(boolean mouseOver)
     {
-        return this.realmsButton.getYImage(mouseOver);
+        return this.field_154318_o.getYImage(mouseOver);
     }
 
     public int func_154312_c(boolean p_154312_1_)
@@ -98,7 +99,7 @@ public class GuiButtonRealmsProxy extends GuiButton
         return super.getHoverState(p_154312_1_);
     }
 
-    public int getHeight()
+    public int func_175232_g()
     {
         return this.height;
     }

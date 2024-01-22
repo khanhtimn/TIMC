@@ -8,6 +8,7 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityMinecartCommandBlock;
 import net.minecraft.entity.item.EntityMinecart;
@@ -15,26 +16,31 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class BlockRailDetector extends BlockRailBase
 {
-    public static final PropertyEnum<BlockRailBase.EnumRailDirection> SHAPE = PropertyEnum.<BlockRailBase.EnumRailDirection>create("shape", BlockRailBase.EnumRailDirection.class, new Predicate<BlockRailBase.EnumRailDirection>()
+    public static final PropertyEnum field_176573_b = PropertyEnum.create("shape", BlockRailBase.EnumRailDirection.class, new Predicate()
     {
-        public boolean apply(BlockRailBase.EnumRailDirection p_apply_1_)
+        
+        public boolean func_180344_a(BlockRailBase.EnumRailDirection p_180344_1_)
         {
-            return p_apply_1_ != BlockRailBase.EnumRailDirection.NORTH_EAST && p_apply_1_ != BlockRailBase.EnumRailDirection.NORTH_WEST && p_apply_1_ != BlockRailBase.EnumRailDirection.SOUTH_EAST && p_apply_1_ != BlockRailBase.EnumRailDirection.SOUTH_WEST;
+            return p_180344_1_ != BlockRailBase.EnumRailDirection.NORTH_EAST && p_180344_1_ != BlockRailBase.EnumRailDirection.NORTH_WEST && p_180344_1_ != BlockRailBase.EnumRailDirection.SOUTH_EAST && p_180344_1_ != BlockRailBase.EnumRailDirection.SOUTH_WEST;
+        }
+        public boolean apply(Object p_apply_1_)
+        {
+            return this.func_180344_a((BlockRailBase.EnumRailDirection)p_apply_1_);
         }
     });
-    public static final PropertyBool POWERED = PropertyBool.create("powered");
+    public static final PropertyBool field_176574_M = PropertyBool.create("powered");
+    
 
     public BlockRailDetector()
     {
         super(true);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(POWERED, Boolean.valueOf(false)).withProperty(SHAPE, BlockRailBase.EnumRailDirection.NORTH_SOUTH));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(field_176574_M, Boolean.valueOf(false)).withProperty(field_176573_b, BlockRailBase.EnumRailDirection.NORTH_SOUTH));
         this.setTickRandomly(true);
     }
 
@@ -61,9 +67,9 @@ public class BlockRailDetector extends BlockRailBase
     {
         if (!worldIn.isRemote)
         {
-            if (!((Boolean)state.getValue(POWERED)).booleanValue())
+            if (!((Boolean)state.getValue(field_176574_M)).booleanValue())
             {
-                this.updatePoweredState(worldIn, pos, state);
+                this.func_176570_e(worldIn, pos, state);
             }
         }
     }
@@ -71,72 +77,70 @@ public class BlockRailDetector extends BlockRailBase
     /**
      * Called randomly when setTickRandomly is set to true (used by e.g. crops to grow, etc.)
      */
-    public void randomTick(World worldIn, BlockPos pos, IBlockState state, Random random)
-    {
-    }
+    public void randomTick(World worldIn, BlockPos pos, IBlockState state, Random random) {}
 
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
-        if (!worldIn.isRemote && ((Boolean)state.getValue(POWERED)).booleanValue())
+        if (!worldIn.isRemote && ((Boolean)state.getValue(field_176574_M)).booleanValue())
         {
-            this.updatePoweredState(worldIn, pos, state);
+            this.func_176570_e(worldIn, pos, state);
         }
     }
 
-    public int getWeakPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
+    public int isProvidingWeakPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
     {
-        return ((Boolean)state.getValue(POWERED)).booleanValue() ? 15 : 0;
+        return ((Boolean)state.getValue(field_176574_M)).booleanValue() ? 15 : 0;
     }
 
-    public int getStrongPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
+    public int isProvidingStrongPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
     {
-        return !((Boolean)state.getValue(POWERED)).booleanValue() ? 0 : (side == EnumFacing.UP ? 15 : 0);
+        return !((Boolean)state.getValue(field_176574_M)).booleanValue() ? 0 : (side == EnumFacing.UP ? 15 : 0);
     }
 
-    private void updatePoweredState(World worldIn, BlockPos pos, IBlockState state)
+    private void func_176570_e(World worldIn, BlockPos p_176570_2_, IBlockState p_176570_3_)
     {
-        boolean flag = ((Boolean)state.getValue(POWERED)).booleanValue();
-        boolean flag1 = false;
-        List<EntityMinecart> list = this.<EntityMinecart>findMinecarts(worldIn, pos, EntityMinecart.class, new Predicate[0]);
+        boolean var4 = ((Boolean)p_176570_3_.getValue(field_176574_M)).booleanValue();
+        boolean var5 = false;
+        List var6 = this.func_176571_a(worldIn, p_176570_2_, EntityMinecart.class, new Predicate[0]);
 
-        if (!list.isEmpty())
+        if (!var6.isEmpty())
         {
-            flag1 = true;
+            var5 = true;
         }
 
-        if (flag1 && !flag)
+        if (var5 && !var4)
         {
-            worldIn.setBlockState(pos, state.withProperty(POWERED, Boolean.valueOf(true)), 3);
-            worldIn.notifyNeighborsOfStateChange(pos, this);
-            worldIn.notifyNeighborsOfStateChange(pos.down(), this);
-            worldIn.markBlockRangeForRenderUpdate(pos, pos);
+            worldIn.setBlockState(p_176570_2_, p_176570_3_.withProperty(field_176574_M, Boolean.valueOf(true)), 3);
+            worldIn.notifyNeighborsOfStateChange(p_176570_2_, this);
+            worldIn.notifyNeighborsOfStateChange(p_176570_2_.offsetDown(), this);
+            worldIn.markBlockRangeForRenderUpdate(p_176570_2_, p_176570_2_);
         }
 
-        if (!flag1 && flag)
+        if (!var5 && var4)
         {
-            worldIn.setBlockState(pos, state.withProperty(POWERED, Boolean.valueOf(false)), 3);
-            worldIn.notifyNeighborsOfStateChange(pos, this);
-            worldIn.notifyNeighborsOfStateChange(pos.down(), this);
-            worldIn.markBlockRangeForRenderUpdate(pos, pos);
+            worldIn.setBlockState(p_176570_2_, p_176570_3_.withProperty(field_176574_M, Boolean.valueOf(false)), 3);
+            worldIn.notifyNeighborsOfStateChange(p_176570_2_, this);
+            worldIn.notifyNeighborsOfStateChange(p_176570_2_.offsetDown(), this);
+            worldIn.markBlockRangeForRenderUpdate(p_176570_2_, p_176570_2_);
         }
 
-        if (flag1)
+        if (var5)
         {
-            worldIn.scheduleUpdate(pos, this, this.tickRate(worldIn));
+            worldIn.scheduleUpdate(p_176570_2_, this, this.tickRate(worldIn));
         }
 
-        worldIn.updateComparatorOutputLevel(pos, this);
+        worldIn.updateComparatorOutputLevel(p_176570_2_, this);
     }
 
     public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state)
     {
         super.onBlockAdded(worldIn, pos, state);
-        this.updatePoweredState(worldIn, pos, state);
+        this.func_176570_e(worldIn, pos, state);
     }
 
-    public IProperty<BlockRailBase.EnumRailDirection> getShapeProperty()
+    public IProperty func_176560_l()
     {
-        return SHAPE;
+        return field_176573_b;
     }
 
     public boolean hasComparatorInputOverride()
@@ -146,36 +150,36 @@ public class BlockRailDetector extends BlockRailBase
 
     public int getComparatorInputOverride(World worldIn, BlockPos pos)
     {
-        if (((Boolean)worldIn.getBlockState(pos).getValue(POWERED)).booleanValue())
+        if (((Boolean)worldIn.getBlockState(pos).getValue(field_176574_M)).booleanValue())
         {
-            List<EntityMinecartCommandBlock> list = this.<EntityMinecartCommandBlock>findMinecarts(worldIn, pos, EntityMinecartCommandBlock.class, new Predicate[0]);
+            List var3 = this.func_176571_a(worldIn, pos, EntityMinecartCommandBlock.class, new Predicate[0]);
 
-            if (!list.isEmpty())
+            if (!var3.isEmpty())
             {
-                return ((EntityMinecartCommandBlock)list.get(0)).getCommandBlockLogic().getSuccessCount();
+                return ((EntityMinecartCommandBlock)var3.get(0)).func_145822_e().getSuccessCount();
             }
 
-            List<EntityMinecart> list1 = this.<EntityMinecart>findMinecarts(worldIn, pos, EntityMinecart.class, new Predicate[] {EntitySelectors.selectInventories});
+            List var4 = this.func_176571_a(worldIn, pos, EntityMinecart.class, new Predicate[] {IEntitySelector.selectInventories});
 
-            if (!list1.isEmpty())
+            if (!var4.isEmpty())
             {
-                return Container.calcRedstoneFromInventory((IInventory)list1.get(0));
+                return Container.calcRedstoneFromInventory((IInventory)var4.get(0));
             }
         }
 
         return 0;
     }
 
-    protected <T extends EntityMinecart> List<T> findMinecarts(World worldIn, BlockPos pos, Class<T> clazz, Predicate<Entity>... filter)
+    protected List func_176571_a(World worldIn, BlockPos p_176571_2_, Class p_176571_3_, Predicate ... p_176571_4_)
     {
-        AxisAlignedBB axisalignedbb = this.getDectectionBox(pos);
-        return filter.length != 1 ? worldIn.getEntitiesWithinAABB(clazz, axisalignedbb) : worldIn.getEntitiesWithinAABB(clazz, axisalignedbb, filter[0]);
+        AxisAlignedBB var5 = this.func_176572_a(p_176571_2_);
+        return p_176571_4_.length != 1 ? worldIn.getEntitiesWithinAABB(p_176571_3_, var5) : worldIn.func_175647_a(p_176571_3_, var5, p_176571_4_[0]);
     }
 
-    private AxisAlignedBB getDectectionBox(BlockPos pos)
+    private AxisAlignedBB func_176572_a(BlockPos p_176572_1_)
     {
-        float f = 0.2F;
-        return new AxisAlignedBB((double)((float)pos.getX() + 0.2F), (double)pos.getY(), (double)((float)pos.getZ() + 0.2F), (double)((float)(pos.getX() + 1) - 0.2F), (double)((float)(pos.getY() + 1) - 0.2F), (double)((float)(pos.getZ() + 1) - 0.2F));
+        float var2 = 0.2F;
+        return new AxisAlignedBB((double)((float)p_176572_1_.getX() + 0.2F), (double)p_176572_1_.getY(), (double)((float)p_176572_1_.getZ() + 0.2F), (double)((float)(p_176572_1_.getX() + 1) - 0.2F), (double)((float)(p_176572_1_.getY() + 1) - 0.2F), (double)((float)(p_176572_1_.getZ() + 1) - 0.2F));
     }
 
     /**
@@ -183,7 +187,7 @@ public class BlockRailDetector extends BlockRailBase
      */
     public IBlockState getStateFromMeta(int meta)
     {
-        return this.getDefaultState().withProperty(SHAPE, BlockRailBase.EnumRailDirection.byMetadata(meta & 7)).withProperty(POWERED, Boolean.valueOf((meta & 8) > 0));
+        return this.getDefaultState().withProperty(field_176573_b, BlockRailBase.EnumRailDirection.func_177016_a(meta & 7)).withProperty(field_176574_M, Boolean.valueOf((meta & 8) > 0));
     }
 
     /**
@@ -191,19 +195,19 @@ public class BlockRailDetector extends BlockRailBase
      */
     public int getMetaFromState(IBlockState state)
     {
-        int i = 0;
-        i = i | ((BlockRailBase.EnumRailDirection)state.getValue(SHAPE)).getMetadata();
+        byte var2 = 0;
+        int var3 = var2 | ((BlockRailBase.EnumRailDirection)state.getValue(field_176573_b)).func_177015_a();
 
-        if (((Boolean)state.getValue(POWERED)).booleanValue())
+        if (((Boolean)state.getValue(field_176574_M)).booleanValue())
         {
-            i |= 8;
+            var3 |= 8;
         }
 
-        return i;
+        return var3;
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {SHAPE, POWERED});
+        return new BlockState(this, new IProperty[] {field_176573_b, field_176574_M});
     }
 }

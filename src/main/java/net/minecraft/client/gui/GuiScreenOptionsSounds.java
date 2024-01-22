@@ -19,6 +19,7 @@ public class GuiScreenOptionsSounds extends GuiScreen
     private final GameSettings game_settings_4;
     protected String field_146507_a = "Options";
     private String field_146508_h;
+    
 
     public GuiScreenOptionsSounds(GuiScreen p_i45025_1_, GameSettings p_i45025_2_)
     {
@@ -27,32 +28,32 @@ public class GuiScreenOptionsSounds extends GuiScreen
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
-     * window resizes, the buttonList is cleared beforehand.
+     * Adds the buttons (and other controls) to the screen in question.
      */
     public void initGui()
     {
-        int i = 0;
+        byte var1 = 0;
         this.field_146507_a = I18n.format("options.sounds.title", new Object[0]);
         this.field_146508_h = I18n.format("options.off", new Object[0]);
-        this.buttonList.add(new GuiScreenOptionsSounds.Button(SoundCategory.MASTER.getCategoryId(), this.width / 2 - 155 + i % 2 * 160, this.height / 6 - 12 + 24 * (i >> 1), SoundCategory.MASTER, true));
-        i = i + 2;
+        this.buttonList.add(new GuiScreenOptionsSounds.Button(SoundCategory.MASTER.getCategoryId(), this.width / 2 - 155 + var1 % 2 * 160, this.height / 6 - 12 + 24 * (var1 >> 1), SoundCategory.MASTER, true));
+        int var6 = var1 + 2;
+        SoundCategory[] var2 = SoundCategory.values();
+        int var3 = var2.length;
 
-        for (SoundCategory soundcategory : SoundCategory.values())
+        for (int var4 = 0; var4 < var3; ++var4)
         {
-            if (soundcategory != SoundCategory.MASTER)
+            SoundCategory var5 = var2[var4];
+
+            if (var5 != SoundCategory.MASTER)
             {
-                this.buttonList.add(new GuiScreenOptionsSounds.Button(soundcategory.getCategoryId(), this.width / 2 - 155 + i % 2 * 160, this.height / 6 - 12 + 24 * (i >> 1), soundcategory, false));
-                ++i;
+                this.buttonList.add(new GuiScreenOptionsSounds.Button(var5.getCategoryId(), this.width / 2 - 155 + var6 % 2 * 160, this.height / 6 - 12 + 24 * (var6 >> 1), var5, false));
+                ++var6;
             }
         }
 
         this.buttonList.add(new GuiButton(200, this.width / 2 - 100, this.height / 6 + 168, I18n.format("gui.done", new Object[0])));
     }
 
-    /**
-     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
-     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
         if (button.enabled)
@@ -77,8 +78,8 @@ public class GuiScreenOptionsSounds extends GuiScreen
 
     protected String getSoundVolume(SoundCategory p_146504_1_)
     {
-        float f = this.game_settings_4.getSoundLevel(p_146504_1_);
-        return f == 0.0F ? this.field_146508_h : (int)(f * 100.0F) + "%";
+        float var2 = this.game_settings_4.getSoundLevel(p_146504_1_);
+        return var2 == 0.0F ? this.field_146508_h : (int)(var2 * 100.0F) + "%";
     }
 
     class Button extends GuiButton
@@ -87,6 +88,7 @@ public class GuiScreenOptionsSounds extends GuiScreen
         private final String field_146152_s;
         public float field_146156_o = 1.0F;
         public boolean field_146155_p;
+        
 
         public Button(int p_i45024_2_, int p_i45024_3_, int p_i45024_4_, SoundCategory p_i45024_5_, boolean p_i45024_6_)
         {
@@ -139,9 +141,7 @@ public class GuiScreenOptionsSounds extends GuiScreen
             }
         }
 
-        public void playPressSound(SoundHandler soundHandlerIn)
-        {
-        }
+        public void playPressSound(SoundHandler soundHandlerIn) {}
 
         public void mouseReleased(int mouseX, int mouseY)
         {
@@ -149,14 +149,14 @@ public class GuiScreenOptionsSounds extends GuiScreen
             {
                 if (this.field_146153_r == SoundCategory.MASTER)
                 {
-                    float f = 1.0F;
+                    float var10000 = 1.0F;
                 }
                 else
                 {
                     GuiScreenOptionsSounds.this.game_settings_4.getSoundLevel(this.field_146153_r);
                 }
 
-                GuiScreenOptionsSounds.this.mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
+                GuiScreenOptionsSounds.this.mc.getSoundHandler().playSound(PositionedSoundRecord.createPositionedSoundRecord(new ResourceLocation("gui.button.press"), 1.0F));
             }
 
             this.field_146155_p = false;

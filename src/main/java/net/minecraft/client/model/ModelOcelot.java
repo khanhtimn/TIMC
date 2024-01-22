@@ -32,6 +32,7 @@ public class ModelOcelot extends ModelBase
     /** The body model for the Ocelot. */
     ModelRenderer ocelotBody;
     int field_78163_i = 1;
+    
 
     public ModelOcelot()
     {
@@ -72,40 +73,40 @@ public class ModelOcelot extends ModelBase
     /**
      * Sets the models various rotation angles then renders the model.
      */
-    public void render(Entity entityIn, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float scale)
+    public void render(Entity p_78088_1_, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float p_78088_7_)
     {
-        this.setRotationAngles(p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, scale, entityIn);
+        this.setRotationAngles(p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, p_78088_7_, p_78088_1_);
 
         if (this.isChild)
         {
-            float f = 2.0F;
+            float var8 = 2.0F;
             GlStateManager.pushMatrix();
-            GlStateManager.scale(1.5F / f, 1.5F / f, 1.5F / f);
-            GlStateManager.translate(0.0F, 10.0F * scale, 4.0F * scale);
-            this.ocelotHead.render(scale);
+            GlStateManager.scale(1.5F / var8, 1.5F / var8, 1.5F / var8);
+            GlStateManager.translate(0.0F, 10.0F * p_78088_7_, 4.0F * p_78088_7_);
+            this.ocelotHead.render(p_78088_7_);
             GlStateManager.popMatrix();
             GlStateManager.pushMatrix();
-            GlStateManager.scale(1.0F / f, 1.0F / f, 1.0F / f);
-            GlStateManager.translate(0.0F, 24.0F * scale, 0.0F);
-            this.ocelotBody.render(scale);
-            this.ocelotBackLeftLeg.render(scale);
-            this.ocelotBackRightLeg.render(scale);
-            this.ocelotFrontLeftLeg.render(scale);
-            this.ocelotFrontRightLeg.render(scale);
-            this.ocelotTail.render(scale);
-            this.ocelotTail2.render(scale);
+            GlStateManager.scale(1.0F / var8, 1.0F / var8, 1.0F / var8);
+            GlStateManager.translate(0.0F, 24.0F * p_78088_7_, 0.0F);
+            this.ocelotBody.render(p_78088_7_);
+            this.ocelotBackLeftLeg.render(p_78088_7_);
+            this.ocelotBackRightLeg.render(p_78088_7_);
+            this.ocelotFrontLeftLeg.render(p_78088_7_);
+            this.ocelotFrontRightLeg.render(p_78088_7_);
+            this.ocelotTail.render(p_78088_7_);
+            this.ocelotTail2.render(p_78088_7_);
             GlStateManager.popMatrix();
         }
         else
         {
-            this.ocelotHead.render(scale);
-            this.ocelotBody.render(scale);
-            this.ocelotTail.render(scale);
-            this.ocelotTail2.render(scale);
-            this.ocelotBackLeftLeg.render(scale);
-            this.ocelotBackRightLeg.render(scale);
-            this.ocelotFrontLeftLeg.render(scale);
-            this.ocelotFrontRightLeg.render(scale);
+            this.ocelotHead.render(p_78088_7_);
+            this.ocelotBody.render(p_78088_7_);
+            this.ocelotTail.render(p_78088_7_);
+            this.ocelotTail2.render(p_78088_7_);
+            this.ocelotBackLeftLeg.render(p_78088_7_);
+            this.ocelotBackRightLeg.render(p_78088_7_);
+            this.ocelotFrontLeftLeg.render(p_78088_7_);
+            this.ocelotFrontRightLeg.render(p_78088_7_);
         }
     }
 
@@ -114,10 +115,10 @@ public class ModelOcelot extends ModelBase
      * and legs, where par1 represents the time(so that arms and legs swing back and forth) and par2 represents how
      * "far" arms and legs can swing at most.
      */
-    public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn)
+    public void setRotationAngles(float p_78087_1_, float p_78087_2_, float p_78087_3_, float p_78087_4_, float p_78087_5_, float p_78087_6_, Entity p_78087_7_)
     {
-        this.ocelotHead.rotateAngleX = headPitch / (180F / (float)Math.PI);
-        this.ocelotHead.rotateAngleY = netHeadYaw / (180F / (float)Math.PI);
+        this.ocelotHead.rotateAngleX = p_78087_5_ / (180F / (float)Math.PI);
+        this.ocelotHead.rotateAngleY = p_78087_4_ / (180F / (float)Math.PI);
 
         if (this.field_78163_i != 3)
         {
@@ -125,26 +126,26 @@ public class ModelOcelot extends ModelBase
 
             if (this.field_78163_i == 2)
             {
-                this.ocelotBackLeftLeg.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.0F * limbSwingAmount;
-                this.ocelotBackRightLeg.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + 0.3F) * 1.0F * limbSwingAmount;
-                this.ocelotFrontLeftLeg.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI + 0.3F) * 1.0F * limbSwingAmount;
-                this.ocelotFrontRightLeg.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.0F * limbSwingAmount;
-                this.ocelotTail2.rotateAngleX = 1.7278761F + ((float)Math.PI / 10F) * MathHelper.cos(limbSwing) * limbSwingAmount;
+                this.ocelotBackLeftLeg.rotateAngleX = MathHelper.cos(p_78087_1_ * 0.6662F) * 1.0F * p_78087_2_;
+                this.ocelotBackRightLeg.rotateAngleX = MathHelper.cos(p_78087_1_ * 0.6662F + 0.3F) * 1.0F * p_78087_2_;
+                this.ocelotFrontLeftLeg.rotateAngleX = MathHelper.cos(p_78087_1_ * 0.6662F + (float)Math.PI + 0.3F) * 1.0F * p_78087_2_;
+                this.ocelotFrontRightLeg.rotateAngleX = MathHelper.cos(p_78087_1_ * 0.6662F + (float)Math.PI) * 1.0F * p_78087_2_;
+                this.ocelotTail2.rotateAngleX = 1.7278761F + ((float)Math.PI / 10F) * MathHelper.cos(p_78087_1_) * p_78087_2_;
             }
             else
             {
-                this.ocelotBackLeftLeg.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.0F * limbSwingAmount;
-                this.ocelotBackRightLeg.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.0F * limbSwingAmount;
-                this.ocelotFrontLeftLeg.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.0F * limbSwingAmount;
-                this.ocelotFrontRightLeg.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.0F * limbSwingAmount;
+                this.ocelotBackLeftLeg.rotateAngleX = MathHelper.cos(p_78087_1_ * 0.6662F) * 1.0F * p_78087_2_;
+                this.ocelotBackRightLeg.rotateAngleX = MathHelper.cos(p_78087_1_ * 0.6662F + (float)Math.PI) * 1.0F * p_78087_2_;
+                this.ocelotFrontLeftLeg.rotateAngleX = MathHelper.cos(p_78087_1_ * 0.6662F + (float)Math.PI) * 1.0F * p_78087_2_;
+                this.ocelotFrontRightLeg.rotateAngleX = MathHelper.cos(p_78087_1_ * 0.6662F) * 1.0F * p_78087_2_;
 
                 if (this.field_78163_i == 1)
                 {
-                    this.ocelotTail2.rotateAngleX = 1.7278761F + ((float)Math.PI / 4F) * MathHelper.cos(limbSwing) * limbSwingAmount;
+                    this.ocelotTail2.rotateAngleX = 1.7278761F + ((float)Math.PI / 4F) * MathHelper.cos(p_78087_1_) * p_78087_2_;
                 }
                 else
                 {
-                    this.ocelotTail2.rotateAngleX = 1.7278761F + 0.47123894F * MathHelper.cos(limbSwing) * limbSwingAmount;
+                    this.ocelotTail2.rotateAngleX = 1.7278761F + 0.47123894F * MathHelper.cos(p_78087_1_) * p_78087_2_;
                 }
             }
         }
@@ -154,9 +155,9 @@ public class ModelOcelot extends ModelBase
      * Used for easily adding entity-dependent animations. The second and third float params here are the same second
      * and third as in the setRotationAngles method.
      */
-    public void setLivingAnimations(EntityLivingBase entitylivingbaseIn, float p_78086_2_, float p_78086_3_, float partialTickTime)
+    public void setLivingAnimations(EntityLivingBase p_78086_1_, float p_78086_2_, float p_78086_3_, float p_78086_4_)
     {
-        EntityOcelot entityocelot = (EntityOcelot)entitylivingbaseIn;
+        EntityOcelot var5 = (EntityOcelot)p_78086_1_;
         this.ocelotBody.rotationPointY = 12.0F;
         this.ocelotBody.rotationPointZ = -10.0F;
         this.ocelotHead.rotationPointY = 15.0F;
@@ -171,7 +172,7 @@ public class ModelOcelot extends ModelBase
         this.ocelotBackLeftLeg.rotationPointZ = this.ocelotBackRightLeg.rotationPointZ = 5.0F;
         this.ocelotTail.rotateAngleX = 0.9F;
 
-        if (entityocelot.isSneaking())
+        if (var5.isSneaking())
         {
             ++this.ocelotBody.rotationPointY;
             this.ocelotHead.rotationPointY += 2.0F;
@@ -182,7 +183,7 @@ public class ModelOcelot extends ModelBase
             this.ocelotTail2.rotateAngleX = ((float)Math.PI / 2F);
             this.field_78163_i = 0;
         }
-        else if (entityocelot.isSprinting())
+        else if (var5.isSprinting())
         {
             this.ocelotTail2.rotationPointY = this.ocelotTail.rotationPointY;
             this.ocelotTail2.rotationPointZ += 2.0F;
@@ -190,7 +191,7 @@ public class ModelOcelot extends ModelBase
             this.ocelotTail2.rotateAngleX = ((float)Math.PI / 2F);
             this.field_78163_i = 2;
         }
-        else if (entityocelot.isSitting())
+        else if (var5.isSitting())
         {
             this.ocelotBody.rotateAngleX = ((float)Math.PI / 4F);
             this.ocelotBody.rotationPointY += -4.0F;

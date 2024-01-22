@@ -4,23 +4,24 @@ import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
 
-public class TileEntityMobSpawner extends TileEntity implements ITickable
+public class TileEntityMobSpawner extends TileEntity implements IUpdatePlayerListBox
 {
-    private final MobSpawnerBaseLogic spawnerLogic = new MobSpawnerBaseLogic()
+    private final MobSpawnerBaseLogic field_145882_a = new MobSpawnerBaseLogic()
     {
-        public void func_98267_a(int id)
+        
+        public void func_98267_a(int p_98267_1_)
         {
-            TileEntityMobSpawner.this.worldObj.addBlockEvent(TileEntityMobSpawner.this.pos, Blocks.mob_spawner, id, 0);
+            TileEntityMobSpawner.this.worldObj.addBlockEvent(TileEntityMobSpawner.this.pos, Blocks.mob_spawner, p_98267_1_, 0);
         }
         public World getSpawnerWorld()
         {
             return TileEntityMobSpawner.this.worldObj;
         }
-        public BlockPos getSpawnerPosition()
+        public BlockPos func_177221_b()
         {
             return TileEntityMobSpawner.this.pos;
         }
@@ -34,51 +35,46 @@ public class TileEntityMobSpawner extends TileEntity implements ITickable
             }
         }
     };
+    
 
     public void readFromNBT(NBTTagCompound compound)
     {
         super.readFromNBT(compound);
-        this.spawnerLogic.readFromNBT(compound);
+        this.field_145882_a.readFromNBT(compound);
     }
 
     public void writeToNBT(NBTTagCompound compound)
     {
         super.writeToNBT(compound);
-        this.spawnerLogic.writeToNBT(compound);
+        this.field_145882_a.writeToNBT(compound);
     }
 
     /**
-     * Like the old updateEntity(), except more generic.
+     * Updates the JList with a new model.
      */
     public void update()
     {
-        this.spawnerLogic.updateSpawner();
+        this.field_145882_a.updateSpawner();
     }
 
     /**
-     * Allows for a specialized description packet to be created. This is often used to sync tile entity data from the
-     * server to the client easily. For example this is used by signs to synchronise the text to be displayed.
+     * Overriden in a sign to provide the text.
      */
     public Packet getDescriptionPacket()
     {
-        NBTTagCompound nbttagcompound = new NBTTagCompound();
-        this.writeToNBT(nbttagcompound);
-        nbttagcompound.removeTag("SpawnPotentials");
-        return new S35PacketUpdateTileEntity(this.pos, 1, nbttagcompound);
+        NBTTagCompound var1 = new NBTTagCompound();
+        this.writeToNBT(var1);
+        var1.removeTag("SpawnPotentials");
+        return new S35PacketUpdateTileEntity(this.pos, 1, var1);
     }
 
     public boolean receiveClientEvent(int id, int type)
     {
-        return this.spawnerLogic.setDelayToMin(id) ? true : super.receiveClientEvent(id, type);
-    }
-
-    public boolean func_183000_F()
-    {
-        return true;
+        return this.field_145882_a.setDelayToMin(id) ? true : super.receiveClientEvent(id, type);
     }
 
     public MobSpawnerBaseLogic getSpawnerBaseLogic()
     {
-        return this.spawnerLogic;
+        return this.field_145882_a;
     }
 }

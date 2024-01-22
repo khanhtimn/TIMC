@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import net.minecraft.client.resources.data.IMetadataSerializer;
@@ -15,115 +17,120 @@ import org.apache.logging.log4j.Logger;
 
 public class FallbackResourceManager implements IResourceManager
 {
-    private static final Logger logger = LogManager.getLogger();
-    protected final List<IResourcePack> resourcePacks = Lists.<IResourcePack>newArrayList();
+    private static final Logger field_177246_b = LogManager.getLogger();
+    protected final List resourcePacks = Lists.newArrayList();
     private final IMetadataSerializer frmMetadataSerializer;
+    
 
-    public FallbackResourceManager(IMetadataSerializer frmMetadataSerializerIn)
+    public FallbackResourceManager(IMetadataSerializer p_i1289_1_)
     {
-        this.frmMetadataSerializer = frmMetadataSerializerIn;
+        this.frmMetadataSerializer = p_i1289_1_;
     }
 
-    public void addResourcePack(IResourcePack resourcePack)
+    public void addResourcePack(IResourcePack p_110538_1_)
     {
-        this.resourcePacks.add(resourcePack);
+        this.resourcePacks.add(p_110538_1_);
     }
 
-    public Set<String> getResourceDomains()
+    public Set getResourceDomains()
     {
         return null;
     }
 
-    public IResource getResource(ResourceLocation location) throws IOException
+    public IResource getResource(ResourceLocation p_110536_1_) throws IOException
     {
-        IResourcePack iresourcepack = null;
-        ResourceLocation resourcelocation = getLocationMcmeta(location);
+        IResourcePack var2 = null;
+        ResourceLocation var3 = getLocationMcmeta(p_110536_1_);
 
-        for (int i = this.resourcePacks.size() - 1; i >= 0; --i)
+        for (int var4 = this.resourcePacks.size() - 1; var4 >= 0; --var4)
         {
-            IResourcePack iresourcepack1 = (IResourcePack)this.resourcePacks.get(i);
+            IResourcePack var5 = (IResourcePack)this.resourcePacks.get(var4);
 
-            if (iresourcepack == null && iresourcepack1.resourceExists(resourcelocation))
+            if (var2 == null && var5.resourceExists(var3))
             {
-                iresourcepack = iresourcepack1;
+                var2 = var5;
             }
 
-            if (iresourcepack1.resourceExists(location))
+            if (var5.resourceExists(p_110536_1_))
             {
-                InputStream inputstream = null;
+                InputStream var6 = null;
 
-                if (iresourcepack != null)
+                if (var2 != null)
                 {
-                    inputstream = this.getInputStream(resourcelocation, iresourcepack);
+                    var6 = this.func_177245_a(var3, var2);
                 }
 
-                return new SimpleResource(iresourcepack1.getPackName(), location, this.getInputStream(location, iresourcepack1), inputstream, this.frmMetadataSerializer);
+                return new SimpleResource(var5.getPackName(), p_110536_1_, this.func_177245_a(p_110536_1_, var5), var6, this.frmMetadataSerializer);
             }
         }
 
-        throw new FileNotFoundException(location.toString());
+        throw new FileNotFoundException(p_110536_1_.toString());
     }
 
-    protected InputStream getInputStream(ResourceLocation location, IResourcePack resourcePack) throws IOException
+    protected InputStream func_177245_a(ResourceLocation p_177245_1_, IResourcePack p_177245_2_) throws IOException
     {
-        InputStream inputstream = resourcePack.getInputStream(location);
-        return (InputStream)(logger.isDebugEnabled() ? new FallbackResourceManager.InputStreamLeakedResourceLogger(inputstream, location, resourcePack.getPackName()) : inputstream);
+        InputStream var3 = p_177245_2_.getInputStream(p_177245_1_);
+        return (InputStream)(field_177246_b.isDebugEnabled() ? new FallbackResourceManager.ImputStreamLeakedResourceLogger(var3, p_177245_1_, p_177245_2_.getPackName()) : var3);
     }
 
-    public List<IResource> getAllResources(ResourceLocation location) throws IOException
+    public List getAllResources(ResourceLocation p_135056_1_) throws IOException
     {
-        List<IResource> list = Lists.<IResource>newArrayList();
-        ResourceLocation resourcelocation = getLocationMcmeta(location);
+        ArrayList var2 = Lists.newArrayList();
+        ResourceLocation var3 = getLocationMcmeta(p_135056_1_);
+        Iterator var4 = this.resourcePacks.iterator();
 
-        for (IResourcePack iresourcepack : this.resourcePacks)
+        while (var4.hasNext())
         {
-            if (iresourcepack.resourceExists(location))
+            IResourcePack var5 = (IResourcePack)var4.next();
+
+            if (var5.resourceExists(p_135056_1_))
             {
-                InputStream inputstream = iresourcepack.resourceExists(resourcelocation) ? this.getInputStream(resourcelocation, iresourcepack) : null;
-                list.add(new SimpleResource(iresourcepack.getPackName(), location, this.getInputStream(location, iresourcepack), inputstream, this.frmMetadataSerializer));
+                InputStream var6 = var5.resourceExists(var3) ? this.func_177245_a(var3, var5) : null;
+                var2.add(new SimpleResource(var5.getPackName(), p_135056_1_, this.func_177245_a(p_135056_1_, var5), var6, this.frmMetadataSerializer));
             }
         }
 
-        if (list.isEmpty())
+        if (var2.isEmpty())
         {
-            throw new FileNotFoundException(location.toString());
+            throw new FileNotFoundException(p_135056_1_.toString());
         }
         else
         {
-            return list;
+            return var2;
         }
     }
 
-    static ResourceLocation getLocationMcmeta(ResourceLocation location)
+    static ResourceLocation getLocationMcmeta(ResourceLocation p_110537_0_)
     {
-        return new ResourceLocation(location.getResourceDomain(), location.getResourcePath() + ".mcmeta");
+        return new ResourceLocation(p_110537_0_.getResourceDomain(), p_110537_0_.getResourcePath() + ".mcmeta");
     }
 
-    static class InputStreamLeakedResourceLogger extends InputStream
+    static class ImputStreamLeakedResourceLogger extends InputStream
     {
-        private final InputStream inputStream;
-        private final String message;
-        private boolean isClosed = false;
+        private final InputStream field_177330_a;
+        private final String field_177328_b;
+        private boolean field_177329_c = false;
+        
 
-        public InputStreamLeakedResourceLogger(InputStream p_i46093_1_, ResourceLocation location, String resourcePack)
+        public ImputStreamLeakedResourceLogger(InputStream p_i46093_1_, ResourceLocation p_i46093_2_, String p_i46093_3_)
         {
-            this.inputStream = p_i46093_1_;
-            ByteArrayOutputStream bytearrayoutputstream = new ByteArrayOutputStream();
-            (new Exception()).printStackTrace(new PrintStream(bytearrayoutputstream));
-            this.message = "Leaked resource: \'" + location + "\' loaded from pack: \'" + resourcePack + "\'\n" + bytearrayoutputstream.toString();
+            this.field_177330_a = p_i46093_1_;
+            ByteArrayOutputStream var4 = new ByteArrayOutputStream();
+            (new Exception()).printStackTrace(new PrintStream(var4));
+            this.field_177328_b = "Leaked resource: \'" + p_i46093_2_ + "\' loaded from pack: \'" + p_i46093_3_ + "\'\n" + var4.toString();
         }
 
         public void close() throws IOException
         {
-            this.inputStream.close();
-            this.isClosed = true;
+            this.field_177330_a.close();
+            this.field_177329_c = true;
         }
 
         protected void finalize() throws Throwable
         {
-            if (!this.isClosed)
+            if (!this.field_177329_c)
             {
-                FallbackResourceManager.logger.warn(this.message);
+                FallbackResourceManager.field_177246_b.warn(this.field_177328_b);
             }
 
             super.finalize();
@@ -131,7 +138,7 @@ public class FallbackResourceManager implements IResourceManager
 
         public int read() throws IOException
         {
-            return this.inputStream.read();
+            return this.field_177330_a.read();
         }
     }
 }

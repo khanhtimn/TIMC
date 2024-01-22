@@ -8,10 +8,9 @@ public class NBTTagShort extends NBTBase.NBTPrimitive
 {
     /** The short value for the tag. */
     private short data;
+    
 
-    public NBTTagShort()
-    {
-    }
+    public NBTTagShort() {}
 
     public NBTTagShort(short data)
     {
@@ -28,7 +27,7 @@ public class NBTTagShort extends NBTBase.NBTPrimitive
 
     void read(DataInput input, int depth, NBTSizeTracker sizeTracker) throws IOException
     {
-        sizeTracker.read(80L);
+        sizeTracker.read(16L);
         this.data = input.readShort();
     }
 
@@ -57,8 +56,8 @@ public class NBTTagShort extends NBTBase.NBTPrimitive
     {
         if (super.equals(p_equals_1_))
         {
-            NBTTagShort nbttagshort = (NBTTagShort)p_equals_1_;
-            return this.data == nbttagshort.data;
+            NBTTagShort var2 = (NBTTagShort)p_equals_1_;
+            return this.data == var2.data;
         }
         else
         {

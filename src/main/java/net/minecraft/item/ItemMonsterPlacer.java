@@ -1,5 +1,6 @@
 package net.minecraft.item;
 
+import java.util.Iterator;
 import java.util.List;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockLiquid;
@@ -25,6 +26,8 @@ import net.minecraft.world.World;
 
 public class ItemMonsterPlacer extends Item
 {
+    
+
     public ItemMonsterPlacer()
     {
         this.setHasSubtypes(true);
@@ -33,25 +36,28 @@ public class ItemMonsterPlacer extends Item
 
     public String getItemStackDisplayName(ItemStack stack)
     {
-        String s = ("" + StatCollector.translateToLocal(this.getUnlocalizedName() + ".name")).trim();
-        String s1 = EntityList.getStringFromID(stack.getMetadata());
+        String var2 = ("" + StatCollector.translateToLocal(this.getUnlocalizedName() + ".name")).trim();
+        String var3 = EntityList.getStringFromID(stack.getMetadata());
 
-        if (s1 != null)
+        if (var3 != null)
         {
-            s = s + " " + StatCollector.translateToLocal("entity." + s1 + ".name");
+            var2 = var2 + " " + StatCollector.translateToLocal("entity." + var3 + ".name");
         }
 
-        return s;
+        return var2;
     }
 
     public int getColorFromItemStack(ItemStack stack, int renderPass)
     {
-        EntityList.EntityEggInfo entitylist$entityegginfo = (EntityList.EntityEggInfo)EntityList.entityEggs.get(Integer.valueOf(stack.getMetadata()));
-        return entitylist$entityegginfo != null ? (renderPass == 0 ? entitylist$entityegginfo.primaryColor : entitylist$entityegginfo.secondaryColor) : 16777215;
+        EntityList.EntityEggInfo var3 = (EntityList.EntityEggInfo)EntityList.entityEggs.get(Integer.valueOf(stack.getMetadata()));
+        return var3 != null ? (renderPass == 0 ? var3.primaryColor : var3.secondaryColor) : 16777215;
     }
 
     /**
      * Called when a Block is right-clicked with this Item
+     *  
+     * @param pos The block being right-clicked
+     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
@@ -59,23 +65,23 @@ public class ItemMonsterPlacer extends Item
         {
             return true;
         }
-        else if (!playerIn.canPlayerEdit(pos.offset(side), side, stack))
+        else if (!playerIn.func_175151_a(pos.offset(side), side, stack))
         {
             return false;
         }
         else
         {
-            IBlockState iblockstate = worldIn.getBlockState(pos);
+            IBlockState var9 = worldIn.getBlockState(pos);
 
-            if (iblockstate.getBlock() == Blocks.mob_spawner)
+            if (var9.getBlock() == Blocks.mob_spawner)
             {
-                TileEntity tileentity = worldIn.getTileEntity(pos);
+                TileEntity var10 = worldIn.getTileEntity(pos);
 
-                if (tileentity instanceof TileEntityMobSpawner)
+                if (var10 instanceof TileEntityMobSpawner)
                 {
-                    MobSpawnerBaseLogic mobspawnerbaselogic = ((TileEntityMobSpawner)tileentity).getSpawnerBaseLogic();
-                    mobspawnerbaselogic.setEntityName(EntityList.getStringFromID(stack.getMetadata()));
-                    tileentity.markDirty();
+                    MobSpawnerBaseLogic var11 = ((TileEntityMobSpawner)var10).getSpawnerBaseLogic();
+                    var11.setEntityName(EntityList.getStringFromID(stack.getMetadata()));
+                    var10.markDirty();
                     worldIn.markBlockForUpdate(pos);
 
                     if (!playerIn.capabilities.isCreativeMode)
@@ -88,20 +94,20 @@ public class ItemMonsterPlacer extends Item
             }
 
             pos = pos.offset(side);
-            double d0 = 0.0D;
+            double var13 = 0.0D;
 
-            if (side == EnumFacing.UP && iblockstate instanceof BlockFence)
+            if (side == EnumFacing.UP && var9 instanceof BlockFence)
             {
-                d0 = 0.5D;
+                var13 = 0.5D;
             }
 
-            Entity entity = spawnCreature(worldIn, stack.getMetadata(), (double)pos.getX() + 0.5D, (double)pos.getY() + d0, (double)pos.getZ() + 0.5D);
+            Entity var12 = spawnCreature(worldIn, stack.getMetadata(), (double)pos.getX() + 0.5D, (double)pos.getY() + var13, (double)pos.getZ() + 0.5D);
 
-            if (entity != null)
+            if (var12 != null)
             {
-                if (entity instanceof EntityLivingBase && stack.hasDisplayName())
+                if (var12 instanceof EntityLivingBase && stack.hasDisplayName())
                 {
-                    entity.setCustomNameTag(stack.getDisplayName());
+                    var12.setCustomNameTag(stack.getDisplayName());
                 }
 
                 if (!playerIn.capabilities.isCreativeMode)
@@ -125,37 +131,37 @@ public class ItemMonsterPlacer extends Item
         }
         else
         {
-            MovingObjectPosition movingobjectposition = this.getMovingObjectPositionFromPlayer(worldIn, playerIn, true);
+            MovingObjectPosition var4 = this.getMovingObjectPositionFromPlayer(worldIn, playerIn, true);
 
-            if (movingobjectposition == null)
+            if (var4 == null)
             {
                 return itemStackIn;
             }
             else
             {
-                if (movingobjectposition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
+                if (var4.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
                 {
-                    BlockPos blockpos = movingobjectposition.getBlockPos();
+                    BlockPos var5 = var4.func_178782_a();
 
-                    if (!worldIn.isBlockModifiable(playerIn, blockpos))
+                    if (!worldIn.isBlockModifiable(playerIn, var5))
                     {
                         return itemStackIn;
                     }
 
-                    if (!playerIn.canPlayerEdit(blockpos, movingobjectposition.sideHit, itemStackIn))
+                    if (!playerIn.func_175151_a(var5, var4.field_178784_b, itemStackIn))
                     {
                         return itemStackIn;
                     }
 
-                    if (worldIn.getBlockState(blockpos).getBlock() instanceof BlockLiquid)
+                    if (worldIn.getBlockState(var5).getBlock() instanceof BlockLiquid)
                     {
-                        Entity entity = spawnCreature(worldIn, itemStackIn.getMetadata(), (double)blockpos.getX() + 0.5D, (double)blockpos.getY() + 0.5D, (double)blockpos.getZ() + 0.5D);
+                        Entity var6 = spawnCreature(worldIn, itemStackIn.getMetadata(), (double)var5.getX() + 0.5D, (double)var5.getY() + 0.5D, (double)var5.getZ() + 0.5D);
 
-                        if (entity != null)
+                        if (var6 != null)
                         {
-                            if (entity instanceof EntityLivingBase && itemStackIn.hasDisplayName())
+                            if (var6 instanceof EntityLivingBase && itemStackIn.hasDisplayName())
                             {
-                                ((EntityLiving)entity).setCustomNameTag(itemStackIn.getDisplayName());
+                                ((EntityLiving)var6).setCustomNameTag(itemStackIn.getDisplayName());
                             }
 
                             if (!playerIn.capabilities.isCreativeMode)
@@ -177,44 +183,49 @@ public class ItemMonsterPlacer extends Item
      * Spawns the creature specified by the egg's type in the location specified by the last three parameters.
      * Parameters: world, entityID, x, y, z.
      */
-    public static Entity spawnCreature(World worldIn, int entityID, double x, double y, double z)
+    public static Entity spawnCreature(World worldIn, int p_77840_1_, double p_77840_2_, double p_77840_4_, double p_77840_6_)
     {
-        if (!EntityList.entityEggs.containsKey(Integer.valueOf(entityID)))
+        if (!EntityList.entityEggs.containsKey(Integer.valueOf(p_77840_1_)))
         {
             return null;
         }
         else
         {
-            Entity entity = null;
+            Entity var8 = null;
 
-            for (int i = 0; i < 1; ++i)
+            for (int var9 = 0; var9 < 1; ++var9)
             {
-                entity = EntityList.createEntityByID(entityID, worldIn);
+                var8 = EntityList.createEntityByID(p_77840_1_, worldIn);
 
-                if (entity instanceof EntityLivingBase)
+                if (var8 instanceof EntityLivingBase)
                 {
-                    EntityLiving entityliving = (EntityLiving)entity;
-                    entity.setLocationAndAngles(x, y, z, MathHelper.wrapAngleTo180_float(worldIn.rand.nextFloat() * 360.0F), 0.0F);
-                    entityliving.rotationYawHead = entityliving.rotationYaw;
-                    entityliving.renderYawOffset = entityliving.rotationYaw;
-                    entityliving.onInitialSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityliving)), (IEntityLivingData)null);
-                    worldIn.spawnEntityInWorld(entity);
-                    entityliving.playLivingSound();
+                    EntityLiving var10 = (EntityLiving)var8;
+                    var8.setLocationAndAngles(p_77840_2_, p_77840_4_, p_77840_6_, MathHelper.wrapAngleTo180_float(worldIn.rand.nextFloat() * 360.0F), 0.0F);
+                    var10.rotationYawHead = var10.rotationYaw;
+                    var10.renderYawOffset = var10.rotationYaw;
+                    var10.func_180482_a(worldIn.getDifficultyForLocation(new BlockPos(var10)), (IEntityLivingData)null);
+                    worldIn.spawnEntityInWorld(var8);
+                    var10.playLivingSound();
                 }
             }
 
-            return entity;
+            return var8;
         }
     }
 
     /**
      * returns a list of items with the same ID, but different meta (eg: dye returns 16 items)
+     *  
+     * @param subItems The List of sub-items. This is a List of ItemStacks.
      */
-    public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems)
+    public void getSubItems(Item itemIn, CreativeTabs tab, List subItems)
     {
-        for (EntityList.EntityEggInfo entitylist$entityegginfo : EntityList.entityEggs.values())
+        Iterator var4 = EntityList.entityEggs.values().iterator();
+
+        while (var4.hasNext())
         {
-            subItems.add(new ItemStack(itemIn, 1, entitylist$entityegginfo.spawnedID));
+            EntityList.EntityEggInfo var5 = (EntityList.EntityEggInfo)var4.next();
+            subItems.add(new ItemStack(itemIn, 1, var5.spawnedID));
         }
     }
 }

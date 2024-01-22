@@ -1,8 +1,6 @@
 package net.minecraft.client.gui;
 
-import com.google.common.base.Predicate;
 import java.io.IOException;
-import java.net.IDN;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.resources.I18n;
 import org.lwjgl.input.Keyboard;
@@ -14,37 +12,7 @@ public class GuiScreenAddServer extends GuiScreen
     private GuiTextField serverIPField;
     private GuiTextField serverNameField;
     private GuiButton serverResourcePacks;
-    private Predicate<String> field_181032_r = new Predicate<String>()
-    {
-        public boolean apply(String p_apply_1_)
-        {
-            if (p_apply_1_.length() == 0)
-            {
-                return true;
-            }
-            else
-            {
-                String[] astring = p_apply_1_.split(":");
-
-                if (astring.length == 0)
-                {
-                    return true;
-                }
-                else
-                {
-                    try
-                    {
-                        String s = IDN.toASCII(astring[0]);
-                        return true;
-                    }
-                    catch (IllegalArgumentException var4)
-                    {
-                        return false;
-                    }
-                }
-            }
-        }
-    };
+    
 
     public GuiScreenAddServer(GuiScreen p_i1033_1_, ServerData p_i1033_2_)
     {
@@ -62,8 +30,7 @@ public class GuiScreenAddServer extends GuiScreen
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
-     * window resizes, the buttonList is cleared beforehand.
+     * Adds the buttons (and other controls) to the screen in question.
      */
     public void initGui()
     {
@@ -78,7 +45,6 @@ public class GuiScreenAddServer extends GuiScreen
         this.serverIPField = new GuiTextField(1, this.fontRendererObj, this.width / 2 - 100, 106, 200, 20);
         this.serverIPField.setMaxStringLength(128);
         this.serverIPField.setText(this.serverData.serverIP);
-        this.serverIPField.setValidator(this.field_181032_r);
         ((GuiButton)this.buttonList.get(0)).enabled = this.serverIPField.getText().length() > 0 && this.serverIPField.getText().split(":").length > 0 && this.serverNameField.getText().length() > 0;
     }
 
@@ -90,9 +56,6 @@ public class GuiScreenAddServer extends GuiScreen
         Keyboard.enableRepeatEvents(false);
     }
 
-    /**
-     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
-     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
         if (button.enabled)
@@ -116,7 +79,7 @@ public class GuiScreenAddServer extends GuiScreen
     }
 
     /**
-     * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
+     * Fired when a key is typed (except F11 who toggle full screen). This is the equivalent of
      * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
      */
     protected void keyTyped(char typedChar, int keyCode) throws IOException

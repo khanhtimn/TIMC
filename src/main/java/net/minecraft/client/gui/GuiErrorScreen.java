@@ -7,6 +7,7 @@ public class GuiErrorScreen extends GuiScreen
 {
     private String field_146313_a;
     private String field_146312_f;
+    
 
     public GuiErrorScreen(String p_i46319_1_, String p_i46319_2_)
     {
@@ -15,8 +16,7 @@ public class GuiErrorScreen extends GuiScreen
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
-     * window resizes, the buttonList is cleared beforehand.
+     * Adds the buttons (and other controls) to the screen in question.
      */
     public void initGui()
     {
@@ -36,16 +36,11 @@ public class GuiErrorScreen extends GuiScreen
     }
 
     /**
-     * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
+     * Fired when a key is typed (except F11 who toggle full screen). This is the equivalent of
      * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
      */
-    protected void keyTyped(char typedChar, int keyCode) throws IOException
-    {
-    }
+    protected void keyTyped(char typedChar, int keyCode) throws IOException {}
 
-    /**
-     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
-     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
         this.mc.displayGuiScreen((GuiScreen)null);

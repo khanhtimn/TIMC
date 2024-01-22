@@ -14,6 +14,7 @@ public class ModelQuadruped extends ModelBase
     public ModelRenderer leg4;
     protected float childYOffset = 8.0F;
     protected float childZOffset = 4.0F;
+    
 
     public ModelQuadruped(int p_i1154_1_, float p_i1154_2_)
     {
@@ -39,35 +40,35 @@ public class ModelQuadruped extends ModelBase
     /**
      * Sets the models various rotation angles then renders the model.
      */
-    public void render(Entity entityIn, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float scale)
+    public void render(Entity p_78088_1_, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float p_78088_7_)
     {
-        this.setRotationAngles(p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, scale, entityIn);
+        this.setRotationAngles(p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, p_78088_7_, p_78088_1_);
 
         if (this.isChild)
         {
-            float f = 2.0F;
+            float var8 = 2.0F;
             GlStateManager.pushMatrix();
-            GlStateManager.translate(0.0F, this.childYOffset * scale, this.childZOffset * scale);
-            this.head.render(scale);
+            GlStateManager.translate(0.0F, this.childYOffset * p_78088_7_, this.childZOffset * p_78088_7_);
+            this.head.render(p_78088_7_);
             GlStateManager.popMatrix();
             GlStateManager.pushMatrix();
-            GlStateManager.scale(1.0F / f, 1.0F / f, 1.0F / f);
-            GlStateManager.translate(0.0F, 24.0F * scale, 0.0F);
-            this.body.render(scale);
-            this.leg1.render(scale);
-            this.leg2.render(scale);
-            this.leg3.render(scale);
-            this.leg4.render(scale);
+            GlStateManager.scale(1.0F / var8, 1.0F / var8, 1.0F / var8);
+            GlStateManager.translate(0.0F, 24.0F * p_78088_7_, 0.0F);
+            this.body.render(p_78088_7_);
+            this.leg1.render(p_78088_7_);
+            this.leg2.render(p_78088_7_);
+            this.leg3.render(p_78088_7_);
+            this.leg4.render(p_78088_7_);
             GlStateManager.popMatrix();
         }
         else
         {
-            this.head.render(scale);
-            this.body.render(scale);
-            this.leg1.render(scale);
-            this.leg2.render(scale);
-            this.leg3.render(scale);
-            this.leg4.render(scale);
+            this.head.render(p_78088_7_);
+            this.body.render(p_78088_7_);
+            this.leg1.render(p_78088_7_);
+            this.leg2.render(p_78088_7_);
+            this.leg3.render(p_78088_7_);
+            this.leg4.render(p_78088_7_);
         }
     }
 
@@ -76,15 +77,15 @@ public class ModelQuadruped extends ModelBase
      * and legs, where par1 represents the time(so that arms and legs swing back and forth) and par2 represents how
      * "far" arms and legs can swing at most.
      */
-    public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn)
+    public void setRotationAngles(float p_78087_1_, float p_78087_2_, float p_78087_3_, float p_78087_4_, float p_78087_5_, float p_78087_6_, Entity p_78087_7_)
     {
-        float f = (180F / (float)Math.PI);
-        this.head.rotateAngleX = headPitch / (180F / (float)Math.PI);
-        this.head.rotateAngleY = netHeadYaw / (180F / (float)Math.PI);
+        float var8 = (180F / (float)Math.PI);
+        this.head.rotateAngleX = p_78087_5_ / (180F / (float)Math.PI);
+        this.head.rotateAngleY = p_78087_4_ / (180F / (float)Math.PI);
         this.body.rotateAngleX = ((float)Math.PI / 2F);
-        this.leg1.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
-        this.leg2.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount;
-        this.leg3.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount;
-        this.leg4.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+        this.leg1.rotateAngleX = MathHelper.cos(p_78087_1_ * 0.6662F) * 1.4F * p_78087_2_;
+        this.leg2.rotateAngleX = MathHelper.cos(p_78087_1_ * 0.6662F + (float)Math.PI) * 1.4F * p_78087_2_;
+        this.leg3.rotateAngleX = MathHelper.cos(p_78087_1_ * 0.6662F + (float)Math.PI) * 1.4F * p_78087_2_;
+        this.leg4.rotateAngleX = MathHelper.cos(p_78087_1_ * 0.6662F) * 1.4F * p_78087_2_;
     }
 }

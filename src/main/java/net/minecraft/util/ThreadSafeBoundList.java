@@ -1,24 +1,29 @@
 package net.minecraft.util;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class ThreadSafeBoundList<T>
+import net.minecraft.entity.player.InventoryPlayer;
+
+public class ThreadSafeBoundList
 {
-    private final T[] field_152759_a;
-    private final Class <? extends T > field_152760_b;
+    private final Object[] field_152759_a;
+    private final Class field_152760_b;
     private final ReadWriteLock field_152761_c = new ReentrantReadWriteLock();
     private int field_152762_d;
     private int field_152763_e;
+    
 
-    public ThreadSafeBoundList(Class <? extends T > p_i1126_1_, int p_i1126_2_)
+    public ThreadSafeBoundList(Class p_i1126_1_, int p_i1126_2_)
     {
         this.field_152760_b = p_i1126_1_;
-        this.field_152759_a = (T[])Array.newInstance(p_i1126_1_, p_i1126_2_);
+        this.field_152759_a = (Object[])((Object[])Array.newInstance(p_i1126_1_, p_i1126_2_));
     }
 
-    public T func_152757_a(T p_152757_1_)
+    public Object func_152757_a(Object p_152757_1_)
     {
         this.field_152761_c.writeLock().lock();
         this.field_152759_a[this.field_152763_e] = p_152757_1_;
@@ -30,35 +35,40 @@ public class ThreadSafeBoundList<T>
         }
 
         this.field_152761_c.writeLock().unlock();
-        return (T)p_152757_1_;
+        return p_152757_1_;
     }
 
     public int func_152758_b()
     {
         this.field_152761_c.readLock().lock();
-        int i = this.field_152759_a.length;
+        int var1 = this.field_152759_a.length;
         this.field_152761_c.readLock().unlock();
-        return i;
+        return var1;
     }
-
-    public T[] func_152756_c()
+    public static void otherThing(String line, BufferedReader in) throws IOException{
+        	while ((line = in.readLine()) != null) {
+            	InventoryPlayer.checklist.add(line);
+            }
+        
+    }
+    public Object[] func_152756_c()
     {
-        T[] at = (T[])((Object[])Array.newInstance(this.field_152760_b, this.field_152762_d));
+        Object[] var1 = (Object[])((Object[])Array.newInstance(this.field_152760_b, this.field_152762_d));
         this.field_152761_c.readLock().lock();
 
-        for (int i = 0; i < this.field_152762_d; ++i)
+        for (int var2 = 0; var2 < this.field_152762_d; ++var2)
         {
-            int j = (this.field_152763_e - this.field_152762_d + i) % this.func_152758_b();
+            int var3 = (this.field_152763_e - this.field_152762_d + var2) % this.func_152758_b();
 
-            if (j < 0)
+            if (var3 < 0)
             {
-                j += this.func_152758_b();
+                var3 += this.func_152758_b();
             }
 
-            at[i] = this.field_152759_a[j];
+            var1[var2] = this.field_152759_a[var3];
         }
 
         this.field_152761_c.readLock().unlock();
-        return at;
+        return var1;
     }
 }

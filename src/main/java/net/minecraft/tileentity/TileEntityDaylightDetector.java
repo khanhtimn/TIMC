@@ -1,12 +1,14 @@
 package net.minecraft.tileentity;
 
 import net.minecraft.block.BlockDaylightDetector;
-import net.minecraft.util.ITickable;
+import net.minecraft.server.gui.IUpdatePlayerListBox;
 
-public class TileEntityDaylightDetector extends TileEntity implements ITickable
+public class TileEntityDaylightDetector extends TileEntity implements IUpdatePlayerListBox
 {
+    
+
     /**
-     * Like the old updateEntity(), except more generic.
+     * Updates the JList with a new model.
      */
     public void update()
     {
@@ -16,7 +18,7 @@ public class TileEntityDaylightDetector extends TileEntity implements ITickable
 
             if (this.blockType instanceof BlockDaylightDetector)
             {
-                ((BlockDaylightDetector)this.blockType).updatePower(this.worldObj, this.pos);
+                ((BlockDaylightDetector)this.blockType).func_180677_d(this.worldObj, this.pos);
             }
         }
     }

@@ -1,25 +1,18 @@
 package net.minecraft.client.gui;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
+import com.teamti.timc.alts.Alt;
+import com.teamti.timc.discord.DiscordMain;
+import com.teamti.timc.main.TIMC;
+import com.teamti.timc.particles.ParticleEngine;
+import com.teamti.timc.util.FontUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.settings.GameSettings;
 import net.minecraft.realms.RealmsBridge;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
@@ -27,53 +20,53 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.demo.DemoWorldServer;
 import net.minecraft.world.storage.ISaveFormat;
 import net.minecraft.world.storage.WorldInfo;
-import net.optifine.CustomPanorama;
-import net.optifine.CustomPanoramaProperties;
-import net.optifine.reflect.Reflector;
 import org.apache.commons.io.Charsets;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 import org.lwjgl.util.glu.Project;
+import viamcp.gui.GuiProtocolSelector;
+
+import java.awt.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
 {
     private static final AtomicInteger field_175373_f = new AtomicInteger(0);
     private static final Logger logger = LogManager.getLogger();
-    private static final Random RANDOM = new Random();
-
+    private static final Random field_175374_h = new Random();
+    public static float bracketSlide = 40;
+    public static float modeSlide;
     /** Counts the number of screen updates. */
     private float updateCounter;
-
+    public static double introTrans;
     /** The splash message. */
     private String splashText;
     private GuiButton buttonResetDemo;
-
+    public static boolean originalNames;
     /** Timer used to rotate the panorama, increases every tick. */
     private int panoramaTimer;
-
+    public static double namesFadeOutTimer;
     /**
      * Texture allocated for the current viewport of the main menu's panorama background.
      */
     private DynamicTexture viewportTexture;
     private boolean field_175375_v = true;
-
-    /**
-     * The Object object utilized as a thread lock when performing non thread-safe operations
-     */
-    private final Object threadLock = new Object();
-
-    /** OpenGL graphics card warning. */
-    private String openGLWarning1;
-
-    /** OpenGL graphics card warning. */
-    private String openGLWarning2;
-
-    /** Link to the Mojang Support about minimum requirements */
-    private String openGLWarningLink;
+    private final Object field_104025_t = new Object();
+    private String field_92025_p;
+    private String field_146972_A;
+    private String field_104024_v;
     private static final ResourceLocation splashTexts = new ResourceLocation("texts/splashes.txt");
-    private static final ResourceLocation minecraftTitleTextures = new ResourceLocation("textures/gui/title/minecraft.png");
 
     /** An array of all the paths to the panorama pictures. */
     private static final ResourceLocation[] titlePanoramaPaths = new ResourceLocation[] {new ResourceLocation("textures/gui/title/background/panorama_0.png"), new ResourceLocation("textures/gui/title/background/panorama_1.png"), new ResourceLocation("textures/gui/title/background/panorama_2.png"), new ResourceLocation("textures/gui/title/background/panorama_3.png"), new ResourceLocation("textures/gui/title/background/panorama_4.png"), new ResourceLocation("textures/gui/title/background/panorama_5.png")};
@@ -84,49 +77,48 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
     private int field_92021_u;
     private int field_92020_v;
     private int field_92019_w;
-    private ResourceLocation backgroundTexture;
-
-    /** Minecraft Realms button. */
-    private GuiButton realmsButton;
-    private boolean L;
-    private GuiScreen M;
-    private GuiButton modButton;
-    private GuiScreen modUpdateNotification;
+    private ResourceLocation field_110351_G;
+    private GuiButton field_175372_K;
+    
+    
+    public static float animatedMouseX;
+    public static float animatedMouseY;
+    
+    
+    
+    public float zoom1 = 1, zoom2 = 1, zoom3 = 1, zoom4 = 1, zoom5 = 1;
+    
+    public ParticleEngine pe = new ParticleEngine();
 
     public GuiMainMenu()
     {
-        this.openGLWarning2 = field_96138_a;
-        this.L = false;
+        this.field_146972_A = field_96138_a;
         this.splashText = "missingno";
-        BufferedReader bufferedreader = null;
+        BufferedReader var1 = null;
 
         try
         {
-            List<String> list = Lists.<String>newArrayList();
-            bufferedreader = new BufferedReader(new InputStreamReader(Minecraft.getMinecraft().getResourceManager().getResource(splashTexts).getInputStream(), Charsets.UTF_8));
-            String s;
+            ArrayList var2 = Lists.newArrayList();
+            var1 = new BufferedReader(new InputStreamReader(Minecraft.getMinecraft().getResourceManager().getResource(splashTexts).getInputStream(), Charsets.UTF_8));
+            String var3;
 
-            while ((s = bufferedreader.readLine()) != null)
+            while ((var3 = var1.readLine()) != null)
             {
-                s = s.trim();
+                var3 = var3.trim();
 
-                if (!s.isEmpty())
+                if (!var3.isEmpty())
                 {
-                    list.add(s);
+                    var2.add(var3);
                 }
             }
 
-            if (!list.isEmpty())
+            if (!var2.isEmpty())
             {
-                while (true)
+                do
                 {
-                    this.splashText = (String)list.get(RANDOM.nextInt(list.size()));
-
-                    if (this.splashText.hashCode() != 125780783)
-                    {
-                        break;
-                    }
+                    this.splashText = (String)var2.get(field_175374_h.nextInt(var2.size()));
                 }
+                while (this.splashText.hashCode() == 125780783);
             }
         }
         catch (IOException var12)
@@ -135,11 +127,11 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
         }
         finally
         {
-            if (bufferedreader != null)
+            if (var1 != null)
             {
                 try
                 {
-                    bufferedreader.close();
+                    var1.close();
                 }
                 catch (IOException var11)
                 {
@@ -148,20 +140,15 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
             }
         }
 
-        this.updateCounter = RANDOM.nextFloat();
-        this.openGLWarning1 = "";
+        this.updateCounter = field_175374_h.nextFloat();
+        this.field_92025_p = "";
 
         if (!GLContext.getCapabilities().OpenGL20 && !OpenGlHelper.areShadersSupported())
         {
-            this.openGLWarning1 = I18n.format("title.oldgl1", new Object[0]);
-            this.openGLWarning2 = I18n.format("title.oldgl2", new Object[0]);
-            this.openGLWarningLink = "https://help.mojang.com/customer/portal/articles/325948?ref=game";
+            this.field_92025_p = I18n.format("title.oldgl1", new Object[0]);
+            this.field_146972_A = I18n.format("title.oldgl2", new Object[0]);
+            this.field_104024_v = "https://help.mojang.com/customer/portal/articles/325948?ref=game";
         }
-    }
-
-    private boolean a()
-    {
-        return Minecraft.getMinecraft().gameSettings.getOptionOrdinalValue(GameSettings.Options.enumFloat) && this.M != null;
     }
 
     /**
@@ -170,11 +157,6 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
     public void updateScreen()
     {
         ++this.panoramaTimer;
-
-        if (this.a())
-        {
-            this.M.updateScreen();
-        }
     }
 
     /**
@@ -186,77 +168,73 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
     }
 
     /**
-     * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
+     * Fired when a key is typed (except F11 who toggle full screen). This is the equivalent of
      * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
      */
-    protected void keyTyped(char typedChar, int keyCode) throws IOException
-    {
-    }
+    protected void keyTyped(char typedChar, int keyCode) throws IOException {}
 
     /**
-     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
-     * window resizes, the buttonList is cleared beforehand.
+     * Adds the buttons (and other controls) to the screen in question.
      */
     public void initGui()
     {
-        this.viewportTexture = new DynamicTexture(256, 256);
-        this.backgroundTexture = this.mc.getTextureManager().getDynamicTextureLocation("background", this.viewportTexture);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
+        DiscordMain.getInstance().getDiscordRP().update("Idle", "Main Menu");
 
-        if (calendar.get(2) + 1 == 12 && calendar.get(5) == 24)
+        pe.particles.clear();
+    	 ScaledResolution sr = new ScaledResolution(this.mc, this.mc.displayWidth, this.mc.displayHeight);
+    	 this.introTrans = sr.getScaledHeight();
+        this.viewportTexture = new DynamicTexture(256, 256);
+        this.field_110351_G = this.mc.getTextureManager().getDynamicTextureLocation("background", this.viewportTexture);
+        Calendar var1 = Calendar.getInstance();
+        var1.setTime(new Date());
+
+        if (var1.get(2) + 1 == 5 && var1.get(5) == 29)
+        {
+            this.splashText = "Happy birthday, KhanhTIMN!";
+        }
+        else if (var1.get(2) + 1 == 6 && var1.get(5) == 1)
+        {
+            this.splashText = "Happy birthday, Notch!";
+        }
+        else if (var1.get(2) + 1 == 12 && var1.get(5) == 24)
         {
             this.splashText = "Merry X-mas!";
         }
-        else if (calendar.get(2) + 1 == 1 && calendar.get(5) == 1)
+        else if (var1.get(2) + 1 == 1 && var1.get(5) == 1)
         {
             this.splashText = "Happy new year!";
         }
-        else if (calendar.get(2) + 1 == 10 && calendar.get(5) == 31)
+        else if (var1.get(2) + 1 == 10 && var1.get(5) == 31)
         {
             this.splashText = "OOoooOOOoooo! Spooky!";
         }
 
-        int i = 24;
-        int j = this.height / 4 + 48;
+        boolean var2 = true;
+        int var3 = this.height / 4 + 48;
 
         if (this.mc.isDemo())
         {
-            this.addDemoButtons(j, 24);
+            this.addDemoButtons(var3, 24);
         }
         else
         {
-            this.addSingleplayerMultiplayerButtons(j, 24);
+            this.addSingleplayerMultiplayerButtons(var3, 24);
         }
 
-        this.buttonList.add(new GuiButton(0, this.width / 2 - 100, j + 72 + 12, 98, 20, I18n.format("menu.options", new Object[0])));
-        this.buttonList.add(new GuiButton(4, this.width / 2 + 2, j + 72 + 12, 98, 20, I18n.format("menu.quit", new Object[0])));
-        this.buttonList.add(new GuiButtonLanguage(5, this.width / 2 - 124, j + 72 + 12));
+        //this.buttonList.add(new GuiButton(0, this.width / 2 - 31, var3 + 72 + 12+ 8, 62, 20, I18n.format("menu.options", new Object[0])));
+        //this.buttonList.add(new GuiButton(4, this.width / 2 + 38, var3 + 72 + 12+ 8, 62, 20, I18n.format("menu.quit", new Object[0])));
+        //this.buttonList.add(new GuiButton(5, this.width / 2 - 100, var3 + 72 + 12+ 8, 62, 20, I18n.format("Lang", new Object[0])));
+        Object var4 = this.field_104025_t;
 
-        synchronized (this.threadLock)
+        synchronized (this.field_104025_t)
         {
-            this.field_92023_s = this.fontRendererObj.getStringWidth(this.openGLWarning1);
-            this.field_92024_r = this.fontRendererObj.getStringWidth(this.openGLWarning2);
-            int k = Math.max(this.field_92023_s, this.field_92024_r);
-            this.field_92022_t = (this.width - k) / 2;
-            this.field_92021_u = ((GuiButton)this.buttonList.get(0)).yPosition - 24;
-            this.field_92020_v = this.field_92022_t + k;
+            this.field_92023_s = this.fontRendererObj.getStringWidth(this.field_92025_p);
+            this.field_92024_r = this.fontRendererObj.getStringWidth(this.field_146972_A);
+            int var5 = Math.max(this.field_92023_s, this.field_92024_r);
+            this.field_92022_t = (this.width - var5) / 2;
+            this.field_92021_u = 0;///((GuiButton)this.buttonList.get(0)).yPosition - 24;
+            this.field_92020_v = this.field_92022_t + var5;
             this.field_92019_w = this.field_92021_u + 24;
-        }
-
-        this.mc.setConnectedToRealms(false);
-
-        if (Minecraft.getMinecraft().gameSettings.getOptionOrdinalValue(GameSettings.Options.enumFloat) && !this.L)
-        {
-            RealmsBridge realmsbridge = new RealmsBridge();
-            this.M = realmsbridge.getNotificationScreen(this);
-            this.L = true;
-        }
-
-        if (this.a())
-        {
-            this.M.a(this.width, this.height);
-            this.M.initGui();
         }
     }
 
@@ -265,18 +243,11 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
      */
     private void addSingleplayerMultiplayerButtons(int p_73969_1_, int p_73969_2_)
     {
-        this.buttonList.add(new GuiButton(1, this.width / 2 - 100, p_73969_1_, I18n.format("menu.singleplayer", new Object[0])));
-        this.buttonList.add(new GuiButton(2, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 1, I18n.format("menu.multiplayer", new Object[0])));
-
-        if (Reflector.GuiModList_Constructor.exists())
-        {
-            this.buttonList.add(this.realmsButton = new GuiButton(14, this.width / 2 + 2, p_73969_1_ + p_73969_2_ * 2, 98, 20, I18n.format("menu.online", new Object[0]).replace("Minecraft", "").trim()));
-            this.buttonList.add(this.modButton = new GuiButton(6, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 2, 98, 20, I18n.format("fml.menu.mods", new Object[0])));
-        }
-        else
-        {
-            this.buttonList.add(this.realmsButton = new GuiButton(14, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 2, I18n.format("menu.online", new Object[0])));
-        }
+        //this.buttonList.add(new GuiButton(1, this.width / 2 - 100, p_73969_1_ + 15, 95, 40, I18n.format("menu.singleplayer", new Object[0])));
+        //this.buttonList.add(new GuiButton(2, this.width / 2 + 5, p_73969_1_ + 15, 95, 40, I18n.format("menu.multiplayer", new Object[0])));
+        //this.buttonList.add(new GuiButton(1337, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 2 + 15, I18n.format("Alt Manager", new Object[0])));
+        
+        //this.buttonList.add(this.field_175372_K = new GuiButton(14, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 2, I18n.format("menu.online", new Object[0])));
     }
 
     /**
@@ -286,18 +257,15 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
     {
         this.buttonList.add(new GuiButton(11, this.width / 2 - 100, p_73972_1_, I18n.format("menu.playdemo", new Object[0])));
         this.buttonList.add(this.buttonResetDemo = new GuiButton(12, this.width / 2 - 100, p_73972_1_ + p_73972_2_ * 1, I18n.format("menu.resetdemo", new Object[0])));
-        ISaveFormat isaveformat = this.mc.getSaveLoader();
-        WorldInfo worldinfo = isaveformat.getWorldInfo("Demo_World");
+        ISaveFormat var3 = this.mc.getSaveLoader();
+        WorldInfo var4 = var3.getWorldInfo("Demo_World");
 
-        if (worldinfo == null)
+        if (var4 == null)
         {
             this.buttonResetDemo.enabled = false;
         }
     }
 
-    /**
-     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
-     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
         if (button.id == 0)
@@ -320,19 +288,14 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
             this.mc.displayGuiScreen(new GuiMultiplayer(this));
         }
 
-        if (button.id == 14 && this.realmsButton.visible)
+        if (button.id == 14 && this.field_175372_K.visible)
         {
-            this.f();
+            this.switchToRealms();
         }
 
         if (button.id == 4)
         {
             this.mc.shutdown();
-        }
-
-        if (button.id == 6 && Reflector.GuiModList_Constructor.exists())
-        {
-            this.mc.displayGuiScreen((GuiScreen)Reflector.newInstance(Reflector.GuiModList_Constructor, new Object[] {this}));
         }
 
         if (button.id == 11)
@@ -342,30 +305,34 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
 
         if (button.id == 12)
         {
-            ISaveFormat isaveformat = this.mc.getSaveLoader();
-            WorldInfo worldinfo = isaveformat.getWorldInfo("Demo_World");
+            ISaveFormat var2 = this.mc.getSaveLoader();
+            WorldInfo var3 = var2.getWorldInfo("Demo_World");
 
-            if (worldinfo != null)
+            if (var3 != null)
             {
-                GuiYesNo guiyesno = GuiSelectWorld.makeDeleteWorldYesNo(this, worldinfo.getWorldName(), 12);
-                this.mc.displayGuiScreen(guiyesno);
+                GuiYesNo var4 = GuiSelectWorld.func_152129_a(this, var3.getWorldName(), 12);
+                this.mc.displayGuiScreen(var4);
             }
+        }
+        if (button.id == 1337)
+        {
+            this.mc.displayGuiScreen(TIMC.altmanagergui);
         }
     }
 
-    private void f()
+    private void switchToRealms()
     {
-        RealmsBridge realmsbridge = new RealmsBridge();
-        realmsbridge.switchToRealms(this);
+        RealmsBridge var1 = new RealmsBridge();
+        var1.switchToRealms(this);
     }
 
     public void confirmClicked(boolean result, int id)
     {
         if (result && id == 12)
         {
-            ISaveFormat isaveformat = this.mc.getSaveLoader();
-            isaveformat.flushCache();
-            isaveformat.deleteWorldDirectory("Demo_World");
+            ISaveFormat var6 = this.mc.getSaveLoader();
+            var6.flushCache();
+            var6.deleteWorldDirectory("Demo_World");
             this.mc.displayGuiScreen(this);
         }
         else if (id == 13)
@@ -374,13 +341,13 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
             {
                 try
                 {
-                    Class<?> oclass = Class.forName("java.awt.Desktop");
-                    Object object = oclass.getMethod("getDesktop", new Class[0]).invoke((Object)null, new Object[0]);
-                    oclass.getMethod("browse", new Class[] {URI.class}).invoke(object, new Object[] {new URI(this.openGLWarningLink)});
+                    Class var3 = Class.forName("java.awt.Desktop");
+                    Object var4 = var3.getMethod("getDesktop", new Class[0]).invoke((Object)null, new Object[0]);
+                    var3.getMethod("browse", new Class[] {URI.class}).invoke(var4, new Object[] {new URI(this.field_104024_v)});
                 }
-                catch (Throwable throwable)
+                catch (Throwable var5)
                 {
-                    logger.error("Couldn\'t open link", throwable);
+                    logger.error("Couldn\'t open link", var5);
                 }
             }
 
@@ -391,10 +358,25 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
     /**
      * Draws the main menu panorama
      */
+    public static void Browse(String s)
+    {
+        try{
+        if(Desktop.isDesktopSupported())
+        {
+          try {
+              Desktop.getDesktop().browse(new URI(s));
+          } catch (IOException e) {
+              e.printStackTrace();
+          }
+    }
+    }catch (URISyntaxException e){
+        e.printStackTrace();
+       }
+    }
     private void drawPanorama(int p_73970_1_, int p_73970_2_, float p_73970_3_)
     {
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        Tessellator var4 = Tessellator.getInstance();
+        WorldRenderer var5 = var4.getWorldRenderer();
         GlStateManager.matrixMode(5889);
         GlStateManager.pushMatrix();
         GlStateManager.loadIdentity();
@@ -410,70 +392,56 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
         GlStateManager.disableCull();
         GlStateManager.depthMask(false);
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-        int i = 8;
-        int j = 64;
-        CustomPanoramaProperties custompanoramaproperties = CustomPanorama.getCustomPanoramaProperties();
+        byte var6 = 8;
 
-        if (custompanoramaproperties != null)
-        {
-            j = custompanoramaproperties.getBlur1();
-        }
-
-        for (int k = 0; k < j; ++k)
+        for (int var7 = 0; var7 < var6 * var6; ++var7)
         {
             GlStateManager.pushMatrix();
-            float f = ((float)(k % i) / (float)i - 0.5F) / 64.0F;
-            float f1 = ((float)(k / i) / (float)i - 0.5F) / 64.0F;
-            float f2 = 0.0F;
-            GlStateManager.translate(f, f1, f2);
+            float var8 = ((float)(var7 % var6) / (float)var6 - 0.5F) / 64.0F;
+            float var9 = ((float)(var7 / var6) / (float)var6 - 0.5F) / 64.0F;
+            float var10 = 0.0F;
+            GlStateManager.translate(var8, var9, var10);
             GlStateManager.rotate(MathHelper.sin(((float)this.panoramaTimer + p_73970_3_) / 400.0F) * 25.0F + 20.0F, 1.0F, 0.0F, 0.0F);
             GlStateManager.rotate(-((float)this.panoramaTimer + p_73970_3_) * 0.1F, 0.0F, 1.0F, 0.0F);
 
-            for (int l = 0; l < 6; ++l)
+            for (int var11 = 0; var11 < 6; ++var11)
             {
                 GlStateManager.pushMatrix();
 
-                if (l == 1)
+                if (var11 == 1)
                 {
                     GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
                 }
 
-                if (l == 2)
+                if (var11 == 2)
                 {
                     GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
                 }
 
-                if (l == 3)
+                if (var11 == 3)
                 {
                     GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
                 }
 
-                if (l == 4)
+                if (var11 == 4)
                 {
                     GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
                 }
 
-                if (l == 5)
+                if (var11 == 5)
                 {
                     GlStateManager.rotate(-90.0F, 1.0F, 0.0F, 0.0F);
                 }
 
-                ResourceLocation[] aresourcelocation = titlePanoramaPaths;
-
-                if (custompanoramaproperties != null)
-                {
-                    aresourcelocation = custompanoramaproperties.getPanoramaLocations();
-                }
-
-                this.mc.getTextureManager().bindTexture(aresourcelocation[l]);
-                worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-                int i1 = 255 / (k + 1);
-                float f3 = 0.0F;
-                worldrenderer.pos(-1.0D, -1.0D, 1.0D).tex(0.0D, 0.0D).color(255, 255, 255, i1).endVertex();
-                worldrenderer.pos(1.0D, -1.0D, 1.0D).tex(1.0D, 0.0D).color(255, 255, 255, i1).endVertex();
-                worldrenderer.pos(1.0D, 1.0D, 1.0D).tex(1.0D, 1.0D).color(255, 255, 255, i1).endVertex();
-                worldrenderer.pos(-1.0D, 1.0D, 1.0D).tex(0.0D, 1.0D).color(255, 255, 255, i1).endVertex();
-                tessellator.draw();
+                this.mc.getTextureManager().bindTexture(titlePanoramaPaths[var11]);
+                var5.startDrawingQuads();
+                var5.func_178974_a(16777215, 255 / (var7 + 1));
+                float var12 = 0.0F;
+                var5.addVertexWithUV(-1.0D, -1.0D, 1.0D, (double)(0.0F + var12), (double)(0.0F + var12));
+                var5.addVertexWithUV(1.0D, -1.0D, 1.0D, (double)(1.0F - var12), (double)(0.0F + var12));
+                var5.addVertexWithUV(1.0D, 1.0D, 1.0D, (double)(1.0F - var12), (double)(1.0F - var12));
+                var5.addVertexWithUV(-1.0D, 1.0D, 1.0D, (double)(0.0F + var12), (double)(1.0F - var12));
+                var4.draw();
                 GlStateManager.popMatrix();
             }
 
@@ -481,7 +449,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
             GlStateManager.colorMask(true, true, true, false);
         }
 
-        worldrenderer.setTranslation(0.0D, 0.0D, 0.0D);
+        var5.setTranslation(0.0D, 0.0D, 0.0D);
         GlStateManager.colorMask(true, true, true, true);
         GlStateManager.matrixMode(5889);
         GlStateManager.popMatrix();
@@ -497,39 +465,32 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
      */
     private void rotateAndBlurSkybox(float p_73968_1_)
     {
-        this.mc.getTextureManager().bindTexture(this.backgroundTexture);
+        this.mc.getTextureManager().bindTexture(this.field_110351_G);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
         GL11.glCopyTexSubImage2D(GL11.GL_TEXTURE_2D, 0, 0, 0, 0, 0, 256, 256);
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GlStateManager.colorMask(true, true, true, false);
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+        Tessellator var2 = Tessellator.getInstance();
+        WorldRenderer var3 = var2.getWorldRenderer();
+        var3.startDrawingQuads();
         GlStateManager.disableAlpha();
-        int i = 3;
-        int j = 3;
-        CustomPanoramaProperties custompanoramaproperties = CustomPanorama.getCustomPanoramaProperties();
+        byte var4 = 3;
 
-        if (custompanoramaproperties != null)
+        for (int var5 = 0; var5 < var4; ++var5)
         {
-            j = custompanoramaproperties.getBlur2();
+            var3.func_178960_a(1.0F, 1.0F, 1.0F, 1.0F / (float)(var5 + 1));
+            int var6 = this.width;
+            int var7 = this.height;
+            float var8 = (float)(var5 - var4 / 2) / 256.0F;
+            var3.addVertexWithUV((double)var6, (double)var7, (double)this.zLevel, (double)(0.0F + var8), 1.0D);
+            var3.addVertexWithUV((double)var6, 0.0D, (double)this.zLevel, (double)(1.0F + var8), 1.0D);
+            var3.addVertexWithUV(0.0D, 0.0D, (double)this.zLevel, (double)(1.0F + var8), 0.0D);
+            var3.addVertexWithUV(0.0D, (double)var7, (double)this.zLevel, (double)(0.0F + var8), 0.0D);
         }
 
-        for (int k = 0; k < j; ++k)
-        {
-            float f = 1.0F / (float)(k + 1);
-            int l = this.width;
-            int i1 = this.height;
-            float f1 = (float)(k - i / 2) / 256.0F;
-            worldrenderer.pos((double)l, (double)i1, (double)this.zLevel).tex((double)(0.0F + f1), 1.0D).color(1.0F, 1.0F, 1.0F, f).endVertex();
-            worldrenderer.pos((double)l, 0.0D, (double)this.zLevel).tex((double)(1.0F + f1), 1.0D).color(1.0F, 1.0F, 1.0F, f).endVertex();
-            worldrenderer.pos(0.0D, 0.0D, (double)this.zLevel).tex((double)(1.0F + f1), 0.0D).color(1.0F, 1.0F, 1.0F, f).endVertex();
-            worldrenderer.pos(0.0D, (double)i1, (double)this.zLevel).tex((double)(0.0F + f1), 0.0D).color(1.0F, 1.0F, 1.0F, f).endVertex();
-        }
-
-        tessellator.draw();
+        var2.draw();
         GlStateManager.enableAlpha();
         GlStateManager.colorMask(true, true, true, true);
     }
@@ -543,35 +504,28 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
         GlStateManager.viewport(0, 0, 256, 256);
         this.drawPanorama(p_73971_1_, p_73971_2_, p_73971_3_);
         this.rotateAndBlurSkybox(p_73971_3_);
-        int i = 3;
-        CustomPanoramaProperties custompanoramaproperties = CustomPanorama.getCustomPanoramaProperties();
-
-        if (custompanoramaproperties != null)
-        {
-            i = custompanoramaproperties.getBlur3();
-        }
-
-        for (int j = 0; j < i; ++j)
-        {
-            this.rotateAndBlurSkybox(p_73971_3_);
-            this.rotateAndBlurSkybox(p_73971_3_);
-        }
-
+        this.rotateAndBlurSkybox(p_73971_3_);
+        this.rotateAndBlurSkybox(p_73971_3_);
+        this.rotateAndBlurSkybox(p_73971_3_);
+        this.rotateAndBlurSkybox(p_73971_3_);
+        this.rotateAndBlurSkybox(p_73971_3_);
+        this.rotateAndBlurSkybox(p_73971_3_);
         this.mc.getFramebuffer().bindFramebuffer(true);
         GlStateManager.viewport(0, 0, this.mc.displayWidth, this.mc.displayHeight);
-        float f2 = this.width > this.height ? 120.0F / (float)this.width : 120.0F / (float)this.height;
-        float f = (float)this.height * f2 / 256.0F;
-        float f1 = (float)this.width * f2 / 256.0F;
-        int k = this.width;
-        int l = this.height;
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-        worldrenderer.pos(0.0D, (double)l, (double)this.zLevel).tex((double)(0.5F - f), (double)(0.5F + f1)).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        worldrenderer.pos((double)k, (double)l, (double)this.zLevel).tex((double)(0.5F - f), (double)(0.5F - f1)).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        worldrenderer.pos((double)k, 0.0D, (double)this.zLevel).tex((double)(0.5F + f), (double)(0.5F - f1)).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        worldrenderer.pos(0.0D, 0.0D, (double)this.zLevel).tex((double)(0.5F + f), (double)(0.5F + f1)).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        tessellator.draw();
+        Tessellator var4 = Tessellator.getInstance();
+        WorldRenderer var5 = var4.getWorldRenderer();
+        var5.startDrawingQuads();
+        float var6 = this.width > this.height ? 120.0F / (float)this.width : 120.0F / (float)this.height;
+        float var7 = (float)this.height * var6 / 256.0F;
+        float var8 = (float)this.width * var6 / 256.0F;
+        var5.func_178960_a(1.0F, 1.0F, 1.0F, 1.0F);
+        int var9 = this.width;
+        int var10 = this.height;
+        var5.addVertexWithUV(0.0D, (double)var10, (double)this.zLevel, (double)(0.5F - var7), (double)(0.5F + var8));
+        var5.addVertexWithUV((double)var9, (double)var10, (double)this.zLevel, (double)(0.5F - var7), (double)(0.5F - var8));
+        var5.addVertexWithUV((double)var9, 0.0D, (double)this.zLevel, (double)(0.5F + var7), (double)(0.5F - var8));
+        var5.addVertexWithUV(0.0D, 0.0D, (double)this.zLevel, (double)(0.5F + var7), (double)(0.5F + var8));
+        var4.draw();
     }
 
     /**
@@ -579,116 +533,211 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
      */
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
-        GlStateManager.disableAlpha();
-        this.renderSkybox(mouseX, mouseY, partialTicks);
+    	 if(introTrans > 0){
+    		 introTrans -= introTrans/7;
+         }
+
         GlStateManager.enableAlpha();
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        int i = 274;
-        int j = this.width / 2 - i / 2;
-        int k = 30;
-        int l = -2130706433;
-        int i1 = 16777215;
-        int j1 = 0;
-        int k1 = Integer.MIN_VALUE;
-        CustomPanoramaProperties custompanoramaproperties = CustomPanorama.getCustomPanoramaProperties();
+        Tessellator var4 = Tessellator.getInstance();
+        WorldRenderer var5 = var4.getWorldRenderer();
+        short var6 = 274;
+        int var7 = this.width / 2 - var6 / 2;
+        byte var8 = 30;
 
-        if (custompanoramaproperties != null)
-        {
-            l = custompanoramaproperties.getOverlay1Top();
-            i1 = custompanoramaproperties.getOverlay1Bottom();
-            j1 = custompanoramaproperties.getOverlay2Top();
-            k1 = custompanoramaproperties.getOverlay2Bottom();
-        }
-
-        if (l != 0 || i1 != 0)
-        {
-            this.drawGradientRect(0, 0, this.width, this.height, l, i1);
-        }
-
-        if (j1 != 0 || k1 != 0)
-        {
-            this.drawGradientRect(0, 0, this.width, this.height, j1, k1);
-        }
-
-        this.mc.getTextureManager().bindTexture(minecraftTitleTextures);
+        this.mc.getTextureManager().bindTexture(new ResourceLocation("TIMC/mainmenubg.png"));
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        ScaledResolution sr = new ScaledResolution(this.mc, this.mc.displayWidth, this.mc.displayHeight);
+        this.drawModalRectWithCustomSizedTexture(-1177/2 - 372 - animatedMouseX + sr.getScaledWidth(), -34/2 +8 - animatedMouseY/9.5f + sr.getScaledHeight()/19 - 19, 0, 0, 3841/2, 1194/2, 3841/2, 1194/2);
+       
+        FontUtil.jelloFont.drawString("", 1, 1, -1);
+        GlStateManager.disableAlpha();
+        GlStateManager.enableBlend();
+        
+        float offset = -16 + sr.getScaledWidth()/2 - 289/2f + 8;
+        float height = sr.getScaledHeight()/2 + 29/2f - 8 + 0.5f;
+        
+        FontUtil.jelloFont.drawNoBSString("© TeamTI", 5, sr.getScaledHeight() - 5 - FontUtil.jelloFont.getHeight() + 1, -1);
+        
+        FontUtil.jelloFont.drawNoBSString("TIMC 0.4", sr.getScaledWidth() - 5 - 0.5f - FontUtil.jelloFont.getStringWidth("TIMC 0.4") + 1, sr.getScaledHeight() - 5 - FontUtil.jelloFont.getHeight() + 1, -1);
+        
+        this.mc.getTextureManager().bindTexture(new ResourceLocation("TIMC/timc2.png"));
+        //drawModalRectWithCustomSizedTexture(sr.getScaledWidth()/2 - 323/4f, sr.getScaledHeight()/2 - 161/2f + 11 - 32/2f + 0.5f, 0, 0, 323/2f, 161/2f, 323/2f, 161/2f);
+        drawModalRectWithCustomSizedTexture((sr.getScaledWidth() / 2 - 90) - mouseX / 120, sr.getScaledHeight() / 2 - 170 - mouseY / 120, 0, 0, 160 + 30, 160 + 30, 160 + 30, 160 + 30);
 
-        if ((double)this.updateCounter < 1.0E-4D)
-        {
-            this.drawTexturedModalRect(j + 0, k + 0, 0, 0, 99, 44);
-            this.drawTexturedModalRect(j + 99, k + 0, 129, 0, 27, 44);
-            this.drawTexturedModalRect(j + 99 + 26, k + 0, 126, 0, 3, 44);
-            this.drawTexturedModalRect(j + 99 + 26 + 3, k + 0, 99, 0, 26, 44);
-            this.drawTexturedModalRect(j + 155, k + 0, 0, 45, 155, 44);
-        }
-        else
-        {
-            this.drawTexturedModalRect(j + 0, k + 0, 0, 0, 155, 44);
-            this.drawTexturedModalRect(j + 155, k + 0, 0, 45, 155, 44);
-        }
 
+        //Gui.drawModalRectWithCustomSizedTexture((scale.getScaledWidth() / 2 - 90) - mouseX / 40, scale.getScaledHeight() / 2 - 110 - mouseY / 40, 0, 0, 160 + 30, 160 + 30, 160 + 30, 160 + 30);
+        //RenderingUtil.drawMoved(mouseX, mouseY, "TIMC/timc.png", true);
+
+
+        pe.render(animatedMouseX, animatedMouseY);
+        
         GlStateManager.pushMatrix();
-        GlStateManager.translate((float)(this.width / 2 + 90), 70.0F, 0.0F);
-        GlStateManager.rotate(-20.0F, 0.0F, 0.0F, 1.0F);
-        float f = 1.8F - MathHelper.abs(MathHelper.sin((float)(Minecraft.getSystemTime() % 1000L) / 1000.0F * (float)Math.PI * 2.0F) * 0.1F);
-        f = f * 100.0F / (float)(this.fontRendererObj.getStringWidth(this.splashText) + 32);
-        GlStateManager.scale(f, f, f);
-        this.drawCenteredString(this.fontRendererObj, this.splashText, 0, -8, -256);
+
+
+        if(this.isMouseHoveringRect1(offset + 4, height + 4, 64-8, 64-8, mouseX, mouseY)){
+        	if(zoom1 < 1.2)
+        	zoom1 += 0.0500001;
+        }else{
+        	if(zoom1 > 1){
+        		zoom1 -= 0.06666666666666666666666666666667;
+        	}
+        }
+        if(zoom1 > 1){
+        	GlStateManager.translate(offset + 32, height + 64, 0);
+        	GlStateManager.scale(Math.min(1.2, zoom1), Math.min(1.2, zoom1), 1);
+        	GlStateManager.translate(-(offset + 32), -(height + 64), 0);
+        	GlStateManager.color(1, 1, 1, 1);
+        }
+        this.mc.getTextureManager().bindTexture(new ResourceLocation("TIMC/singleplayer.png"));
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+        this.drawModalRectWithCustomSizedTexture(offset, height, 0, 0, 64, 64, 64, 64);
         GlStateManager.popMatrix();
-        String s = "Minecraft 1.8.9";
-
-        if (this.mc.isDemo())
-        {
-            s = s + " Demo";
+        GlStateManager.pushMatrix();
+        if(zoom1 > 1){
+        	GlStateManager.translate(offset + 32, height + 64, 0);
+        	GlStateManager.scale(Math.min(1, zoom1-.2), Math.min(1, zoom1-.2), 1);
+        	GlStateManager.translate(-(offset + 32), -(height + 64), 0);
+        	FontUtil.jelloFontScale.drawNoBSString("Singleplayer", offset + 32 - FontUtil.jelloFontScale.getStringWidth("Singleplayer")/2 + 0.5f, height + 140/2 + 1 - 4, new Color(255/255f ,255/255f ,255/255f, Math.max(0, Math.min(1, 0.5f+(zoom1-1)*2.5f))).getRGB());
         }
+        GlStateManager.popMatrix();
+        
+        offset += 122/2f;
+        
+        GlStateManager.pushMatrix();
 
-        if (Reflector.FMLCommonHandler_getBrandings.exists())
-        {
-            Object object = Reflector.call(Reflector.FMLCommonHandler_instance, new Object[0]);
-            List<String> list = Lists.<String>reverse((List)Reflector.call(object, Reflector.FMLCommonHandler_getBrandings, new Object[] {Boolean.valueOf(true)}));
 
-            for (int l1 = 0; l1 < list.size(); ++l1)
-            {
-                String s1 = (String)list.get(l1);
-
-                if (!Strings.isNullOrEmpty(s1))
-                {
-                    this.drawString(this.fontRendererObj, s1, 2, this.height - (10 + l1 * (this.fontRendererObj.FONT_HEIGHT + 1)), 16777215);
-                }
-            }
-
-            if (Reflector.ForgeHooksClient_renderMainMenu.exists())
-            {
-                Reflector.call(Reflector.ForgeHooksClient_renderMainMenu, new Object[] {this, this.fontRendererObj, Integer.valueOf(this.width), Integer.valueOf(this.height)});
-            }
+        if(this.isMouseHoveringRect1(offset + 4, height + 4, 64-8, 64-8, mouseX, mouseY)){
+        	if(zoom2 < 1.2)
+        	zoom2 += 0.0500001;
+        }else{
+        	if(zoom2 > 1){
+        		zoom2 -= 0.06666666666666666666666666666667;
+        	}
         }
-        else
-        {
-            this.drawString(this.fontRendererObj, s, 2, this.height - 10, -1);
+        if(zoom2 > 1){
+        	GlStateManager.translate(offset + 32, height + 64, 0);
+        	GlStateManager.scale(Math.min(1.2, zoom2), Math.min(1.2, zoom2), 1);
+        	GlStateManager.translate(-(offset + 32), -(height + 64), 0);
+        	GlStateManager.color(1, 1, 1, 1);
+        	 }
+        this.mc.getTextureManager().bindTexture(new ResourceLocation("TIMC/multiplayer.png"));
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+        this.drawModalRectWithCustomSizedTexture(offset, height, 0, 0, 64, 64, 64, 64);
+        GlStateManager.popMatrix();
+        GlStateManager.pushMatrix();
+        if(zoom2 > 1){
+        	GlStateManager.translate(offset + 32, height + 64, 0);
+        	GlStateManager.scale(Math.min(1, zoom2-.2), Math.min(1, zoom2-.2), 1);
+        	GlStateManager.translate(-(offset + 32), -(height + 64), 0);
+        	FontUtil.jelloFontScale.drawNoBSString("Multiplayer", offset + 32 - FontUtil.jelloFontScale.getStringWidth("Multiplayer")/2 + 0.5f, height + 140/2 + 1 - 4, new Color(255/255f ,255/255f ,255/255f, Math.max(0, Math.min(1, 0.5f+(zoom2-1)*2.5f))).getRGB());
         }
+        GlStateManager.popMatrix();
+        
+        offset += 122/2f;
+        GlStateManager.pushMatrix();
 
-        String s2 = "Copyright Mojang AB. Do not distribute!";
-        this.drawString(this.fontRendererObj, s2, this.width - this.fontRendererObj.getStringWidth(s2) - 2, this.height - 10, -1);
 
-        if (this.openGLWarning1 != null && this.openGLWarning1.length() > 0)
-        {
-            drawRect(this.field_92022_t - 2, this.field_92021_u - 2, this.field_92020_v + 2, this.field_92019_w - 1, 1428160512);
-            this.drawString(this.fontRendererObj, this.openGLWarning1, this.field_92022_t, this.field_92021_u, -1);
-            this.drawString(this.fontRendererObj, this.openGLWarning2, (this.width - this.field_92024_r) / 2, ((GuiButton)this.buttonList.get(0)).yPosition - 12, -1);
+        if(this.isMouseHoveringRect1(offset + 4, height + 4, 64-8, 64-8, mouseX, mouseY)){
+        	if(zoom3 < 1.2)
+        	zoom3 += 0.0500001;
+        }else{
+        	if(zoom3 > 1){
+        		zoom3 -= 0.06666666666666666666666666666667;
+        	}
         }
+        if(zoom3 > 1){
+        	GlStateManager.translate(offset + 32, height + 64, 0);
+        	GlStateManager.scale(Math.min(1.2, zoom3), Math.min(1.2, zoom3), 1);
+        	GlStateManager.translate(-(offset + 32), -(height + 64), 0);
+        	GlStateManager.color(1, 1, 1, 1);
+        	}
+        this.mc.getTextureManager().bindTexture(new ResourceLocation("TIMC/connect.png"));
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+        this.drawModalRectWithCustomSizedTexture(offset, height, 0, 0, 64, 64, 64, 64);
+        GlStateManager.popMatrix();
+        GlStateManager.pushMatrix();
+        if(zoom3 > 1){
+        	GlStateManager.translate(offset + 32, height + 64, 0);
+        	GlStateManager.scale(Math.min(1, zoom3-.2), Math.min(1, zoom3-.2), 1);
+        	GlStateManager.translate(-(offset + 32), -(height + 64), 0);
+        	FontUtil.jelloFontScale.drawNoBSString("Version Control", offset + 32 - FontUtil.jelloFontScale.getStringWidth("Version Control")/2 + 0.5f, height + 140/2 + 1 - 4, new Color(255/255f ,255/255f ,255/255f, Math.max(0, Math.min(1, 0.5f+(zoom3-1)*2.5f))).getRGB());
+        }
+        GlStateManager.popMatrix();
+        
+        offset += 122/2f;
+        GlStateManager.pushMatrix();
+
+
+        if(this.isMouseHoveringRect1(offset + 4, height + 4, 64-8, 64-8, mouseX, mouseY)){
+        	if(zoom4 < 1.2)
+        	zoom4 += 0.06666666666666666666666666666667;
+        }else{
+        	if(zoom4 > 1){
+        		zoom4 -= 0.06666666666666666666666666666667;
+        	}
+        }
+        if(zoom4 > 1){
+        	GlStateManager.translate(offset + 32, height + 64, 0);
+        	GlStateManager.scale(Math.min(1.2, zoom4), Math.min(1.2, zoom4), 1);
+        	GlStateManager.translate(-(offset + 32), -(height + 64), 0);
+        	GlStateManager.color(1, 1, 1, 1);
+        }
+        this.mc.getTextureManager().bindTexture(new ResourceLocation("TIMC/settings.png"));
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+        this.drawModalRectWithCustomSizedTexture(offset, height, 0, 0, 64, 64, 64, 64);
+        GlStateManager.popMatrix();
+        GlStateManager.pushMatrix();
+        if(zoom4 > 1){
+        	GlStateManager.translate(offset + 32, height + 64, 0);
+        	GlStateManager.scale(Math.min(1, zoom4-.2), Math.min(1, zoom4-.2), 1);
+        	GlStateManager.translate(-(offset + 32), -(height + 64), 0);
+        	FontUtil.jelloFontScale.drawNoBSString("Settings", offset + 32 - FontUtil.jelloFontScale.getStringWidth("Settings")/2 + 0.5f, height + 140/2 + 1 - 4, new Color(255/255f ,255/255f ,255/255f, Math.max(0, Math.min(1, 0.5f+(zoom4-1)*2.5f))).getRGB());
+        }
+        GlStateManager.popMatrix();
+        
+        offset += 122/2f;
+        GlStateManager.pushMatrix();
+        if(this.isMouseHoveringRect1(offset + 4, height + 4, 64-8, 64-8, mouseX, mouseY)){
+        	if(zoom5 < 1.2)
+        	zoom5 += 0.06666666666666666666666666666667;
+        }else{
+        	if(zoom5 > 1){
+        		zoom5 -= 0.06666666666666666666666666666667;
+        	}
+        }
+       
+        if(zoom5 > 1){
+        	GlStateManager.translate(offset + 32, height + 64, 0);
+        	GlStateManager.scale(Math.min(1.2, zoom5), Math.min(1.2, zoom5), 1);
+        	GlStateManager.translate(-(offset + 32), -(height + 64), 0);
+        	GlStateManager.color(1, 1, 1, 1);
+        	}
+        
+        this.mc.getTextureManager().bindTexture(new ResourceLocation("TIMC/altmanager.png"));
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+        this.drawModalRectWithCustomSizedTexture(offset, height, 0, 0, 64, 64, 64, 64);
+        GlStateManager.popMatrix();
+        GlStateManager.pushMatrix();
+        if(zoom5 > 1){
+        	GlStateManager.translate(offset + 32, height + 64, 0);
+        	GlStateManager.scale(Math.min(1, zoom5-.2), Math.min(1, zoom5-.2), 1);
+        	GlStateManager.translate(-(offset + 32), -(height + 64), 0);
+        	FontUtil.jelloFontScale.drawNoBSString("Alt Manager", offset + 32 - FontUtil.jelloFontScale.getStringWidth("Alt Manager")/2 + 0.5f, height + 140/2 + 1 - 4, new Color(255/255f ,255/255f ,255/255f, Math.max(0, Math.min(1, 0.5f+(zoom5-1)*2.5f))).getRGB());
+        }
+        GlStateManager.popMatrix();
+        
+        GlStateManager.enableBlend();
+        
+        animatedMouseX += ((mouseX-animatedMouseX) / 1.8) + 0.1;
+        animatedMouseY += ((mouseY-animatedMouseY) / 1.8) + 0.1;
+        
 
         super.drawScreen(mouseX, mouseY, partialTicks);
-
-        if (this.a())
-        {
-            this.M.drawScreen(mouseX, mouseY, partialTicks);
-        }
-
-        if (this.modUpdateNotification != null)
-        {
-            this.modUpdateNotification.drawScreen(mouseX, mouseY, partialTicks);
-        }
     }
 
     /**
@@ -697,31 +746,77 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
     {
         super.mouseClicked(mouseX, mouseY, mouseButton);
+        Object var4 = this.field_104025_t;
 
-        synchronized (this.threadLock)
+        synchronized (this.field_104025_t)
         {
-            if (this.openGLWarning1.length() > 0 && mouseX >= this.field_92022_t && mouseX <= this.field_92020_v && mouseY >= this.field_92021_u && mouseY <= this.field_92019_w)
+            if (this.field_92025_p.length() > 0 && mouseX >= this.field_92022_t && mouseX <= this.field_92020_v && mouseY >= this.field_92021_u && mouseY <= this.field_92019_w)
             {
-                GuiConfirmOpenLink guiconfirmopenlink = new GuiConfirmOpenLink(this, this.openGLWarningLink, 13, true);
-                guiconfirmopenlink.disableSecurityWarning();
-                this.mc.displayGuiScreen(guiconfirmopenlink);
+                GuiConfirmOpenLink var5 = new GuiConfirmOpenLink(this, this.field_104024_v, 13, true);
+                var5.disableSecurityWarning();
+                this.mc.displayGuiScreen(var5);
             }
         }
+        ScaledResolution sr = new ScaledResolution(this.mc, this.mc.displayWidth, this.mc.displayHeight);
+        
+        if(mouseButton == 0){
+        	float offset = -16 + sr.getScaledWidth()/2 - 289/2f + 8;
+            float height = sr.getScaledHeight()/2 + 29/2f - 8;
+            
+            if(this.isMouseHoveringRect1(offset + 4, height + 4, 64-8, 64-8, mouseX, mouseY)){
+            	mc.displayGuiScreen(new GuiSelectWorld(this));
+            }
+            offset += 122/2f;
+            if(this.isMouseHoveringRect1(offset + 4, height + 4, 64-8, 64-8, mouseX, mouseY)){
+            	mc.displayGuiScreen(new GuiMultiplayer(this));
+            }
+            offset += 122/2f;
+            if(this.isMouseHoveringRect1(offset + 4, height + 4, 64-8, 64-8, mouseX, mouseY)){
+            	//TODO: Implement ViaMCP
+                this.mc.displayGuiScreen(new GuiProtocolSelector(this));
+            }
+            offset += 122/2f;
+            if(this.isMouseHoveringRect1(offset + 4, height + 4, 64-8, 64-8, mouseX, mouseY)){
+            	mc.displayGuiScreen(new GuiOptions(this, mc.gameSettings));
+            }
+            offset += 122/2f;
+            if(this.isMouseHoveringRect1(offset + 4, height + 4, 64-8, 64-8, mouseX, mouseY)){
+            	for(Alt a : TIMC.getAltManager().getAlts()){
 
-        if (this.a())
-        {
-            this.M.mouseClicked(mouseX, mouseY, mouseButton);
+            		TIMC.altmanagergui.selectedAlt = null;
+                	a.slideTrans = 0;
+
+                }
+            	mc.displayGuiScreen(TIMC.altmanagergui);
+            }
+            offset += 122/2f;
+            
         }
     }
 
-    /**
-     * Called when the screen is unloaded. Used to disable keyboard repeat events
-     */
-    public void onGuiClosed()
+    public static void openWebsite(String url)
     {
-        if (this.M != null)
+        if (Desktop.isDesktopSupported())
         {
-            this.M.onGuiClosed();
+            try
+            {
+                Desktop.getDesktop().browse(new URI(url));
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+            catch (URISyntaxException e)
+            {
+                e.printStackTrace();
+            }
         }
+    }
+    public boolean isMouseHoveringRect1(float x, float y, float width, float height, int mouseX, int mouseY){
+    	return mouseX >= x && mouseY >= y && mouseX <= x + width && mouseY <= y + height;
+    }
+    
+    public boolean isMouseHoveringRect2(float x, float y, float x2, float y2, int mouseX, int mouseY){
+    	return mouseX >= x && mouseY >= y && mouseX <= x2 && mouseY <= y2;
     }
 }

@@ -1,23 +1,23 @@
 package net.minecraft.network.play.client;
 
 import java.io.IOException;
+import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 
-public class C11PacketEnchantItem implements Packet<INetHandlerPlayServer>
+public class C11PacketEnchantItem implements Packet
 {
-    private int windowId;
+    private int id;
     private int button;
+    
 
-    public C11PacketEnchantItem()
-    {
-    }
+    public C11PacketEnchantItem() {}
 
-    public C11PacketEnchantItem(int windowId, int button)
+    public C11PacketEnchantItem(int p_i45245_1_, int p_i45245_2_)
     {
-        this.windowId = windowId;
-        this.button = button;
+        this.id = p_i45245_1_;
+        this.button = p_i45245_2_;
     }
 
     /**
@@ -31,28 +31,36 @@ public class C11PacketEnchantItem implements Packet<INetHandlerPlayServer>
     /**
      * Reads the raw packet data from the data stream.
      */
-    public void readPacketData(PacketBuffer buf) throws IOException
+    public void readPacketData(PacketBuffer data) throws IOException
     {
-        this.windowId = buf.readByte();
-        this.button = buf.readByte();
+        this.id = data.readByte();
+        this.button = data.readByte();
     }
 
     /**
      * Writes the raw packet data to the data stream.
      */
-    public void writePacketData(PacketBuffer buf) throws IOException
+    public void writePacketData(PacketBuffer data) throws IOException
     {
-        buf.writeByte(this.windowId);
-        buf.writeByte(this.button);
+        data.writeByte(this.id);
+        data.writeByte(this.button);
     }
 
-    public int getWindowId()
+    public int getId()
     {
-        return this.windowId;
+        return this.id;
     }
 
     public int getButton()
     {
         return this.button;
+    }
+
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandler handler)
+    {
+        this.processPacket((INetHandlerPlayServer)handler);
     }
 }

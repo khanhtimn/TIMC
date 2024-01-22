@@ -18,32 +18,36 @@ import net.minecraft.world.World;
 
 public class BlockStainedGlass extends BlockBreakable
 {
-    public static final PropertyEnum<EnumDyeColor> COLOR = PropertyEnum.<EnumDyeColor>create("color", EnumDyeColor.class);
+    public static final PropertyEnum field_176547_a = PropertyEnum.create("color", EnumDyeColor.class);
+    
 
-    public BlockStainedGlass(Material materialIn)
+    public BlockStainedGlass(Material p_i45427_1_)
     {
-        super(materialIn, false);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(COLOR, EnumDyeColor.WHITE));
+        super(p_i45427_1_, false);
+        this.setDefaultState(this.blockState.getBaseState().withProperty(field_176547_a, EnumDyeColor.WHITE));
         this.setCreativeTab(CreativeTabs.tabBlock);
     }
 
     /**
-     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
-     * returns the metadata of the dropped item based on the old metadata of the block.
+     * Get the damage value that this Block should drop
      */
     public int damageDropped(IBlockState state)
     {
-        return ((EnumDyeColor)state.getValue(COLOR)).getMetadata();
+        return ((EnumDyeColor)state.getValue(field_176547_a)).func_176765_a();
     }
 
     /**
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
     {
-        for (EnumDyeColor enumdyecolor : EnumDyeColor.values())
+        EnumDyeColor[] var4 = EnumDyeColor.values();
+        int var5 = var4.length;
+
+        for (int var6 = 0; var6 < var5; ++var6)
         {
-            list.add(new ItemStack(itemIn, 1, enumdyecolor.getMetadata()));
+            EnumDyeColor var7 = var4[var6];
+            list.add(new ItemStack(itemIn, 1, var7.func_176765_a()));
         }
     }
 
@@ -52,7 +56,7 @@ public class BlockStainedGlass extends BlockBreakable
      */
     public MapColor getMapColor(IBlockState state)
     {
-        return ((EnumDyeColor)state.getValue(COLOR)).getMapColor();
+        return ((EnumDyeColor)state.getValue(field_176547_a)).func_176768_e();
     }
 
     public EnumWorldBlockLayer getBlockLayer()
@@ -83,14 +87,14 @@ public class BlockStainedGlass extends BlockBreakable
      */
     public IBlockState getStateFromMeta(int meta)
     {
-        return this.getDefaultState().withProperty(COLOR, EnumDyeColor.byMetadata(meta));
+        return this.getDefaultState().withProperty(field_176547_a, EnumDyeColor.func_176764_b(meta));
     }
 
     public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state)
     {
         if (!worldIn.isRemote)
         {
-            BlockBeacon.updateColorAsync(worldIn, pos);
+            BlockBeacon.func_176450_d(worldIn, pos);
         }
     }
 
@@ -98,7 +102,7 @@ public class BlockStainedGlass extends BlockBreakable
     {
         if (!worldIn.isRemote)
         {
-            BlockBeacon.updateColorAsync(worldIn, pos);
+            BlockBeacon.func_176450_d(worldIn, pos);
         }
     }
 
@@ -107,11 +111,11 @@ public class BlockStainedGlass extends BlockBreakable
      */
     public int getMetaFromState(IBlockState state)
     {
-        return ((EnumDyeColor)state.getValue(COLOR)).getMetadata();
+        return ((EnumDyeColor)state.getValue(field_176547_a)).func_176765_a();
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {COLOR});
+        return new BlockState(this, new IProperty[] {field_176547_a});
     }
 }

@@ -1,17 +1,17 @@
 package net.minecraft.entity.ai;
 
 import com.google.common.base.Predicate;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityTameable;
 
-public class EntityAITargetNonTamed<T extends EntityLivingBase> extends EntityAINearestAttackableTarget
+public class EntityAITargetNonTamed extends EntityAINearestAttackableTarget
 {
     private EntityTameable theTameable;
+    
 
-    public EntityAITargetNonTamed(EntityTameable entityIn, Class<T> classTarget, boolean checkSight, Predicate <? super T > targetSelector)
+    public EntityAITargetNonTamed(EntityTameable p_i45876_1_, Class p_i45876_2_, boolean p_i45876_3_, Predicate p_i45876_4_)
     {
-        super(entityIn, classTarget, 10, checkSight, false, targetSelector);
-        this.theTameable = entityIn;
+        super(p_i45876_1_, p_i45876_2_, 10, p_i45876_3_, false, p_i45876_4_);
+        this.theTameable = p_i45876_1_;
     }
 
     /**

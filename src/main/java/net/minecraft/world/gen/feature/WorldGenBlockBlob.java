@@ -1,5 +1,6 @@
 package net.minecraft.world.gen.feature;
 
+import java.util.Iterator;
 import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -10,6 +11,7 @@ public class WorldGenBlockBlob extends WorldGenerator
 {
     private final Block field_150545_a;
     private final int field_150544_b;
+    
 
     public WorldGenBlockBlob(Block p_i45450_1_, int p_i45450_2_)
     {
@@ -18,55 +20,58 @@ public class WorldGenBlockBlob extends WorldGenerator
         this.field_150544_b = p_i45450_2_;
     }
 
-    public boolean generate(World worldIn, Random rand, BlockPos position)
+    public boolean generate(World worldIn, Random p_180709_2_, BlockPos p_180709_3_)
     {
         while (true)
         {
-            label0:
+            if (p_180709_3_.getY() > 3)
             {
-                if (position.getY() > 3)
+                label47:
                 {
-                    if (worldIn.isAirBlock(position.down()))
+                    if (!worldIn.isAirBlock(p_180709_3_.offsetDown()))
                     {
-                        break label0;
-                    }
+                        Block var4 = worldIn.getBlockState(p_180709_3_.offsetDown()).getBlock();
 
-                    Block block = worldIn.getBlockState(position.down()).getBlock();
-
-                    if (block != Blocks.grass && block != Blocks.dirt && block != Blocks.stone)
-                    {
-                        break label0;
-                    }
-                }
-
-                if (position.getY() <= 3)
-                {
-                    return false;
-                }
-
-                int i1 = this.field_150544_b;
-
-                for (int i = 0; i1 >= 0 && i < 3; ++i)
-                {
-                    int j = i1 + rand.nextInt(2);
-                    int k = i1 + rand.nextInt(2);
-                    int l = i1 + rand.nextInt(2);
-                    float f = (float)(j + k + l) * 0.333F + 0.5F;
-
-                    for (BlockPos blockpos : BlockPos.getAllInBox(position.add(-j, -k, -l), position.add(j, k, l)))
-                    {
-                        if (blockpos.distanceSq(position) <= (double)(f * f))
+                        if (var4 == Blocks.grass || var4 == Blocks.dirt || var4 == Blocks.stone)
                         {
-                            worldIn.setBlockState(blockpos, this.field_150545_a.getDefaultState(), 4);
+                            break label47;
                         }
                     }
 
-                    position = position.add(-(i1 + 1) + rand.nextInt(2 + i1 * 2), 0 - rand.nextInt(2), -(i1 + 1) + rand.nextInt(2 + i1 * 2));
+                    p_180709_3_ = p_180709_3_.offsetDown();
+                    continue;
+                }
+            }
+
+            if (p_180709_3_.getY() <= 3)
+            {
+                return false;
+            }
+
+            int var12 = this.field_150544_b;
+
+            for (int var5 = 0; var12 >= 0 && var5 < 3; ++var5)
+            {
+                int var6 = var12 + p_180709_2_.nextInt(2);
+                int var7 = var12 + p_180709_2_.nextInt(2);
+                int var8 = var12 + p_180709_2_.nextInt(2);
+                float var9 = (float)(var6 + var7 + var8) * 0.333F + 0.5F;
+                Iterator var10 = BlockPos.getAllInBox(p_180709_3_.add(-var6, -var7, -var8), p_180709_3_.add(var6, var7, var8)).iterator();
+
+                while (var10.hasNext())
+                {
+                    BlockPos var11 = (BlockPos)var10.next();
+
+                    if (var11.distanceSq(p_180709_3_) <= (double)(var9 * var9))
+                    {
+                        worldIn.setBlockState(var11, this.field_150545_a.getDefaultState(), 4);
+                    }
                 }
 
-                return true;
+                p_180709_3_ = p_180709_3_.add(-(var12 + 1) + p_180709_2_.nextInt(2 + var12 * 2), 0 - p_180709_2_.nextInt(2), -(var12 + 1) + p_180709_2_.nextInt(2 + var12 * 2));
             }
-            position = position.down();
+
+            return true;
         }
     }
 }

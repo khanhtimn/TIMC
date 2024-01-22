@@ -1,7 +1,6 @@
 package net.minecraft.block;
 
 import java.util.List;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
@@ -14,41 +13,37 @@ import net.minecraft.util.IStringSerializable;
 
 public class BlockSandStone extends Block
 {
-    public static final PropertyEnum<BlockSandStone.EnumType> TYPE = PropertyEnum.<BlockSandStone.EnumType>create("type", BlockSandStone.EnumType.class);
+    public static final PropertyEnum field_176297_a = PropertyEnum.create("type", BlockSandStone.EnumType.class);
+    
 
     public BlockSandStone()
     {
         super(Material.rock);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, BlockSandStone.EnumType.DEFAULT));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(field_176297_a, BlockSandStone.EnumType.DEFAULT));
         this.setCreativeTab(CreativeTabs.tabBlock);
     }
 
     /**
-     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
-     * returns the metadata of the dropped item based on the old metadata of the block.
+     * Get the damage value that this Block should drop
      */
     public int damageDropped(IBlockState state)
     {
-        return ((BlockSandStone.EnumType)state.getValue(TYPE)).getMetadata();
+        return ((BlockSandStone.EnumType)state.getValue(field_176297_a)).func_176675_a();
     }
 
     /**
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
     {
-        for (BlockSandStone.EnumType blocksandstone$enumtype : BlockSandStone.EnumType.values())
-        {
-            list.add(new ItemStack(itemIn, 1, blocksandstone$enumtype.getMetadata()));
-        }
-    }
+        BlockSandStone.EnumType[] var4 = BlockSandStone.EnumType.values();
+        int var5 = var4.length;
 
-    /**
-     * Get the MapColor for this Block and the given BlockState
-     */
-    public MapColor getMapColor(IBlockState state)
-    {
-        return MapColor.sandColor;
+        for (int var6 = 0; var6 < var5; ++var6)
+        {
+            BlockSandStone.EnumType var7 = var4[var6];
+            list.add(new ItemStack(itemIn, 1, var7.func_176675_a()));
+        }
     }
 
     /**
@@ -56,7 +51,7 @@ public class BlockSandStone extends Block
      */
     public IBlockState getStateFromMeta(int meta)
     {
-        return this.getDefaultState().withProperty(TYPE, BlockSandStone.EnumType.byMetadata(meta));
+        return this.getDefaultState().withProperty(field_176297_a, BlockSandStone.EnumType.func_176673_a(meta));
     }
 
     /**
@@ -64,66 +59,72 @@ public class BlockSandStone extends Block
      */
     public int getMetaFromState(IBlockState state)
     {
-        return ((BlockSandStone.EnumType)state.getValue(TYPE)).getMetadata();
+        return ((BlockSandStone.EnumType)state.getValue(field_176297_a)).func_176675_a();
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {TYPE});
+        return new BlockState(this, new IProperty[] {field_176297_a});
     }
 
     public static enum EnumType implements IStringSerializable
     {
-        DEFAULT(0, "sandstone", "default"),
-        CHISELED(1, "chiseled_sandstone", "chiseled"),
-        SMOOTH(2, "smooth_sandstone", "smooth");
+        DEFAULT("DEFAULT", 0, 0, "sandstone", "default"),
+        CHISELED("CHISELED", 1, 1, "chiseled_sandstone", "chiseled"),
+        SMOOTH("SMOOTH", 2, 2, "smooth_sandstone", "smooth");
+        private static final BlockSandStone.EnumType[] field_176679_d = new BlockSandStone.EnumType[values().length];
+        private final int field_176680_e;
+        private final String field_176677_f;
+        private final String field_176678_g;
 
-        private static final BlockSandStone.EnumType[] META_LOOKUP = new BlockSandStone.EnumType[values().length];
-        private final int metadata;
-        private final String name;
-        private final String unlocalizedName;
+        private static final BlockSandStone.EnumType[] $VALUES = new BlockSandStone.EnumType[]{DEFAULT, CHISELED, SMOOTH};
+        
 
-        private EnumType(int meta, String name, String unlocalizedName)
+        private EnumType(String p_i45686_1_, int p_i45686_2_, int p_i45686_3_, String p_i45686_4_, String p_i45686_5_)
         {
-            this.metadata = meta;
-            this.name = name;
-            this.unlocalizedName = unlocalizedName;
+            this.field_176680_e = p_i45686_3_;
+            this.field_176677_f = p_i45686_4_;
+            this.field_176678_g = p_i45686_5_;
         }
 
-        public int getMetadata()
+        public int func_176675_a()
         {
-            return this.metadata;
+            return this.field_176680_e;
         }
 
         public String toString()
         {
-            return this.name;
+            return this.field_176677_f;
         }
 
-        public static BlockSandStone.EnumType byMetadata(int meta)
+        public static BlockSandStone.EnumType func_176673_a(int p_176673_0_)
         {
-            if (meta < 0 || meta >= META_LOOKUP.length)
+            if (p_176673_0_ < 0 || p_176673_0_ >= field_176679_d.length)
             {
-                meta = 0;
+                p_176673_0_ = 0;
             }
 
-            return META_LOOKUP[meta];
+            return field_176679_d[p_176673_0_];
         }
 
         public String getName()
         {
-            return this.name;
+            return this.field_176677_f;
         }
 
-        public String getUnlocalizedName()
+        public String func_176676_c()
         {
-            return this.unlocalizedName;
+            return this.field_176678_g;
         }
 
         static {
-            for (BlockSandStone.EnumType blocksandstone$enumtype : values())
+            BlockSandStone.EnumType[] var0 = values();
+            int var1 = var0.length;
+
+            for (int var2 = 0; var2 < var1; ++var2)
             {
-                META_LOOKUP[blocksandstone$enumtype.getMetadata()] = blocksandstone$enumtype;
+                BlockSandStone.EnumType var3 = var0[var2];
+                field_176679_d[var3.func_176675_a()] = var3;
             }
         }
     }

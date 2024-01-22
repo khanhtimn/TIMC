@@ -14,24 +14,26 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.init.Blocks;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityPiston;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
-public class TileEntityPistonRenderer extends TileEntitySpecialRenderer<TileEntityPiston>
+public class TileEntityPistonRenderer extends TileEntitySpecialRenderer
 {
-    private final BlockRendererDispatcher blockRenderer = Minecraft.getMinecraft().getBlockRendererDispatcher();
+    private final BlockRendererDispatcher field_178462_c = Minecraft.getMinecraft().getBlockRendererDispatcher();
+    
 
-    public void renderTileEntityAt(TileEntityPiston te, double x, double y, double z, float partialTicks, int destroyStage)
+    public void func_178461_a(TileEntityPiston p_178461_1_, double p_178461_2_, double p_178461_4_, double p_178461_6_, float p_178461_8_, int p_178461_9_)
     {
-        BlockPos blockpos = te.getPos();
-        IBlockState iblockstate = te.getPistonState();
-        Block block = iblockstate.getBlock();
+        BlockPos var10 = p_178461_1_.getPos();
+        IBlockState var11 = p_178461_1_.func_174927_b();
+        Block var12 = var11.getBlock();
 
-        if (block.getMaterial() != Material.air && te.getProgress(partialTicks) < 1.0F)
+        if (var12.getMaterial() != Material.air && p_178461_1_.func_145860_a(p_178461_8_) < 1.0F)
         {
-            Tessellator tessellator = Tessellator.getInstance();
-            WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+            Tessellator var13 = Tessellator.getInstance();
+            WorldRenderer var14 = var13.getWorldRenderer();
             this.bindTexture(TextureMap.locationBlocksTexture);
             RenderHelper.disableStandardItemLighting();
             GlStateManager.blendFunc(770, 771);
@@ -47,33 +49,40 @@ public class TileEntityPistonRenderer extends TileEntitySpecialRenderer<TileEnti
                 GlStateManager.shadeModel(7424);
             }
 
-            worldrenderer.begin(7, DefaultVertexFormats.BLOCK);
-            worldrenderer.setTranslation((double)((float)x - (float)blockpos.getX() + te.getOffsetX(partialTicks)), (double)((float)y - (float)blockpos.getY() + te.getOffsetY(partialTicks)), (double)((float)z - (float)blockpos.getZ() + te.getOffsetZ(partialTicks)));
-            World world = this.getWorld();
+            var14.startDrawingQuads();
+            var14.setVertexFormat(DefaultVertexFormats.field_176600_a);
+            var14.setTranslation((double)((float)p_178461_2_ - (float)var10.getX() + p_178461_1_.func_174929_b(p_178461_8_)), (double)((float)p_178461_4_ - (float)var10.getY() + p_178461_1_.func_174928_c(p_178461_8_)), (double)((float)p_178461_6_ - (float)var10.getZ() + p_178461_1_.func_174926_d(p_178461_8_)));
+            var14.func_178986_b(1.0F, 1.0F, 1.0F);
+            World var15 = this.getWorld();
 
-            if (block == Blocks.piston_head && te.getProgress(partialTicks) < 0.5F)
+            if (var12 == Blocks.piston_head && p_178461_1_.func_145860_a(p_178461_8_) < 0.5F)
             {
-                iblockstate = iblockstate.withProperty(BlockPistonExtension.SHORT, Boolean.valueOf(true));
-                this.blockRenderer.getBlockModelRenderer().renderModel(world, this.blockRenderer.getModelFromBlockState(iblockstate, world, blockpos), iblockstate, blockpos, worldrenderer, true);
+                var11 = var11.withProperty(BlockPistonExtension.field_176327_M, Boolean.valueOf(true));
+                this.field_178462_c.func_175019_b().renderBlockModel(var15, this.field_178462_c.getModelFromBlockState(var11, var15, var10), var11, var10, var14, true);
             }
-            else if (te.shouldPistonHeadBeRendered() && !te.isExtending())
+            else if (p_178461_1_.shouldPistonHeadBeRendered() && !p_178461_1_.isExtending())
             {
-                BlockPistonExtension.EnumPistonType blockpistonextension$enumpistontype = block == Blocks.sticky_piston ? BlockPistonExtension.EnumPistonType.STICKY : BlockPistonExtension.EnumPistonType.DEFAULT;
-                IBlockState iblockstate1 = Blocks.piston_head.getDefaultState().withProperty(BlockPistonExtension.TYPE, blockpistonextension$enumpistontype).withProperty(BlockPistonExtension.FACING, iblockstate.getValue(BlockPistonBase.FACING));
-                iblockstate1 = iblockstate1.withProperty(BlockPistonExtension.SHORT, Boolean.valueOf(te.getProgress(partialTicks) >= 0.5F));
-                this.blockRenderer.getBlockModelRenderer().renderModel(world, this.blockRenderer.getModelFromBlockState(iblockstate1, world, blockpos), iblockstate1, blockpos, worldrenderer, true);
-                worldrenderer.setTranslation((double)((float)x - (float)blockpos.getX()), (double)((float)y - (float)blockpos.getY()), (double)((float)z - (float)blockpos.getZ()));
-                iblockstate.withProperty(BlockPistonBase.EXTENDED, Boolean.valueOf(true));
-                this.blockRenderer.getBlockModelRenderer().renderModel(world, this.blockRenderer.getModelFromBlockState(iblockstate, world, blockpos), iblockstate, blockpos, worldrenderer, true);
+                BlockPistonExtension.EnumPistonType var16 = var12 == Blocks.sticky_piston ? BlockPistonExtension.EnumPistonType.STICKY : BlockPistonExtension.EnumPistonType.DEFAULT;
+                IBlockState var17 = Blocks.piston_head.getDefaultState().withProperty(BlockPistonExtension.field_176325_b, var16).withProperty(BlockPistonExtension.field_176326_a, var11.getValue(BlockPistonBase.FACING));
+                var17 = var17.withProperty(BlockPistonExtension.field_176327_M, Boolean.valueOf(p_178461_1_.func_145860_a(p_178461_8_) >= 0.5F));
+                this.field_178462_c.func_175019_b().renderBlockModel(var15, this.field_178462_c.getModelFromBlockState(var17, var15, var10), var17, var10, var14, true);
+                var14.setTranslation((double)((float)p_178461_2_ - (float)var10.getX()), (double)((float)p_178461_4_ - (float)var10.getY()), (double)((float)p_178461_6_ - (float)var10.getZ()));
+                var11.withProperty(BlockPistonBase.EXTENDED, Boolean.valueOf(true));
+                this.field_178462_c.func_175019_b().renderBlockModel(var15, this.field_178462_c.getModelFromBlockState(var11, var15, var10), var11, var10, var14, true);
             }
             else
             {
-                this.blockRenderer.getBlockModelRenderer().renderModel(world, this.blockRenderer.getModelFromBlockState(iblockstate, world, blockpos), iblockstate, blockpos, worldrenderer, false);
+                this.field_178462_c.func_175019_b().renderBlockModel(var15, this.field_178462_c.getModelFromBlockState(var11, var15, var10), var11, var10, var14, false);
             }
 
-            worldrenderer.setTranslation(0.0D, 0.0D, 0.0D);
-            tessellator.draw();
+            var14.setTranslation(0.0D, 0.0D, 0.0D);
+            var13.draw();
             RenderHelper.enableStandardItemLighting();
         }
+    }
+
+    public void renderTileEntityAt(TileEntity p_180535_1_, double p_180535_2_, double p_180535_4_, double p_180535_6_, float p_180535_8_, int p_180535_9_)
+    {
+        this.func_178461_a((TileEntityPiston)p_180535_1_, p_180535_2_, p_180535_4_, p_180535_6_, p_180535_8_, p_180535_9_);
     }
 }

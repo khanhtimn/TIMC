@@ -9,15 +9,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
 
 public class CommandTestFor extends CommandBase
 {
-    /**
-     * Gets the name of the command
-     */
+    
+
     public String getCommandName()
     {
         return "testfor";
@@ -31,17 +29,11 @@ public class CommandTestFor extends CommandBase
         return 2;
     }
 
-    /**
-     * Gets the usage string for the command.
-     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.testfor.usage";
     }
 
-    /**
-     * Callback when the command is invoked
-     */
     public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 1)
@@ -50,33 +42,33 @@ public class CommandTestFor extends CommandBase
         }
         else
         {
-            Entity entity = getEntity(sender, args[0]);
-            NBTTagCompound nbttagcompound = null;
+            Entity var3 = func_175768_b(sender, args[0]);
+            NBTTagCompound var4 = null;
 
             if (args.length >= 2)
             {
                 try
                 {
-                    nbttagcompound = JsonToNBT.getTagFromJson(buildString(args, 1));
+                    var4 = JsonToNBT.func_180713_a(func_180529_a(args, 1));
                 }
-                catch (NBTException nbtexception)
+                catch (NBTException var6)
                 {
-                    throw new CommandException("commands.testfor.tagError", new Object[] {nbtexception.getMessage()});
+                    throw new CommandException("commands.testfor.tagError", new Object[] {var6.getMessage()});
                 }
             }
 
-            if (nbttagcompound != null)
+            if (var4 != null)
             {
-                NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-                entity.writeToNBT(nbttagcompound1);
+                NBTTagCompound var5 = new NBTTagCompound();
+                var3.writeToNBT(var5);
 
-                if (!NBTUtil.func_181123_a(nbttagcompound, nbttagcompound1, true))
+                if (!CommandTestForBlock.func_175775_a(var4, var5, true))
                 {
-                    throw new CommandException("commands.testfor.failure", new Object[] {entity.getName()});
+                    throw new CommandException("commands.testfor.failure", new Object[] {var3.getName()});
                 }
             }
 
-            notifyOperators(sender, this, "commands.testfor.success", new Object[] {entity.getName()});
+            notifyOperators(sender, this, "commands.testfor.success", new Object[] {var3.getName()});
         }
     }
 
@@ -88,7 +80,7 @@ public class CommandTestFor extends CommandBase
         return index == 0;
     }
 
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         return args.length == 1 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : null;
     }

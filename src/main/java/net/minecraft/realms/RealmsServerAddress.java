@@ -6,11 +6,12 @@ public class RealmsServerAddress
 {
     private final String host;
     private final int port;
+    
 
-    protected RealmsServerAddress(String hostIn, int portIn)
+    protected RealmsServerAddress(String p_i1121_1_, int p_i1121_2_)
     {
-        this.host = hostIn;
-        this.port = portIn;
+        this.host = p_i1121_1_;
+        this.port = p_i1121_2_;
     }
 
     public String getHost()
@@ -25,7 +26,7 @@ public class RealmsServerAddress
 
     public static RealmsServerAddress parseString(String p_parseString_0_)
     {
-        ServerAddress serveraddress = ServerAddress.fromString(p_parseString_0_);
-        return new RealmsServerAddress(serveraddress.getIP(), serveraddress.getPort());
+        ServerAddress var1 = ServerAddress.func_78860_a(p_parseString_0_);
+        return new RealmsServerAddress(var1.getIP(), var1.getPort());
     }
 }

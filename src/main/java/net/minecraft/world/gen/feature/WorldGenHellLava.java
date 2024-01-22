@@ -11,6 +11,7 @@ public class WorldGenHellLava extends WorldGenerator
 {
     private final Block field_150553_a;
     private final boolean field_94524_b;
+    
 
     public WorldGenHellLava(Block p_i45453_1_, boolean p_i45453_2_)
     {
@@ -18,76 +19,76 @@ public class WorldGenHellLava extends WorldGenerator
         this.field_94524_b = p_i45453_2_;
     }
 
-    public boolean generate(World worldIn, Random rand, BlockPos position)
+    public boolean generate(World worldIn, Random p_180709_2_, BlockPos p_180709_3_)
     {
-        if (worldIn.getBlockState(position.up()).getBlock() != Blocks.netherrack)
+        if (worldIn.getBlockState(p_180709_3_.offsetUp()).getBlock() != Blocks.netherrack)
         {
             return false;
         }
-        else if (worldIn.getBlockState(position).getBlock().getMaterial() != Material.air && worldIn.getBlockState(position).getBlock() != Blocks.netherrack)
+        else if (worldIn.getBlockState(p_180709_3_).getBlock().getMaterial() != Material.air && worldIn.getBlockState(p_180709_3_).getBlock() != Blocks.netherrack)
         {
             return false;
         }
         else
         {
-            int i = 0;
+            int var4 = 0;
 
-            if (worldIn.getBlockState(position.west()).getBlock() == Blocks.netherrack)
+            if (worldIn.getBlockState(p_180709_3_.offsetWest()).getBlock() == Blocks.netherrack)
             {
-                ++i;
+                ++var4;
             }
 
-            if (worldIn.getBlockState(position.east()).getBlock() == Blocks.netherrack)
+            if (worldIn.getBlockState(p_180709_3_.offsetEast()).getBlock() == Blocks.netherrack)
             {
-                ++i;
+                ++var4;
             }
 
-            if (worldIn.getBlockState(position.north()).getBlock() == Blocks.netherrack)
+            if (worldIn.getBlockState(p_180709_3_.offsetNorth()).getBlock() == Blocks.netherrack)
             {
-                ++i;
+                ++var4;
             }
 
-            if (worldIn.getBlockState(position.south()).getBlock() == Blocks.netherrack)
+            if (worldIn.getBlockState(p_180709_3_.offsetSouth()).getBlock() == Blocks.netherrack)
             {
-                ++i;
+                ++var4;
             }
 
-            if (worldIn.getBlockState(position.down()).getBlock() == Blocks.netherrack)
+            if (worldIn.getBlockState(p_180709_3_.offsetDown()).getBlock() == Blocks.netherrack)
             {
-                ++i;
+                ++var4;
             }
 
-            int j = 0;
+            int var5 = 0;
 
-            if (worldIn.isAirBlock(position.west()))
+            if (worldIn.isAirBlock(p_180709_3_.offsetWest()))
             {
-                ++j;
+                ++var5;
             }
 
-            if (worldIn.isAirBlock(position.east()))
+            if (worldIn.isAirBlock(p_180709_3_.offsetEast()))
             {
-                ++j;
+                ++var5;
             }
 
-            if (worldIn.isAirBlock(position.north()))
+            if (worldIn.isAirBlock(p_180709_3_.offsetNorth()))
             {
-                ++j;
+                ++var5;
             }
 
-            if (worldIn.isAirBlock(position.south()))
+            if (worldIn.isAirBlock(p_180709_3_.offsetSouth()))
             {
-                ++j;
+                ++var5;
             }
 
-            if (worldIn.isAirBlock(position.down()))
+            if (worldIn.isAirBlock(p_180709_3_.offsetDown()))
             {
-                ++j;
+                ++var5;
             }
 
-            if (!this.field_94524_b && i == 4 && j == 1 || i == 5)
+            if (!this.field_94524_b && var4 == 4 && var5 == 1 || var4 == 5)
             {
-                worldIn.setBlockState(position, this.field_150553_a.getDefaultState(), 2);
-                worldIn.forceBlockUpdateTick(this.field_150553_a, position, rand);
+                worldIn.setBlockState(p_180709_3_, this.field_150553_a.getDefaultState(), 2);
+                worldIn.func_175637_a(this.field_150553_a, p_180709_3_, p_180709_2_);
             }
 
             return true;

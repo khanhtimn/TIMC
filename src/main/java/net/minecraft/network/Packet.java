@@ -7,19 +7,15 @@ public interface Packet<T extends INetHandler>
     /**
      * Reads the raw packet data from the data stream.
      */
-    void readPacketData(PacketBuffer buf) throws IOException;
+    void readPacketData(PacketBuffer var1) throws IOException;
 
     /**
      * Writes the raw packet data to the data stream.
      */
-    void writePacketData(PacketBuffer buf) throws IOException;
+    void writePacketData(PacketBuffer var1) throws IOException;
 
     /**
      * Passes this Packet on to the NetHandler for processing.
      */
-    void processPacket(T handler);
-
-    default int getID(){
-        return 99;
-    }
+    void processPacket(INetHandler var1);
 }

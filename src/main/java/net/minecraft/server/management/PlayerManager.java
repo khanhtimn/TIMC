@@ -1,22 +1,14 @@
 package net.minecraft.server.management;
 
 import com.google.common.collect.Lists;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Set;
-import java.util.Map.Entry;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S21PacketChunkData;
 import net.minecraft.network.play.server.S22PacketMultiBlockChange;
 import net.minecraft.network.play.server.S23PacketBlockChange;
-import net.minecraft.src.Config;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.LongHashMap;
@@ -25,18 +17,25 @@ import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
-import net.optifine.ChunkPosComparator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class PlayerManager
 {
-    private static final Logger pmLogger = LogManager.getLogger();
+    private static final Logger field_152627_a = LogManager.getLogger();
     private final WorldServer theWorldServer;
-    private final List<EntityPlayerMP> players = Lists.<EntityPlayerMP>newArrayList();
-    private final LongHashMap<PlayerManager.PlayerInstance> playerInstances = new LongHashMap();
-    private final List<PlayerManager.PlayerInstance> playerInstancesToUpdate = Lists.<PlayerManager.PlayerInstance>newArrayList();
-    private final List<PlayerManager.PlayerInstance> playerInstanceList = Lists.<PlayerManager.PlayerInstance>newArrayList();
+
+    /** players in the current instance */
+    private final List players = Lists.newArrayList();
+
+    /** the hash of all playerInstances created */
+    private final LongHashMap playerInstances = new LongHashMap();
+
+    /** the playerInstances(chunks) that need to be updated */
+    private final List playerInstancesToUpdate = Lists.newArrayList();
+
+    /** This field is using when chunk should be processed (every 8000 ticks) */
+    private final List playerInstanceList = Lists.newArrayList();
 
     /**
      * Number of chunks the server sends to the client. Valid 3<=x<=15. In server.properties.
@@ -48,18 +47,18 @@ public class PlayerManager
 
     /** x, z direction vectors: east, south, west, north */
     private final int[][] xzDirectionsConst = new int[][] {{1, 0}, {0, 1}, { -1, 0}, {0, -1}};
-    private final Map<EntityPlayerMP, Set<ChunkCoordIntPair>> mapPlayerPendingEntries = new HashMap();
+    
 
-    public PlayerManager(WorldServer serverWorld)
+    public PlayerManager(WorldServer p_i1176_1_)
     {
-        this.theWorldServer = serverWorld;
-        this.setPlayerViewRadius(serverWorld.getMinecraftServer().getConfigurationManager().getViewDistance());
+        this.theWorldServer = p_i1176_1_;
+        this.func_152622_a(p_i1176_1_.func_73046_m().getConfigurationManager().getViewDistance());
     }
 
     /**
-     * Returns the WorldServer associated with this PlayerManager
+     * Returns the MinecraftServer associated with the PlayerManager.
      */
-    public WorldServer getWorldServer()
+    public WorldServer getMinecraftServer()
     {
         return this.theWorldServer;
     }
@@ -69,60 +68,27 @@ public class PlayerManager
      */
     public void updatePlayerInstances()
     {
-        Set<Entry<EntityPlayerMP, Set<ChunkCoordIntPair>>> set = this.mapPlayerPendingEntries.entrySet();
-        Iterator iterator = set.iterator();
+        long var1 = this.theWorldServer.getTotalWorldTime();
+        int var3;
+        PlayerManager.PlayerInstance var4;
 
-        while (iterator.hasNext())
+        if (var1 - this.previousTotalWorldTime > 8000L)
         {
-            Entry<EntityPlayerMP, Set<ChunkCoordIntPair>> entry = (Entry)iterator.next();
-            Set<ChunkCoordIntPair> set1 = (Set)entry.getValue();
+            this.previousTotalWorldTime = var1;
 
-            if (!set1.isEmpty())
+            for (var3 = 0; var3 < this.playerInstanceList.size(); ++var3)
             {
-                EntityPlayerMP entityplayermp = (EntityPlayerMP)entry.getKey();
-
-                if (entityplayermp.worldObj != this.theWorldServer)
-                {
-                    iterator.remove();
-                }
-                else
-                {
-                    int i = this.playerViewRadius / 3 + 1;
-
-                    if (!Config.isLazyChunkLoading())
-                    {
-                        i = this.playerViewRadius * 2 + 1;
-                    }
-
-                    for (ChunkCoordIntPair chunkcoordintpair : this.getNearest(set1, entityplayermp, i))
-                    {
-                        PlayerManager.PlayerInstance playermanager$playerinstance = this.getPlayerInstance(chunkcoordintpair.chunkXPos, chunkcoordintpair.chunkZPos, true);
-                        playermanager$playerinstance.addPlayer(entityplayermp);
-                        set1.remove(chunkcoordintpair);
-                    }
-                }
-            }
-        }
-
-        long j = this.theWorldServer.getTotalWorldTime();
-
-        if (j - this.previousTotalWorldTime > 8000L)
-        {
-            this.previousTotalWorldTime = j;
-
-            for (int k = 0; k < this.playerInstanceList.size(); ++k)
-            {
-                PlayerManager.PlayerInstance playermanager$playerinstance1 = (PlayerManager.PlayerInstance)this.playerInstanceList.get(k);
-                playermanager$playerinstance1.onUpdate();
-                playermanager$playerinstance1.processChunk();
+                var4 = (PlayerManager.PlayerInstance)this.playerInstanceList.get(var3);
+                var4.onUpdate();
+                var4.processChunk();
             }
         }
         else
         {
-            for (int l = 0; l < this.playerInstancesToUpdate.size(); ++l)
+            for (var3 = 0; var3 < this.playerInstancesToUpdate.size(); ++var3)
             {
-                PlayerManager.PlayerInstance playermanager$playerinstance2 = (PlayerManager.PlayerInstance)this.playerInstancesToUpdate.get(l);
-                playermanager$playerinstance2.onUpdate();
+                var4 = (PlayerManager.PlayerInstance)this.playerInstancesToUpdate.get(var3);
+                var4.onUpdate();
             }
         }
 
@@ -130,137 +96,126 @@ public class PlayerManager
 
         if (this.players.isEmpty())
         {
-            WorldProvider worldprovider = this.theWorldServer.provider;
+            WorldProvider var5 = this.theWorldServer.provider;
 
-            if (!worldprovider.canRespawnHere())
+            if (!var5.canRespawnHere())
             {
                 this.theWorldServer.theChunkProviderServer.unloadAllChunks();
             }
         }
     }
 
-    public boolean hasPlayerInstance(int chunkX, int chunkZ)
+    public boolean func_152621_a(int p_152621_1_, int p_152621_2_)
     {
-        long i = (long)chunkX + 2147483647L | (long)chunkZ + 2147483647L << 32;
-        return this.playerInstances.getValueByKey(i) != null;
+        long var3 = (long)p_152621_1_ + 2147483647L | (long)p_152621_2_ + 2147483647L << 32;
+        return this.playerInstances.getValueByKey(var3) != null;
     }
 
     /**
      * passi n the chunk x and y and a flag as to whether or not the instance should be made if it doesnt exist
      */
-    private PlayerManager.PlayerInstance getPlayerInstance(int chunkX, int chunkZ, boolean createIfAbsent)
+    private PlayerManager.PlayerInstance getPlayerInstance(int p_72690_1_, int p_72690_2_, boolean p_72690_3_)
     {
-        long i = (long)chunkX + 2147483647L | (long)chunkZ + 2147483647L << 32;
-        PlayerManager.PlayerInstance playermanager$playerinstance = (PlayerManager.PlayerInstance)this.playerInstances.getValueByKey(i);
+        long var4 = (long)p_72690_1_ + 2147483647L | (long)p_72690_2_ + 2147483647L << 32;
+        PlayerManager.PlayerInstance var6 = (PlayerManager.PlayerInstance)this.playerInstances.getValueByKey(var4);
 
-        if (playermanager$playerinstance == null && createIfAbsent)
+        if (var6 == null && p_72690_3_)
         {
-            playermanager$playerinstance = new PlayerManager.PlayerInstance(chunkX, chunkZ);
-            this.playerInstances.add(i, playermanager$playerinstance);
-            this.playerInstanceList.add(playermanager$playerinstance);
+            var6 = new PlayerManager.PlayerInstance(p_72690_1_, p_72690_2_);
+            this.playerInstances.add(var4, var6);
+            this.playerInstanceList.add(var6);
         }
 
-        return playermanager$playerinstance;
+        return var6;
     }
 
-    public void markBlockForUpdate(BlockPos pos)
+    public void func_180244_a(BlockPos p_180244_1_)
     {
-        int i = pos.getX() >> 4;
-        int j = pos.getZ() >> 4;
-        PlayerManager.PlayerInstance playermanager$playerinstance = this.getPlayerInstance(i, j, false);
+        int var2 = p_180244_1_.getX() >> 4;
+        int var3 = p_180244_1_.getZ() >> 4;
+        PlayerManager.PlayerInstance var4 = this.getPlayerInstance(var2, var3, false);
 
-        if (playermanager$playerinstance != null)
+        if (var4 != null)
         {
-            playermanager$playerinstance.flagChunkForUpdate(pos.getX() & 15, pos.getY(), pos.getZ() & 15);
+            var4.flagChunkForUpdate(p_180244_1_.getX() & 15, p_180244_1_.getY(), p_180244_1_.getZ() & 15);
         }
     }
 
     /**
      * Adds an EntityPlayerMP to the PlayerManager and to all player instances within player visibility
      */
-    public void addPlayer(EntityPlayerMP player)
+    public void addPlayer(EntityPlayerMP p_72683_1_)
     {
-        int i = (int)player.posX >> 4;
-        int j = (int)player.posZ >> 4;
-        player.managedPosX = player.posX;
-        player.managedPosZ = player.posZ;
-        int k = Math.min(this.playerViewRadius, 8);
-        int l = i - k;
-        int i1 = i + k;
-        int j1 = j - k;
-        int k1 = j + k;
-        Set<ChunkCoordIntPair> set = this.getPendingEntriesSafe(player);
+        int var2 = (int)p_72683_1_.posX >> 4;
+        int var3 = (int)p_72683_1_.posZ >> 4;
+        p_72683_1_.managedPosX = p_72683_1_.posX;
+        p_72683_1_.managedPosZ = p_72683_1_.posZ;
 
-        for (int l1 = i - this.playerViewRadius; l1 <= i + this.playerViewRadius; ++l1)
+        for (int var4 = var2 - this.playerViewRadius; var4 <= var2 + this.playerViewRadius; ++var4)
         {
-            for (int i2 = j - this.playerViewRadius; i2 <= j + this.playerViewRadius; ++i2)
+            for (int var5 = var3 - this.playerViewRadius; var5 <= var3 + this.playerViewRadius; ++var5)
             {
-                if (l1 >= l && l1 <= i1 && i2 >= j1 && i2 <= k1)
-                {
-                    this.getPlayerInstance(l1, i2, true).addPlayer(player);
-                }
-                else
-                {
-                    set.add(new ChunkCoordIntPair(l1, i2));
-                }
+                this.getPlayerInstance(var4, var5, true).addPlayer(p_72683_1_);
             }
         }
 
-        this.players.add(player);
-        this.filterChunkLoadQueue(player);
+        this.players.add(p_72683_1_);
+        this.filterChunkLoadQueue(p_72683_1_);
     }
 
     /**
      * Removes all chunks from the given player's chunk load queue that are not in viewing range of the player.
      */
-    public void filterChunkLoadQueue(EntityPlayerMP player)
+    public void filterChunkLoadQueue(EntityPlayerMP p_72691_1_)
     {
-        List<ChunkCoordIntPair> list = Lists.newArrayList(player.loadedChunks);
-        int i = 0;
-        int j = this.playerViewRadius;
-        int k = (int)player.posX >> 4;
-        int l = (int)player.posZ >> 4;
-        int i1 = 0;
-        int j1 = 0;
-        ChunkCoordIntPair chunkcoordintpair = this.getPlayerInstance(k, l, true).chunkCoords;
-        player.loadedChunks.clear();
+        ArrayList var2 = Lists.newArrayList(p_72691_1_.loadedChunks);
+        int var3 = 0;
+        int var4 = this.playerViewRadius;
+        int var5 = (int)p_72691_1_.posX >> 4;
+        int var6 = (int)p_72691_1_.posZ >> 4;
+        int var7 = 0;
+        int var8 = 0;
+        ChunkCoordIntPair var9 = this.getPlayerInstance(var5, var6, true).currentChunk;
+        p_72691_1_.loadedChunks.clear();
 
-        if (list.contains(chunkcoordintpair))
+        if (var2.contains(var9))
         {
-            player.loadedChunks.add(chunkcoordintpair);
+            p_72691_1_.loadedChunks.add(var9);
         }
 
-        for (int k1 = 1; k1 <= j * 2; ++k1)
+        int var10;
+
+        for (var10 = 1; var10 <= var4 * 2; ++var10)
         {
-            for (int l1 = 0; l1 < 2; ++l1)
+            for (int var11 = 0; var11 < 2; ++var11)
             {
-                int[] aint = this.xzDirectionsConst[i++ % 4];
+                int[] var12 = this.xzDirectionsConst[var3++ % 4];
 
-                for (int i2 = 0; i2 < k1; ++i2)
+                for (int var13 = 0; var13 < var10; ++var13)
                 {
-                    i1 += aint[0];
-                    j1 += aint[1];
-                    chunkcoordintpair = this.getPlayerInstance(k + i1, l + j1, true).chunkCoords;
+                    var7 += var12[0];
+                    var8 += var12[1];
+                    var9 = this.getPlayerInstance(var5 + var7, var6 + var8, true).currentChunk;
 
-                    if (list.contains(chunkcoordintpair))
+                    if (var2.contains(var9))
                     {
-                        player.loadedChunks.add(chunkcoordintpair);
+                        p_72691_1_.loadedChunks.add(var9);
                     }
                 }
             }
         }
 
-        i = i % 4;
+        var3 %= 4;
 
-        for (int j2 = 0; j2 < j * 2; ++j2)
+        for (var10 = 0; var10 < var4 * 2; ++var10)
         {
-            i1 += this.xzDirectionsConst[i][0];
-            j1 += this.xzDirectionsConst[i][1];
-            chunkcoordintpair = this.getPlayerInstance(k + i1, l + j1, true).chunkCoords;
+            var7 += this.xzDirectionsConst[var3][0];
+            var8 += this.xzDirectionsConst[var3][1];
+            var9 = this.getPlayerInstance(var5 + var7, var6 + var8, true).currentChunk;
 
-            if (list.contains(chunkcoordintpair))
+            if (var2.contains(var9))
             {
-                player.loadedChunks.add(chunkcoordintpair);
+                p_72691_1_.loadedChunks.add(var9);
             }
         }
     }
@@ -268,256 +223,174 @@ public class PlayerManager
     /**
      * Removes an EntityPlayerMP from the PlayerManager.
      */
-    public void removePlayer(EntityPlayerMP player)
+    public void removePlayer(EntityPlayerMP p_72695_1_)
     {
-        this.mapPlayerPendingEntries.remove(player);
-        int i = (int)player.managedPosX >> 4;
-        int j = (int)player.managedPosZ >> 4;
+        int var2 = (int)p_72695_1_.managedPosX >> 4;
+        int var3 = (int)p_72695_1_.managedPosZ >> 4;
 
-        for (int k = i - this.playerViewRadius; k <= i + this.playerViewRadius; ++k)
+        for (int var4 = var2 - this.playerViewRadius; var4 <= var2 + this.playerViewRadius; ++var4)
         {
-            for (int l = j - this.playerViewRadius; l <= j + this.playerViewRadius; ++l)
+            for (int var5 = var3 - this.playerViewRadius; var5 <= var3 + this.playerViewRadius; ++var5)
             {
-                PlayerManager.PlayerInstance playermanager$playerinstance = this.getPlayerInstance(k, l, false);
+                PlayerManager.PlayerInstance var6 = this.getPlayerInstance(var4, var5, false);
 
-                if (playermanager$playerinstance != null)
+                if (var6 != null)
                 {
-                    playermanager$playerinstance.removePlayer(player);
+                    var6.removePlayer(p_72695_1_);
                 }
             }
         }
 
-        this.players.remove(player);
+        this.players.remove(p_72695_1_);
     }
 
     /**
      * Determine if two rectangles centered at the given points overlap for the provided radius. Arguments: x1, z1, x2,
      * z2, radius.
      */
-    private boolean overlaps(int x1, int z1, int x2, int z2, int radius)
+    private boolean overlaps(int p_72684_1_, int p_72684_2_, int p_72684_3_, int p_72684_4_, int p_72684_5_)
     {
-        int i = x1 - x2;
-        int j = z1 - z2;
-        return i >= -radius && i <= radius ? j >= -radius && j <= radius : false;
+        int var6 = p_72684_1_ - p_72684_3_;
+        int var7 = p_72684_2_ - p_72684_4_;
+        return var6 >= -p_72684_5_ && var6 <= p_72684_5_ ? var7 >= -p_72684_5_ && var7 <= p_72684_5_ : false;
     }
 
     /**
      * update chunks around a player being moved by server logic (e.g. cart, boat)
      */
-    public void updateMountedMovingPlayer(EntityPlayerMP player)
+    public void updateMountedMovingPlayer(EntityPlayerMP p_72685_1_)
     {
-        int i = (int)player.posX >> 4;
-        int j = (int)player.posZ >> 4;
-        double d0 = player.managedPosX - player.posX;
-        double d1 = player.managedPosZ - player.posZ;
-        double d2 = d0 * d0 + d1 * d1;
+        int var2 = (int)p_72685_1_.posX >> 4;
+        int var3 = (int)p_72685_1_.posZ >> 4;
+        double var4 = p_72685_1_.managedPosX - p_72685_1_.posX;
+        double var6 = p_72685_1_.managedPosZ - p_72685_1_.posZ;
+        double var8 = var4 * var4 + var6 * var6;
 
-        if (d2 >= 64.0D)
+        if (var8 >= 64.0D)
         {
-            int k = (int)player.managedPosX >> 4;
-            int l = (int)player.managedPosZ >> 4;
-            int i1 = this.playerViewRadius;
-            int j1 = i - k;
-            int k1 = j - l;
+            int var10 = (int)p_72685_1_.managedPosX >> 4;
+            int var11 = (int)p_72685_1_.managedPosZ >> 4;
+            int var12 = this.playerViewRadius;
+            int var13 = var2 - var10;
+            int var14 = var3 - var11;
 
-            if (j1 != 0 || k1 != 0)
+            if (var13 != 0 || var14 != 0)
             {
-                Set<ChunkCoordIntPair> set = this.getPendingEntriesSafe(player);
-
-                for (int l1 = i - i1; l1 <= i + i1; ++l1)
+                for (int var15 = var2 - var12; var15 <= var2 + var12; ++var15)
                 {
-                    for (int i2 = j - i1; i2 <= j + i1; ++i2)
+                    for (int var16 = var3 - var12; var16 <= var3 + var12; ++var16)
                     {
-                        if (!this.overlaps(l1, i2, k, l, i1))
+                        if (!this.overlaps(var15, var16, var10, var11, var12))
                         {
-                            if (Config.isLazyChunkLoading())
-                            {
-                                set.add(new ChunkCoordIntPair(l1, i2));
-                            }
-                            else
-                            {
-                                this.getPlayerInstance(l1, i2, true).addPlayer(player);
-                            }
+                            this.getPlayerInstance(var15, var16, true).addPlayer(p_72685_1_);
                         }
 
-                        if (!this.overlaps(l1 - j1, i2 - k1, i, j, i1))
+                        if (!this.overlaps(var15 - var13, var16 - var14, var2, var3, var12))
                         {
-                            set.remove(new ChunkCoordIntPair(l1 - j1, i2 - k1));
-                            PlayerManager.PlayerInstance playermanager$playerinstance = this.getPlayerInstance(l1 - j1, i2 - k1, false);
+                            PlayerManager.PlayerInstance var17 = this.getPlayerInstance(var15 - var13, var16 - var14, false);
 
-                            if (playermanager$playerinstance != null)
+                            if (var17 != null)
                             {
-                                playermanager$playerinstance.removePlayer(player);
+                                var17.removePlayer(p_72685_1_);
                             }
                         }
                     }
                 }
 
-                this.filterChunkLoadQueue(player);
-                player.managedPosX = player.posX;
-                player.managedPosZ = player.posZ;
+                this.filterChunkLoadQueue(p_72685_1_);
+                p_72685_1_.managedPosX = p_72685_1_.posX;
+                p_72685_1_.managedPosZ = p_72685_1_.posZ;
             }
         }
     }
 
-    public boolean isPlayerWatchingChunk(EntityPlayerMP player, int chunkX, int chunkZ)
+    public boolean isPlayerWatchingChunk(EntityPlayerMP p_72694_1_, int p_72694_2_, int p_72694_3_)
     {
-        PlayerManager.PlayerInstance playermanager$playerinstance = this.getPlayerInstance(chunkX, chunkZ, false);
-        return playermanager$playerinstance != null && playermanager$playerinstance.playersWatchingChunk.contains(player) && !player.loadedChunks.contains(playermanager$playerinstance.chunkCoords);
+        PlayerManager.PlayerInstance var4 = this.getPlayerInstance(p_72694_2_, p_72694_3_, false);
+        return var4 != null && var4.playersWatchingChunk.contains(p_72694_1_) && !p_72694_1_.loadedChunks.contains(var4.currentChunk);
     }
 
-    public void setPlayerViewRadius(int radius)
+    public void func_152622_a(int p_152622_1_)
     {
-        radius = MathHelper.clamp_int(radius, 3, 64);
+        p_152622_1_ = MathHelper.clamp_int(p_152622_1_, 3, 32);
 
-        if (radius != this.playerViewRadius)
+        if (p_152622_1_ != this.playerViewRadius)
         {
-            int i = radius - this.playerViewRadius;
+            int var2 = p_152622_1_ - this.playerViewRadius;
+            ArrayList var3 = Lists.newArrayList(this.players);
+            Iterator var4 = var3.iterator();
 
-            for (EntityPlayerMP entityplayermp : Lists.newArrayList(this.players))
+            while (var4.hasNext())
             {
-                int j = (int)entityplayermp.posX >> 4;
-                int k = (int)entityplayermp.posZ >> 4;
-                Set<ChunkCoordIntPair> set = this.getPendingEntriesSafe(entityplayermp);
+                EntityPlayerMP var5 = (EntityPlayerMP)var4.next();
+                int var6 = (int)var5.posX >> 4;
+                int var7 = (int)var5.posZ >> 4;
+                int var8;
+                int var9;
 
-                if (i > 0)
+                if (var2 > 0)
                 {
-                    for (int j1 = j - radius; j1 <= j + radius; ++j1)
+                    for (var8 = var6 - p_152622_1_; var8 <= var6 + p_152622_1_; ++var8)
                     {
-                        for (int k1 = k - radius; k1 <= k + radius; ++k1)
+                        for (var9 = var7 - p_152622_1_; var9 <= var7 + p_152622_1_; ++var9)
                         {
-                            if (Config.isLazyChunkLoading())
-                            {
-                                set.add(new ChunkCoordIntPair(j1, k1));
-                            }
-                            else
-                            {
-                                PlayerManager.PlayerInstance playermanager$playerinstance1 = this.getPlayerInstance(j1, k1, true);
+                            PlayerManager.PlayerInstance var10 = this.getPlayerInstance(var8, var9, true);
 
-                                if (!playermanager$playerinstance1.playersWatchingChunk.contains(entityplayermp))
-                                {
-                                    playermanager$playerinstance1.addPlayer(entityplayermp);
-                                }
+                            if (!var10.playersWatchingChunk.contains(var5))
+                            {
+                                var10.addPlayer(var5);
                             }
                         }
                     }
                 }
                 else
                 {
-                    for (int l = j - this.playerViewRadius; l <= j + this.playerViewRadius; ++l)
+                    for (var8 = var6 - this.playerViewRadius; var8 <= var6 + this.playerViewRadius; ++var8)
                     {
-                        for (int i1 = k - this.playerViewRadius; i1 <= k + this.playerViewRadius; ++i1)
+                        for (var9 = var7 - this.playerViewRadius; var9 <= var7 + this.playerViewRadius; ++var9)
                         {
-                            if (!this.overlaps(l, i1, j, k, radius))
+                            if (!this.overlaps(var8, var9, var6, var7, p_152622_1_))
                             {
-                                set.remove(new ChunkCoordIntPair(l, i1));
-                                PlayerManager.PlayerInstance playermanager$playerinstance = this.getPlayerInstance(l, i1, true);
-
-                                if (playermanager$playerinstance != null)
-                                {
-                                    playermanager$playerinstance.removePlayer(entityplayermp);
-                                }
+                                this.getPlayerInstance(var8, var9, true).removePlayer(var5);
                             }
                         }
                     }
                 }
             }
 
-            this.playerViewRadius = radius;
+            this.playerViewRadius = p_152622_1_;
         }
     }
 
     /**
      * Get the furthest viewable block given player's view distance
      */
-    public static int getFurthestViewableBlock(int distance)
+    public static int getFurthestViewableBlock(int p_72686_0_)
     {
-        return distance * 16 - 16;
-    }
-
-    private PriorityQueue<ChunkCoordIntPair> getNearest(Set<ChunkCoordIntPair> p_getNearest_1_, EntityPlayerMP p_getNearest_2_, int p_getNearest_3_)
-    {
-        float f;
-
-        for (f = p_getNearest_2_.rotationYaw + 90.0F; f <= -180.0F; f += 360.0F)
-        {
-            ;
-        }
-
-        while (f > 180.0F)
-        {
-            f -= 360.0F;
-        }
-
-        double d0 = (double)f * 0.017453292519943295D;
-        double d1 = (double)p_getNearest_2_.rotationPitch;
-        double d2 = d1 * 0.017453292519943295D;
-        ChunkPosComparator chunkposcomparator = new ChunkPosComparator(p_getNearest_2_.chunkCoordX, p_getNearest_2_.chunkCoordZ, d0, d2);
-        Comparator<ChunkCoordIntPair> comparator = Collections.<ChunkCoordIntPair>reverseOrder(chunkposcomparator);
-        PriorityQueue<ChunkCoordIntPair> priorityqueue = new PriorityQueue(p_getNearest_3_, comparator);
-
-        for (ChunkCoordIntPair chunkcoordintpair : p_getNearest_1_)
-        {
-            if (priorityqueue.size() < p_getNearest_3_)
-            {
-                priorityqueue.add(chunkcoordintpair);
-            }
-            else
-            {
-                ChunkCoordIntPair chunkcoordintpair1 = (ChunkCoordIntPair)priorityqueue.peek();
-
-                if (chunkposcomparator.compare(chunkcoordintpair, chunkcoordintpair1) < 0)
-                {
-                    priorityqueue.remove();
-                    priorityqueue.add(chunkcoordintpair);
-                }
-            }
-        }
-
-        return priorityqueue;
-    }
-
-    private Set<ChunkCoordIntPair> getPendingEntriesSafe(EntityPlayerMP p_getPendingEntriesSafe_1_)
-    {
-        Set<ChunkCoordIntPair> set = (Set)this.mapPlayerPendingEntries.get(p_getPendingEntriesSafe_1_);
-
-        if (set != null)
-        {
-            return set;
-        }
-        else
-        {
-            int i = Math.min(this.playerViewRadius, 8);
-            int j = this.playerViewRadius * 2 + 1;
-            int k = i * 2 + 1;
-            int l = j * j - k * k;
-            l = Math.max(l, 16);
-            HashSet hashset = new HashSet(l);
-            this.mapPlayerPendingEntries.put(p_getPendingEntriesSafe_1_, hashset);
-            return hashset;
-        }
+        return p_72686_0_ * 16 - 16;
     }
 
     class PlayerInstance
     {
-        private final List<EntityPlayerMP> playersWatchingChunk = Lists.<EntityPlayerMP>newArrayList();
-        private final ChunkCoordIntPair chunkCoords;
+        private final List playersWatchingChunk = Lists.newArrayList();
+        private final ChunkCoordIntPair currentChunk;
         private short[] locationOfBlockChange = new short[64];
         private int numBlocksToUpdate;
         private int flagsYAreasToUpdate;
         private long previousWorldTime;
+        
 
-        public PlayerInstance(int chunkX, int chunkZ)
+        public PlayerInstance(int p_i1518_2_, int p_i1518_3_)
         {
-            this.chunkCoords = new ChunkCoordIntPair(chunkX, chunkZ);
-            PlayerManager.this.getWorldServer().theChunkProviderServer.loadChunk(chunkX, chunkZ);
+            this.currentChunk = new ChunkCoordIntPair(p_i1518_2_, p_i1518_3_);
+            PlayerManager.this.getMinecraftServer().theChunkProviderServer.loadChunk(p_i1518_2_, p_i1518_3_);
         }
 
-        public void addPlayer(EntityPlayerMP player)
+        public void addPlayer(EntityPlayerMP p_73255_1_)
         {
-            if (this.playersWatchingChunk.contains(player))
+            if (this.playersWatchingChunk.contains(p_73255_1_))
             {
-                PlayerManager.pmLogger.debug("Failed to add player. {} already is in chunk {}, {}", new Object[] {player, Integer.valueOf(this.chunkCoords.chunkXPos), Integer.valueOf(this.chunkCoords.chunkZPos)});
+                PlayerManager.field_152627_a.debug("Failed to add player. {} already is in chunk {}, {}", new Object[] {p_73255_1_, Integer.valueOf(this.currentChunk.chunkXPos), Integer.valueOf(this.currentChunk.chunkZPos)});
             }
             else
             {
@@ -526,30 +399,30 @@ public class PlayerManager
                     this.previousWorldTime = PlayerManager.this.theWorldServer.getTotalWorldTime();
                 }
 
-                this.playersWatchingChunk.add(player);
-                player.loadedChunks.add(this.chunkCoords);
+                this.playersWatchingChunk.add(p_73255_1_);
+                p_73255_1_.loadedChunks.add(this.currentChunk);
             }
         }
 
-        public void removePlayer(EntityPlayerMP player)
+        public void removePlayer(EntityPlayerMP p_73252_1_)
         {
-            if (this.playersWatchingChunk.contains(player))
+            if (this.playersWatchingChunk.contains(p_73252_1_))
             {
-                Chunk chunk = PlayerManager.this.theWorldServer.getChunkFromChunkCoords(this.chunkCoords.chunkXPos, this.chunkCoords.chunkZPos);
+                Chunk var2 = PlayerManager.this.theWorldServer.getChunkFromChunkCoords(this.currentChunk.chunkXPos, this.currentChunk.chunkZPos);
 
-                if (chunk.isPopulated())
+                if (var2.isPopulated())
                 {
-                    player.playerNetServerHandler.sendPacket(new S21PacketChunkData(chunk, true, 0));
+                    p_73252_1_.playerNetServerHandler.sendPacket(new S21PacketChunkData(var2, true, 0));
                 }
 
-                this.playersWatchingChunk.remove(player);
-                player.loadedChunks.remove(this.chunkCoords);
+                this.playersWatchingChunk.remove(p_73252_1_);
+                p_73252_1_.loadedChunks.remove(this.currentChunk);
 
                 if (this.playersWatchingChunk.isEmpty())
                 {
-                    long i = (long)this.chunkCoords.chunkXPos + 2147483647L | (long)this.chunkCoords.chunkZPos + 2147483647L << 32;
-                    this.increaseInhabitedTime(chunk);
-                    PlayerManager.this.playerInstances.remove(i);
+                    long var3 = (long)this.currentChunk.chunkXPos + 2147483647L | (long)this.currentChunk.chunkZPos + 2147483647L << 32;
+                    this.increaseInhabitedTime(var2);
+                    PlayerManager.this.playerInstances.remove(var3);
                     PlayerManager.this.playerInstanceList.remove(this);
 
                     if (this.numBlocksToUpdate > 0)
@@ -557,56 +430,56 @@ public class PlayerManager
                         PlayerManager.this.playerInstancesToUpdate.remove(this);
                     }
 
-                    PlayerManager.this.getWorldServer().theChunkProviderServer.dropChunk(this.chunkCoords.chunkXPos, this.chunkCoords.chunkZPos);
+                    PlayerManager.this.getMinecraftServer().theChunkProviderServer.dropChunk(this.currentChunk.chunkXPos, this.currentChunk.chunkZPos);
                 }
             }
         }
 
         public void processChunk()
         {
-            this.increaseInhabitedTime(PlayerManager.this.theWorldServer.getChunkFromChunkCoords(this.chunkCoords.chunkXPos, this.chunkCoords.chunkZPos));
+            this.increaseInhabitedTime(PlayerManager.this.theWorldServer.getChunkFromChunkCoords(this.currentChunk.chunkXPos, this.currentChunk.chunkZPos));
         }
 
-        private void increaseInhabitedTime(Chunk theChunk)
+        private void increaseInhabitedTime(Chunk p_111196_1_)
         {
-            theChunk.setInhabitedTime(theChunk.getInhabitedTime() + PlayerManager.this.theWorldServer.getTotalWorldTime() - this.previousWorldTime);
+            p_111196_1_.setInhabitedTime(p_111196_1_.getInhabitedTime() + PlayerManager.this.theWorldServer.getTotalWorldTime() - this.previousWorldTime);
             this.previousWorldTime = PlayerManager.this.theWorldServer.getTotalWorldTime();
         }
 
-        public void flagChunkForUpdate(int x, int y, int z)
+        public void flagChunkForUpdate(int p_151253_1_, int p_151253_2_, int p_151253_3_)
         {
             if (this.numBlocksToUpdate == 0)
             {
                 PlayerManager.this.playerInstancesToUpdate.add(this);
             }
 
-            this.flagsYAreasToUpdate |= 1 << (y >> 4);
+            this.flagsYAreasToUpdate |= 1 << (p_151253_2_ >> 4);
 
             if (this.numBlocksToUpdate < 64)
             {
-                short short1 = (short)(x << 12 | z << 8 | y);
+                short var4 = (short)(p_151253_1_ << 12 | p_151253_3_ << 8 | p_151253_2_);
 
-                for (int i = 0; i < this.numBlocksToUpdate; ++i)
+                for (int var5 = 0; var5 < this.numBlocksToUpdate; ++var5)
                 {
-                    if (this.locationOfBlockChange[i] == short1)
+                    if (this.locationOfBlockChange[var5] == var4)
                     {
                         return;
                     }
                 }
 
-                this.locationOfBlockChange[this.numBlocksToUpdate++] = short1;
+                this.locationOfBlockChange[this.numBlocksToUpdate++] = var4;
             }
         }
 
-        public void sendToAllPlayersWatchingChunk(Packet thePacket)
+        public void sendToAllPlayersWatchingChunk(Packet p_151251_1_)
         {
-            for (int i = 0; i < this.playersWatchingChunk.size(); ++i)
+            for (int var2 = 0; var2 < this.playersWatchingChunk.size(); ++var2)
             {
-                EntityPlayerMP entityplayermp = (EntityPlayerMP)this.playersWatchingChunk.get(i);
+                EntityPlayerMP var3 = (EntityPlayerMP)this.playersWatchingChunk.get(var2);
 
-                if (!entityplayermp.loadedChunks.contains(this.chunkCoords))
+                if (!var3.loadedChunks.contains(this.currentChunk))
                 {
-                    entityplayermp.playerNetServerHandler.sendPacket(thePacket);
+                    var3.playerNetServerHandler.sendPacket(p_151251_1_);
                 }
             }
         }
@@ -615,52 +488,61 @@ public class PlayerManager
         {
             if (this.numBlocksToUpdate != 0)
             {
+                int var1;
+                int var2;
+                int var3;
+
                 if (this.numBlocksToUpdate == 1)
                 {
-                    int k1 = (this.locationOfBlockChange[0] >> 12 & 15) + this.chunkCoords.chunkXPos * 16;
-                    int i2 = this.locationOfBlockChange[0] & 255;
-                    int k2 = (this.locationOfBlockChange[0] >> 8 & 15) + this.chunkCoords.chunkZPos * 16;
-                    BlockPos blockpos = new BlockPos(k1, i2, k2);
-                    this.sendToAllPlayersWatchingChunk(new S23PacketBlockChange(PlayerManager.this.theWorldServer, blockpos));
+                    var1 = (this.locationOfBlockChange[0] >> 12 & 15) + this.currentChunk.chunkXPos * 16;
+                    var2 = this.locationOfBlockChange[0] & 255;
+                    var3 = (this.locationOfBlockChange[0] >> 8 & 15) + this.currentChunk.chunkZPos * 16;
+                    BlockPos var4 = new BlockPos(var1, var2, var3);
+                    this.sendToAllPlayersWatchingChunk(new S23PacketBlockChange(PlayerManager.this.theWorldServer, var4));
 
-                    if (PlayerManager.this.theWorldServer.getBlockState(blockpos).getBlock().hasTileEntity())
+                    if (PlayerManager.this.theWorldServer.getBlockState(var4).getBlock().hasTileEntity())
                     {
-                        this.sendTileToAllPlayersWatchingChunk(PlayerManager.this.theWorldServer.getTileEntity(blockpos));
-                    }
-                }
-                else if (this.numBlocksToUpdate != 64)
-                {
-                    this.sendToAllPlayersWatchingChunk(new S22PacketMultiBlockChange(this.numBlocksToUpdate, this.locationOfBlockChange, PlayerManager.this.theWorldServer.getChunkFromChunkCoords(this.chunkCoords.chunkXPos, this.chunkCoords.chunkZPos)));
-
-                    for (int j1 = 0; j1 < this.numBlocksToUpdate; ++j1)
-                    {
-                        int l1 = (this.locationOfBlockChange[j1] >> 12 & 15) + this.chunkCoords.chunkXPos * 16;
-                        int j2 = this.locationOfBlockChange[j1] & 255;
-                        int l2 = (this.locationOfBlockChange[j1] >> 8 & 15) + this.chunkCoords.chunkZPos * 16;
-                        BlockPos blockpos1 = new BlockPos(l1, j2, l2);
-
-                        if (PlayerManager.this.theWorldServer.getBlockState(blockpos1).getBlock().hasTileEntity())
-                        {
-                            this.sendTileToAllPlayersWatchingChunk(PlayerManager.this.theWorldServer.getTileEntity(blockpos1));
-                        }
+                        this.sendTileToAllPlayersWatchingChunk(PlayerManager.this.theWorldServer.getTileEntity(var4));
                     }
                 }
                 else
                 {
-                    int i = this.chunkCoords.chunkXPos * 16;
-                    int j = this.chunkCoords.chunkZPos * 16;
-                    this.sendToAllPlayersWatchingChunk(new S21PacketChunkData(PlayerManager.this.theWorldServer.getChunkFromChunkCoords(this.chunkCoords.chunkXPos, this.chunkCoords.chunkZPos), false, this.flagsYAreasToUpdate));
+                    int var7;
 
-                    for (int k = 0; k < 16; ++k)
+                    if (this.numBlocksToUpdate == 64)
                     {
-                        if ((this.flagsYAreasToUpdate & 1 << k) != 0)
-                        {
-                            int l = k << 4;
-                            List<TileEntity> list = PlayerManager.this.theWorldServer.getTileEntitiesIn(i, l, j, i + 16, l + 16, j + 16);
+                        var1 = this.currentChunk.chunkXPos * 16;
+                        var2 = this.currentChunk.chunkZPos * 16;
+                        this.sendToAllPlayersWatchingChunk(new S21PacketChunkData(PlayerManager.this.theWorldServer.getChunkFromChunkCoords(this.currentChunk.chunkXPos, this.currentChunk.chunkZPos), false, this.flagsYAreasToUpdate));
 
-                            for (int i1 = 0; i1 < list.size(); ++i1)
+                        for (var3 = 0; var3 < 16; ++var3)
+                        {
+                            if ((this.flagsYAreasToUpdate & 1 << var3) != 0)
                             {
-                                this.sendTileToAllPlayersWatchingChunk((TileEntity)list.get(i1));
+                                var7 = var3 << 4;
+                                List var5 = PlayerManager.this.theWorldServer.func_147486_a(var1, var7, var2, var1 + 16, var7 + 16, var2 + 16);
+
+                                for (int var6 = 0; var6 < var5.size(); ++var6)
+                                {
+                                    this.sendTileToAllPlayersWatchingChunk((TileEntity)var5.get(var6));
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        this.sendToAllPlayersWatchingChunk(new S22PacketMultiBlockChange(this.numBlocksToUpdate, this.locationOfBlockChange, PlayerManager.this.theWorldServer.getChunkFromChunkCoords(this.currentChunk.chunkXPos, this.currentChunk.chunkZPos)));
+
+                        for (var1 = 0; var1 < this.numBlocksToUpdate; ++var1)
+                        {
+                            var2 = (this.locationOfBlockChange[var1] >> 12 & 15) + this.currentChunk.chunkXPos * 16;
+                            var3 = this.locationOfBlockChange[var1] & 255;
+                            var7 = (this.locationOfBlockChange[var1] >> 8 & 15) + this.currentChunk.chunkZPos * 16;
+                            BlockPos var8 = new BlockPos(var2, var3, var7);
+
+                            if (PlayerManager.this.theWorldServer.getBlockState(var8).getBlock().hasTileEntity())
+                            {
+                                this.sendTileToAllPlayersWatchingChunk(PlayerManager.this.theWorldServer.getTileEntity(var8));
                             }
                         }
                     }
@@ -671,15 +553,15 @@ public class PlayerManager
             }
         }
 
-        private void sendTileToAllPlayersWatchingChunk(TileEntity theTileEntity)
+        private void sendTileToAllPlayersWatchingChunk(TileEntity p_151252_1_)
         {
-            if (theTileEntity != null)
+            if (p_151252_1_ != null)
             {
-                Packet packet = theTileEntity.getDescriptionPacket();
+                Packet var2 = p_151252_1_.getDescriptionPacket();
 
-                if (packet != null)
+                if (var2 != null)
                 {
-                    this.sendToAllPlayersWatchingChunk(packet);
+                    this.sendToAllPlayersWatchingChunk(var2);
                 }
             }
         }

@@ -34,27 +34,28 @@ public class EnchantmentDamage extends Enchantment
      * Defines the type of damage of the enchantment, 0 = all, 1 = undead, 3 = arthropods
      */
     public final int damageType;
+    
 
-    public EnchantmentDamage(int enchID, ResourceLocation enchName, int enchWeight, int classification)
+    public EnchantmentDamage(int p_i45774_1_, ResourceLocation p_i45774_2_, int p_i45774_3_, int p_i45774_4_)
     {
-        super(enchID, enchName, enchWeight, EnumEnchantmentType.WEAPON);
-        this.damageType = classification;
+        super(p_i45774_1_, p_i45774_2_, p_i45774_3_, EnumEnchantmentType.WEAPON);
+        this.damageType = p_i45774_4_;
     }
 
     /**
      * Returns the minimal value of enchantability needed on the enchantment level passed.
      */
-    public int getMinEnchantability(int enchantmentLevel)
+    public int getMinEnchantability(int p_77321_1_)
     {
-        return baseEnchantability[this.damageType] + (enchantmentLevel - 1) * levelEnchantability[this.damageType];
+        return baseEnchantability[this.damageType] + (p_77321_1_ - 1) * levelEnchantability[this.damageType];
     }
 
     /**
      * Returns the maximum value of enchantability nedded on the enchantment level passed.
      */
-    public int getMaxEnchantability(int enchantmentLevel)
+    public int getMaxEnchantability(int p_77317_1_)
     {
-        return this.getMinEnchantability(enchantmentLevel) + thresholdEnchantability[this.damageType];
+        return this.getMinEnchantability(p_77317_1_) + thresholdEnchantability[this.damageType];
     }
 
     /**
@@ -65,13 +66,9 @@ public class EnchantmentDamage extends Enchantment
         return 5;
     }
 
-    /**
-     * Calculates the additional damage that will be dealt by an item with this enchantment. This alternative to
-     * calcModifierDamage is sensitive to the targets EnumCreatureAttribute.
-     */
-    public float calcDamageByCreature(int level, EnumCreatureAttribute creatureType)
+    public float func_152376_a(int p_152376_1_, EnumCreatureAttribute p_152376_2_)
     {
-        return this.damageType == 0 ? (float)level * 1.25F : (this.damageType == 1 && creatureType == EnumCreatureAttribute.UNDEAD ? (float)level * 2.5F : (this.damageType == 2 && creatureType == EnumCreatureAttribute.ARTHROPOD ? (float)level * 2.5F : 0.0F));
+        return this.damageType == 0 ? (float)p_152376_1_ * 1.25F : (this.damageType == 1 && p_152376_2_ == EnumCreatureAttribute.UNDEAD ? (float)p_152376_1_ * 2.5F : (this.damageType == 2 && p_152376_2_ == EnumCreatureAttribute.ARTHROPOD ? (float)p_152376_1_ * 2.5F : 0.0F));
     }
 
     /**
@@ -85,32 +82,26 @@ public class EnchantmentDamage extends Enchantment
     /**
      * Determines if the enchantment passed can be applyied together with this enchantment.
      */
-    public boolean canApplyTogether(Enchantment ench)
+    public boolean canApplyTogether(Enchantment p_77326_1_)
     {
-        return !(ench instanceof EnchantmentDamage);
+        return !(p_77326_1_ instanceof EnchantmentDamage);
     }
 
-    /**
-     * Determines if this enchantment can be applied to a specific ItemStack.
-     */
-    public boolean canApply(ItemStack stack)
+    public boolean canApply(ItemStack p_92089_1_)
     {
-        return stack.getItem() instanceof ItemAxe ? true : super.canApply(stack);
+        return p_92089_1_.getItem() instanceof ItemAxe ? true : super.canApply(p_92089_1_);
     }
 
-    /**
-     * Called whenever a mob is damaged with an item that has this enchantment on it.
-     */
-    public void onEntityDamaged(EntityLivingBase user, Entity target, int level)
+    public void func_151368_a(EntityLivingBase p_151368_1_, Entity p_151368_2_, int p_151368_3_)
     {
-        if (target instanceof EntityLivingBase)
+        if (p_151368_2_ instanceof EntityLivingBase)
         {
-            EntityLivingBase entitylivingbase = (EntityLivingBase)target;
+            EntityLivingBase var4 = (EntityLivingBase)p_151368_2_;
 
-            if (this.damageType == 2 && entitylivingbase.getCreatureAttribute() == EnumCreatureAttribute.ARTHROPOD)
+            if (this.damageType == 2 && var4.getCreatureAttribute() == EnumCreatureAttribute.ARTHROPOD)
             {
-                int i = 20 + user.getRNG().nextInt(10 * level);
-                entitylivingbase.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, i, 3));
+                int var5 = 20 + p_151368_1_.getRNG().nextInt(10 * p_151368_3_);
+                var4.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, var5, 3));
             }
         }
     }

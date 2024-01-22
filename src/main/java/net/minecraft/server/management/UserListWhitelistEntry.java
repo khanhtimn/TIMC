@@ -4,16 +4,18 @@ import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 import java.util.UUID;
 
-public class UserListWhitelistEntry extends UserListEntry<GameProfile>
+public class UserListWhitelistEntry extends UserListEntry
 {
-    public UserListWhitelistEntry(GameProfile profile)
+    
+
+    public UserListWhitelistEntry(GameProfile p_i1129_1_)
     {
-        super(profile);
+        super(p_i1129_1_);
     }
 
-    public UserListWhitelistEntry(JsonObject json)
+    public UserListWhitelistEntry(JsonObject p_i1130_1_)
     {
-        super(gameProfileFromJsonObject(json), json);
+        super(func_152646_b(p_i1130_1_), p_i1130_1_);
     }
 
     protected void onSerialization(JsonObject data)
@@ -26,23 +28,23 @@ public class UserListWhitelistEntry extends UserListEntry<GameProfile>
         }
     }
 
-    private static GameProfile gameProfileFromJsonObject(JsonObject json)
+    private static GameProfile func_152646_b(JsonObject p_152646_0_)
     {
-        if (json.has("uuid") && json.has("name"))
+        if (p_152646_0_.has("uuid") && p_152646_0_.has("name"))
         {
-            String s = json.get("uuid").getAsString();
-            UUID uuid;
+            String var1 = p_152646_0_.get("uuid").getAsString();
+            UUID var2;
 
             try
             {
-                uuid = UUID.fromString(s);
+                var2 = UUID.fromString(var1);
             }
             catch (Throwable var4)
             {
                 return null;
             }
 
-            return new GameProfile(uuid, json.get("name").getAsString());
+            return new GameProfile(var2, p_152646_0_.get("name").getAsString());
         }
         else
         {

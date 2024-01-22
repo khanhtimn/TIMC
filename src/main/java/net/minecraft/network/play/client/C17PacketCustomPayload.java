@@ -1,42 +1,44 @@
 package net.minecraft.network.play.client;
 
 import io.netty.buffer.ByteBuf;
-import java.io.IOException;
+import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayServer;
 
-public class C17PacketCustomPayload implements Packet<INetHandlerPlayServer>
+import java.io.IOException;
+
+public class C17PacketCustomPayload implements Packet
 {
     private String channel;
     private PacketBuffer data;
+    
 
-    public C17PacketCustomPayload()
+    public C17PacketCustomPayload() {}
+
+    public C17PacketCustomPayload(String p_i45945_1_, PacketBuffer p_i45945_2_)
     {
-    }
+        this.channel = p_i45945_1_;
+        this.data = p_i45945_2_;
 
-    public C17PacketCustomPayload(String channelIn, PacketBuffer dataIn)
-    {
-        this.channel = channelIn;
-        this.data = dataIn;
-
-        if (dataIn.writerIndex() > 32767)
+        if (p_i45945_2_.writerIndex() > 32767)
         {
             throw new IllegalArgumentException("Payload may not be larger than 32767 bytes");
         }
+
     }
 
     /**
      * Reads the raw packet data from the data stream.
      */
-    public void readPacketData(PacketBuffer buf) throws IOException
+    public void readPacketData(PacketBuffer data) throws IOException
     {
-        this.channel = buf.readStringFromBuffer(20);
-        int i = buf.readableBytes();
+        this.channel = data.readStringFromBuffer(20);
+        int var2 = data.readableBytes();
 
-        if (i >= 0 && i <= 32767)
+        if (var2 >= 0 && var2 <= 32767)
         {
-            this.data = new PacketBuffer(buf.readBytes(i));
+            this.data = new PacketBuffer(data.readBytes(var2));
         }
         else
         {
@@ -47,10 +49,10 @@ public class C17PacketCustomPayload implements Packet<INetHandlerPlayServer>
     /**
      * Writes the raw packet data to the data stream.
      */
-    public void writePacketData(PacketBuffer buf) throws IOException
+    public void writePacketData(PacketBuffer data) throws IOException
     {
-        buf.writeString(this.channel);
-        buf.writeBytes((ByteBuf)this.data);
+        data.writeString(this.channel);
+        data.writeBytes((ByteBuf)this.data);
     }
 
     /**
@@ -69,5 +71,13 @@ public class C17PacketCustomPayload implements Packet<INetHandlerPlayServer>
     public PacketBuffer getBufferData()
     {
         return this.data;
+    }
+
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandler handler)
+    {
+        this.processPacket((INetHandlerPlayServer)handler);
     }
 }

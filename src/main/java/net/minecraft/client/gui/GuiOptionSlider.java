@@ -12,6 +12,7 @@ public class GuiOptionSlider extends GuiButton
     private GameSettings.Options options;
     private final float field_146132_r;
     private final float field_146131_s;
+    
 
     public GuiOptionSlider(int p_i45016_1_, int p_i45016_2_, int p_i45016_3_, GameSettings.Options p_i45016_4_)
     {
@@ -25,9 +26,9 @@ public class GuiOptionSlider extends GuiButton
         this.options = p_i45017_4_;
         this.field_146132_r = p_i45017_5_;
         this.field_146131_s = p_i45017_6_;
-        Minecraft minecraft = Minecraft.getMinecraft();
-        this.sliderValue = p_i45017_4_.normalizeValue(minecraft.gameSettings.getOptionFloatValue(p_i45017_4_));
-        this.displayString = minecraft.gameSettings.getKeyBinding(p_i45017_4_);
+        Minecraft var7 = Minecraft.getMinecraft();
+        this.sliderValue = p_i45017_4_.normalizeValue(var7.gameSettings.getOptionFloatValue(p_i45017_4_));
+        this.displayString = var7.gameSettings.getKeyBinding(p_i45017_4_);
     }
 
     /**
@@ -50,9 +51,9 @@ public class GuiOptionSlider extends GuiButton
             {
                 this.sliderValue = (float)(mouseX - (this.xPosition + 4)) / (float)(this.width - 8);
                 this.sliderValue = MathHelper.clamp_float(this.sliderValue, 0.0F, 1.0F);
-                float f = this.options.denormalizeValue(this.sliderValue);
-                mc.gameSettings.setOptionFloatValue(this.options, f);
-                this.sliderValue = this.options.normalizeValue(f);
+                float var4 = this.options.denormalizeValue(this.sliderValue);
+                mc.gameSettings.setOptionFloatValue(this.options, var4);
+                this.sliderValue = this.options.normalizeValue(var4);
                 this.displayString = mc.gameSettings.getKeyBinding(this.options);
             }
 

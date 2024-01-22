@@ -1,16 +1,21 @@
 package net.minecraft.client.renderer.tileentity;
 
-import java.util.Calendar;
+import com.teamti.timc.modules.ChestESP;
+import com.teamti.timc.util.OutlineRenderer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
 import net.minecraft.client.model.ModelChest;
 import net.minecraft.client.model.ModelLargeChest;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.ResourceLocation;
 
-public class TileEntityChestRenderer extends TileEntitySpecialRenderer<TileEntityChest>
+import java.util.Calendar;
+
+public class TileEntityChestRenderer extends TileEntitySpecialRenderer
 {
+
     private static final ResourceLocation textureTrappedDouble = new ResourceLocation("textures/entity/chest/trapped_double.png");
     private static final ResourceLocation textureChristmasDouble = new ResourceLocation("textures/entity/chest/christmas_double.png");
     private static final ResourceLocation textureNormalDouble = new ResourceLocation("textures/entity/chest/normal_double.png");
@@ -19,67 +24,65 @@ public class TileEntityChestRenderer extends TileEntitySpecialRenderer<TileEntit
     private static final ResourceLocation textureNormal = new ResourceLocation("textures/entity/chest/normal.png");
     private ModelChest simpleChest = new ModelChest();
     private ModelChest largeChest = new ModelLargeChest();
-    private boolean isChristmas;
+    private boolean isChristams;
+    
 
     public TileEntityChestRenderer()
     {
-        Calendar calendar = Calendar.getInstance();
+        Calendar var1 = Calendar.getInstance();
 
-        if (calendar.get(2) + 1 == 12 && calendar.get(5) >= 24 && calendar.get(5) <= 26)
+        if (var1.get(2) + 1 == 12 && var1.get(5) >= 24 && var1.get(5) <= 26)
         {
-            this.isChristmas = true;
+            this.isChristams = true;
         }
     }
 
-    public void renderTileEntityAt(TileEntityChest te, double x, double y, double z, float partialTicks, int destroyStage)
+    public void func_180538_a(TileEntityChest p_180538_1_, double p_180538_2_, double p_180538_4_, double p_180538_6_, float p_180538_8_, int p_180538_9_)
     {
-        GlStateManager.enableDepth();
-        GlStateManager.depthFunc(515);
-        GlStateManager.depthMask(true);
-        int i;
+        int var10;
 
-        if (!te.hasWorldObj())
+        if (!p_180538_1_.hasWorldObj())
         {
-            i = 0;
+            var10 = 0;
         }
         else
         {
-            Block block = te.getBlockType();
-            i = te.getBlockMetadata();
+            Block var11 = p_180538_1_.getBlockType();
+            var10 = p_180538_1_.getBlockMetadata();
 
-            if (block instanceof BlockChest && i == 0)
+            if (var11 instanceof BlockChest && var10 == 0)
             {
-                ((BlockChest)block).checkForSurroundingChests(te.getWorld(), te.getPos(), te.getWorld().getBlockState(te.getPos()));
-                i = te.getBlockMetadata();
+                ((BlockChest)var11).checkForSurroundingChests(p_180538_1_.getWorld(), p_180538_1_.getPos(), p_180538_1_.getWorld().getBlockState(p_180538_1_.getPos()));
+                var10 = p_180538_1_.getBlockMetadata();
             }
 
-            te.checkForAdjacentChests();
+            p_180538_1_.checkForAdjacentChests();
         }
 
-        if (te.adjacentChestZNeg == null && te.adjacentChestXNeg == null)
+        if (p_180538_1_.adjacentChestZNeg == null && p_180538_1_.adjacentChestXNeg == null)
         {
-            ModelChest modelchest;
+            ModelChest var15;
 
-            if (te.adjacentChestXPos == null && te.adjacentChestZPos == null)
+            if (p_180538_1_.adjacentChestXPos == null && p_180538_1_.adjacentChestZPos == null)
             {
-                modelchest = this.simpleChest;
+                var15 = this.simpleChest;
 
-                if (destroyStage >= 0)
+                if (p_180538_9_ >= 0)
                 {
-                    this.bindTexture(DESTROY_STAGES[destroyStage]);
+                    this.bindTexture(DESTROY_STAGES[p_180538_9_]);
                     GlStateManager.matrixMode(5890);
                     GlStateManager.pushMatrix();
                     GlStateManager.scale(4.0F, 4.0F, 1.0F);
                     GlStateManager.translate(0.0625F, 0.0625F, 0.0625F);
                     GlStateManager.matrixMode(5888);
                 }
-                else if (this.isChristmas)
-                {
-                    this.bindTexture(textureChristmas);
-                }
-                else if (te.getChestType() == 1)
+                else if (p_180538_1_.getChestType() == 1)
                 {
                     this.bindTexture(textureTrapped);
+                }
+                else if (this.isChristams)
+                {
+                    this.bindTexture(textureChristmas);
                 }
                 else
                 {
@@ -88,24 +91,24 @@ public class TileEntityChestRenderer extends TileEntitySpecialRenderer<TileEntit
             }
             else
             {
-                modelchest = this.largeChest;
+                var15 = this.largeChest;
 
-                if (destroyStage >= 0)
+                if (p_180538_9_ >= 0)
                 {
-                    this.bindTexture(DESTROY_STAGES[destroyStage]);
+                    this.bindTexture(DESTROY_STAGES[p_180538_9_]);
                     GlStateManager.matrixMode(5890);
                     GlStateManager.pushMatrix();
                     GlStateManager.scale(8.0F, 4.0F, 1.0F);
                     GlStateManager.translate(0.0625F, 0.0625F, 0.0625F);
                     GlStateManager.matrixMode(5888);
                 }
-                else if (this.isChristmas)
-                {
-                    this.bindTexture(textureChristmasDouble);
-                }
-                else if (te.getChestType() == 1)
+                else if (p_180538_1_.getChestType() == 1)
                 {
                     this.bindTexture(textureTrappedDouble);
+                }
+                else if (this.isChristams)
+                {
+                    this.bindTexture(textureChristmasDouble);
                 }
                 else
                 {
@@ -116,84 +119,104 @@ public class TileEntityChestRenderer extends TileEntitySpecialRenderer<TileEntit
             GlStateManager.pushMatrix();
             GlStateManager.enableRescaleNormal();
 
-            if (destroyStage < 0)
+            if (p_180538_9_ < 0)
             {
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             }
 
-            GlStateManager.translate((float)x, (float)y + 1.0F, (float)z + 1.0F);
+            GlStateManager.translate((float)p_180538_2_, (float)p_180538_4_ + 1.0F, (float)p_180538_6_ + 1.0F);
             GlStateManager.scale(1.0F, -1.0F, -1.0F);
             GlStateManager.translate(0.5F, 0.5F, 0.5F);
-            int j = 0;
+            short var12 = 0;
 
-            if (i == 2)
+            if (var10 == 2)
             {
-                j = 180;
+                var12 = 180;
             }
 
-            if (i == 3)
+            if (var10 == 3)
             {
-                j = 0;
+                var12 = 0;
             }
 
-            if (i == 4)
+            if (var10 == 4)
             {
-                j = 90;
+                var12 = 90;
             }
 
-            if (i == 5)
+            if (var10 == 5)
             {
-                j = -90;
+                var12 = -90;
             }
 
-            if (i == 2 && te.adjacentChestXPos != null)
+            if (var10 == 2 && p_180538_1_.adjacentChestXPos != null)
             {
                 GlStateManager.translate(1.0F, 0.0F, 0.0F);
             }
 
-            if (i == 5 && te.adjacentChestZPos != null)
+            if (var10 == 5 && p_180538_1_.adjacentChestZPos != null)
             {
                 GlStateManager.translate(0.0F, 0.0F, -1.0F);
             }
 
-            GlStateManager.rotate((float)j, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate((float)var12, 0.0F, 1.0F, 0.0F);
             GlStateManager.translate(-0.5F, -0.5F, -0.5F);
-            float f = te.prevLidAngle + (te.lidAngle - te.prevLidAngle) * partialTicks;
+            float var13 = p_180538_1_.prevLidAngle + (p_180538_1_.lidAngle - p_180538_1_.prevLidAngle) * p_180538_8_;
+            float var14;
 
-            if (te.adjacentChestZNeg != null)
+            if (p_180538_1_.adjacentChestZNeg != null)
             {
-                float f1 = te.adjacentChestZNeg.prevLidAngle + (te.adjacentChestZNeg.lidAngle - te.adjacentChestZNeg.prevLidAngle) * partialTicks;
+                var14 = p_180538_1_.adjacentChestZNeg.prevLidAngle + (p_180538_1_.adjacentChestZNeg.lidAngle - p_180538_1_.adjacentChestZNeg.prevLidAngle) * p_180538_8_;
 
-                if (f1 > f)
+                if (var14 > var13)
                 {
-                    f = f1;
+                    var13 = var14;
                 }
             }
 
-            if (te.adjacentChestXNeg != null)
+            if (p_180538_1_.adjacentChestXNeg != null)
             {
-                float f2 = te.adjacentChestXNeg.prevLidAngle + (te.adjacentChestXNeg.lidAngle - te.adjacentChestXNeg.prevLidAngle) * partialTicks;
+                var14 = p_180538_1_.adjacentChestXNeg.prevLidAngle + (p_180538_1_.adjacentChestXNeg.lidAngle - p_180538_1_.adjacentChestXNeg.prevLidAngle) * p_180538_8_;
 
-                if (f2 > f)
+                if (var14 > var13)
                 {
-                    f = f2;
+                    var13 = var14;
                 }
             }
 
-            f = 1.0F - f;
-            f = 1.0F - f * f * f;
-            modelchest.chestLid.rotateAngleX = -(f * (float)Math.PI / 2.0F);
-            modelchest.renderAll();
+            var13 = 1.0F - var13;
+            var13 = 1.0F - var13 * var13 * var13;
+            //TODO: Chest opening animation
+            var15.chestLid.rotateAngleX = -(var13 * (float)Math.PI / 8.0F);
+            var15.renderAll();
+            //TODO: ChestESP
+            if(ChestESP.isEnabled){
+                var15.renderAll();
+                OutlineRenderer.renderOneChest();
+                var15.renderAll();
+                OutlineRenderer.renderTwo();
+                var15.renderAll();
+                OutlineRenderer.renderThree();
+                OutlineRenderer.renderFour(false);
+                var15.renderAll();
+                OutlineRenderer.renderFive();
+            }
+
             GlStateManager.disableRescaleNormal();
             GlStateManager.popMatrix();
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-            if (destroyStage >= 0)
+            if (p_180538_9_ >= 0)
             {
                 GlStateManager.matrixMode(5890);
                 GlStateManager.popMatrix();
                 GlStateManager.matrixMode(5888);
             }
         }
+    }
+
+    public void renderTileEntityAt(TileEntity p_180535_1_, double p_180535_2_, double p_180535_4_, double p_180535_6_, float p_180535_8_, int p_180535_9_)
+    {
+        this.func_180538_a((TileEntityChest)p_180535_1_, p_180535_2_, p_180535_4_, p_180535_6_, p_180535_8_, p_180535_9_);
     }
 }

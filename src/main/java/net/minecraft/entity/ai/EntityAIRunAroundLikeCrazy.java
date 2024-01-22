@@ -8,15 +8,16 @@ import net.minecraft.util.Vec3;
 public class EntityAIRunAroundLikeCrazy extends EntityAIBase
 {
     private EntityHorse horseHost;
-    private double speed;
-    private double targetX;
-    private double targetY;
-    private double targetZ;
+    private double field_111178_b;
+    private double field_111179_c;
+    private double field_111176_d;
+    private double field_111177_e;
+    
 
-    public EntityAIRunAroundLikeCrazy(EntityHorse horse, double speedIn)
+    public EntityAIRunAroundLikeCrazy(EntityHorse p_i1653_1_, double p_i1653_2_)
     {
-        this.horseHost = horse;
-        this.speed = speedIn;
+        this.horseHost = p_i1653_1_;
+        this.field_111178_b = p_i1653_2_;
         this.setMutexBits(1);
     }
 
@@ -27,17 +28,17 @@ public class EntityAIRunAroundLikeCrazy extends EntityAIBase
     {
         if (!this.horseHost.isTame() && this.horseHost.riddenByEntity != null)
         {
-            Vec3 vec3 = RandomPositionGenerator.findRandomTarget(this.horseHost, 5, 4);
+            Vec3 var1 = RandomPositionGenerator.findRandomTarget(this.horseHost, 5, 4);
 
-            if (vec3 == null)
+            if (var1 == null)
             {
                 return false;
             }
             else
             {
-                this.targetX = vec3.xCoord;
-                this.targetY = vec3.yCoord;
-                this.targetZ = vec3.zCoord;
+                this.field_111179_c = var1.xCoord;
+                this.field_111176_d = var1.yCoord;
+                this.field_111177_e = var1.zCoord;
                 return true;
             }
         }
@@ -52,7 +53,7 @@ public class EntityAIRunAroundLikeCrazy extends EntityAIBase
      */
     public void startExecuting()
     {
-        this.horseHost.getNavigator().tryMoveToXYZ(this.targetX, this.targetY, this.targetZ, this.speed);
+        this.horseHost.getNavigator().tryMoveToXYZ(this.field_111179_c, this.field_111176_d, this.field_111177_e, this.field_111178_b);
     }
 
     /**
@@ -72,10 +73,10 @@ public class EntityAIRunAroundLikeCrazy extends EntityAIBase
         {
             if (this.horseHost.riddenByEntity instanceof EntityPlayer)
             {
-                int i = this.horseHost.getTemper();
-                int j = this.horseHost.getMaxTemper();
+                int var1 = this.horseHost.getTemper();
+                int var2 = this.horseHost.getMaxTemper();
 
-                if (j > 0 && this.horseHost.getRNG().nextInt(j) < i)
+                if (var2 > 0 && this.horseHost.getRNG().nextInt(var2) < var1)
                 {
                     this.horseHost.setTamedBy((EntityPlayer)this.horseHost.riddenByEntity);
                     this.horseHost.worldObj.setEntityState(this.horseHost, (byte)7);

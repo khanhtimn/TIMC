@@ -14,24 +14,25 @@ public class EntityAIWatchClosest extends EntityAIBase
     /** This is the Maximum distance that the AI will look for the Entity */
     protected float maxDistanceForPlayer;
     private int lookTime;
-    private float chance;
-    protected Class <? extends Entity > watchedClass;
+    private float field_75331_e;
+    protected Class watchedClass;
+    
 
-    public EntityAIWatchClosest(EntityLiving entitylivingIn, Class <? extends Entity > watchTargetClass, float maxDistance)
+    public EntityAIWatchClosest(EntityLiving p_i1631_1_, Class p_i1631_2_, float p_i1631_3_)
     {
-        this.theWatcher = entitylivingIn;
-        this.watchedClass = watchTargetClass;
-        this.maxDistanceForPlayer = maxDistance;
-        this.chance = 0.02F;
+        this.theWatcher = p_i1631_1_;
+        this.watchedClass = p_i1631_2_;
+        this.maxDistanceForPlayer = p_i1631_3_;
+        this.field_75331_e = 0.02F;
         this.setMutexBits(2);
     }
 
-    public EntityAIWatchClosest(EntityLiving entitylivingIn, Class <? extends Entity > watchTargetClass, float maxDistance, float chanceIn)
+    public EntityAIWatchClosest(EntityLiving p_i1632_1_, Class p_i1632_2_, float p_i1632_3_, float p_i1632_4_)
     {
-        this.theWatcher = entitylivingIn;
-        this.watchedClass = watchTargetClass;
-        this.maxDistanceForPlayer = maxDistance;
-        this.chance = chanceIn;
+        this.theWatcher = p_i1632_1_;
+        this.watchedClass = p_i1632_2_;
+        this.maxDistanceForPlayer = p_i1632_3_;
+        this.field_75331_e = p_i1632_4_;
         this.setMutexBits(2);
     }
 
@@ -40,7 +41,7 @@ public class EntityAIWatchClosest extends EntityAIBase
      */
     public boolean shouldExecute()
     {
-        if (this.theWatcher.getRNG().nextFloat() >= this.chance)
+        if (this.theWatcher.getRNG().nextFloat() >= this.field_75331_e)
         {
             return false;
         }

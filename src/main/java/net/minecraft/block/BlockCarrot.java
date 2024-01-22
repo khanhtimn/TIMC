@@ -5,6 +5,8 @@ import net.minecraft.item.Item;
 
 public class BlockCarrot extends BlockCrops
 {
+    
+
     protected Item getSeed()
     {
         return Items.carrot;

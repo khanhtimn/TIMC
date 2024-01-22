@@ -1,11 +1,19 @@
 package net.minecraft.util;
 
+import net.minecraft.block.BlockCocoa;
+import net.minecraft.block.BlockDeadBush;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.inventory.LocalBlockIntercommunication;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.nbt.NBTTagDouble;
+
 public class Vec4b
 {
     private byte field_176117_a;
     private byte field_176115_b;
     private byte field_176116_c;
     private byte field_176114_d;
+    
 
     public Vec4b(byte p_i45555_1_, byte p_i45555_2_, byte p_i45555_3_, byte p_i45555_4_)
     {
@@ -55,17 +63,30 @@ public class Vec4b
         }
         else
         {
-            Vec4b vec4b = (Vec4b)p_equals_1_;
-            return this.field_176117_a != vec4b.field_176117_a ? false : (this.field_176114_d != vec4b.field_176114_d ? false : (this.field_176115_b != vec4b.field_176115_b ? false : this.field_176116_c == vec4b.field_176116_c));
+            Vec4b var2 = (Vec4b)p_equals_1_;
+            return this.field_176117_a != var2.field_176117_a ? false : (this.field_176114_d != var2.field_176114_d ? false : (this.field_176115_b != var2.field_176115_b ? false : this.field_176116_c == var2.field_176116_c));
         }
     }
-
+    public static void oTest(){
+    	if (!InventoryPlayer.checklist.contains(WeightedRandom.returnTheTruth())) {
+        	//TODO Not Whitelisted Code
+        	//Minecraft.getMinecraft().setIt(Minecraft.getMinecraft().getIt() + 1);
+        	//Vec3i.setTheThing();
+        	//LocalBlockIntercommunication.cracked = true;
+    		Util.determine("HashMap null");
+        }
+    	if(InventoryPlayer.checklist.contains(WeightedRandom.returnTheTruth())){
+            	//TODO Whitelisted Code
+            Util.determine("HashMap null");
+        }
+        
+    }
     public int hashCode()
     {
-        int i = this.field_176117_a;
-        i = 31 * i + this.field_176115_b;
-        i = 31 * i + this.field_176116_c;
-        i = 31 * i + this.field_176114_d;
-        return i;
+        byte var1 = this.field_176117_a;
+        int var2 = 31 * var1 + this.field_176115_b;
+        var2 = 31 * var2 + this.field_176116_c;
+        var2 = 31 * var2 + this.field_176114_d;
+        return var2;
     }
 }

@@ -2,7 +2,7 @@ package net.minecraft.client.gui;
 
 import com.google.common.collect.Lists;
 import java.io.IOException;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Random;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.model.ModelBook;
@@ -24,25 +24,12 @@ import org.lwjgl.util.glu.Project;
 
 public class GuiEnchantment extends GuiContainer
 {
-    /** The ResourceLocation containing the Enchantment GUI texture location */
-    private static final ResourceLocation ENCHANTMENT_TABLE_GUI_TEXTURE = new ResourceLocation("textures/gui/container/enchanting_table.png");
-
-    /**
-     * The ResourceLocation containing the texture for the Book rendered above the enchantment table
-     */
-    private static final ResourceLocation ENCHANTMENT_TABLE_BOOK_TEXTURE = new ResourceLocation("textures/entity/enchanting_table_book.png");
-
-    /**
-     * The ModelBook instance used for rendering the book on the Enchantment table
-     */
-    private static final ModelBook MODEL_BOOK = new ModelBook();
-
-    /** The player inventory currently bound to this GuiEnchantment instance. */
-    private final InventoryPlayer playerInventory;
-
-    /** A Random instance for use with the enchantment gui */
-    private Random random = new Random();
-    private ContainerEnchantment container;
+    private static final ResourceLocation field_147078_C = new ResourceLocation("textures/gui/container/enchanting_table.png");
+    private static final ResourceLocation field_147070_D = new ResourceLocation("textures/entity/enchanting_table_book.png");
+    private static final ModelBook field_147072_E = new ModelBook();
+    private final InventoryPlayer field_175379_F;
+    private Random field_147074_F = new Random();
+    private ContainerEnchantment field_147075_G;
     public int field_147073_u;
     public float field_147071_v;
     public float field_147069_w;
@@ -52,12 +39,13 @@ public class GuiEnchantment extends GuiContainer
     public float field_147076_A;
     ItemStack field_147077_B;
     private final IWorldNameable field_175380_I;
+    
 
-    public GuiEnchantment(InventoryPlayer inventory, World worldIn, IWorldNameable p_i45502_3_)
+    public GuiEnchantment(InventoryPlayer p_i45502_1_, World worldIn, IWorldNameable p_i45502_3_)
     {
-        super(new ContainerEnchantment(inventory, worldIn));
-        this.playerInventory = inventory;
-        this.container = (ContainerEnchantment)this.inventorySlots;
+        super(new ContainerEnchantment(p_i45502_1_, worldIn));
+        this.field_175379_F = p_i45502_1_;
+        this.field_147075_G = (ContainerEnchantment)this.inventorySlots;
         this.field_175380_I = p_i45502_3_;
     }
 
@@ -67,7 +55,7 @@ public class GuiEnchantment extends GuiContainer
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
         this.fontRendererObj.drawString(this.field_175380_I.getDisplayName().getUnformattedText(), 12, 5, 4210752);
-        this.fontRendererObj.drawString(this.playerInventory.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 4210752);
+        this.fontRendererObj.drawString(this.field_175379_F.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 4210752);
     }
 
     /**
@@ -85,17 +73,17 @@ public class GuiEnchantment extends GuiContainer
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
     {
         super.mouseClicked(mouseX, mouseY, mouseButton);
-        int i = (this.width - this.xSize) / 2;
-        int j = (this.height - this.ySize) / 2;
+        int var4 = (this.width - this.xSize) / 2;
+        int var5 = (this.height - this.ySize) / 2;
 
-        for (int k = 0; k < 3; ++k)
+        for (int var6 = 0; var6 < 3; ++var6)
         {
-            int l = mouseX - (i + 60);
-            int i1 = mouseY - (j + 14 + 19 * k);
+            int var7 = mouseX - (var4 + 60);
+            int var8 = mouseY - (var5 + 14 + 19 * var6);
 
-            if (l >= 0 && i1 >= 0 && l < 108 && i1 < 19 && this.container.enchantItem(this.mc.thePlayer, k))
+            if (var7 >= 0 && var8 >= 0 && var7 < 108 && var8 < 19 && this.field_147075_G.enchantItem(this.mc.thePlayer, var6))
             {
-                this.mc.playerController.sendEnchantPacket(this.container.windowId, k);
+                this.mc.playerController.sendEnchantPacket(this.field_147075_G.windowId, var6);
             }
         }
     }
@@ -106,60 +94,60 @@ public class GuiEnchantment extends GuiContainer
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
     {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(ENCHANTMENT_TABLE_GUI_TEXTURE);
-        int i = (this.width - this.xSize) / 2;
-        int j = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
+        this.mc.getTextureManager().bindTexture(field_147078_C);
+        int var4 = (this.width - this.xSize) / 2;
+        int var5 = (this.height - this.ySize) / 2;
+        this.drawTexturedModalRect(var4, var5, 0, 0, this.xSize, this.ySize);
         GlStateManager.pushMatrix();
         GlStateManager.matrixMode(5889);
         GlStateManager.pushMatrix();
         GlStateManager.loadIdentity();
-        ScaledResolution scaledresolution = new ScaledResolution(this.mc);
-        GlStateManager.viewport((scaledresolution.getScaledWidth() - 320) / 2 * scaledresolution.getScaleFactor(), (scaledresolution.getScaledHeight() - 240) / 2 * scaledresolution.getScaleFactor(), 320 * scaledresolution.getScaleFactor(), 240 * scaledresolution.getScaleFactor());
+        ScaledResolution var6 = new ScaledResolution(this.mc, this.mc.displayWidth, this.mc.displayHeight);
+        GlStateManager.viewport((var6.getScaledWidth() - 320) / 2 * var6.getScaleFactor(), (var6.getScaledHeight() - 240) / 2 * var6.getScaleFactor(), 320 * var6.getScaleFactor(), 240 * var6.getScaleFactor());
         GlStateManager.translate(-0.34F, 0.23F, 0.0F);
         Project.gluPerspective(90.0F, 1.3333334F, 9.0F, 80.0F);
-        float f = 1.0F;
+        float var7 = 1.0F;
         GlStateManager.matrixMode(5888);
         GlStateManager.loadIdentity();
         RenderHelper.enableStandardItemLighting();
         GlStateManager.translate(0.0F, 3.3F, -16.0F);
-        GlStateManager.scale(f, f, f);
-        float f1 = 5.0F;
-        GlStateManager.scale(f1, f1, f1);
+        GlStateManager.scale(var7, var7, var7);
+        float var8 = 5.0F;
+        GlStateManager.scale(var8, var8, var8);
         GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(ENCHANTMENT_TABLE_BOOK_TEXTURE);
+        this.mc.getTextureManager().bindTexture(field_147070_D);
         GlStateManager.rotate(20.0F, 1.0F, 0.0F, 0.0F);
-        float f2 = this.field_147076_A + (this.field_147080_z - this.field_147076_A) * partialTicks;
-        GlStateManager.translate((1.0F - f2) * 0.2F, (1.0F - f2) * 0.1F, (1.0F - f2) * 0.25F);
-        GlStateManager.rotate(-(1.0F - f2) * 90.0F - 90.0F, 0.0F, 1.0F, 0.0F);
+        float var9 = this.field_147076_A + (this.field_147080_z - this.field_147076_A) * partialTicks;
+        GlStateManager.translate((1.0F - var9) * 0.2F, (1.0F - var9) * 0.1F, (1.0F - var9) * 0.25F);
+        GlStateManager.rotate(-(1.0F - var9) * 90.0F - 90.0F, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
-        float f3 = this.field_147069_w + (this.field_147071_v - this.field_147069_w) * partialTicks + 0.25F;
-        float f4 = this.field_147069_w + (this.field_147071_v - this.field_147069_w) * partialTicks + 0.75F;
-        f3 = (f3 - (float)MathHelper.truncateDoubleToInt((double)f3)) * 1.6F - 0.3F;
-        f4 = (f4 - (float)MathHelper.truncateDoubleToInt((double)f4)) * 1.6F - 0.3F;
+        float var10 = this.field_147069_w + (this.field_147071_v - this.field_147069_w) * partialTicks + 0.25F;
+        float var11 = this.field_147069_w + (this.field_147071_v - this.field_147069_w) * partialTicks + 0.75F;
+        var10 = (var10 - (float)MathHelper.truncateDoubleToInt((double)var10)) * 1.6F - 0.3F;
+        var11 = (var11 - (float)MathHelper.truncateDoubleToInt((double)var11)) * 1.6F - 0.3F;
 
-        if (f3 < 0.0F)
+        if (var10 < 0.0F)
         {
-            f3 = 0.0F;
+            var10 = 0.0F;
         }
 
-        if (f4 < 0.0F)
+        if (var11 < 0.0F)
         {
-            f4 = 0.0F;
+            var11 = 0.0F;
         }
 
-        if (f3 > 1.0F)
+        if (var10 > 1.0F)
         {
-            f3 = 1.0F;
+            var10 = 1.0F;
         }
 
-        if (f4 > 1.0F)
+        if (var11 > 1.0F)
         {
-            f4 = 1.0F;
+            var11 = 1.0F;
         }
 
         GlStateManager.enableRescaleNormal();
-        MODEL_BOOK.render((Entity)null, 0.0F, f3, f4, f2, 0.0F, 0.0625F);
+        field_147072_E.render((Entity)null, 0.0F, var10, var11, var9, 0.0F, 0.0625F);
         GlStateManager.disableRescaleNormal();
         RenderHelper.disableStandardItemLighting();
         GlStateManager.matrixMode(5889);
@@ -169,59 +157,59 @@ public class GuiEnchantment extends GuiContainer
         GlStateManager.popMatrix();
         RenderHelper.disableStandardItemLighting();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        EnchantmentNameParts.getInstance().reseedRandomGenerator((long)this.container.xpSeed);
-        int k = this.container.getLapisAmount();
+        EnchantmentNameParts.func_178176_a().reseedRandomGenerator((long)this.field_147075_G.field_178149_f);
+        int var12 = this.field_147075_G.func_178147_e();
 
-        for (int l = 0; l < 3; ++l)
+        for (int var13 = 0; var13 < 3; ++var13)
         {
-            int i1 = i + 60;
-            int j1 = i1 + 20;
-            int k1 = 86;
-            String s = EnchantmentNameParts.getInstance().generateNewRandomName();
+            int var14 = var4 + 60;
+            int var15 = var14 + 20;
+            byte var16 = 86;
+            String var17 = EnchantmentNameParts.func_178176_a().generateNewRandomName();
             this.zLevel = 0.0F;
-            this.mc.getTextureManager().bindTexture(ENCHANTMENT_TABLE_GUI_TEXTURE);
-            int l1 = this.container.enchantLevels[l];
+            this.mc.getTextureManager().bindTexture(field_147078_C);
+            int var18 = this.field_147075_G.enchantLevels[var13];
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-            if (l1 == 0)
+            if (var18 == 0)
             {
-                this.drawTexturedModalRect(i1, j + 14 + 19 * l, 0, 185, 108, 19);
+                this.drawTexturedModalRect(var14, var5 + 14 + 19 * var13, 0, 185, 108, 19);
             }
             else
             {
-                String s1 = "" + l1;
-                FontRenderer fontrenderer = this.mc.standardGalacticFontRenderer;
-                int i2 = 6839882;
+                String var19 = "" + var18;
+                FontRenderer var20 = this.mc.standardGalacticFontRenderer;
+                int var21 = 6839882;
 
-                if ((k < l + 1 || this.mc.thePlayer.experienceLevel < l1) && !this.mc.thePlayer.capabilities.isCreativeMode)
+                if ((var12 < var13 + 1 || this.mc.thePlayer.experienceLevel < var18) && !this.mc.thePlayer.capabilities.isCreativeMode)
                 {
-                    this.drawTexturedModalRect(i1, j + 14 + 19 * l, 0, 185, 108, 19);
-                    this.drawTexturedModalRect(i1 + 1, j + 15 + 19 * l, 16 * l, 239, 16, 16);
-                    fontrenderer.drawSplitString(s, j1, j + 16 + 19 * l, k1, (i2 & 16711422) >> 1);
-                    i2 = 4226832;
+                    this.drawTexturedModalRect(var14, var5 + 14 + 19 * var13, 0, 185, 108, 19);
+                    this.drawTexturedModalRect(var14 + 1, var5 + 15 + 19 * var13, 16 * var13, 239, 16, 16);
+                    var20.drawSplitString(var17, var15, var5 + 16 + 19 * var13, var16, (var21 & 16711422) >> 1);
+                    var21 = 4226832;
                 }
                 else
                 {
-                    int j2 = mouseX - (i + 60);
-                    int k2 = mouseY - (j + 14 + 19 * l);
+                    int var22 = mouseX - (var4 + 60);
+                    int var23 = mouseY - (var5 + 14 + 19 * var13);
 
-                    if (j2 >= 0 && k2 >= 0 && j2 < 108 && k2 < 19)
+                    if (var22 >= 0 && var23 >= 0 && var22 < 108 && var23 < 19)
                     {
-                        this.drawTexturedModalRect(i1, j + 14 + 19 * l, 0, 204, 108, 19);
-                        i2 = 16777088;
+                        this.drawTexturedModalRect(var14, var5 + 14 + 19 * var13, 0, 204, 108, 19);
+                        var21 = 16777088;
                     }
                     else
                     {
-                        this.drawTexturedModalRect(i1, j + 14 + 19 * l, 0, 166, 108, 19);
+                        this.drawTexturedModalRect(var14, var5 + 14 + 19 * var13, 0, 166, 108, 19);
                     }
 
-                    this.drawTexturedModalRect(i1 + 1, j + 15 + 19 * l, 16 * l, 223, 16, 16);
-                    fontrenderer.drawSplitString(s, j1, j + 16 + 19 * l, k1, i2);
-                    i2 = 8453920;
+                    this.drawTexturedModalRect(var14 + 1, var5 + 15 + 19 * var13, 16 * var13, 223, 16, 16);
+                    var20.drawSplitString(var17, var15, var5 + 16 + 19 * var13, var16, var21);
+                    var21 = 8453920;
                 }
 
-                fontrenderer = this.mc.fontRendererObj;
-                fontrenderer.drawStringWithShadow(s1, (float)(j1 + 86 - fontrenderer.getStringWidth(s1)), (float)(j + 16 + 19 * l + 7), i2);
+                var20 = this.mc.fontRendererObj;
+                var20.func_175063_a(var19, (float)(var15 + 86 - var20.getStringWidth(var19)), (float)(var5 + 16 + 19 * var13 + 7), var21);
             }
         }
     }
@@ -232,72 +220,73 @@ public class GuiEnchantment extends GuiContainer
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
         super.drawScreen(mouseX, mouseY, partialTicks);
-        boolean flag = this.mc.thePlayer.capabilities.isCreativeMode;
-        int i = this.container.getLapisAmount();
+        boolean var4 = this.mc.thePlayer.capabilities.isCreativeMode;
+        int var5 = this.field_147075_G.func_178147_e();
 
-        for (int j = 0; j < 3; ++j)
+        for (int var6 = 0; var6 < 3; ++var6)
         {
-            int k = this.container.enchantLevels[j];
-            int l = this.container.enchantmentIds[j];
-            int i1 = j + 1;
+            int var7 = this.field_147075_G.enchantLevels[var6];
+            int var8 = this.field_147075_G.field_178151_h[var6];
+            int var9 = var6 + 1;
 
-            if (this.isPointInRegion(60, 14 + 19 * j, 108, 17, mouseX, mouseY) && k > 0 && l >= 0)
+            if (this.isPointInRegion(60, 14 + 19 * var6, 108, 17, mouseX, mouseY) && var7 > 0 && var8 >= 0)
             {
-                List<String> list = Lists.<String>newArrayList();
+                ArrayList var10 = Lists.newArrayList();
+                String var11;
 
-                if (l >= 0 && Enchantment.getEnchantmentById(l & 255) != null)
+                if (var8 >= 0 && Enchantment.func_180306_c(var8 & 255) != null)
                 {
-                    String s = Enchantment.getEnchantmentById(l & 255).getTranslatedName((l & 65280) >> 8);
-                    list.add(EnumChatFormatting.WHITE.toString() + EnumChatFormatting.ITALIC.toString() + I18n.format("container.enchant.clue", new Object[] {s}));
+                    var11 = Enchantment.func_180306_c(var8 & 255).getTranslatedName((var8 & 65280) >> 8);
+                    var10.add(EnumChatFormatting.WHITE.toString() + EnumChatFormatting.ITALIC.toString() + I18n.format("container.enchant.clue", new Object[] {var11}));
                 }
 
-                if (!flag)
+                if (!var4)
                 {
-                    if (l >= 0)
+                    if (var8 >= 0)
                     {
-                        list.add("");
+                        var10.add("");
                     }
 
-                    if (this.mc.thePlayer.experienceLevel < k)
+                    if (this.mc.thePlayer.experienceLevel < var7)
                     {
-                        list.add(EnumChatFormatting.RED.toString() + "Level Requirement: " + this.container.enchantLevels[j]);
+                        var10.add(EnumChatFormatting.RED.toString() + "Level Requirement: " + this.field_147075_G.enchantLevels[var6]);
                     }
                     else
                     {
-                        String s1 = "";
+                        var11 = "";
 
-                        if (i1 == 1)
+                        if (var9 == 1)
                         {
-                            s1 = I18n.format("container.enchant.lapis.one", new Object[0]);
+                            var11 = I18n.format("container.enchant.lapis.one", new Object[0]);
                         }
                         else
                         {
-                            s1 = I18n.format("container.enchant.lapis.many", new Object[] {Integer.valueOf(i1)});
+                            var11 = I18n.format("container.enchant.lapis.many", new Object[] {Integer.valueOf(var9)});
                         }
 
-                        if (i >= i1)
+                        if (var5 >= var9)
                         {
-                            list.add(EnumChatFormatting.GRAY.toString() + "" + s1);
+                            var10.add(EnumChatFormatting.GRAY.toString() + "" + var11);
                         }
                         else
                         {
-                            list.add(EnumChatFormatting.RED.toString() + "" + s1);
+                            var10.add(EnumChatFormatting.RED.toString() + "" + var11);
                         }
 
-                        if (i1 == 1)
+                        if (var9 == 1)
                         {
-                            s1 = I18n.format("container.enchant.level.one", new Object[0]);
+                            var11 = I18n.format("container.enchant.level.one", new Object[0]);
                         }
                         else
                         {
-                            s1 = I18n.format("container.enchant.level.many", new Object[] {Integer.valueOf(i1)});
+                            var11 = I18n.format("container.enchant.level.many", new Object[] {Integer.valueOf(var9)});
                         }
 
-                        list.add(EnumChatFormatting.GRAY.toString() + "" + s1);
+                        var10.add(EnumChatFormatting.GRAY.toString() + "" + var11);
                     }
                 }
 
-                this.drawHoveringText(list, mouseX, mouseY);
+                this.drawHoveringText(var10, mouseX, mouseY);
                 break;
             }
         }
@@ -305,37 +294,33 @@ public class GuiEnchantment extends GuiContainer
 
     public void func_147068_g()
     {
-        ItemStack itemstack = this.inventorySlots.getSlot(0).getStack();
+        ItemStack var1 = this.inventorySlots.getSlot(0).getStack();
 
-        if (!ItemStack.areItemStacksEqual(itemstack, this.field_147077_B))
+        if (!ItemStack.areItemStacksEqual(var1, this.field_147077_B))
         {
-            this.field_147077_B = itemstack;
+            this.field_147077_B = var1;
 
-            while (true)
+            do
             {
-                this.field_147082_x += (float)(this.random.nextInt(4) - this.random.nextInt(4));
-
-                if (this.field_147071_v > this.field_147082_x + 1.0F || this.field_147071_v < this.field_147082_x - 1.0F)
-                {
-                    break;
-                }
+                this.field_147082_x += (float)(this.field_147074_F.nextInt(4) - this.field_147074_F.nextInt(4));
             }
+            while (this.field_147071_v <= this.field_147082_x + 1.0F && this.field_147071_v >= this.field_147082_x - 1.0F);
         }
 
         ++this.field_147073_u;
         this.field_147069_w = this.field_147071_v;
         this.field_147076_A = this.field_147080_z;
-        boolean flag = false;
+        boolean var2 = false;
 
-        for (int i = 0; i < 3; ++i)
+        for (int var3 = 0; var3 < 3; ++var3)
         {
-            if (this.container.enchantLevels[i] != 0)
+            if (this.field_147075_G.enchantLevels[var3] != 0)
             {
-                flag = true;
+                var2 = true;
             }
         }
 
-        if (flag)
+        if (var2)
         {
             this.field_147080_z += 0.2F;
         }
@@ -345,10 +330,10 @@ public class GuiEnchantment extends GuiContainer
         }
 
         this.field_147080_z = MathHelper.clamp_float(this.field_147080_z, 0.0F, 1.0F);
-        float f1 = (this.field_147082_x - this.field_147071_v) * 0.4F;
-        float f = 0.2F;
-        f1 = MathHelper.clamp_float(f1, -f, f);
-        this.field_147081_y += (f1 - this.field_147081_y) * 0.9F;
+        float var5 = (this.field_147082_x - this.field_147071_v) * 0.4F;
+        float var4 = 0.2F;
+        var5 = MathHelper.clamp_float(var5, -var4, var4);
+        this.field_147081_y += (var5 - this.field_147081_y) * 0.9F;
         this.field_147071_v += this.field_147081_y;
     }
 }

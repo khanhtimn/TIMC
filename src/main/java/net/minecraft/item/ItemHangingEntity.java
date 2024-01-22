@@ -11,16 +11,20 @@ import net.minecraft.world.World;
 
 public class ItemHangingEntity extends Item
 {
-    private final Class <? extends EntityHanging > hangingEntityClass;
+    private final Class hangingEntityClass;
+    
 
-    public ItemHangingEntity(Class <? extends EntityHanging > entityClass)
+    public ItemHangingEntity(Class p_i45342_1_)
     {
-        this.hangingEntityClass = entityClass;
+        this.hangingEntityClass = p_i45342_1_;
         this.setCreativeTab(CreativeTabs.tabDecorations);
     }
 
     /**
      * Called when a Block is right-clicked with this Item
+     *  
+     * @param pos The block being right-clicked
+     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
@@ -34,21 +38,21 @@ public class ItemHangingEntity extends Item
         }
         else
         {
-            BlockPos blockpos = pos.offset(side);
+            BlockPos var9 = pos.offset(side);
 
-            if (!playerIn.canPlayerEdit(blockpos, side, stack))
+            if (!playerIn.func_175151_a(var9, side, stack))
             {
                 return false;
             }
             else
             {
-                EntityHanging entityhanging = this.createEntity(worldIn, blockpos, side);
+                EntityHanging var10 = this.func_179233_a(worldIn, var9, side);
 
-                if (entityhanging != null && entityhanging.onValidSurface())
+                if (var10 != null && var10.onValidSurface())
                 {
                     if (!worldIn.isRemote)
                     {
-                        worldIn.spawnEntityInWorld(entityhanging);
+                        worldIn.spawnEntityInWorld(var10);
                     }
 
                     --stack.stackSize;
@@ -59,8 +63,8 @@ public class ItemHangingEntity extends Item
         }
     }
 
-    private EntityHanging createEntity(World worldIn, BlockPos pos, EnumFacing clickedSide)
+    private EntityHanging func_179233_a(World worldIn, BlockPos p_179233_2_, EnumFacing p_179233_3_)
     {
-        return (EntityHanging)(this.hangingEntityClass == EntityPainting.class ? new EntityPainting(worldIn, pos, clickedSide) : (this.hangingEntityClass == EntityItemFrame.class ? new EntityItemFrame(worldIn, pos, clickedSide) : null));
+        return (EntityHanging)(this.hangingEntityClass == EntityPainting.class ? new EntityPainting(worldIn, p_179233_2_, p_179233_3_) : (this.hangingEntityClass == EntityItemFrame.class ? new EntityItemFrame(worldIn, p_179233_2_, p_179233_3_) : null));
     }
 }

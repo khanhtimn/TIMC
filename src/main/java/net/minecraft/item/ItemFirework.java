@@ -1,6 +1,7 @@
 package net.minecraft.item;
 
 import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,15 +14,20 @@ import net.minecraft.world.World;
 
 public class ItemFirework extends Item
 {
+    
+
     /**
      * Called when a Block is right-clicked with this Item
+     *  
+     * @param pos The block being right-clicked
+     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
         if (!worldIn.isRemote)
         {
-            EntityFireworkRocket entityfireworkrocket = new EntityFireworkRocket(worldIn, (double)((float)pos.getX() + hitX), (double)((float)pos.getY() + hitY), (double)((float)pos.getZ() + hitZ), stack);
-            worldIn.spawnEntityInWorld(entityfireworkrocket);
+            EntityFireworkRocket var9 = new EntityFireworkRocket(worldIn, (double)((float)pos.getX() + hitX), (double)((float)pos.getY() + hitY), (double)((float)pos.getZ() + hitZ), stack);
+            worldIn.spawnEntityInWorld(var9);
 
             if (!playerIn.capabilities.isCreativeMode)
             {
@@ -38,38 +44,41 @@ public class ItemFirework extends Item
 
     /**
      * allows items to add custom lines of information to the mouseover description
+     *  
+     * @param tooltip All lines to display in the Item's tooltip. This is a List of Strings.
+     * @param advanced Whether the setting "Advanced tooltips" is enabled
      */
-    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced)
+    public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced)
     {
         if (stack.hasTagCompound())
         {
-            NBTTagCompound nbttagcompound = stack.getTagCompound().getCompoundTag("Fireworks");
+            NBTTagCompound var5 = stack.getTagCompound().getCompoundTag("Fireworks");
 
-            if (nbttagcompound != null)
+            if (var5 != null)
             {
-                if (nbttagcompound.hasKey("Flight", 99))
+                if (var5.hasKey("Flight", 99))
                 {
-                    tooltip.add(StatCollector.translateToLocal("item.fireworks.flight") + " " + nbttagcompound.getByte("Flight"));
+                    tooltip.add(StatCollector.translateToLocal("item.fireworks.flight") + " " + var5.getByte("Flight"));
                 }
 
-                NBTTagList nbttaglist = nbttagcompound.getTagList("Explosions", 10);
+                NBTTagList var6 = var5.getTagList("Explosions", 10);
 
-                if (nbttaglist != null && nbttaglist.tagCount() > 0)
+                if (var6 != null && var6.tagCount() > 0)
                 {
-                    for (int i = 0; i < nbttaglist.tagCount(); ++i)
+                    for (int var7 = 0; var7 < var6.tagCount(); ++var7)
                     {
-                        NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
-                        List<String> list = Lists.<String>newArrayList();
-                        ItemFireworkCharge.addExplosionInfo(nbttagcompound1, list);
+                        NBTTagCompound var8 = var6.getCompoundTagAt(var7);
+                        ArrayList var9 = Lists.newArrayList();
+                        ItemFireworkCharge.func_150902_a(var8, var9);
 
-                        if (list.size() > 0)
+                        if (var9.size() > 0)
                         {
-                            for (int j = 1; j < ((List)list).size(); ++j)
+                            for (int var10 = 1; var10 < var9.size(); ++var10)
                             {
-                                list.set(j, "  " + (String)list.get(j));
+                                var9.set(var10, "  " + (String)var9.get(var10));
                             }
 
-                            tooltip.addAll(list);
+                            tooltip.addAll(var9);
                         }
                     }
                 }

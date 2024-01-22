@@ -29,28 +29,30 @@ public class TileEntitySign extends TileEntity
      */
     public int lineBeingEdited = -1;
     private boolean isEditable = true;
-    private EntityPlayer player;
-    private final CommandResultStats stats = new CommandResultStats();
+    private EntityPlayer field_145917_k;
+    private final CommandResultStats field_174883_i = new CommandResultStats();
+    
 
     public void writeToNBT(NBTTagCompound compound)
     {
         super.writeToNBT(compound);
 
-        for (int i = 0; i < 4; ++i)
+        for (int var2 = 0; var2 < 4; ++var2)
         {
-            String s = IChatComponent.Serializer.componentToJson(this.signText[i]);
-            compound.setString("Text" + (i + 1), s);
+            String var3 = IChatComponent.Serializer.componentToJson(this.signText[var2]);
+            compound.setString("Text" + (var2 + 1), var3);
         }
 
-        this.stats.writeStatsToNBT(compound);
+        this.field_174883_i.func_179670_b(compound);
     }
 
     public void readFromNBT(NBTTagCompound compound)
     {
         this.isEditable = false;
         super.readFromNBT(compound);
-        ICommandSender icommandsender = new ICommandSender()
+        ICommandSender var2 = new ICommandSender()
         {
+            
             public String getName()
             {
                 return "Sign";
@@ -59,10 +61,8 @@ public class TileEntitySign extends TileEntity
             {
                 return new ChatComponentText(this.getName());
             }
-            public void addChatMessage(IChatComponent component)
-            {
-            }
-            public boolean canCommandSenderUseCommand(int permLevel, String commandName)
+            public void addChatMessage(IChatComponent message) {}
+            public boolean canCommandSenderUseCommand(int permissionLevel, String command)
             {
                 return true;
             }
@@ -86,51 +86,43 @@ public class TileEntitySign extends TileEntity
             {
                 return false;
             }
-            public void setCommandStat(CommandResultStats.Type type, int amount)
-            {
-            }
+            public void func_174794_a(CommandResultStats.Type p_174794_1_, int p_174794_2_) {}
         };
 
-        for (int i = 0; i < 4; ++i)
+        for (int var3 = 0; var3 < 4; ++var3)
         {
-            String s = compound.getString("Text" + (i + 1));
+            String var4 = compound.getString("Text" + (var3 + 1));
 
             try
             {
-                IChatComponent ichatcomponent = IChatComponent.Serializer.jsonToComponent(s);
+                IChatComponent var5 = IChatComponent.Serializer.jsonToComponent(var4);
 
                 try
                 {
-                    this.signText[i] = ChatComponentProcessor.processComponent(icommandsender, ichatcomponent, (Entity)null);
+                    this.signText[var3] = ChatComponentProcessor.func_179985_a(var2, var5, (Entity)null);
                 }
                 catch (CommandException var7)
                 {
-                    this.signText[i] = ichatcomponent;
+                    this.signText[var3] = var5;
                 }
             }
             catch (JsonParseException var8)
             {
-                this.signText[i] = new ChatComponentText(s);
+                this.signText[var3] = new ChatComponentText(var4);
             }
         }
 
-        this.stats.readStatsFromNBT(compound);
+        this.field_174883_i.func_179668_a(compound);
     }
 
     /**
-     * Allows for a specialized description packet to be created. This is often used to sync tile entity data from the
-     * server to the client easily. For example this is used by signs to synchronise the text to be displayed.
+     * Overriden in a sign to provide the text.
      */
     public Packet getDescriptionPacket()
     {
-        IChatComponent[] aichatcomponent = new IChatComponent[4];
-        System.arraycopy(this.signText, 0, aichatcomponent, 0, 4);
-        return new S33PacketUpdateSign(this.worldObj, this.pos, aichatcomponent);
-    }
-
-    public boolean func_183000_F()
-    {
-        return true;
+        IChatComponent[] var1 = new IChatComponent[4];
+        System.arraycopy(this.signText, 0, var1, 0, 4);
+        return new S33PacketUpdateSign(this.worldObj, this.pos, var1);
     }
 
     public boolean getIsEditable()
@@ -141,44 +133,43 @@ public class TileEntitySign extends TileEntity
     /**
      * Sets the sign's isEditable flag to the specified parameter.
      */
-    public void setEditable(boolean isEditableIn)
+    public void setEditable(boolean p_145913_1_)
     {
-        this.isEditable = isEditableIn;
+        this.isEditable = p_145913_1_;
 
-        if (!isEditableIn)
+        if (!p_145913_1_)
         {
-            this.player = null;
+            this.field_145917_k = null;
         }
     }
 
-    public void setPlayer(EntityPlayer playerIn)
+    public void func_145912_a(EntityPlayer p_145912_1_)
     {
-        this.player = playerIn;
+        this.field_145917_k = p_145912_1_;
     }
 
-    public EntityPlayer getPlayer()
+    public EntityPlayer func_145911_b()
     {
-        return this.player;
+        return this.field_145917_k;
     }
 
-    public boolean executeCommand(final EntityPlayer playerIn)
+    public boolean func_174882_b(final EntityPlayer p_174882_1_)
     {
-        ICommandSender icommandsender = new ICommandSender()
+        ICommandSender var2 = new ICommandSender()
         {
+            
             public String getName()
             {
-                return playerIn.getName();
+                return p_174882_1_.getName();
             }
             public IChatComponent getDisplayName()
             {
-                return playerIn.getDisplayName();
+                return p_174882_1_.getDisplayName();
             }
-            public void addChatMessage(IChatComponent component)
+            public void addChatMessage(IChatComponent message) {}
+            public boolean canCommandSenderUseCommand(int permissionLevel, String command)
             {
-            }
-            public boolean canCommandSenderUseCommand(int permLevel, String commandName)
-            {
-                return permLevel <= 2;
+                return true;
             }
             public BlockPos getPosition()
             {
@@ -190,33 +181,33 @@ public class TileEntitySign extends TileEntity
             }
             public World getEntityWorld()
             {
-                return playerIn.getEntityWorld();
+                return p_174882_1_.getEntityWorld();
             }
             public Entity getCommandSenderEntity()
             {
-                return playerIn;
+                return p_174882_1_;
             }
             public boolean sendCommandFeedback()
             {
                 return false;
             }
-            public void setCommandStat(CommandResultStats.Type type, int amount)
+            public void func_174794_a(CommandResultStats.Type p_174794_1_, int p_174794_2_)
             {
-                TileEntitySign.this.stats.setCommandStatScore(this, type, amount);
+                TileEntitySign.this.field_174883_i.func_179672_a(this, p_174794_1_, p_174794_2_);
             }
         };
 
-        for (int i = 0; i < this.signText.length; ++i)
+        for (int var3 = 0; var3 < this.signText.length; ++var3)
         {
-            ChatStyle chatstyle = this.signText[i] == null ? null : this.signText[i].getChatStyle();
+            ChatStyle var4 = this.signText[var3] == null ? null : this.signText[var3].getChatStyle();
 
-            if (chatstyle != null && chatstyle.getChatClickEvent() != null)
+            if (var4 != null && var4.getChatClickEvent() != null)
             {
-                ClickEvent clickevent = chatstyle.getChatClickEvent();
+                ClickEvent var5 = var4.getChatClickEvent();
 
-                if (clickevent.getAction() == ClickEvent.Action.RUN_COMMAND)
+                if (var5.getAction() == ClickEvent.Action.RUN_COMMAND)
                 {
-                    MinecraftServer.getServer().getCommandManager().executeCommand(icommandsender, clickevent.getValue());
+                    MinecraftServer.getServer().getCommandManager().executeCommand(var2, var5.getValue());
                 }
             }
         }
@@ -224,8 +215,8 @@ public class TileEntitySign extends TileEntity
         return true;
     }
 
-    public CommandResultStats getStats()
+    public CommandResultStats func_174880_d()
     {
-        return this.stats;
+        return this.field_174883_i;
     }
 }

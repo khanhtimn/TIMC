@@ -8,11 +8,12 @@ public class EntityAIOwnerHurtTarget extends EntityAITarget
     EntityTameable theEntityTameable;
     EntityLivingBase theTarget;
     private int field_142050_e;
+    
 
-    public EntityAIOwnerHurtTarget(EntityTameable theEntityTameableIn)
+    public EntityAIOwnerHurtTarget(EntityTameable p_i1668_1_)
     {
-        super(theEntityTameableIn, false);
-        this.theEntityTameable = theEntityTameableIn;
+        super(p_i1668_1_, false);
+        this.theEntityTameable = p_i1668_1_;
         this.setMutexBits(1);
     }
 
@@ -27,17 +28,17 @@ public class EntityAIOwnerHurtTarget extends EntityAITarget
         }
         else
         {
-            EntityLivingBase entitylivingbase = this.theEntityTameable.getOwner();
+            EntityLivingBase var1 = this.theEntityTameable.func_180492_cm();
 
-            if (entitylivingbase == null)
+            if (var1 == null)
             {
                 return false;
             }
             else
             {
-                this.theTarget = entitylivingbase.getLastAttacker();
-                int i = entitylivingbase.getLastAttackerTime();
-                return i != this.field_142050_e && this.isSuitableTarget(this.theTarget, false) && this.theEntityTameable.shouldAttackEntity(this.theTarget, entitylivingbase);
+                this.theTarget = var1.getLastAttacker();
+                int var2 = var1.getLastAttackerTime();
+                return var2 != this.field_142050_e && this.isSuitableTarget(this.theTarget, false) && this.theEntityTameable.func_142018_a(this.theTarget, var1);
             }
         }
     }
@@ -48,11 +49,11 @@ public class EntityAIOwnerHurtTarget extends EntityAITarget
     public void startExecuting()
     {
         this.taskOwner.setAttackTarget(this.theTarget);
-        EntityLivingBase entitylivingbase = this.theEntityTameable.getOwner();
+        EntityLivingBase var1 = this.theEntityTameable.func_180492_cm();
 
-        if (entitylivingbase != null)
+        if (var1 != null)
         {
-            this.field_142050_e = entitylivingbase.getLastAttackerTime();
+            this.field_142050_e = var1.getLastAttackerTime();
         }
 
         super.startExecuting();

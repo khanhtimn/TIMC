@@ -1,5 +1,6 @@
 package net.minecraft.block;
 
+import java.util.Iterator;
 import java.util.Random;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -13,18 +14,17 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class BlockFarmland extends Block
 {
-    public static final PropertyInteger MOISTURE = PropertyInteger.create("moisture", 0, 7);
+    public static final PropertyInteger field_176531_a = PropertyInteger.create("moisture", 0, 7);
+    
 
     protected BlockFarmland()
     {
         super(Material.ground);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(MOISTURE, Integer.valueOf(0)));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(field_176531_a, Integer.valueOf(0)));
         this.setTickRandomly(true);
         this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.9375F, 1.0F);
         this.setLightOpacity(255);
@@ -35,9 +35,6 @@ public class BlockFarmland extends Block
         return new AxisAlignedBB((double)pos.getX(), (double)pos.getY(), (double)pos.getZ(), (double)(pos.getX() + 1), (double)(pos.getY() + 1), (double)(pos.getZ() + 1));
     }
 
-    /**
-     * Used to determine ambient occlusion and culling when rebuilding chunks for render
-     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -50,27 +47,29 @@ public class BlockFarmland extends Block
 
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
-        int i = ((Integer)state.getValue(MOISTURE)).intValue();
+        int var5 = ((Integer)state.getValue(field_176531_a)).intValue();
 
-        if (!this.hasWater(worldIn, pos) && !worldIn.isRainingAt(pos.up()))
+        if (!this.func_176530_e(worldIn, pos) && !worldIn.func_175727_C(pos.offsetUp()))
         {
-            if (i > 0)
+            if (var5 > 0)
             {
-                worldIn.setBlockState(pos, state.withProperty(MOISTURE, Integer.valueOf(i - 1)), 2);
+                worldIn.setBlockState(pos, state.withProperty(field_176531_a, Integer.valueOf(var5 - 1)), 2);
             }
-            else if (!this.hasCrops(worldIn, pos))
+            else if (!this.func_176529_d(worldIn, pos))
             {
                 worldIn.setBlockState(pos, Blocks.dirt.getDefaultState());
             }
         }
-        else if (i < 7)
+        else if (var5 < 7)
         {
-            worldIn.setBlockState(pos, state.withProperty(MOISTURE, Integer.valueOf(7)), 2);
+            worldIn.setBlockState(pos, state.withProperty(field_176531_a, Integer.valueOf(7)), 2);
         }
     }
 
     /**
      * Block's chance to react to a living entity falling on it.
+     *  
+     * @param fallDistance The distance the entity has fallen before landing
      */
     public void onFallenUpon(World worldIn, BlockPos pos, Entity entityIn, float fallDistance)
     {
@@ -78,7 +77,7 @@ public class BlockFarmland extends Block
         {
             if (!worldIn.isRemote && worldIn.rand.nextFloat() < fallDistance - 0.5F)
             {
-                if (!(entityIn instanceof EntityPlayer) && !worldIn.getGameRules().getBoolean("mobGriefing"))
+                if (!(entityIn instanceof EntityPlayer) && !worldIn.getGameRules().getGameRuleBooleanValue("mobGriefing"))
                 {
                     return;
                 }
@@ -90,59 +89,45 @@ public class BlockFarmland extends Block
         }
     }
 
-    private boolean hasCrops(World worldIn, BlockPos pos)
+    private boolean func_176529_d(World worldIn, BlockPos p_176529_2_)
     {
-        Block block = worldIn.getBlockState(pos.up()).getBlock();
-        return block instanceof BlockCrops || block instanceof BlockStem;
+        Block var3 = worldIn.getBlockState(p_176529_2_.offsetUp()).getBlock();
+        return var3 instanceof BlockCrops || var3 instanceof BlockStem;
     }
 
-    private boolean hasWater(World worldIn, BlockPos pos)
+    private boolean func_176530_e(World worldIn, BlockPos p_176530_2_)
     {
-        for (BlockPos.MutableBlockPos blockpos$mutableblockpos : BlockPos.getAllInBoxMutable(pos.add(-4, 0, -4), pos.add(4, 1, 4)))
+        Iterator var3 = BlockPos.getAllInBoxMutable(p_176530_2_.add(-4, 0, -4), p_176530_2_.add(4, 1, 4)).iterator();
+        BlockPos.MutableBlockPos var4;
+
+        do
         {
-            if (worldIn.getBlockState(blockpos$mutableblockpos).getBlock().getMaterial() == Material.water)
+            if (!var3.hasNext())
             {
-                return true;
+                return false;
             }
-        }
 
-        return false;
+            var4 = (BlockPos.MutableBlockPos)var3.next();
+        }
+        while (worldIn.getBlockState(var4).getBlock().getMaterial() != Material.water);
+
+        return true;
     }
 
-    /**
-     * Called when a neighboring block changes.
-     */
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
     {
         super.onNeighborBlockChange(worldIn, pos, state, neighborBlock);
 
-        if (worldIn.getBlockState(pos.up()).getBlock().getMaterial().isSolid())
+        if (worldIn.getBlockState(pos.offsetUp()).getBlock().getMaterial().isSolid())
         {
             worldIn.setBlockState(pos, Blocks.dirt.getDefaultState());
         }
     }
 
-    public boolean shouldSideBeRendered(IBlockAccess worldIn, BlockPos pos, EnumFacing side)
-    {
-        switch (side)
-        {
-            case UP:
-                return true;
-
-            case NORTH:
-            case SOUTH:
-            case WEST:
-            case EAST:
-                Block block = worldIn.getBlockState(pos).getBlock();
-                return !block.isOpaqueCube() && block != Blocks.farmland;
-
-            default:
-                return super.shouldSideBeRendered(worldIn, pos, side);
-        }
-    }
-
     /**
      * Get the Item that this Block should drop when harvested.
+     *  
+     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -159,7 +144,7 @@ public class BlockFarmland extends Block
      */
     public IBlockState getStateFromMeta(int meta)
     {
-        return this.getDefaultState().withProperty(MOISTURE, Integer.valueOf(meta & 7));
+        return this.getDefaultState().withProperty(field_176531_a, Integer.valueOf(meta & 7));
     }
 
     /**
@@ -167,11 +152,11 @@ public class BlockFarmland extends Block
      */
     public int getMetaFromState(IBlockState state)
     {
-        return ((Integer)state.getValue(MOISTURE)).intValue();
+        return ((Integer)state.getValue(field_176531_a)).intValue();
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {MOISTURE});
+        return new BlockState(this, new IProperty[] {field_176531_a});
     }
 }

@@ -1,6 +1,5 @@
 package net.minecraft.block;
 
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
@@ -10,9 +9,11 @@ import net.minecraft.world.World;
 
 public class BlockSlime extends BlockBreakable
 {
+    
+
     public BlockSlime()
     {
-        super(Material.clay, false, MapColor.grassColor);
+        super(Material.clay, false);
         this.setCreativeTab(CreativeTabs.tabDecorations);
         this.slipperiness = 0.8F;
     }
@@ -24,6 +25,8 @@ public class BlockSlime extends BlockBreakable
 
     /**
      * Block's chance to react to a living entity falling on it.
+     *  
+     * @param fallDistance The distance the entity has fallen before landing
      */
     public void onFallenUpon(World worldIn, BlockPos pos, Entity entityIn, float fallDistance)
     {
@@ -60,9 +63,9 @@ public class BlockSlime extends BlockBreakable
     {
         if (Math.abs(entityIn.motionY) < 0.1D && !entityIn.isSneaking())
         {
-            double d0 = 0.4D + Math.abs(entityIn.motionY) * 0.2D;
-            entityIn.motionX *= d0;
-            entityIn.motionZ *= d0;
+            double var4 = 0.4D + Math.abs(entityIn.motionY) * 0.2D;
+            entityIn.motionX *= var4;
+            entityIn.motionZ *= var4;
         }
 
         super.onEntityCollidedWithBlock(worldIn, pos, entityIn);

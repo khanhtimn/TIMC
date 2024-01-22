@@ -1,7 +1,6 @@
 package net.minecraft.block;
 
 import java.util.Random;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -14,29 +13,26 @@ import net.minecraft.world.World;
 
 public abstract class BlockBasePressurePlate extends Block
 {
+    
+
     protected BlockBasePressurePlate(Material materialIn)
     {
-        this(materialIn, materialIn.getMaterialMapColor());
-    }
-
-    protected BlockBasePressurePlate(Material p_i46401_1_, MapColor p_i46401_2_)
-    {
-        super(p_i46401_1_, p_i46401_2_);
+        super(materialIn);
         this.setCreativeTab(CreativeTabs.tabRedstone);
         this.setTickRandomly(true);
     }
 
-    public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
+    public void setBlockBoundsBasedOnState(IBlockAccess access, BlockPos pos)
     {
-        this.setBlockBoundsBasedOnState0(worldIn.getBlockState(pos));
+        this.func_180668_d(access.getBlockState(pos));
     }
 
-    protected void setBlockBoundsBasedOnState0(IBlockState state)
+    protected void func_180668_d(IBlockState p_180668_1_)
     {
-        boolean flag = this.getRedstoneStrength(state) > 0;
-        float f = 0.0625F;
+        boolean var2 = this.getRedstoneStrength(p_180668_1_) > 0;
+        float var3 = 0.0625F;
 
-        if (flag)
+        if (var2)
         {
             this.setBlockBounds(0.0625F, 0.0F, 0.0625F, 0.9375F, 0.03125F, 0.9375F);
         }
@@ -59,9 +55,6 @@ public abstract class BlockBasePressurePlate extends Block
         return null;
     }
 
-    /**
-     * Used to determine ambient occlusion and culling when rebuilding chunks for render
-     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -72,30 +65,19 @@ public abstract class BlockBasePressurePlate extends Block
         return false;
     }
 
-    public boolean isPassable(IBlockAccess worldIn, BlockPos pos)
-    {
-        return true;
-    }
-
-    /**
-     * Return true if an entity can be spawned inside the block (used to get the player's bed spawn location)
-     */
-    public boolean canSpawnInBlock()
+    public boolean isPassable(IBlockAccess blockAccess, BlockPos pos)
     {
         return true;
     }
 
     public boolean canPlaceBlockAt(World worldIn, BlockPos pos)
     {
-        return this.canBePlacedOn(worldIn, pos.down());
+        return this.canBePlacedOn(worldIn, pos.offsetDown());
     }
 
-    /**
-     * Called when a neighboring block changes.
-     */
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
     {
-        if (!this.canBePlacedOn(worldIn, pos.down()))
+        if (!this.canBePlacedOn(worldIn, pos.offsetDown()))
         {
             this.dropBlockAsItem(worldIn, pos, state, 0);
             worldIn.setBlockToAir(pos);
@@ -110,19 +92,17 @@ public abstract class BlockBasePressurePlate extends Block
     /**
      * Called randomly when setTickRandomly is set to true (used by e.g. crops to grow, etc.)
      */
-    public void randomTick(World worldIn, BlockPos pos, IBlockState state, Random random)
-    {
-    }
+    public void randomTick(World worldIn, BlockPos pos, IBlockState state, Random random) {}
 
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
         if (!worldIn.isRemote)
         {
-            int i = this.getRedstoneStrength(state);
+            int var5 = this.getRedstoneStrength(state);
 
-            if (i > 0)
+            if (var5 > 0)
             {
-                this.updateState(worldIn, pos, state, i);
+                this.updateState(worldIn, pos, state, var5);
             }
         }
     }
@@ -134,11 +114,11 @@ public abstract class BlockBasePressurePlate extends Block
     {
         if (!worldIn.isRemote)
         {
-            int i = this.getRedstoneStrength(state);
+            int var5 = this.getRedstoneStrength(state);
 
-            if (i == 0)
+            if (var5 == 0)
             {
-                this.updateState(worldIn, pos, state, i);
+                this.updateState(worldIn, pos, state, var5);
             }
         }
     }
@@ -148,28 +128,28 @@ public abstract class BlockBasePressurePlate extends Block
      */
     protected void updateState(World worldIn, BlockPos pos, IBlockState state, int oldRedstoneStrength)
     {
-        int i = this.computeRedstoneStrength(worldIn, pos);
-        boolean flag = oldRedstoneStrength > 0;
-        boolean flag1 = i > 0;
+        int var5 = this.computeRedstoneStrength(worldIn, pos);
+        boolean var6 = oldRedstoneStrength > 0;
+        boolean var7 = var5 > 0;
 
-        if (oldRedstoneStrength != i)
+        if (oldRedstoneStrength != var5)
         {
-            state = this.setRedstoneStrength(state, i);
+            state = this.setRedstoneStrength(state, var5);
             worldIn.setBlockState(pos, state, 2);
             this.updateNeighbors(worldIn, pos);
             worldIn.markBlockRangeForRenderUpdate(pos, pos);
         }
 
-        if (!flag1 && flag)
+        if (!var7 && var6)
         {
             worldIn.playSoundEffect((double)pos.getX() + 0.5D, (double)pos.getY() + 0.1D, (double)pos.getZ() + 0.5D, "random.click", 0.3F, 0.5F);
         }
-        else if (flag1 && !flag)
+        else if (var7 && !var6)
         {
             worldIn.playSoundEffect((double)pos.getX() + 0.5D, (double)pos.getY() + 0.1D, (double)pos.getZ() + 0.5D, "random.click", 0.3F, 0.6F);
         }
 
-        if (flag1)
+        if (var7)
         {
             worldIn.scheduleUpdate(pos, this, this.tickRate(worldIn));
         }
@@ -180,7 +160,7 @@ public abstract class BlockBasePressurePlate extends Block
      */
     protected AxisAlignedBB getSensitiveAABB(BlockPos pos)
     {
-        float f = 0.125F;
+        float var2 = 0.125F;
         return new AxisAlignedBB((double)((float)pos.getX() + 0.125F), (double)pos.getY(), (double)((float)pos.getZ() + 0.125F), (double)((float)(pos.getX() + 1) - 0.125F), (double)pos.getY() + 0.25D, (double)((float)(pos.getZ() + 1) - 0.125F));
     }
 
@@ -200,15 +180,15 @@ public abstract class BlockBasePressurePlate extends Block
     protected void updateNeighbors(World worldIn, BlockPos pos)
     {
         worldIn.notifyNeighborsOfStateChange(pos, this);
-        worldIn.notifyNeighborsOfStateChange(pos.down(), this);
+        worldIn.notifyNeighborsOfStateChange(pos.offsetDown(), this);
     }
 
-    public int getWeakPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
+    public int isProvidingWeakPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
     {
         return this.getRedstoneStrength(state);
     }
 
-    public int getStrongPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
+    public int isProvidingStrongPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
     {
         return side == EnumFacing.UP ? this.getRedstoneStrength(state) : 0;
     }
@@ -226,9 +206,9 @@ public abstract class BlockBasePressurePlate extends Block
      */
     public void setBlockBoundsForItemRender()
     {
-        float f = 0.5F;
-        float f1 = 0.125F;
-        float f2 = 0.5F;
+        float var1 = 0.5F;
+        float var2 = 0.125F;
+        float var3 = 0.5F;
         this.setBlockBounds(0.0F, 0.375F, 0.0F, 1.0F, 0.625F, 1.0F);
     }
 
@@ -237,9 +217,9 @@ public abstract class BlockBasePressurePlate extends Block
         return 1;
     }
 
-    protected abstract int computeRedstoneStrength(World worldIn, BlockPos pos);
+    protected abstract int computeRedstoneStrength(World var1, BlockPos var2);
 
-    protected abstract int getRedstoneStrength(IBlockState state);
+    protected abstract int getRedstoneStrength(IBlockState var1);
 
-    protected abstract IBlockState setRedstoneStrength(IBlockState state, int strength);
+    protected abstract IBlockState setRedstoneStrength(IBlockState var1, int var2);
 }

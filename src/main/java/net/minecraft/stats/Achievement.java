@@ -6,7 +6,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
-import net.minecraft.util.IJsonSerializable;
 import net.minecraft.util.StatCollector;
 
 public class Achievement extends StatBase
@@ -47,53 +46,50 @@ public class Achievement extends StatBase
      * achieve.
      */
     private boolean isSpecial;
+    
 
-    public Achievement(String statIdIn, String unlocalizedName, int column, int row, Item itemIn, Achievement parent)
+    public Achievement(String p_i46327_1_, String p_i46327_2_, int p_i46327_3_, int p_i46327_4_, Item p_i46327_5_, Achievement p_i46327_6_)
     {
-        this(statIdIn, unlocalizedName, column, row, new ItemStack(itemIn), parent);
+        this(p_i46327_1_, p_i46327_2_, p_i46327_3_, p_i46327_4_, new ItemStack(p_i46327_5_), p_i46327_6_);
     }
 
-    public Achievement(String statIdIn, String unlocalizedName, int column, int row, Block blockIn, Achievement parent)
+    public Achievement(String p_i45301_1_, String p_i45301_2_, int p_i45301_3_, int p_i45301_4_, Block p_i45301_5_, Achievement p_i45301_6_)
     {
-        this(statIdIn, unlocalizedName, column, row, new ItemStack(blockIn), parent);
+        this(p_i45301_1_, p_i45301_2_, p_i45301_3_, p_i45301_4_, new ItemStack(p_i45301_5_), p_i45301_6_);
     }
 
-    public Achievement(String statIdIn, String unlocalizedName, int column, int row, ItemStack stack, Achievement parent)
+    public Achievement(String p_i45302_1_, String p_i45302_2_, int p_i45302_3_, int p_i45302_4_, ItemStack p_i45302_5_, Achievement p_i45302_6_)
     {
-        super(statIdIn, new ChatComponentTranslation("achievement." + unlocalizedName, new Object[0]));
-        this.theItemStack = stack;
-        this.achievementDescription = "achievement." + unlocalizedName + ".desc";
-        this.displayColumn = column;
-        this.displayRow = row;
+        super(p_i45302_1_, new ChatComponentTranslation("achievement." + p_i45302_2_, new Object[0]));
+        this.theItemStack = p_i45302_5_;
+        this.achievementDescription = "achievement." + p_i45302_2_ + ".desc";
+        this.displayColumn = p_i45302_3_;
+        this.displayRow = p_i45302_4_;
 
-        if (column < AchievementList.minDisplayColumn)
+        if (p_i45302_3_ < AchievementList.minDisplayColumn)
         {
-            AchievementList.minDisplayColumn = column;
+            AchievementList.minDisplayColumn = p_i45302_3_;
         }
 
-        if (row < AchievementList.minDisplayRow)
+        if (p_i45302_4_ < AchievementList.minDisplayRow)
         {
-            AchievementList.minDisplayRow = row;
+            AchievementList.minDisplayRow = p_i45302_4_;
         }
 
-        if (column > AchievementList.maxDisplayColumn)
+        if (p_i45302_3_ > AchievementList.maxDisplayColumn)
         {
-            AchievementList.maxDisplayColumn = column;
+            AchievementList.maxDisplayColumn = p_i45302_3_;
         }
 
-        if (row > AchievementList.maxDisplayRow)
+        if (p_i45302_4_ > AchievementList.maxDisplayRow)
         {
-            AchievementList.maxDisplayRow = row;
+            AchievementList.maxDisplayRow = p_i45302_4_;
         }
 
-        this.parentAchievement = parent;
+        this.parentAchievement = p_i45302_6_;
     }
 
-    /**
-     * Initializes the current stat as independent (i.e., lacking prerequisites for being updated) and returns the
-     * current instance.
-     */
-    public Achievement initIndependentStat()
+    public Achievement func_180789_a()
     {
         this.isIndependent = true;
         return this;
@@ -109,10 +105,7 @@ public class Achievement extends StatBase
         return this;
     }
 
-    /**
-     * Register the stat into StatList.
-     */
-    public Achievement registerStat()
+    public Achievement func_180788_c()
     {
         super.registerStat();
         AchievementList.achievementList.add(this);
@@ -129,14 +122,14 @@ public class Achievement extends StatBase
 
     public IChatComponent getStatName()
     {
-        IChatComponent ichatcomponent = super.getStatName();
-        ichatcomponent.getChatStyle().setColor(this.getSpecial() ? EnumChatFormatting.DARK_PURPLE : EnumChatFormatting.GREEN);
-        return ichatcomponent;
+        IChatComponent var1 = super.getStatName();
+        var1.getChatStyle().setColor(this.getSpecial() ? EnumChatFormatting.DARK_PURPLE : EnumChatFormatting.GREEN);
+        return var1;
     }
 
-    public Achievement func_150953_b(Class <? extends IJsonSerializable > p_150953_1_)
+    public Achievement func_180787_a(Class p_180787_1_)
     {
-        return (Achievement)super.func_150953_b(p_150953_1_);
+        return (Achievement)super.func_150953_b(p_180787_1_);
     }
 
     /**
@@ -149,12 +142,10 @@ public class Achievement extends StatBase
 
     /**
      * Defines a string formatter for the achievement.
-     *  
-     * @param statStringFormatterIn 1.8.9
      */
-    public Achievement setStatStringFormatter(IStatStringFormat statStringFormatterIn)
+    public Achievement setStatStringFormatter(IStatStringFormat p_75988_1_)
     {
-        this.statStringFormatter = statStringFormatterIn;
+        this.statStringFormatter = p_75988_1_;
         return this;
     }
 
@@ -165,5 +156,27 @@ public class Achievement extends StatBase
     public boolean getSpecial()
     {
         return this.isSpecial;
+    }
+
+    public StatBase func_150953_b(Class p_150953_1_)
+    {
+        return this.func_180787_a(p_150953_1_);
+    }
+
+    /**
+     * Register the stat into StatList.
+     */
+    public StatBase registerStat()
+    {
+        return this.func_180788_c();
+    }
+
+    /**
+     * Initializes the current stat as independent (i.e., lacking prerequisites for being updated) and returns the
+     * current instance.
+     */
+    public StatBase initIndependentStat()
+    {
+        return this.func_180789_a();
     }
 }

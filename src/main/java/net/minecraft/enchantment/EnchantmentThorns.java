@@ -10,6 +10,8 @@ import net.minecraft.util.ResourceLocation;
 
 public class EnchantmentThorns extends Enchantment
 {
+    
+
     public EnchantmentThorns(int p_i45764_1_, ResourceLocation p_i45764_2_, int p_i45764_3_)
     {
         super(p_i45764_1_, p_i45764_2_, p_i45764_3_, EnumEnchantmentType.ARMOR_TORSO);
@@ -19,17 +21,17 @@ public class EnchantmentThorns extends Enchantment
     /**
      * Returns the minimal value of enchantability needed on the enchantment level passed.
      */
-    public int getMinEnchantability(int enchantmentLevel)
+    public int getMinEnchantability(int p_77321_1_)
     {
-        return 10 + 20 * (enchantmentLevel - 1);
+        return 10 + 20 * (p_77321_1_ - 1);
     }
 
     /**
      * Returns the maximum value of enchantability nedded on the enchantment level passed.
      */
-    public int getMaxEnchantability(int enchantmentLevel)
+    public int getMaxEnchantability(int p_77317_1_)
     {
-        return super.getMinEnchantability(enchantmentLevel) + 50;
+        return super.getMinEnchantability(p_77317_1_) + 50;
     }
 
     /**
@@ -40,39 +42,29 @@ public class EnchantmentThorns extends Enchantment
         return 3;
     }
 
-    /**
-     * Determines if this enchantment can be applied to a specific ItemStack.
-     */
-    public boolean canApply(ItemStack stack)
+    public boolean canApply(ItemStack p_92089_1_)
     {
-        return stack.getItem() instanceof ItemArmor ? true : super.canApply(stack);
+        return p_92089_1_.getItem() instanceof ItemArmor ? true : super.canApply(p_92089_1_);
     }
 
-    /**
-     * Whenever an entity that has this enchantment on one of its associated items is damaged this method will be
-     * called.
-     */
-    public void onUserHurt(EntityLivingBase user, Entity attacker, int level)
+    public void func_151367_b(EntityLivingBase p_151367_1_, Entity p_151367_2_, int p_151367_3_)
     {
-        Random random = user.getRNG();
-        ItemStack itemstack = EnchantmentHelper.getEnchantedItem(Enchantment.thorns, user);
+        Random var4 = p_151367_1_.getRNG();
+        ItemStack var5 = EnchantmentHelper.func_92099_a(Enchantment.thorns, p_151367_1_);
 
-        if (func_92094_a(level, random))
+        if (func_92094_a(p_151367_3_, var4))
         {
-            if (attacker != null)
-            {
-                attacker.attackEntityFrom(DamageSource.causeThornsDamage(user), (float)func_92095_b(level, random));
-                attacker.playSound("damage.thorns", 0.5F, 1.0F);
-            }
+            p_151367_2_.attackEntityFrom(DamageSource.causeThornsDamage(p_151367_1_), (float)func_92095_b(p_151367_3_, var4));
+            p_151367_2_.playSound("damage.thorns", 0.5F, 1.0F);
 
-            if (itemstack != null)
+            if (var5 != null)
             {
-                itemstack.damageItem(3, user);
+                var5.damageItem(3, p_151367_1_);
             }
         }
-        else if (itemstack != null)
+        else if (var5 != null)
         {
-            itemstack.damageItem(1, user);
+            var5.damageItem(1, p_151367_1_);
         }
     }
 

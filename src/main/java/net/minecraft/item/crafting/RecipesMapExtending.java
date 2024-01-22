@@ -9,6 +9,8 @@ import net.minecraft.world.storage.MapData;
 
 public class RecipesMapExtending extends ShapedRecipes
 {
+    
+
     public RecipesMapExtending()
     {
         super(3, 3, new ItemStack[] {new ItemStack(Items.paper), new ItemStack(Items.paper), new ItemStack(Items.paper), new ItemStack(Items.paper), new ItemStack(Items.filled_map, 0, 32767), new ItemStack(Items.paper), new ItemStack(Items.paper), new ItemStack(Items.paper), new ItemStack(Items.paper)}, new ItemStack(Items.map, 0, 0));
@@ -17,34 +19,34 @@ public class RecipesMapExtending extends ShapedRecipes
     /**
      * Used to check if a recipe matches current crafting inventory
      */
-    public boolean matches(InventoryCrafting inv, World worldIn)
+    public boolean matches(InventoryCrafting p_77569_1_, World worldIn)
     {
-        if (!super.matches(inv, worldIn))
+        if (!super.matches(p_77569_1_, worldIn))
         {
             return false;
         }
         else
         {
-            ItemStack itemstack = null;
+            ItemStack var3 = null;
 
-            for (int i = 0; i < inv.getSizeInventory() && itemstack == null; ++i)
+            for (int var4 = 0; var4 < p_77569_1_.getSizeInventory() && var3 == null; ++var4)
             {
-                ItemStack itemstack1 = inv.getStackInSlot(i);
+                ItemStack var5 = p_77569_1_.getStackInSlot(var4);
 
-                if (itemstack1 != null && itemstack1.getItem() == Items.filled_map)
+                if (var5 != null && var5.getItem() == Items.filled_map)
                 {
-                    itemstack = itemstack1;
+                    var3 = var5;
                 }
             }
 
-            if (itemstack == null)
+            if (var3 == null)
             {
                 return false;
             }
             else
             {
-                MapData mapdata = Items.filled_map.getMapData(itemstack, worldIn);
-                return mapdata == null ? false : mapdata.scale < 4;
+                MapData var6 = Items.filled_map.getMapData(var3, worldIn);
+                return var6 == null ? false : var6.scale < 4;
             }
         }
     }
@@ -52,29 +54,29 @@ public class RecipesMapExtending extends ShapedRecipes
     /**
      * Returns an Item that is the result of this recipe
      */
-    public ItemStack getCraftingResult(InventoryCrafting inv)
+    public ItemStack getCraftingResult(InventoryCrafting p_77572_1_)
     {
-        ItemStack itemstack = null;
+        ItemStack var2 = null;
 
-        for (int i = 0; i < inv.getSizeInventory() && itemstack == null; ++i)
+        for (int var3 = 0; var3 < p_77572_1_.getSizeInventory() && var2 == null; ++var3)
         {
-            ItemStack itemstack1 = inv.getStackInSlot(i);
+            ItemStack var4 = p_77572_1_.getStackInSlot(var3);
 
-            if (itemstack1 != null && itemstack1.getItem() == Items.filled_map)
+            if (var4 != null && var4.getItem() == Items.filled_map)
             {
-                itemstack = itemstack1;
+                var2 = var4;
             }
         }
 
-        itemstack = itemstack.copy();
-        itemstack.stackSize = 1;
+        var2 = var2.copy();
+        var2.stackSize = 1;
 
-        if (itemstack.getTagCompound() == null)
+        if (var2.getTagCompound() == null)
         {
-            itemstack.setTagCompound(new NBTTagCompound());
+            var2.setTagCompound(new NBTTagCompound());
         }
 
-        itemstack.getTagCompound().setBoolean("map_is_scaling", true);
-        return itemstack;
+        var2.getTagCompound().setBoolean("map_is_scaling", true);
+        return var2;
     }
 }

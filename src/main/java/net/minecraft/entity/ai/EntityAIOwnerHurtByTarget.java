@@ -8,11 +8,12 @@ public class EntityAIOwnerHurtByTarget extends EntityAITarget
     EntityTameable theDefendingTameable;
     EntityLivingBase theOwnerAttacker;
     private int field_142051_e;
+    
 
-    public EntityAIOwnerHurtByTarget(EntityTameable theDefendingTameableIn)
+    public EntityAIOwnerHurtByTarget(EntityTameable p_i1667_1_)
     {
-        super(theDefendingTameableIn, false);
-        this.theDefendingTameable = theDefendingTameableIn;
+        super(p_i1667_1_, false);
+        this.theDefendingTameable = p_i1667_1_;
         this.setMutexBits(1);
     }
 
@@ -27,17 +28,17 @@ public class EntityAIOwnerHurtByTarget extends EntityAITarget
         }
         else
         {
-            EntityLivingBase entitylivingbase = this.theDefendingTameable.getOwner();
+            EntityLivingBase var1 = this.theDefendingTameable.func_180492_cm();
 
-            if (entitylivingbase == null)
+            if (var1 == null)
             {
                 return false;
             }
             else
             {
-                this.theOwnerAttacker = entitylivingbase.getAITarget();
-                int i = entitylivingbase.getRevengeTimer();
-                return i != this.field_142051_e && this.isSuitableTarget(this.theOwnerAttacker, false) && this.theDefendingTameable.shouldAttackEntity(this.theOwnerAttacker, entitylivingbase);
+                this.theOwnerAttacker = var1.getAITarget();
+                int var2 = var1.getRevengeTimer();
+                return var2 != this.field_142051_e && this.isSuitableTarget(this.theOwnerAttacker, false) && this.theDefendingTameable.func_142018_a(this.theOwnerAttacker, var1);
             }
         }
     }
@@ -48,11 +49,11 @@ public class EntityAIOwnerHurtByTarget extends EntityAITarget
     public void startExecuting()
     {
         this.taskOwner.setAttackTarget(this.theOwnerAttacker);
-        EntityLivingBase entitylivingbase = this.theDefendingTameable.getOwner();
+        EntityLivingBase var1 = this.theDefendingTameable.func_180492_cm();
 
-        if (entitylivingbase != null)
+        if (var1 != null)
         {
-            this.field_142051_e = entitylivingbase.getRevengeTimer();
+            this.field_142051_e = var1.getRevengeTimer();
         }
 
         super.startExecuting();

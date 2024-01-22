@@ -14,7 +14,7 @@ public class Material
     public static final Material leaves = (new Material(MapColor.foliageColor)).setBurning().setTranslucent().setNoPushMobility();
     public static final Material plants = (new MaterialLogic(MapColor.foliageColor)).setNoPushMobility();
     public static final Material vine = (new MaterialLogic(MapColor.foliageColor)).setBurning().setNoPushMobility().setReplaceable();
-    public static final Material sponge = new Material(MapColor.yellowColor);
+    public static final Material sponge = new Material(MapColor.clothColor);
     public static final Material cloth = (new Material(MapColor.clothColor)).setBurning();
     public static final Material fire = (new MaterialTransparent(MapColor.airColor)).setNoPushMobility();
     public static final Material sand = new Material(MapColor.sandColor);
@@ -38,6 +38,7 @@ public class Material
     public static final Material cake = (new Material(MapColor.airColor)).setNoPushMobility();
     public static final Material web = (new Material(MapColor.clothColor)
     {
+        
         public boolean blocksMovement()
         {
             return false;
@@ -74,10 +75,11 @@ public class Material
      */
     private int mobilityFlag;
     private boolean isAdventureModeExempt;
+    
 
-    public Material(MapColor color)
+    public Material(MapColor p_i2116_1_)
     {
-        this.materialMapColor = color;
+        this.materialMapColor = p_i2116_1_;
     }
 
     /**
@@ -88,9 +90,6 @@ public class Material
         return false;
     }
 
-    /**
-     * Returns true if the block is a considered solid. This is true by default.
-     */
     public boolean isSolid()
     {
         return true;
@@ -216,9 +215,6 @@ public class Material
         return this;
     }
 
-    /**
-     * Retrieves the color index of the block. This is is the same color used by vanilla maps to represent this block.
-     */
     public MapColor getMaterialMapColor()
     {
         return this.materialMapColor;

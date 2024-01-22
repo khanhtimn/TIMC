@@ -4,6 +4,7 @@ public class AnimationFrame
 {
     private final int frameIndex;
     private final int frameTime;
+    
 
     public AnimationFrame(int p_i1307_1_)
     {

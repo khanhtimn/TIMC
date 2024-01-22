@@ -1,37 +1,30 @@
 package net.minecraft.client.renderer;
 
-import net.optifine.SmartAnimations;
-
 public class Tessellator
 {
     private WorldRenderer worldRenderer;
-    private WorldVertexBufferUploader vboUploader = new WorldVertexBufferUploader();
+    private WorldVertexBufferUploader field_178182_b = new WorldVertexBufferUploader();
 
     /** The static instance of the Tessellator. */
-    private static final Tessellator instance = new Tessellator(2097152);
+    public static final Tessellator instance = new Tessellator(2097152);
+    
 
     public static Tessellator getInstance()
     {
         return instance;
     }
 
-    public Tessellator(int bufferSize)
+    public Tessellator(int p_i1250_1_)
     {
-        this.worldRenderer = new WorldRenderer(bufferSize);
+        this.worldRenderer = new WorldRenderer(p_i1250_1_);
     }
 
     /**
      * Draws the data set up in this tessellator and resets the state to prepare for new drawing.
      */
-    public void draw()
+    public int draw()
     {
-        if (this.worldRenderer.animatedSprites != null)
-        {
-            SmartAnimations.spritesRendered(this.worldRenderer.animatedSprites);
-        }
-
-        this.worldRenderer.finishDrawing();
-        this.vboUploader.draw(this.worldRenderer);
+        return this.field_178182_b.draw(this.worldRenderer, this.worldRenderer.draw());
     }
 
     public WorldRenderer getWorldRenderer()

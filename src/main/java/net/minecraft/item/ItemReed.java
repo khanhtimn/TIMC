@@ -12,31 +12,35 @@ import net.minecraft.world.World;
 
 public class ItemReed extends Item
 {
-    private Block block;
+    private Block field_150935_a;
+    
 
-    public ItemReed(Block block)
+    public ItemReed(Block p_i45329_1_)
     {
-        this.block = block;
+        this.field_150935_a = p_i45329_1_;
     }
 
     /**
      * Called when a Block is right-clicked with this Item
+     *  
+     * @param pos The block being right-clicked
+     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
-        IBlockState iblockstate = worldIn.getBlockState(pos);
-        Block block = iblockstate.getBlock();
+        IBlockState var9 = worldIn.getBlockState(pos);
+        Block var10 = var9.getBlock();
 
-        if (block == Blocks.snow_layer && ((Integer)iblockstate.getValue(BlockSnow.LAYERS)).intValue() < 1)
+        if (var10 == Blocks.snow_layer && ((Integer)var9.getValue(BlockSnow.LAYERS_PROP)).intValue() < 1)
         {
             side = EnumFacing.UP;
         }
-        else if (!block.isReplaceable(worldIn, pos))
+        else if (!var10.isReplaceable(worldIn, pos))
         {
             pos = pos.offset(side);
         }
 
-        if (!playerIn.canPlayerEdit(pos, side, stack))
+        if (!playerIn.func_175151_a(pos, side, stack))
         {
             return false;
         }
@@ -46,21 +50,21 @@ public class ItemReed extends Item
         }
         else
         {
-            if (worldIn.canBlockBePlaced(this.block, pos, false, side, (Entity)null, stack))
+            if (worldIn.canBlockBePlaced(this.field_150935_a, pos, false, side, (Entity)null, stack))
             {
-                IBlockState iblockstate1 = this.block.onBlockPlaced(worldIn, pos, side, hitX, hitY, hitZ, 0, playerIn);
+                IBlockState var11 = this.field_150935_a.onBlockPlaced(worldIn, pos, side, hitX, hitY, hitZ, 0, playerIn);
 
-                if (worldIn.setBlockState(pos, iblockstate1, 3))
+                if (worldIn.setBlockState(pos, var11, 3))
                 {
-                    iblockstate1 = worldIn.getBlockState(pos);
+                    var11 = worldIn.getBlockState(pos);
 
-                    if (iblockstate1.getBlock() == this.block)
+                    if (var11.getBlock() == this.field_150935_a)
                     {
-                        ItemBlock.setTileEntityNBT(worldIn, playerIn, pos, stack);
-                        iblockstate1.getBlock().onBlockPlacedBy(worldIn, pos, iblockstate1, playerIn, stack);
+                        ItemBlock.setTileEntityNBT(worldIn, pos, stack);
+                        var11.getBlock().onBlockPlacedBy(worldIn, pos, var11, playerIn, stack);
                     }
 
-                    worldIn.playSoundEffect((double)((float)pos.getX() + 0.5F), (double)((float)pos.getY() + 0.5F), (double)((float)pos.getZ() + 0.5F), this.block.stepSound.getPlaceSound(), (this.block.stepSound.getVolume() + 1.0F) / 2.0F, this.block.stepSound.getFrequency() * 0.8F);
+                    worldIn.playSoundEffect((double)((float)pos.getX() + 0.5F), (double)((float)pos.getY() + 0.5F), (double)((float)pos.getZ() + 0.5F), this.field_150935_a.stepSound.getPlaceSound(), (this.field_150935_a.stepSound.getVolume() + 1.0F) / 2.0F, this.field_150935_a.stepSound.getFrequency() * 0.8F);
                     --stack.stackSize;
                     return true;
                 }

@@ -1,189 +1,162 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
+import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.util.EnumParticleTypes;
 
-public class S2APacketParticles implements Packet<INetHandlerPlayClient>
+public class S2APacketParticles implements Packet
 {
-    private EnumParticleTypes particleType;
-    private float xCoord;
-    private float yCoord;
-    private float zCoord;
-    private float xOffset;
-    private float yOffset;
-    private float zOffset;
-    private float particleSpeed;
-    private int particleCount;
-    private boolean longDistance;
+    private EnumParticleTypes field_179751_a;
+    private float field_149234_b;
+    private float field_149235_c;
+    private float field_149232_d;
+    private float field_149233_e;
+    private float field_149230_f;
+    private float field_149231_g;
+    private float field_149237_h;
+    private int field_149238_i;
+    private boolean field_179752_j;
+    private int[] field_179753_k;
+    
 
-    /**
-     * These are the block/item ids and possibly metaData ids that are used to color or texture the particle.
-     */
-    private int[] particleArguments;
+    public S2APacketParticles() {}
 
-    public S2APacketParticles()
+    public S2APacketParticles(EnumParticleTypes p_i45977_1_, boolean p_i45977_2_, float p_i45977_3_, float p_i45977_4_, float p_i45977_5_, float p_i45977_6_, float p_i45977_7_, float p_i45977_8_, float p_i45977_9_, int p_i45977_10_, int ... p_i45977_11_)
     {
-    }
-
-    public S2APacketParticles(EnumParticleTypes particleTypeIn, boolean longDistanceIn, float x, float y, float z, float xOffsetIn, float yOffset, float zOffset, float particleSpeedIn, int particleCountIn, int... particleArgumentsIn)
-    {
-        this.particleType = particleTypeIn;
-        this.longDistance = longDistanceIn;
-        this.xCoord = x;
-        this.yCoord = y;
-        this.zCoord = z;
-        this.xOffset = xOffsetIn;
-        this.yOffset = yOffset;
-        this.zOffset = zOffset;
-        this.particleSpeed = particleSpeedIn;
-        this.particleCount = particleCountIn;
-        this.particleArguments = particleArgumentsIn;
+        this.field_179751_a = p_i45977_1_;
+        this.field_179752_j = p_i45977_2_;
+        this.field_149234_b = p_i45977_3_;
+        this.field_149235_c = p_i45977_4_;
+        this.field_149232_d = p_i45977_5_;
+        this.field_149233_e = p_i45977_6_;
+        this.field_149230_f = p_i45977_7_;
+        this.field_149231_g = p_i45977_8_;
+        this.field_149237_h = p_i45977_9_;
+        this.field_149238_i = p_i45977_10_;
+        this.field_179753_k = p_i45977_11_;
     }
 
     /**
      * Reads the raw packet data from the data stream.
      */
-    public void readPacketData(PacketBuffer buf) throws IOException
+    public void readPacketData(PacketBuffer data) throws IOException
     {
-        this.particleType = EnumParticleTypes.getParticleFromId(buf.readInt());
+        this.field_179751_a = EnumParticleTypes.func_179342_a(data.readInt());
 
-        if (this.particleType == null)
+        if (this.field_179751_a == null)
         {
-            this.particleType = EnumParticleTypes.BARRIER;
+            this.field_179751_a = EnumParticleTypes.BARRIER;
         }
 
-        this.longDistance = buf.readBoolean();
-        this.xCoord = buf.readFloat();
-        this.yCoord = buf.readFloat();
-        this.zCoord = buf.readFloat();
-        this.xOffset = buf.readFloat();
-        this.yOffset = buf.readFloat();
-        this.zOffset = buf.readFloat();
-        this.particleSpeed = buf.readFloat();
-        this.particleCount = buf.readInt();
-        int i = this.particleType.getArgumentCount();
-        this.particleArguments = new int[i];
+        this.field_179752_j = data.readBoolean();
+        this.field_149234_b = data.readFloat();
+        this.field_149235_c = data.readFloat();
+        this.field_149232_d = data.readFloat();
+        this.field_149233_e = data.readFloat();
+        this.field_149230_f = data.readFloat();
+        this.field_149231_g = data.readFloat();
+        this.field_149237_h = data.readFloat();
+        this.field_149238_i = data.readInt();
+        int var2 = this.field_179751_a.func_179345_d();
+        this.field_179753_k = new int[var2];
 
-        for (int j = 0; j < i; ++j)
+        for (int var3 = 0; var3 < var2; ++var3)
         {
-            this.particleArguments[j] = buf.readVarIntFromBuffer();
+            this.field_179753_k[var3] = data.readVarIntFromBuffer();
         }
     }
 
     /**
      * Writes the raw packet data to the data stream.
      */
-    public void writePacketData(PacketBuffer buf) throws IOException
+    public void writePacketData(PacketBuffer data) throws IOException
     {
-        buf.writeInt(this.particleType.getParticleID());
-        buf.writeBoolean(this.longDistance);
-        buf.writeFloat(this.xCoord);
-        buf.writeFloat(this.yCoord);
-        buf.writeFloat(this.zCoord);
-        buf.writeFloat(this.xOffset);
-        buf.writeFloat(this.yOffset);
-        buf.writeFloat(this.zOffset);
-        buf.writeFloat(this.particleSpeed);
-        buf.writeInt(this.particleCount);
-        int i = this.particleType.getArgumentCount();
+        data.writeInt(this.field_179751_a.func_179348_c());
+        data.writeBoolean(this.field_179752_j);
+        data.writeFloat(this.field_149234_b);
+        data.writeFloat(this.field_149235_c);
+        data.writeFloat(this.field_149232_d);
+        data.writeFloat(this.field_149233_e);
+        data.writeFloat(this.field_149230_f);
+        data.writeFloat(this.field_149231_g);
+        data.writeFloat(this.field_149237_h);
+        data.writeInt(this.field_149238_i);
+        int var2 = this.field_179751_a.func_179345_d();
 
-        for (int j = 0; j < i; ++j)
+        for (int var3 = 0; var3 < var2; ++var3)
         {
-            buf.writeVarIntToBuffer(this.particleArguments[j]);
+            data.writeVarIntToBuffer(this.field_179753_k[var3]);
         }
     }
 
-    public EnumParticleTypes getParticleType()
+    public EnumParticleTypes func_179749_a()
     {
-        return this.particleType;
+        return this.field_179751_a;
     }
 
-    public boolean isLongDistance()
+    public boolean func_179750_b()
     {
-        return this.longDistance;
+        return this.field_179752_j;
     }
 
-    /**
-     * Gets the x coordinate to spawn the particle.
-     */
-    public double getXCoordinate()
+    public double func_149220_d()
     {
-        return (double)this.xCoord;
+        return (double)this.field_149234_b;
     }
 
-    /**
-     * Gets the y coordinate to spawn the particle.
-     */
-    public double getYCoordinate()
+    public double func_149226_e()
     {
-        return (double)this.yCoord;
+        return (double)this.field_149235_c;
     }
 
-    /**
-     * Gets the z coordinate to spawn the particle.
-     */
-    public double getZCoordinate()
+    public double func_149225_f()
     {
-        return (double)this.zCoord;
+        return (double)this.field_149232_d;
     }
 
-    /**
-     * Gets the x coordinate offset for the particle. The particle may use the offset for particle spread.
-     */
-    public float getXOffset()
+    public float func_149221_g()
     {
-        return this.xOffset;
+        return this.field_149233_e;
     }
 
-    /**
-     * Gets the y coordinate offset for the particle. The particle may use the offset for particle spread.
-     */
-    public float getYOffset()
+    public float func_149224_h()
     {
-        return this.yOffset;
+        return this.field_149230_f;
     }
 
-    /**
-     * Gets the z coordinate offset for the particle. The particle may use the offset for particle spread.
-     */
-    public float getZOffset()
+    public float func_149223_i()
     {
-        return this.zOffset;
+        return this.field_149231_g;
     }
 
-    /**
-     * Gets the speed of the particle animation (used in client side rendering).
-     */
-    public float getParticleSpeed()
+    public float func_149227_j()
     {
-        return this.particleSpeed;
+        return this.field_149237_h;
     }
 
-    /**
-     * Gets the amount of particles to spawn
-     */
-    public int getParticleCount()
+    public int func_149222_k()
     {
-        return this.particleCount;
+        return this.field_149238_i;
     }
 
-    /**
-     * Gets the particle arguments. Some particles rely on block and/or item ids and sometimes metadata ids to color or
-     * texture the particle.
-     */
-    public int[] getParticleArgs()
+    public int[] func_179748_k()
     {
-        return this.particleArguments;
+        return this.field_179753_k;
+    }
+
+    public void func_180740_a(INetHandlerPlayClient p_180740_1_)
+    {
+        p_180740_1_.handleParticles(this);
     }
 
     /**
      * Passes this Packet on to the NetHandler for processing.
      */
-    public void processPacket(INetHandlerPlayClient handler)
+    public void processPacket(INetHandler handler)
     {
-        handler.handleParticles(this);
+        this.func_180740_a((INetHandlerPlayClient)handler);
     }
 }

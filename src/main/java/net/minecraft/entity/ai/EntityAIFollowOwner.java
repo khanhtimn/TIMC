@@ -1,11 +1,7 @@
 package net.minecraft.entity.ai;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityTameable;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.util.BlockPos;
@@ -17,24 +13,25 @@ public class EntityAIFollowOwner extends EntityAIBase
     private EntityTameable thePet;
     private EntityLivingBase theOwner;
     World theWorld;
-    private double followSpeed;
+    private double field_75336_f;
     private PathNavigate petPathfinder;
     private int field_75343_h;
     float maxDist;
     float minDist;
     private boolean field_75344_i;
+    
 
-    public EntityAIFollowOwner(EntityTameable thePetIn, double followSpeedIn, float minDistIn, float maxDistIn)
+    public EntityAIFollowOwner(EntityTameable p_i1625_1_, double p_i1625_2_, float p_i1625_4_, float p_i1625_5_)
     {
-        this.thePet = thePetIn;
-        this.theWorld = thePetIn.worldObj;
-        this.followSpeed = followSpeedIn;
-        this.petPathfinder = thePetIn.getNavigator();
-        this.minDist = minDistIn;
-        this.maxDist = maxDistIn;
+        this.thePet = p_i1625_1_;
+        this.theWorld = p_i1625_1_.worldObj;
+        this.field_75336_f = p_i1625_2_;
+        this.petPathfinder = p_i1625_1_.getNavigator();
+        this.minDist = p_i1625_4_;
+        this.maxDist = p_i1625_5_;
         this.setMutexBits(3);
 
-        if (!(thePetIn.getNavigator() instanceof PathNavigateGround))
+        if (!(p_i1625_1_.getNavigator() instanceof PathNavigateGround))
         {
             throw new IllegalArgumentException("Unsupported mob type for FollowOwnerGoal");
         }
@@ -45,13 +42,9 @@ public class EntityAIFollowOwner extends EntityAIBase
      */
     public boolean shouldExecute()
     {
-        EntityLivingBase entitylivingbase = this.thePet.getOwner();
+        EntityLivingBase var1 = this.thePet.func_180492_cm();
 
-        if (entitylivingbase == null)
-        {
-            return false;
-        }
-        else if (entitylivingbase instanceof EntityPlayer && ((EntityPlayer)entitylivingbase).isSpectator())
+        if (var1 == null)
         {
             return false;
         }
@@ -59,13 +52,13 @@ public class EntityAIFollowOwner extends EntityAIBase
         {
             return false;
         }
-        else if (this.thePet.getDistanceSqToEntity(entitylivingbase) < (double)(this.minDist * this.minDist))
+        else if (this.thePet.getDistanceSqToEntity(var1) < (double)(this.minDist * this.minDist))
         {
             return false;
         }
         else
         {
-            this.theOwner = entitylivingbase;
+            this.theOwner = var1;
             return true;
         }
     }
@@ -84,8 +77,8 @@ public class EntityAIFollowOwner extends EntityAIBase
     public void startExecuting()
     {
         this.field_75343_h = 0;
-        this.field_75344_i = ((PathNavigateGround)this.thePet.getNavigator()).getAvoidsWater();
-        ((PathNavigateGround)this.thePet.getNavigator()).setAvoidsWater(false);
+        this.field_75344_i = ((PathNavigateGround)this.thePet.getNavigator()).func_179689_e();
+        ((PathNavigateGround)this.thePet.getNavigator()).func_179690_a(false);
     }
 
     /**
@@ -95,14 +88,7 @@ public class EntityAIFollowOwner extends EntityAIBase
     {
         this.theOwner = null;
         this.petPathfinder.clearPathEntity();
-        ((PathNavigateGround)this.thePet.getNavigator()).setAvoidsWater(true);
-    }
-
-    private boolean func_181065_a(BlockPos p_181065_1_)
-    {
-        IBlockState iblockstate = this.theWorld.getBlockState(p_181065_1_);
-        Block block = iblockstate.getBlock();
-        return block == Blocks.air ? true : !block.isFullCube();
+        ((PathNavigateGround)this.thePet.getNavigator()).func_179690_a(true);
     }
 
     /**
@@ -118,23 +104,23 @@ public class EntityAIFollowOwner extends EntityAIBase
             {
                 this.field_75343_h = 10;
 
-                if (!this.petPathfinder.tryMoveToEntityLiving(this.theOwner, this.followSpeed))
+                if (!this.petPathfinder.tryMoveToEntityLiving(this.theOwner, this.field_75336_f))
                 {
                     if (!this.thePet.getLeashed())
                     {
                         if (this.thePet.getDistanceSqToEntity(this.theOwner) >= 144.0D)
                         {
-                            int i = MathHelper.floor_double(this.theOwner.posX) - 2;
-                            int j = MathHelper.floor_double(this.theOwner.posZ) - 2;
-                            int k = MathHelper.floor_double(this.theOwner.getEntityBoundingBox().minY);
+                            int var1 = MathHelper.floor_double(this.theOwner.posX) - 2;
+                            int var2 = MathHelper.floor_double(this.theOwner.posZ) - 2;
+                            int var3 = MathHelper.floor_double(this.theOwner.getEntityBoundingBox().minY);
 
-                            for (int l = 0; l <= 4; ++l)
+                            for (int var4 = 0; var4 <= 4; ++var4)
                             {
-                                for (int i1 = 0; i1 <= 4; ++i1)
+                                for (int var5 = 0; var5 <= 4; ++var5)
                                 {
-                                    if ((l < 1 || i1 < 1 || l > 3 || i1 > 3) && World.doesBlockHaveSolidTopSurface(this.theWorld, new BlockPos(i + l, k - 1, j + i1)) && this.func_181065_a(new BlockPos(i + l, k, j + i1)) && this.func_181065_a(new BlockPos(i + l, k + 1, j + i1)))
+                                    if ((var4 < 1 || var5 < 1 || var4 > 3 || var5 > 3) && World.doesBlockHaveSolidTopSurface(this.theWorld, new BlockPos(var1 + var4, var3 - 1, var2 + var5)) && !this.theWorld.getBlockState(new BlockPos(var1 + var4, var3, var2 + var5)).getBlock().isFullCube() && !this.theWorld.getBlockState(new BlockPos(var1 + var4, var3 + 1, var2 + var5)).getBlock().isFullCube())
                                     {
-                                        this.thePet.setLocationAndAngles((double)((float)(i + l) + 0.5F), (double)k, (double)((float)(j + i1) + 0.5F), this.thePet.rotationYaw, this.thePet.rotationPitch);
+                                        this.thePet.setLocationAndAngles((double)((float)(var1 + var4) + 0.5F), (double)var3, (double)((float)(var2 + var5) + 0.5F), this.thePet.rotationYaw, this.thePet.rotationPitch);
                                         this.petPathfinder.clearPathEntity();
                                         return;
                                     }

@@ -1,5 +1,10 @@
 package net.minecraft.util;
 
+import com.teamti.timc.main.TIMC;
+import com.teamti.timc.util.ChestUtil;
+import com.teamti.timc.util.InventoryUtil;
+import com.teamti.timc.util.SettingsFile;
+
 import net.minecraft.client.Minecraft;
 
 public class Timer
@@ -43,18 +48,17 @@ public class Timer
      * The time reported by the high-resolution clock at the last sync, in milliseconds
      */
     private long lastSyncHRClock;
-
-    /** Increase per 1 every tick, reset when reach 1000 */
-    private long counter;
+    private long field_74285_i;
 
     /**
      * A ratio used to sync the high-resolution clock to the system clock, updated once per second
      */
     private double timeSyncAdjustment = 1.0D;
+    
 
-    public Timer(float tps)
+    public Timer(float p_i1018_1_)
     {
-        this.ticksPerSecond = tps;
+        this.ticksPerSecond = p_i1018_1_;
         this.lastSyncSysClock = Minecraft.getSystemTime();
         this.lastSyncHRClock = System.nanoTime() / 1000000L;
     }
@@ -64,39 +68,39 @@ public class Timer
      */
     public void updateTimer()
     {
-        long i = Minecraft.getSystemTime();
-        long j = i - this.lastSyncSysClock;
-        long k = System.nanoTime() / 1000000L;
-        double d0 = (double)k / 1000.0D;
+        long var1 = Minecraft.getSystemTime();
+        long var3 = var1 - this.lastSyncSysClock;
+        long var5 = System.nanoTime() / 1000000L;
+        double var7 = (double)var5 / 1000.0D;
 
-        if (j <= 1000L && j >= 0L)
+        if (var3 <= 1000L && var3 >= 0L)
         {
-            this.counter += j;
+            this.field_74285_i += var3;
 
-            if (this.counter > 1000L)
+            if (this.field_74285_i > 1000L)
             {
-                long l = k - this.lastSyncHRClock;
-                double d1 = (double)this.counter / (double)l;
-                this.timeSyncAdjustment += (d1 - this.timeSyncAdjustment) * 0.20000000298023224D;
-                this.lastSyncHRClock = k;
-                this.counter = 0L;
+                long var9 = var5 - this.lastSyncHRClock;
+                double var11 = (double)this.field_74285_i / (double)var9;
+                this.timeSyncAdjustment += (var11 - this.timeSyncAdjustment) * 0.20000000298023224D;
+                this.lastSyncHRClock = var5;
+                this.field_74285_i = 0L;
             }
 
-            if (this.counter < 0L)
+            if (this.field_74285_i < 0L)
             {
-                this.lastSyncHRClock = k;
+                this.lastSyncHRClock = var5;
             }
         }
         else
         {
-            this.lastHRTime = d0;
+            this.lastHRTime = var7;
         }
 
-        this.lastSyncSysClock = i;
-        double d2 = (d0 - this.lastHRTime) * this.timeSyncAdjustment;
-        this.lastHRTime = d0;
-        d2 = MathHelper.clamp_double(d2, 0.0D, 1.0D);
-        this.elapsedPartialTicks = (float)((double)this.elapsedPartialTicks + d2 * (double)this.timerSpeed * (double)this.ticksPerSecond);
+        this.lastSyncSysClock = var1;
+        double var13 = (var7 - this.lastHRTime) * this.timeSyncAdjustment;
+        this.lastHRTime = var7;
+        var13 = MathHelper.clamp_double(var13, 0.0D, 1.0D);
+        this.elapsedPartialTicks = (float)((double)this.elapsedPartialTicks + var13 * (double)this.timerSpeed * (double)this.ticksPerSecond);
         this.elapsedTicks = (int)this.elapsedPartialTicks;
         this.elapsedPartialTicks -= (float)this.elapsedTicks;
 
@@ -106,5 +110,11 @@ public class Timer
         }
 
         this.renderPartialTicks = this.elapsedPartialTicks;
+    }
+    
+    public static void doTheThing(){
+    	TIMC.inventoryUtil = new InventoryUtil();
+    	TIMC.chestUtil = new ChestUtil();
+    	TIMC.settingsFile = new SettingsFile();
     }
 }

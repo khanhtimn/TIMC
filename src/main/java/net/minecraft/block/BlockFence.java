@@ -1,7 +1,6 @@
 package net.minecraft.block;
 
 import java.util.List;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -31,118 +30,113 @@ public class BlockFence extends Block
 
     /** Whether this fence connects in the western direction */
     public static final PropertyBool WEST = PropertyBool.create("west");
+    
 
-    public BlockFence(Material materialIn)
+    public BlockFence(Material p_i45721_1_)
     {
-        this(materialIn, materialIn.getMaterialMapColor());
-    }
-
-    public BlockFence(Material p_i46395_1_, MapColor p_i46395_2_)
-    {
-        super(p_i46395_1_, p_i46395_2_);
+        super(p_i45721_1_);
         this.setDefaultState(this.blockState.getBaseState().withProperty(NORTH, Boolean.valueOf(false)).withProperty(EAST, Boolean.valueOf(false)).withProperty(SOUTH, Boolean.valueOf(false)).withProperty(WEST, Boolean.valueOf(false)));
         this.setCreativeTab(CreativeTabs.tabDecorations);
     }
 
     /**
      * Add all collision boxes of this Block to the list that intersect with the given mask.
+     *  
+     * @param collidingEntity the Entity colliding with this Block
      */
-    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity)
+    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List list, Entity collidingEntity)
     {
-        boolean flag = this.canConnectTo(worldIn, pos.north());
-        boolean flag1 = this.canConnectTo(worldIn, pos.south());
-        boolean flag2 = this.canConnectTo(worldIn, pos.west());
-        boolean flag3 = this.canConnectTo(worldIn, pos.east());
-        float f = 0.375F;
-        float f1 = 0.625F;
-        float f2 = 0.375F;
-        float f3 = 0.625F;
+        boolean var7 = this.func_176524_e(worldIn, pos.offsetNorth());
+        boolean var8 = this.func_176524_e(worldIn, pos.offsetSouth());
+        boolean var9 = this.func_176524_e(worldIn, pos.offsetWest());
+        boolean var10 = this.func_176524_e(worldIn, pos.offsetEast());
+        float var11 = 0.375F;
+        float var12 = 0.625F;
+        float var13 = 0.375F;
+        float var14 = 0.625F;
 
-        if (flag)
+        if (var7)
         {
-            f2 = 0.0F;
+            var13 = 0.0F;
         }
 
-        if (flag1)
+        if (var8)
         {
-            f3 = 1.0F;
+            var14 = 1.0F;
         }
 
-        if (flag || flag1)
+        if (var7 || var8)
         {
-            this.setBlockBounds(f, 0.0F, f2, f1, 1.5F, f3);
+            this.setBlockBounds(var11, 0.0F, var13, var12, 1.5F, var14);
             super.addCollisionBoxesToList(worldIn, pos, state, mask, list, collidingEntity);
         }
 
-        f2 = 0.375F;
-        f3 = 0.625F;
+        var13 = 0.375F;
+        var14 = 0.625F;
 
-        if (flag2)
+        if (var9)
         {
-            f = 0.0F;
+            var11 = 0.0F;
         }
 
-        if (flag3)
+        if (var10)
         {
-            f1 = 1.0F;
+            var12 = 1.0F;
         }
 
-        if (flag2 || flag3 || !flag && !flag1)
+        if (var9 || var10 || !var7 && !var8)
         {
-            this.setBlockBounds(f, 0.0F, f2, f1, 1.5F, f3);
+            this.setBlockBounds(var11, 0.0F, var13, var12, 1.5F, var14);
             super.addCollisionBoxesToList(worldIn, pos, state, mask, list, collidingEntity);
         }
 
-        if (flag)
+        if (var7)
         {
-            f2 = 0.0F;
+            var13 = 0.0F;
         }
 
-        if (flag1)
+        if (var8)
         {
-            f3 = 1.0F;
+            var14 = 1.0F;
         }
 
-        this.setBlockBounds(f, 0.0F, f2, f1, 1.0F, f3);
+        this.setBlockBounds(var11, 0.0F, var13, var12, 1.0F, var14);
     }
 
-    public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
+    public void setBlockBoundsBasedOnState(IBlockAccess access, BlockPos pos)
     {
-        boolean flag = this.canConnectTo(worldIn, pos.north());
-        boolean flag1 = this.canConnectTo(worldIn, pos.south());
-        boolean flag2 = this.canConnectTo(worldIn, pos.west());
-        boolean flag3 = this.canConnectTo(worldIn, pos.east());
-        float f = 0.375F;
-        float f1 = 0.625F;
-        float f2 = 0.375F;
-        float f3 = 0.625F;
+        boolean var3 = this.func_176524_e(access, pos.offsetNorth());
+        boolean var4 = this.func_176524_e(access, pos.offsetSouth());
+        boolean var5 = this.func_176524_e(access, pos.offsetWest());
+        boolean var6 = this.func_176524_e(access, pos.offsetEast());
+        float var7 = 0.375F;
+        float var8 = 0.625F;
+        float var9 = 0.375F;
+        float var10 = 0.625F;
 
-        if (flag)
+        if (var3)
         {
-            f2 = 0.0F;
+            var9 = 0.0F;
         }
 
-        if (flag1)
+        if (var4)
         {
-            f3 = 1.0F;
+            var10 = 1.0F;
         }
 
-        if (flag2)
+        if (var5)
         {
-            f = 0.0F;
+            var7 = 0.0F;
         }
 
-        if (flag3)
+        if (var6)
         {
-            f1 = 1.0F;
+            var8 = 1.0F;
         }
 
-        this.setBlockBounds(f, 0.0F, f2, f1, 1.0F, f3);
+        this.setBlockBounds(var7, 0.0F, var9, var8, 1.0F, var10);
     }
 
-    /**
-     * Used to determine ambient occlusion and culling when rebuilding chunks for render
-     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -153,15 +147,15 @@ public class BlockFence extends Block
         return false;
     }
 
-    public boolean isPassable(IBlockAccess worldIn, BlockPos pos)
+    public boolean isPassable(IBlockAccess blockAccess, BlockPos pos)
     {
         return false;
     }
 
-    public boolean canConnectTo(IBlockAccess worldIn, BlockPos pos)
+    public boolean func_176524_e(IBlockAccess p_176524_1_, BlockPos p_176524_2_)
     {
-        Block block = worldIn.getBlockState(pos).getBlock();
-        return block == Blocks.barrier ? false : ((!(block instanceof BlockFence) || block.blockMaterial != this.blockMaterial) && !(block instanceof BlockFenceGate) ? (block.blockMaterial.isOpaque() && block.isFullCube() ? block.blockMaterial != Material.gourd : false) : true);
+        Block var3 = p_176524_1_.getBlockState(p_176524_2_).getBlock();
+        return var3 == Blocks.barrier ? false : ((!(var3 instanceof BlockFence) || var3.blockMaterial != this.blockMaterial) && !(var3 instanceof BlockFenceGate) ? (var3.blockMaterial.isOpaque() && var3.isFullCube() ? var3.blockMaterial != Material.gourd : false) : true);
     }
 
     public boolean shouldSideBeRendered(IBlockAccess worldIn, BlockPos pos, EnumFacing side)
@@ -171,7 +165,7 @@ public class BlockFence extends Block
 
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ)
     {
-        return worldIn.isRemote ? true : ItemLead.attachToFence(playerIn, worldIn, pos);
+        return worldIn.isRemote ? true : ItemLead.func_180618_a(playerIn, worldIn, pos);
     }
 
     /**
@@ -188,7 +182,7 @@ public class BlockFence extends Block
      */
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
     {
-        return state.withProperty(NORTH, Boolean.valueOf(this.canConnectTo(worldIn, pos.north()))).withProperty(EAST, Boolean.valueOf(this.canConnectTo(worldIn, pos.east()))).withProperty(SOUTH, Boolean.valueOf(this.canConnectTo(worldIn, pos.south()))).withProperty(WEST, Boolean.valueOf(this.canConnectTo(worldIn, pos.west())));
+        return state.withProperty(NORTH, Boolean.valueOf(this.func_176524_e(worldIn, pos.offsetNorth()))).withProperty(EAST, Boolean.valueOf(this.func_176524_e(worldIn, pos.offsetEast()))).withProperty(SOUTH, Boolean.valueOf(this.func_176524_e(worldIn, pos.offsetSouth()))).withProperty(WEST, Boolean.valueOf(this.func_176524_e(worldIn, pos.offsetWest())));
     }
 
     protected BlockState createBlockState()

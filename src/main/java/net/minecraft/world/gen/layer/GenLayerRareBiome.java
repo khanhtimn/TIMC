@@ -4,6 +4,8 @@ import net.minecraft.world.biome.BiomeGenBase;
 
 public class GenLayerRareBiome extends GenLayer
 {
+    
+
     public GenLayerRareBiome(long p_i45478_1_, GenLayer p_i45478_3_)
     {
         super(p_i45478_1_);
@@ -16,34 +18,34 @@ public class GenLayerRareBiome extends GenLayer
      */
     public int[] getInts(int areaX, int areaY, int areaWidth, int areaHeight)
     {
-        int[] aint = this.parent.getInts(areaX - 1, areaY - 1, areaWidth + 2, areaHeight + 2);
-        int[] aint1 = IntCache.getIntCache(areaWidth * areaHeight);
+        int[] var5 = this.parent.getInts(areaX - 1, areaY - 1, areaWidth + 2, areaHeight + 2);
+        int[] var6 = IntCache.getIntCache(areaWidth * areaHeight);
 
-        for (int i = 0; i < areaHeight; ++i)
+        for (int var7 = 0; var7 < areaHeight; ++var7)
         {
-            for (int j = 0; j < areaWidth; ++j)
+            for (int var8 = 0; var8 < areaWidth; ++var8)
             {
-                this.initChunkSeed((long)(j + areaX), (long)(i + areaY));
-                int k = aint[j + 1 + (i + 1) * (areaWidth + 2)];
+                this.initChunkSeed((long)(var8 + areaX), (long)(var7 + areaY));
+                int var9 = var5[var8 + 1 + (var7 + 1) * (areaWidth + 2)];
 
                 if (this.nextInt(57) == 0)
                 {
-                    if (k == BiomeGenBase.plains.biomeID)
+                    if (var9 == BiomeGenBase.plains.biomeID)
                     {
-                        aint1[j + i * areaWidth] = BiomeGenBase.plains.biomeID + 128;
+                        var6[var8 + var7 * areaWidth] = BiomeGenBase.plains.biomeID + 128;
                     }
                     else
                     {
-                        aint1[j + i * areaWidth] = k;
+                        var6[var8 + var7 * areaWidth] = var9;
                     }
                 }
                 else
                 {
-                    aint1[j + i * areaWidth] = k;
+                    var6[var8 + var7 * areaWidth] = var9;
                 }
             }
         }
 
-        return aint1;
+        return var6;
     }
 }

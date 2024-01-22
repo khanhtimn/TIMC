@@ -9,10 +9,9 @@ public class NBTTagFloat extends NBTBase.NBTPrimitive
 {
     /** The float value for the tag. */
     private float data;
+    
 
-    NBTTagFloat()
-    {
-    }
+    NBTTagFloat() {}
 
     public NBTTagFloat(float data)
     {
@@ -29,7 +28,7 @@ public class NBTTagFloat extends NBTBase.NBTPrimitive
 
     void read(DataInput input, int depth, NBTSizeTracker sizeTracker) throws IOException
     {
-        sizeTracker.read(96L);
+        sizeTracker.read(32L);
         this.data = input.readFloat();
     }
 
@@ -58,8 +57,8 @@ public class NBTTagFloat extends NBTBase.NBTPrimitive
     {
         if (super.equals(p_equals_1_))
         {
-            NBTTagFloat nbttagfloat = (NBTTagFloat)p_equals_1_;
-            return this.data == nbttagfloat.data;
+            NBTTagFloat var2 = (NBTTagFloat)p_equals_1_;
+            return this.data == var2.data;
         }
         else
         {

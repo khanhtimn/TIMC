@@ -18,189 +18,199 @@ import org.apache.logging.log4j.Logger;
 public class ChunkRenderWorker implements Runnable
 {
     private static final Logger LOGGER = LogManager.getLogger();
-    private final ChunkRenderDispatcher chunkRenderDispatcher;
-    private final RegionRenderCacheBuilder regionRenderCacheBuilder;
+    private final ChunkRenderDispatcher field_178477_b;
+    private final RegionRenderCacheBuilder field_178478_c;
+    
 
     public ChunkRenderWorker(ChunkRenderDispatcher p_i46201_1_)
     {
         this(p_i46201_1_, (RegionRenderCacheBuilder)null);
     }
 
-    public ChunkRenderWorker(ChunkRenderDispatcher chunkRenderDispatcherIn, RegionRenderCacheBuilder regionRenderCacheBuilderIn)
+    public ChunkRenderWorker(ChunkRenderDispatcher p_i46202_1_, RegionRenderCacheBuilder p_i46202_2_)
     {
-        this.chunkRenderDispatcher = chunkRenderDispatcherIn;
-        this.regionRenderCacheBuilder = regionRenderCacheBuilderIn;
+        this.field_178477_b = p_i46202_1_;
+        this.field_178478_c = p_i46202_2_;
     }
 
     public void run()
     {
-        while (true)
+        try
         {
-            try
+            while (true)
             {
-                this.processTask(this.chunkRenderDispatcher.getNextChunkUpdate());
+                this.func_178474_a(this.field_178477_b.func_178511_d());
             }
-            catch (InterruptedException var3)
-            {
-                LOGGER.debug("Stopping due to interrupt");
-                return;
-            }
-            catch (Throwable throwable)
-            {
-                CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Batching chunks");
-                Minecraft.getMinecraft().crashed(Minecraft.getMinecraft().addGraphicsAndWorldToCrashReport(crashreport));
-                return;
-            }
+        }
+        catch (InterruptedException var3)
+        {
+            LOGGER.debug("Stopping due to interrupt");
+        }
+        catch (Throwable var4)
+        {
+            CrashReport var2 = CrashReport.makeCrashReport(var4, "Batching chunks");
+            Minecraft.getMinecraft().crashed(Minecraft.getMinecraft().addGraphicsAndWorldToCrashReport(var2));
         }
     }
 
-    protected void processTask(final ChunkCompileTaskGenerator generator) throws InterruptedException
+    protected void func_178474_a(final ChunkCompileTaskGenerator p_178474_1_) throws InterruptedException
     {
-        generator.getLock().lock();
-
-        try
+        p_178474_1_.func_178540_f().lock();
+        label242:
         {
-            if (generator.getStatus() != ChunkCompileTaskGenerator.Status.PENDING)
-            {
-                if (!generator.isFinished())
-                {
-                    LOGGER.warn("Chunk render task was " + generator.getStatus() + " when I expected it to be pending; ignoring task");
-                }
-
-                return;
-            }
-
-            generator.setStatus(ChunkCompileTaskGenerator.Status.COMPILING);
-        }
-        finally
-        {
-            generator.getLock().unlock();
-        }
-
-        Entity lvt_2_1_ = Minecraft.getMinecraft().getRenderViewEntity();
-
-        if (lvt_2_1_ == null)
-        {
-            generator.finish();
-        }
-        else
-        {
-            generator.setRegionRenderCacheBuilder(this.getRegionRenderCacheBuilder());
-            float f = (float)lvt_2_1_.posX;
-            float f1 = (float)lvt_2_1_.posY + lvt_2_1_.getEyeHeight();
-            float f2 = (float)lvt_2_1_.posZ;
-            ChunkCompileTaskGenerator.Type chunkcompiletaskgenerator$type = generator.getType();
-
-            if (chunkcompiletaskgenerator$type == ChunkCompileTaskGenerator.Type.REBUILD_CHUNK)
-            {
-                generator.getRenderChunk().rebuildChunk(f, f1, f2, generator);
-            }
-            else if (chunkcompiletaskgenerator$type == ChunkCompileTaskGenerator.Type.RESORT_TRANSPARENCY)
-            {
-                generator.getRenderChunk().resortTransparency(f, f1, f2, generator);
-            }
-
-            generator.getLock().lock();
-
             try
             {
-                if (generator.getStatus() != ChunkCompileTaskGenerator.Status.COMPILING)
+                if (p_178474_1_.func_178546_a() == ChunkCompileTaskGenerator.Status.PENDING)
                 {
-                    if (!generator.isFinished())
-                    {
-                        LOGGER.warn("Chunk render task was " + generator.getStatus() + " when I expected it to be compiling; aborting task");
-                    }
-
-                    this.freeRenderBuilder(generator);
-                    return;
+                    p_178474_1_.func_178535_a(ChunkCompileTaskGenerator.Status.COMPILING);
+                    break label242;
                 }
 
-                generator.setStatus(ChunkCompileTaskGenerator.Status.UPLOADING);
+                if (!p_178474_1_.func_178537_h())
+                {
+                    LOGGER.warn("Chunk render task was " + p_178474_1_.func_178546_a() + " when I expected it to be pending; ignoring task");
+                }
             }
             finally
             {
-                generator.getLock().unlock();
+                p_178474_1_.func_178540_f().unlock();
             }
 
-            final CompiledChunk lvt_7_1_ = generator.getCompiledChunk();
-            ArrayList lvt_8_1_ = Lists.newArrayList();
+            return;
+        }
+        Entity var2 = Minecraft.getMinecraft().getRenderViewEntity();
 
-            if (chunkcompiletaskgenerator$type == ChunkCompileTaskGenerator.Type.REBUILD_CHUNK)
+        if (var2 == null)
+        {
+            p_178474_1_.func_178542_e();
+        }
+        else
+        {
+            p_178474_1_.func_178541_a(this.func_178475_b());
+            float var3 = (float)var2.posX;
+            float var4 = (float)var2.posY + var2.getEyeHeight();
+            float var5 = (float)var2.posZ;
+            ChunkCompileTaskGenerator.Type var6 = p_178474_1_.func_178538_g();
+
+            if (var6 == ChunkCompileTaskGenerator.Type.REBUILD_CHUNK)
             {
-                for (EnumWorldBlockLayer enumworldblocklayer : EnumWorldBlockLayer.values())
+                p_178474_1_.func_178536_b().func_178581_b(var3, var4, var5, p_178474_1_);
+            }
+            else if (var6 == ChunkCompileTaskGenerator.Type.RESORT_TRANSPARENCY)
+            {
+                p_178474_1_.func_178536_b().func_178570_a(var3, var4, var5, p_178474_1_);
+            }
+
+            p_178474_1_.func_178540_f().lock();
+
+            try
+            {
+                if (p_178474_1_.func_178546_a() != ChunkCompileTaskGenerator.Status.COMPILING)
                 {
-                    if (lvt_7_1_.isLayerStarted(enumworldblocklayer))
+                    if (!p_178474_1_.func_178537_h())
                     {
-                        lvt_8_1_.add(this.chunkRenderDispatcher.uploadChunk(enumworldblocklayer, generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(enumworldblocklayer), generator.getRenderChunk(), lvt_7_1_));
+                        LOGGER.warn("Chunk render task was " + p_178474_1_.func_178546_a() + " when I expected it to be compiling; aborting task");
+                    }
+
+                    this.func_178473_b(p_178474_1_);
+                    return;
+                }
+
+                p_178474_1_.func_178535_a(ChunkCompileTaskGenerator.Status.UPLOADING);
+            }
+            finally
+            {
+                p_178474_1_.func_178540_f().unlock();
+            }
+
+            final CompiledChunk var7 = p_178474_1_.func_178544_c();
+            ArrayList var8 = Lists.newArrayList();
+
+            if (var6 == ChunkCompileTaskGenerator.Type.REBUILD_CHUNK)
+            {
+                EnumWorldBlockLayer[] var9 = EnumWorldBlockLayer.values();
+                int var10 = var9.length;
+
+                for (int var11 = 0; var11 < var10; ++var11)
+                {
+                    EnumWorldBlockLayer var12 = var9[var11];
+
+                    if (var7.func_178492_d(var12))
+                    {
+                        var8.add(this.field_178477_b.func_178503_a(var12, p_178474_1_.func_178545_d().func_179038_a(var12), p_178474_1_.func_178536_b(), var7));
                     }
                 }
             }
-            else if (chunkcompiletaskgenerator$type == ChunkCompileTaskGenerator.Type.RESORT_TRANSPARENCY)
+            else if (var6 == ChunkCompileTaskGenerator.Type.RESORT_TRANSPARENCY)
             {
-                lvt_8_1_.add(this.chunkRenderDispatcher.uploadChunk(EnumWorldBlockLayer.TRANSLUCENT, generator.getRegionRenderCacheBuilder().getWorldRendererByLayer(EnumWorldBlockLayer.TRANSLUCENT), generator.getRenderChunk(), lvt_7_1_));
+                var8.add(this.field_178477_b.func_178503_a(EnumWorldBlockLayer.TRANSLUCENT, p_178474_1_.func_178545_d().func_179038_a(EnumWorldBlockLayer.TRANSLUCENT), p_178474_1_.func_178536_b(), var7));
             }
 
-            final ListenableFuture<List<Object>> listenablefuture = Futures.allAsList(lvt_8_1_);
-            generator.addFinishRunnable(new Runnable()
+            final ListenableFuture var19 = Futures.allAsList(var8);
+            p_178474_1_.func_178539_a(new Runnable()
             {
+                
                 public void run()
                 {
-                    listenablefuture.cancel(false);
+                    var19.cancel(false);
                 }
             });
-            Futures.addCallback(listenablefuture, new FutureCallback<List<Object>>()
+            Futures.addCallback(var19, new FutureCallback()
             {
-                public void onSuccess(List<Object> p_onSuccess_1_)
+                
+                public void func_178481_a(List p_178481_1_)
                 {
-                    ChunkRenderWorker.this.freeRenderBuilder(generator);
-                    generator.getLock().lock();
-                    label21:
+                    ChunkRenderWorker.this.func_178473_b(p_178474_1_);
+                    p_178474_1_.func_178540_f().lock();
+
+                    try
                     {
-                        try
+                        if (p_178474_1_.func_178546_a() != ChunkCompileTaskGenerator.Status.UPLOADING)
                         {
-                            if (generator.getStatus() == ChunkCompileTaskGenerator.Status.UPLOADING)
+                            if (!p_178474_1_.func_178537_h())
                             {
-                                generator.setStatus(ChunkCompileTaskGenerator.Status.DONE);
-                                break label21;
+                                ChunkRenderWorker.LOGGER.warn("Chunk render task was " + p_178474_1_.func_178546_a() + " when I expected it to be uploading; aborting task");
                             }
 
-                            if (!generator.isFinished())
-                            {
-                                ChunkRenderWorker.LOGGER.warn("Chunk render task was " + generator.getStatus() + " when I expected it to be uploading; aborting task");
-                            }
-                        }
-                        finally
-                        {
-                            generator.getLock().unlock();
+                            return;
                         }
 
-                        return;
+                        p_178474_1_.func_178535_a(ChunkCompileTaskGenerator.Status.DONE);
                     }
-                    generator.getRenderChunk().setCompiledChunk(lvt_7_1_);
+                    finally
+                    {
+                        p_178474_1_.func_178540_f().unlock();
+                    }
+
+                    p_178474_1_.func_178536_b().func_178580_a(var7);
                 }
                 public void onFailure(Throwable p_onFailure_1_)
                 {
-                    ChunkRenderWorker.this.freeRenderBuilder(generator);
+                    ChunkRenderWorker.this.func_178473_b(p_178474_1_);
 
                     if (!(p_onFailure_1_ instanceof CancellationException) && !(p_onFailure_1_ instanceof InterruptedException))
                     {
                         Minecraft.getMinecraft().crashed(CrashReport.makeCrashReport(p_onFailure_1_, "Rendering chunk"));
                     }
                 }
+                public void onSuccess(Object p_onSuccess_1_)
+                {
+                    this.func_178481_a((List)p_onSuccess_1_);
+                }
             });
         }
     }
 
-    private RegionRenderCacheBuilder getRegionRenderCacheBuilder() throws InterruptedException
+    private RegionRenderCacheBuilder func_178475_b() throws InterruptedException
     {
-        return this.regionRenderCacheBuilder != null ? this.regionRenderCacheBuilder : this.chunkRenderDispatcher.allocateRenderBuilder();
+        return this.field_178478_c != null ? this.field_178478_c : this.field_178477_b.func_178515_c();
     }
 
-    private void freeRenderBuilder(ChunkCompileTaskGenerator taskGenerator)
+    private void func_178473_b(ChunkCompileTaskGenerator p_178473_1_)
     {
-        if (this.regionRenderCacheBuilder == null)
+        if (this.field_178478_c == null)
         {
-            this.chunkRenderDispatcher.freeRenderBuilder(taskGenerator.getRegionRenderCacheBuilder());
+            this.field_178477_b.func_178512_a(p_178473_1_.func_178545_d());
         }
     }
 }

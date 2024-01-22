@@ -7,6 +7,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -18,13 +19,22 @@ import net.minecraft.world.WorldSavedData;
 public class MapStorage
 {
     private ISaveHandler saveHandler;
-    protected Map<String, WorldSavedData> loadedDataMap = Maps.<String, WorldSavedData>newHashMap();
-    private List<WorldSavedData> loadedDataList = Lists.<WorldSavedData>newArrayList();
-    private Map<String, Short> idCounts = Maps.<String, Short>newHashMap();
 
-    public MapStorage(ISaveHandler saveHandlerIn)
+    /** Map of item data String id to loaded MapDataBases */
+    protected Map loadedDataMap = Maps.newHashMap();
+
+    /** List of loaded MapDataBases. */
+    private List loadedDataList = Lists.newArrayList();
+
+    /**
+     * Map of MapDataBase id String prefixes ('map' etc) to max known unique Short id (the 0 part etc) for that prefix
+     */
+    private Map idCounts = Maps.newHashMap();
+    
+
+    public MapStorage(ISaveHandler p_i2162_1_)
     {
-        this.saveHandler = saveHandlerIn;
+        this.saveHandler = p_i2162_1_;
         this.loadIdCounts();
     }
 
@@ -32,13 +42,13 @@ public class MapStorage
      * Loads an existing MapDataBase corresponding to the given String id from disk, instantiating the given Class, or
      * returns null if none such file exists. args: Class to instantiate, String dataid
      */
-    public WorldSavedData loadData(Class <? extends WorldSavedData > clazz, String dataIdentifier)
+    public WorldSavedData loadData(Class p_75742_1_, String p_75742_2_)
     {
-        WorldSavedData worldsaveddata = (WorldSavedData)this.loadedDataMap.get(dataIdentifier);
+        WorldSavedData var3 = (WorldSavedData)this.loadedDataMap.get(p_75742_2_);
 
-        if (worldsaveddata != null)
+        if (var3 != null)
         {
-            return worldsaveddata;
+            return var3;
         }
         else
         {
@@ -46,53 +56,53 @@ public class MapStorage
             {
                 try
                 {
-                    File file1 = this.saveHandler.getMapFileFromName(dataIdentifier);
+                    File var4 = this.saveHandler.getMapFileFromName(p_75742_2_);
 
-                    if (file1 != null && file1.exists())
+                    if (var4 != null && var4.exists())
                     {
                         try
                         {
-                            worldsaveddata = (WorldSavedData)clazz.getConstructor(new Class[] {String.class}).newInstance(new Object[] {dataIdentifier});
+                            var3 = (WorldSavedData)p_75742_1_.getConstructor(new Class[] {String.class}).newInstance(new Object[] {p_75742_2_});
                         }
-                        catch (Exception exception)
+                        catch (Exception var7)
                         {
-                            throw new RuntimeException("Failed to instantiate " + clazz.toString(), exception);
+                            throw new RuntimeException("Failed to instantiate " + p_75742_1_.toString(), var7);
                         }
 
-                        FileInputStream fileinputstream = new FileInputStream(file1);
-                        NBTTagCompound nbttagcompound = CompressedStreamTools.readCompressed(fileinputstream);
-                        fileinputstream.close();
-                        worldsaveddata.readFromNBT(nbttagcompound.getCompoundTag("data"));
+                        FileInputStream var5 = new FileInputStream(var4);
+                        NBTTagCompound var6 = CompressedStreamTools.readCompressed(var5);
+                        var5.close();
+                        var3.readFromNBT(var6.getCompoundTag("data"));
                     }
                 }
-                catch (Exception exception1)
+                catch (Exception var8)
                 {
-                    exception1.printStackTrace();
+                    var8.printStackTrace();
                 }
             }
 
-            if (worldsaveddata != null)
+            if (var3 != null)
             {
-                this.loadedDataMap.put(dataIdentifier, worldsaveddata);
-                this.loadedDataList.add(worldsaveddata);
+                this.loadedDataMap.put(p_75742_2_, var3);
+                this.loadedDataList.add(var3);
             }
 
-            return worldsaveddata;
+            return var3;
         }
     }
 
     /**
      * Assigns the given String id to the given MapDataBase, removing any existing ones of the same id.
      */
-    public void setData(String dataIdentifier, WorldSavedData data)
+    public void setData(String p_75745_1_, WorldSavedData p_75745_2_)
     {
-        if (this.loadedDataMap.containsKey(dataIdentifier))
+        if (this.loadedDataMap.containsKey(p_75745_1_))
         {
-            this.loadedDataList.remove(this.loadedDataMap.remove(dataIdentifier));
+            this.loadedDataList.remove(this.loadedDataMap.remove(p_75745_1_));
         }
 
-        this.loadedDataMap.put(dataIdentifier, data);
-        this.loadedDataList.add(data);
+        this.loadedDataMap.put(p_75745_1_, p_75745_2_);
+        this.loadedDataList.add(p_75745_2_);
     }
 
     /**
@@ -100,14 +110,14 @@ public class MapStorage
      */
     public void saveAllData()
     {
-        for (int i = 0; i < this.loadedDataList.size(); ++i)
+        for (int var1 = 0; var1 < this.loadedDataList.size(); ++var1)
         {
-            WorldSavedData worldsaveddata = (WorldSavedData)this.loadedDataList.get(i);
+            WorldSavedData var2 = (WorldSavedData)this.loadedDataList.get(var1);
 
-            if (worldsaveddata.isDirty())
+            if (var2.isDirty())
             {
-                this.saveData(worldsaveddata);
-                worldsaveddata.setDirty(false);
+                this.saveData(var2);
+                var2.setDirty(false);
             }
         }
     }
@@ -121,22 +131,22 @@ public class MapStorage
         {
             try
             {
-                File file1 = this.saveHandler.getMapFileFromName(p_75747_1_.mapName);
+                File var2 = this.saveHandler.getMapFileFromName(p_75747_1_.mapName);
 
-                if (file1 != null)
+                if (var2 != null)
                 {
-                    NBTTagCompound nbttagcompound = new NBTTagCompound();
-                    p_75747_1_.writeToNBT(nbttagcompound);
-                    NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-                    nbttagcompound1.setTag("data", nbttagcompound);
-                    FileOutputStream fileoutputstream = new FileOutputStream(file1);
-                    CompressedStreamTools.writeCompressed(nbttagcompound1, fileoutputstream);
-                    fileoutputstream.close();
+                    NBTTagCompound var3 = new NBTTagCompound();
+                    p_75747_1_.writeToNBT(var3);
+                    NBTTagCompound var4 = new NBTTagCompound();
+                    var4.setTag("data", var3);
+                    FileOutputStream var5 = new FileOutputStream(var2);
+                    CompressedStreamTools.writeCompressed(var4, var5);
+                    var5.close();
                 }
             }
-            catch (Exception exception)
+            catch (Exception var6)
             {
-                exception.printStackTrace();
+                var6.printStackTrace();
             }
         }
     }
@@ -155,82 +165,86 @@ public class MapStorage
                 return;
             }
 
-            File file1 = this.saveHandler.getMapFileFromName("idcounts");
+            File var1 = this.saveHandler.getMapFileFromName("idcounts");
 
-            if (file1 != null && file1.exists())
+            if (var1 != null && var1.exists())
             {
-                DataInputStream datainputstream = new DataInputStream(new FileInputStream(file1));
-                NBTTagCompound nbttagcompound = CompressedStreamTools.read(datainputstream);
-                datainputstream.close();
+                DataInputStream var2 = new DataInputStream(new FileInputStream(var1));
+                NBTTagCompound var3 = CompressedStreamTools.read(var2);
+                var2.close();
+                Iterator var4 = var3.getKeySet().iterator();
 
-                for (String s : nbttagcompound.getKeySet())
+                while (var4.hasNext())
                 {
-                    NBTBase nbtbase = nbttagcompound.getTag(s);
+                    String var5 = (String)var4.next();
+                    NBTBase var6 = var3.getTag(var5);
 
-                    if (nbtbase instanceof NBTTagShort)
+                    if (var6 instanceof NBTTagShort)
                     {
-                        NBTTagShort nbttagshort = (NBTTagShort)nbtbase;
-                        short short1 = nbttagshort.getShort();
-                        this.idCounts.put(s, Short.valueOf(short1));
+                        NBTTagShort var7 = (NBTTagShort)var6;
+                        short var9 = var7.getShort();
+                        this.idCounts.put(var5, Short.valueOf(var9));
                     }
                 }
             }
         }
-        catch (Exception exception)
+        catch (Exception var10)
         {
-            exception.printStackTrace();
+            var10.printStackTrace();
         }
     }
 
     /**
      * Returns an unique new data id for the given prefix and saves the idCounts map to the 'idcounts' file.
      */
-    public int getUniqueDataId(String key)
+    public int getUniqueDataId(String p_75743_1_)
     {
-        Short oshort = (Short)this.idCounts.get(key);
+        Short var2 = (Short)this.idCounts.get(p_75743_1_);
 
-        if (oshort == null)
+        if (var2 == null)
         {
-            oshort = Short.valueOf((short)0);
+            var2 = Short.valueOf((short)0);
         }
         else
         {
-            oshort = Short.valueOf((short)(oshort.shortValue() + 1));
+            var2 = Short.valueOf((short)(var2.shortValue() + 1));
         }
 
-        this.idCounts.put(key, oshort);
+        this.idCounts.put(p_75743_1_, var2);
 
         if (this.saveHandler == null)
         {
-            return oshort.shortValue();
+            return var2.shortValue();
         }
         else
         {
             try
             {
-                File file1 = this.saveHandler.getMapFileFromName("idcounts");
+                File var3 = this.saveHandler.getMapFileFromName("idcounts");
 
-                if (file1 != null)
+                if (var3 != null)
                 {
-                    NBTTagCompound nbttagcompound = new NBTTagCompound();
+                    NBTTagCompound var4 = new NBTTagCompound();
+                    Iterator var5 = this.idCounts.keySet().iterator();
 
-                    for (String s : this.idCounts.keySet())
+                    while (var5.hasNext())
                     {
-                        short short1 = ((Short)this.idCounts.get(s)).shortValue();
-                        nbttagcompound.setShort(s, short1);
+                        String var6 = (String)var5.next();
+                        short var7 = ((Short)this.idCounts.get(var6)).shortValue();
+                        var4.setShort(var6, var7);
                     }
 
-                    DataOutputStream dataoutputstream = new DataOutputStream(new FileOutputStream(file1));
-                    CompressedStreamTools.write(nbttagcompound, dataoutputstream);
-                    dataoutputstream.close();
+                    DataOutputStream var9 = new DataOutputStream(new FileOutputStream(var3));
+                    CompressedStreamTools.write(var4, var9);
+                    var9.close();
                 }
             }
-            catch (Exception exception)
+            catch (Exception var8)
             {
-                exception.printStackTrace();
+                var8.printStackTrace();
             }
 
-            return oshort.shortValue();
+            return var2.shortValue();
         }
     }
 }

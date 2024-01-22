@@ -2,20 +2,22 @@ package net.minecraft.util;
 
 public enum EnumWorldBlockLayer
 {
-    SOLID("Solid"),
-    CUTOUT_MIPPED("Mipped Cutout"),
-    CUTOUT("Cutout"),
-    TRANSLUCENT("Translucent");
+    SOLID("SOLID", 0, "Solid"),
+    CUTOUT_MIPPED("CUTOUT_MIPPED", 1, "Mipped Cutout"),
+    CUTOUT("CUTOUT", 2, "Cutout"),
+    TRANSLUCENT("TRANSLUCENT", 3, "Translucent");
+    private final String field_180338_e;
 
-    private final String layerName;
+    private static final EnumWorldBlockLayer[] $VALUES = new EnumWorldBlockLayer[]{SOLID, CUTOUT_MIPPED, CUTOUT, TRANSLUCENT};
+    
 
-    private EnumWorldBlockLayer(String layerNameIn)
+    private EnumWorldBlockLayer(String p_i45755_1_, int p_i45755_2_, String p_i45755_3_)
     {
-        this.layerName = layerNameIn;
+        this.field_180338_e = p_i45755_3_;
     }
 
     public String toString()
     {
-        return this.layerName;
+        return this.field_180338_e;
     }
 }

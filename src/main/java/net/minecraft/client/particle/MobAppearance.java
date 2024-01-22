@@ -13,11 +13,12 @@ import net.minecraft.world.World;
 
 public class MobAppearance extends EntityFX
 {
-    private EntityLivingBase entity;
+    private EntityLivingBase field_174844_a;
+    
 
-    protected MobAppearance(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn)
+    protected MobAppearance(World worldIn, double p_i46283_2_, double p_i46283_4_, double p_i46283_6_)
     {
-        super(worldIn, xCoordIn, yCoordIn, zCoordIn, 0.0D, 0.0D, 0.0D);
+        super(worldIn, p_i46283_2_, p_i46283_4_, p_i46283_6_, 0.0D, 0.0D, 0.0D);
         this.particleRed = this.particleGreen = this.particleBlue = 1.0F;
         this.motionX = this.motionY = this.motionZ = 0.0D;
         this.particleGravity = 0.0F;
@@ -36,42 +37,39 @@ public class MobAppearance extends EntityFX
     {
         super.onUpdate();
 
-        if (this.entity == null)
+        if (this.field_174844_a == null)
         {
-            EntityGuardian entityguardian = new EntityGuardian(this.worldObj);
-            entityguardian.setElder();
-            this.entity = entityguardian;
+            EntityGuardian var1 = new EntityGuardian(this.worldObj);
+            var1.func_175465_cm();
+            this.field_174844_a = var1;
         }
     }
 
-    /**
-     * Renders the particle
-     */
-    public void renderParticle(WorldRenderer worldRendererIn, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ)
+    public void func_180434_a(WorldRenderer p_180434_1_, Entity p_180434_2_, float p_180434_3_, float p_180434_4_, float p_180434_5_, float p_180434_6_, float p_180434_7_, float p_180434_8_)
     {
-        if (this.entity != null)
+        if (this.field_174844_a != null)
         {
-            RenderManager rendermanager = Minecraft.getMinecraft().getRenderManager();
-            rendermanager.setRenderPosition(EntityFX.interpPosX, EntityFX.interpPosY, EntityFX.interpPosZ);
-            float f = 0.42553192F;
-            float f1 = ((float)this.particleAge + partialTicks) / (float)this.particleMaxAge;
+            RenderManager var9 = Minecraft.getMinecraft().getRenderManager();
+            var9.func_178628_a(EntityFX.interpPosX, EntityFX.interpPosY, EntityFX.interpPosZ);
+            float var10 = 0.42553192F;
+            float var11 = ((float)this.particleAge + p_180434_3_) / (float)this.particleMaxAge;
             GlStateManager.depthMask(true);
             GlStateManager.enableBlend();
             GlStateManager.enableDepth();
             GlStateManager.blendFunc(770, 771);
-            float f2 = 240.0F;
-            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, f2, f2);
+            float var12 = 240.0F;
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, var12, var12);
             GlStateManager.pushMatrix();
-            float f3 = 0.05F + 0.5F * MathHelper.sin(f1 * (float)Math.PI);
-            GlStateManager.color(1.0F, 1.0F, 1.0F, f3);
+            float var13 = 0.05F + 0.5F * MathHelper.sin(var11 * (float)Math.PI);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, var13);
             GlStateManager.translate(0.0F, 1.8F, 0.0F);
-            GlStateManager.rotate(180.0F - entityIn.rotationYaw, 0.0F, 1.0F, 0.0F);
-            GlStateManager.rotate(60.0F - 150.0F * f1 - entityIn.rotationPitch, 1.0F, 0.0F, 0.0F);
+            GlStateManager.rotate(180.0F - p_180434_2_.rotationYaw, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(60.0F - 150.0F * var11 - p_180434_2_.rotationPitch, 1.0F, 0.0F, 0.0F);
             GlStateManager.translate(0.0F, -0.4F, -1.5F);
-            GlStateManager.scale(f, f, f);
-            this.entity.rotationYaw = this.entity.prevRotationYaw = 0.0F;
-            this.entity.rotationYawHead = this.entity.prevRotationYawHead = 0.0F;
-            rendermanager.renderEntityWithPosYaw(this.entity, 0.0D, 0.0D, 0.0D, 0.0F, partialTicks);
+            GlStateManager.scale(var10, var10, var10);
+            this.field_174844_a.rotationYaw = this.field_174844_a.prevRotationYaw = 0.0F;
+            this.field_174844_a.rotationYawHead = this.field_174844_a.prevRotationYawHead = 0.0F;
+            var9.renderEntityWithPosYaw(this.field_174844_a, 0.0D, 0.0D, 0.0D, 0.0F, p_180434_3_);
             GlStateManager.popMatrix();
             GlStateManager.enableDepth();
         }
@@ -79,9 +77,11 @@ public class MobAppearance extends EntityFX
 
     public static class Factory implements IParticleFactory
     {
-        public EntityFX getEntityFX(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn, int... p_178902_15_)
+        
+
+        public EntityFX func_178902_a(int p_178902_1_, World worldIn, double p_178902_3_, double p_178902_5_, double p_178902_7_, double p_178902_9_, double p_178902_11_, double p_178902_13_, int ... p_178902_15_)
         {
-            return new MobAppearance(worldIn, xCoordIn, yCoordIn, zCoordIn);
+            return new MobAppearance(worldIn, p_178902_3_, p_178902_5_, p_178902_7_);
         }
     }
 }

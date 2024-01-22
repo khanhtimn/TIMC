@@ -1,106 +1,98 @@
 package net.minecraft.client.renderer.chunk;
 
+import java.util.BitSet;
+import java.util.Iterator;
 import java.util.Set;
 import net.minecraft.util.EnumFacing;
 
 public class SetVisibility
 {
-    private static final int COUNT_FACES = EnumFacing.values().length;
-    private long bits;
+    private static final int field_178623_a = EnumFacing.values().length;
+    private final BitSet field_178622_b;
+    
 
-    public void setManyVisible(Set<EnumFacing> p_178620_1_)
+    public SetVisibility()
     {
-        for (EnumFacing enumfacing : p_178620_1_)
+        this.field_178622_b = new BitSet(field_178623_a * field_178623_a);
+    }
+
+    public void func_178620_a(Set p_178620_1_)
+    {
+        Iterator var2 = p_178620_1_.iterator();
+
+        while (var2.hasNext())
         {
-            for (EnumFacing enumfacing1 : p_178620_1_)
+            EnumFacing var3 = (EnumFacing)var2.next();
+            Iterator var4 = p_178620_1_.iterator();
+
+            while (var4.hasNext())
             {
-                this.setVisible(enumfacing, enumfacing1, true);
+                EnumFacing var5 = (EnumFacing)var4.next();
+                this.func_178619_a(var3, var5, true);
             }
         }
     }
 
-    public void setVisible(EnumFacing facing, EnumFacing facing2, boolean p_178619_3_)
+    public void func_178619_a(EnumFacing p_178619_1_, EnumFacing p_178619_2_, boolean p_178619_3_)
     {
-        this.setBit(facing.ordinal() + facing2.ordinal() * COUNT_FACES, p_178619_3_);
-        this.setBit(facing2.ordinal() + facing.ordinal() * COUNT_FACES, p_178619_3_);
+        this.field_178622_b.set(p_178619_1_.ordinal() + p_178619_2_.ordinal() * field_178623_a, p_178619_3_);
+        this.field_178622_b.set(p_178619_2_.ordinal() + p_178619_1_.ordinal() * field_178623_a, p_178619_3_);
     }
 
-    public void setAllVisible(boolean visible)
+    public void func_178618_a(boolean p_178618_1_)
     {
-        if (visible)
-        {
-            this.bits = -1L;
-        }
-        else
-        {
-            this.bits = 0L;
-        }
+        this.field_178622_b.set(0, this.field_178622_b.size(), p_178618_1_);
     }
 
-    public boolean isVisible(EnumFacing facing, EnumFacing facing2)
+    public boolean func_178621_a(EnumFacing p_178621_1_, EnumFacing p_178621_2_)
     {
-        return this.getBit(facing.ordinal() + facing2.ordinal() * COUNT_FACES);
+        return this.field_178622_b.get(p_178621_1_.ordinal() + p_178621_2_.ordinal() * field_178623_a);
     }
 
     public String toString()
     {
-        StringBuilder stringbuilder = new StringBuilder();
-        stringbuilder.append(' ');
+        StringBuilder var1 = new StringBuilder();
+        var1.append(' ');
+        EnumFacing[] var2 = EnumFacing.values();
+        int var3 = var2.length;
+        int var4;
+        EnumFacing var5;
 
-        for (EnumFacing enumfacing : EnumFacing.values())
+        for (var4 = 0; var4 < var3; ++var4)
         {
-            stringbuilder.append(' ').append(enumfacing.toString().toUpperCase().charAt(0));
+            var5 = var2[var4];
+            var1.append(' ').append(var5.toString().toUpperCase().charAt(0));
         }
 
-        stringbuilder.append('\n');
+        var1.append('\n');
+        var2 = EnumFacing.values();
+        var3 = var2.length;
 
-        for (EnumFacing enumfacing2 : EnumFacing.values())
+        for (var4 = 0; var4 < var3; ++var4)
         {
-            stringbuilder.append(enumfacing2.toString().toUpperCase().charAt(0));
+            var5 = var2[var4];
+            var1.append(var5.toString().toUpperCase().charAt(0));
+            EnumFacing[] var6 = EnumFacing.values();
+            int var7 = var6.length;
 
-            for (EnumFacing enumfacing1 : EnumFacing.values())
+            for (int var8 = 0; var8 < var7; ++var8)
             {
-                if (enumfacing2 == enumfacing1)
+                EnumFacing var9 = var6[var8];
+
+                if (var5 == var9)
                 {
-                    stringbuilder.append("  ");
+                    var1.append("  ");
                 }
                 else
                 {
-                    boolean flag = this.isVisible(enumfacing2, enumfacing1);
-                    stringbuilder.append(' ').append((char)(flag ? 'Y' : 'n'));
+                    boolean var10 = this.func_178621_a(var5, var9);
+                    var1.append(' ').append((char)(var10 ? 'Y' : 'n'));
                 }
             }
 
-            stringbuilder.append('\n');
+            var1.append('\n');
         }
 
-        return stringbuilder.toString();
-    }
-
-    private boolean getBit(int p_getBit_1_)
-    {
-        return (this.bits & (long)(1 << p_getBit_1_)) != 0L;
-    }
-
-    private void setBit(int p_setBit_1_, boolean p_setBit_2_)
-    {
-        if (p_setBit_2_)
-        {
-            this.setBit(p_setBit_1_);
-        }
-        else
-        {
-            this.clearBit(p_setBit_1_);
-        }
-    }
-
-    private void setBit(int p_setBit_1_)
-    {
-        this.bits |= (long)(1 << p_setBit_1_);
-    }
-
-    private void clearBit(int p_clearBit_1_)
-    {
-        this.bits &= (long)(~(1 << p_clearBit_1_));
+        return var1.toString();
     }
 }

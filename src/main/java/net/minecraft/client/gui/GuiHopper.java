@@ -10,20 +10,16 @@ import net.minecraft.util.ResourceLocation;
 
 public class GuiHopper extends GuiContainer
 {
-    /** The ResourceLocation containing the gui texture for the hopper */
-    private static final ResourceLocation HOPPER_GUI_TEXTURE = new ResourceLocation("textures/gui/container/hopper.png");
+    private static final ResourceLocation field_147085_u = new ResourceLocation("textures/gui/container/hopper.png");
+    private IInventory field_147084_v;
+    private IInventory field_147083_w;
+    
 
-    /** The player inventory currently bound to this GUI instance */
-    private IInventory playerInventory;
-
-    /** The hopper inventory bound to this GUI instance */
-    private IInventory hopperInventory;
-
-    public GuiHopper(InventoryPlayer playerInv, IInventory hopperInv)
+    public GuiHopper(InventoryPlayer p_i1092_1_, IInventory p_i1092_2_)
     {
-        super(new ContainerHopper(playerInv, hopperInv, Minecraft.getMinecraft().thePlayer));
-        this.playerInventory = playerInv;
-        this.hopperInventory = hopperInv;
+        super(new ContainerHopper(p_i1092_1_, p_i1092_2_, Minecraft.getMinecraft().thePlayer));
+        this.field_147084_v = p_i1092_1_;
+        this.field_147083_w = p_i1092_2_;
         this.allowUserInput = false;
         this.ySize = 133;
     }
@@ -33,8 +29,8 @@ public class GuiHopper extends GuiContainer
      */
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
-        this.fontRendererObj.drawString(this.hopperInventory.getDisplayName().getUnformattedText(), 8, 6, 4210752);
-        this.fontRendererObj.drawString(this.playerInventory.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 4210752);
+        this.fontRendererObj.drawString(this.field_147083_w.getDisplayName().getUnformattedText(), 8, 6, 4210752);
+        this.fontRendererObj.drawString(this.field_147084_v.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 4210752);
     }
 
     /**
@@ -43,9 +39,9 @@ public class GuiHopper extends GuiContainer
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
     {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(HOPPER_GUI_TEXTURE);
-        int i = (this.width - this.xSize) / 2;
-        int j = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
+        this.mc.getTextureManager().bindTexture(field_147085_u);
+        int var4 = (this.width - this.xSize) / 2;
+        int var5 = (this.height - this.ySize) / 2;
+        this.drawTexturedModalRect(var4, var5, 0, 0, this.xSize, this.ySize);
     }
 }

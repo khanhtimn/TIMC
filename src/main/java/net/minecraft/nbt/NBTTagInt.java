@@ -8,10 +8,9 @@ public class NBTTagInt extends NBTBase.NBTPrimitive
 {
     /** The integer value for the tag. */
     private int data;
+    
 
-    NBTTagInt()
-    {
-    }
+    NBTTagInt() {}
 
     public NBTTagInt(int data)
     {
@@ -28,7 +27,7 @@ public class NBTTagInt extends NBTBase.NBTPrimitive
 
     void read(DataInput input, int depth, NBTSizeTracker sizeTracker) throws IOException
     {
-        sizeTracker.read(96L);
+        sizeTracker.read(32L);
         this.data = input.readInt();
     }
 
@@ -57,8 +56,8 @@ public class NBTTagInt extends NBTBase.NBTPrimitive
     {
         if (super.equals(p_equals_1_))
         {
-            NBTTagInt nbttagint = (NBTTagInt)p_equals_1_;
-            return this.data == nbttagint.data;
+            NBTTagInt var2 = (NBTTagInt)p_equals_1_;
+            return this.data == var2.data;
         }
         else
         {

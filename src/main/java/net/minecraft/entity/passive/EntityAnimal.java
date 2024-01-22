@@ -15,13 +15,15 @@ import net.minecraft.world.World;
 
 public abstract class EntityAnimal extends EntityAgeable implements IAnimals
 {
-    protected Block spawnableBlock = Blocks.grass;
+    protected Block field_175506_bl;
     private int inLove;
     private EntityPlayer playerInLove;
+    
 
     public EntityAnimal(World worldIn)
     {
         super(worldIn);
+        this.field_175506_bl = Blocks.grass;
     }
 
     protected void updateAITasks()
@@ -53,10 +55,10 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals
 
             if (this.inLove % 10 == 0)
             {
-                double d0 = this.rand.nextGaussian() * 0.02D;
-                double d1 = this.rand.nextGaussian() * 0.02D;
-                double d2 = this.rand.nextGaussian() * 0.02D;
-                this.worldObj.spawnParticle(EnumParticleTypes.HEART, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, d0, d1, d2, new int[0]);
+                double var1 = this.rand.nextGaussian() * 0.02D;
+                double var3 = this.rand.nextGaussian() * 0.02D;
+                double var5 = this.rand.nextGaussian() * 0.02D;
+                this.worldObj.spawnParticle(EnumParticleTypes.HEART, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, var1, var3, var5, new int[0]);
             }
         }
     }
@@ -66,7 +68,7 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals
      */
     public boolean attackEntityFrom(DamageSource source, float amount)
     {
-        if (this.isEntityInvulnerable(source))
+        if (this.func_180431_b(source))
         {
             return false;
         }
@@ -77,9 +79,9 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals
         }
     }
 
-    public float getBlockPathWeight(BlockPos pos)
+    public float func_180484_a(BlockPos p_180484_1_)
     {
-        return this.worldObj.getBlockState(pos.down()).getBlock() == Blocks.grass ? 10.0F : this.worldObj.getLightBrightness(pos) - 0.5F;
+        return this.worldObj.getBlockState(p_180484_1_.offsetDown()).getBlock() == Blocks.grass ? 10.0F : this.worldObj.getLightBrightness(p_180484_1_) - 0.5F;
     }
 
     /**
@@ -105,11 +107,11 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals
      */
     public boolean getCanSpawnHere()
     {
-        int i = MathHelper.floor_double(this.posX);
-        int j = MathHelper.floor_double(this.getEntityBoundingBox().minY);
-        int k = MathHelper.floor_double(this.posZ);
-        BlockPos blockpos = new BlockPos(i, j, k);
-        return this.worldObj.getBlockState(blockpos.down()).getBlock() == this.spawnableBlock && this.worldObj.getLight(blockpos) > 8 && super.getCanSpawnHere();
+        int var1 = MathHelper.floor_double(this.posX);
+        int var2 = MathHelper.floor_double(this.getEntityBoundingBox().minY);
+        int var3 = MathHelper.floor_double(this.posZ);
+        BlockPos var4 = new BlockPos(var1, var2, var3);
+        return this.worldObj.getBlockState(var4.offsetDown()).getBlock() == this.field_175506_bl && this.worldObj.getLight(var4) > 8 && super.getCanSpawnHere();
     }
 
     /**
@@ -131,7 +133,7 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals
     /**
      * Get the experience points the entity currently has.
      */
-    protected int getExperiencePoints(EntityPlayer player)
+    protected int getExperiencePoints(EntityPlayer p_70693_1_)
     {
         return 1 + this.worldObj.rand.nextInt(3);
     }
@@ -140,62 +142,59 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals
      * Checks if the parameter is an item which this animal can be fed to breed it (wheat, carrots or seeds depending on
      * the animal type)
      */
-    public boolean isBreedingItem(ItemStack stack)
+    public boolean isBreedingItem(ItemStack p_70877_1_)
     {
-        return stack == null ? false : stack.getItem() == Items.wheat;
+        return p_70877_1_ == null ? false : p_70877_1_.getItem() == Items.wheat;
     }
 
     /**
      * Called when a player interacts with a mob. e.g. gets milk from a cow, gets into the saddle on a pig.
      */
-    public boolean interact(EntityPlayer player)
+    public boolean interact(EntityPlayer p_70085_1_)
     {
-        ItemStack itemstack = player.inventory.getCurrentItem();
+        ItemStack var2 = p_70085_1_.inventory.getCurrentItem();
 
-        if (itemstack != null)
+        if (var2 != null)
         {
-            if (this.isBreedingItem(itemstack) && this.getGrowingAge() == 0 && this.inLove <= 0)
+            if (this.isBreedingItem(var2) && this.getGrowingAge() == 0 && this.inLove <= 0)
             {
-                this.consumeItemFromStack(player, itemstack);
-                this.setInLove(player);
+                this.func_175505_a(p_70085_1_, var2);
+                this.setInLove(p_70085_1_);
                 return true;
             }
 
-            if (this.isChild() && this.isBreedingItem(itemstack))
+            if (this.isChild() && this.isBreedingItem(var2))
             {
-                this.consumeItemFromStack(player, itemstack);
+                this.func_175505_a(p_70085_1_, var2);
                 this.func_175501_a((int)((float)(-this.getGrowingAge() / 20) * 0.1F), true);
                 return true;
             }
         }
 
-        return super.interact(player);
+        return super.interact(p_70085_1_);
     }
 
-    /**
-     * Decreases ItemStack size by one
-     */
-    protected void consumeItemFromStack(EntityPlayer player, ItemStack stack)
+    protected void func_175505_a(EntityPlayer p_175505_1_, ItemStack p_175505_2_)
     {
-        if (!player.capabilities.isCreativeMode)
+        if (!p_175505_1_.capabilities.isCreativeMode)
         {
-            --stack.stackSize;
+            --p_175505_2_.stackSize;
 
-            if (stack.stackSize <= 0)
+            if (p_175505_2_.stackSize <= 0)
             {
-                player.inventory.setInventorySlotContents(player.inventory.currentItem, (ItemStack)null);
+                p_175505_1_.inventory.setInventorySlotContents(p_175505_1_.inventory.currentItem, (ItemStack)null);
             }
         }
     }
 
-    public void setInLove(EntityPlayer player)
+    public void setInLove(EntityPlayer p_146082_1_)
     {
         this.inLove = 600;
-        this.playerInLove = player;
+        this.playerInLove = p_146082_1_;
         this.worldObj.setEntityState(this, (byte)18);
     }
 
-    public EntityPlayer getPlayerInLove()
+    public EntityPlayer func_146083_cb()
     {
         return this.playerInLove;
     }
@@ -216,26 +215,26 @@ public abstract class EntityAnimal extends EntityAgeable implements IAnimals
     /**
      * Returns true if the mob is currently able to mate with the specified mob.
      */
-    public boolean canMateWith(EntityAnimal otherAnimal)
+    public boolean canMateWith(EntityAnimal p_70878_1_)
     {
-        return otherAnimal == this ? false : (otherAnimal.getClass() != this.getClass() ? false : this.isInLove() && otherAnimal.isInLove());
+        return p_70878_1_ == this ? false : (p_70878_1_.getClass() != this.getClass() ? false : this.isInLove() && p_70878_1_.isInLove());
     }
 
-    public void handleStatusUpdate(byte id)
+    public void handleHealthUpdate(byte p_70103_1_)
     {
-        if (id == 18)
+        if (p_70103_1_ == 18)
         {
-            for (int i = 0; i < 7; ++i)
+            for (int var2 = 0; var2 < 7; ++var2)
             {
-                double d0 = this.rand.nextGaussian() * 0.02D;
-                double d1 = this.rand.nextGaussian() * 0.02D;
-                double d2 = this.rand.nextGaussian() * 0.02D;
-                this.worldObj.spawnParticle(EnumParticleTypes.HEART, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, d0, d1, d2, new int[0]);
+                double var3 = this.rand.nextGaussian() * 0.02D;
+                double var5 = this.rand.nextGaussian() * 0.02D;
+                double var7 = this.rand.nextGaussian() * 0.02D;
+                this.worldObj.spawnParticle(EnumParticleTypes.HEART, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, var3, var5, var7, new int[0]);
             }
         }
         else
         {
-            super.handleStatusUpdate(id);
+            super.handleHealthUpdate(p_70103_1_);
         }
     }
 }

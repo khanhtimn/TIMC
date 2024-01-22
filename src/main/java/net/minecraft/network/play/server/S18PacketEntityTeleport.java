@@ -2,73 +2,73 @@ package net.minecraft.network.play.server;
 
 import java.io.IOException;
 import net.minecraft.entity.Entity;
+import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.util.MathHelper;
 
-public class S18PacketEntityTeleport implements Packet<INetHandlerPlayClient>
+public class S18PacketEntityTeleport implements Packet
 {
-    private int entityId;
-    private int posX;
-    private int posY;
-    private int posZ;
-    private byte yaw;
-    private byte pitch;
-    private boolean onGround;
+    private int field_149458_a;
+    private int field_149456_b;
+    private int field_149457_c;
+    private int field_149454_d;
+    private byte field_149455_e;
+    private byte field_149453_f;
+    private boolean field_179698_g;
+    
 
-    public S18PacketEntityTeleport()
+    public S18PacketEntityTeleport() {}
+
+    public S18PacketEntityTeleport(Entity p_i45233_1_)
     {
+        this.field_149458_a = p_i45233_1_.getEntityId();
+        this.field_149456_b = MathHelper.floor_double(p_i45233_1_.posX * 32.0D);
+        this.field_149457_c = MathHelper.floor_double(p_i45233_1_.posY * 32.0D);
+        this.field_149454_d = MathHelper.floor_double(p_i45233_1_.posZ * 32.0D);
+        this.field_149455_e = (byte)((int)(p_i45233_1_.rotationYaw * 256.0F / 360.0F));
+        this.field_149453_f = (byte)((int)(p_i45233_1_.rotationPitch * 256.0F / 360.0F));
+        this.field_179698_g = p_i45233_1_.onGround;
     }
 
-    public S18PacketEntityTeleport(Entity entityIn)
+    public S18PacketEntityTeleport(int p_i45949_1_, int p_i45949_2_, int p_i45949_3_, int p_i45949_4_, byte p_i45949_5_, byte p_i45949_6_, boolean p_i45949_7_)
     {
-        this.entityId = entityIn.getEntityId();
-        this.posX = MathHelper.floor_double(entityIn.posX * 32.0D);
-        this.posY = MathHelper.floor_double(entityIn.posY * 32.0D);
-        this.posZ = MathHelper.floor_double(entityIn.posZ * 32.0D);
-        this.yaw = (byte)((int)(entityIn.rotationYaw * 256.0F / 360.0F));
-        this.pitch = (byte)((int)(entityIn.rotationPitch * 256.0F / 360.0F));
-        this.onGround = entityIn.onGround;
-    }
-
-    public S18PacketEntityTeleport(int entityIdIn, int posXIn, int posYIn, int posZIn, byte yawIn, byte pitchIn, boolean onGroundIn)
-    {
-        this.entityId = entityIdIn;
-        this.posX = posXIn;
-        this.posY = posYIn;
-        this.posZ = posZIn;
-        this.yaw = yawIn;
-        this.pitch = pitchIn;
-        this.onGround = onGroundIn;
+        this.field_149458_a = p_i45949_1_;
+        this.field_149456_b = p_i45949_2_;
+        this.field_149457_c = p_i45949_3_;
+        this.field_149454_d = p_i45949_4_;
+        this.field_149455_e = p_i45949_5_;
+        this.field_149453_f = p_i45949_6_;
+        this.field_179698_g = p_i45949_7_;
     }
 
     /**
      * Reads the raw packet data from the data stream.
      */
-    public void readPacketData(PacketBuffer buf) throws IOException
+    public void readPacketData(PacketBuffer data) throws IOException
     {
-        this.entityId = buf.readVarIntFromBuffer();
-        this.posX = buf.readInt();
-        this.posY = buf.readInt();
-        this.posZ = buf.readInt();
-        this.yaw = buf.readByte();
-        this.pitch = buf.readByte();
-        this.onGround = buf.readBoolean();
+        this.field_149458_a = data.readVarIntFromBuffer();
+        this.field_149456_b = data.readInt();
+        this.field_149457_c = data.readInt();
+        this.field_149454_d = data.readInt();
+        this.field_149455_e = data.readByte();
+        this.field_149453_f = data.readByte();
+        this.field_179698_g = data.readBoolean();
     }
 
     /**
      * Writes the raw packet data to the data stream.
      */
-    public void writePacketData(PacketBuffer buf) throws IOException
+    public void writePacketData(PacketBuffer data) throws IOException
     {
-        buf.writeVarIntToBuffer(this.entityId);
-        buf.writeInt(this.posX);
-        buf.writeInt(this.posY);
-        buf.writeInt(this.posZ);
-        buf.writeByte(this.yaw);
-        buf.writeByte(this.pitch);
-        buf.writeBoolean(this.onGround);
+        data.writeVarIntToBuffer(this.field_149458_a);
+        data.writeInt(this.field_149456_b);
+        data.writeInt(this.field_149457_c);
+        data.writeInt(this.field_149454_d);
+        data.writeByte(this.field_149455_e);
+        data.writeByte(this.field_149453_f);
+        data.writeBoolean(this.field_179698_g);
     }
 
     /**
@@ -79,38 +79,46 @@ public class S18PacketEntityTeleport implements Packet<INetHandlerPlayClient>
         handler.handleEntityTeleport(this);
     }
 
-    public int getEntityId()
+    public int func_149451_c()
     {
-        return this.entityId;
+        return this.field_149458_a;
     }
 
-    public int getX()
+    public int func_149449_d()
     {
-        return this.posX;
+        return this.field_149456_b;
     }
 
-    public int getY()
+    public int func_149448_e()
     {
-        return this.posY;
+        return this.field_149457_c;
     }
 
-    public int getZ()
+    public int func_149446_f()
     {
-        return this.posZ;
+        return this.field_149454_d;
     }
 
-    public byte getYaw()
+    public byte func_149450_g()
     {
-        return this.yaw;
+        return this.field_149455_e;
     }
 
-    public byte getPitch()
+    public byte func_149447_h()
     {
-        return this.pitch;
+        return this.field_149453_f;
     }
 
-    public boolean getOnGround()
+    public boolean func_179697_g()
     {
-        return this.onGround;
+        return this.field_179698_g;
+    }
+
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandler handler)
+    {
+        this.processPacket((INetHandlerPlayClient)handler);
     }
 }

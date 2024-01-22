@@ -4,15 +4,16 @@ import net.minecraft.block.Block;
 
 public class ItemColored extends ItemBlock
 {
-    private final Block coloredBlock;
-    private String[] subtypeNames;
+    private final Block field_150944_b;
+    private String[] field_150945_c;
+    
 
-    public ItemColored(Block block, boolean hasSubtypes)
+    public ItemColored(Block p_i45332_1_, boolean p_i45332_2_)
     {
-        super(block);
-        this.coloredBlock = block;
+        super(p_i45332_1_);
+        this.field_150944_b = p_i45332_1_;
 
-        if (hasSubtypes)
+        if (p_i45332_2_)
         {
             this.setMaxDamage(0);
             this.setHasSubtypes(true);
@@ -21,7 +22,7 @@ public class ItemColored extends ItemBlock
 
     public int getColorFromItemStack(ItemStack stack, int renderPass)
     {
-        return this.coloredBlock.getRenderColor(this.coloredBlock.getStateFromMeta(stack.getMetadata()));
+        return this.field_150944_b.getRenderColor(this.field_150944_b.getStateFromMeta(stack.getMetadata()));
     }
 
     /**
@@ -33,9 +34,9 @@ public class ItemColored extends ItemBlock
         return damage;
     }
 
-    public ItemColored setSubtypeNames(String[] names)
+    public ItemColored func_150943_a(String[] p_150943_1_)
     {
-        this.subtypeNames = names;
+        this.field_150945_c = p_150943_1_;
         return this;
     }
 
@@ -45,14 +46,14 @@ public class ItemColored extends ItemBlock
      */
     public String getUnlocalizedName(ItemStack stack)
     {
-        if (this.subtypeNames == null)
+        if (this.field_150945_c == null)
         {
             return super.getUnlocalizedName(stack);
         }
         else
         {
-            int i = stack.getMetadata();
-            return i >= 0 && i < this.subtypeNames.length ? super.getUnlocalizedName(stack) + "." + this.subtypeNames[i] : super.getUnlocalizedName(stack);
+            int var2 = stack.getMetadata();
+            return var2 >= 0 && var2 < this.field_150945_c.length ? super.getUnlocalizedName(stack) + "." + this.field_150945_c[var2] : super.getUnlocalizedName(stack);
         }
     }
 }

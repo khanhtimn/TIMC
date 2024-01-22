@@ -14,6 +14,7 @@ public class EntityEnderCrystal extends Entity
     /** Used to create the rotation animation when rendering the crystal. */
     public int innerRotation;
     public int health;
+    
 
     public EntityEnderCrystal(World worldIn)
     {
@@ -24,10 +25,10 @@ public class EntityEnderCrystal extends Entity
         this.innerRotation = this.rand.nextInt(100000);
     }
 
-    public EntityEnderCrystal(World worldIn, double x, double y, double z)
+    public EntityEnderCrystal(World worldIn, double p_i1699_2_, double p_i1699_4_, double p_i1699_6_)
     {
         this(worldIn);
-        this.setPosition(x, y, z);
+        this.setPosition(p_i1699_2_, p_i1699_4_, p_i1699_6_);
     }
 
     /**
@@ -54,29 +55,25 @@ public class EntityEnderCrystal extends Entity
         this.prevPosZ = this.posZ;
         ++this.innerRotation;
         this.dataWatcher.updateObject(8, Integer.valueOf(this.health));
-        int i = MathHelper.floor_double(this.posX);
-        int j = MathHelper.floor_double(this.posY);
-        int k = MathHelper.floor_double(this.posZ);
+        int var1 = MathHelper.floor_double(this.posX);
+        int var2 = MathHelper.floor_double(this.posY);
+        int var3 = MathHelper.floor_double(this.posZ);
 
-        if (this.worldObj.provider instanceof WorldProviderEnd && this.worldObj.getBlockState(new BlockPos(i, j, k)).getBlock() != Blocks.fire)
+        if (this.worldObj.provider instanceof WorldProviderEnd && this.worldObj.getBlockState(new BlockPos(var1, var2, var3)).getBlock() != Blocks.fire)
         {
-            this.worldObj.setBlockState(new BlockPos(i, j, k), Blocks.fire.getDefaultState());
+            this.worldObj.setBlockState(new BlockPos(var1, var2, var3), Blocks.fire.getDefaultState());
         }
     }
 
     /**
      * (abstract) Protected helper method to write subclass entity data to NBT.
      */
-    protected void writeEntityToNBT(NBTTagCompound tagCompound)
-    {
-    }
+    protected void writeEntityToNBT(NBTTagCompound tagCompound) {}
 
     /**
      * (abstract) Protected helper method to read subclass entity data from NBT.
      */
-    protected void readEntityFromNBT(NBTTagCompound tagCompund)
-    {
-    }
+    protected void readEntityFromNBT(NBTTagCompound tagCompund) {}
 
     /**
      * Returns true if other Entities should be prevented from moving through this Entity.
@@ -91,7 +88,7 @@ public class EntityEnderCrystal extends Entity
      */
     public boolean attackEntityFrom(DamageSource source, float amount)
     {
-        if (this.isEntityInvulnerable(source))
+        if (this.func_180431_b(source))
         {
             return false;
         }

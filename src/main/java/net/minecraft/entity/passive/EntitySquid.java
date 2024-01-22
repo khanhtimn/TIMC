@@ -38,6 +38,7 @@ public class EntitySquid extends EntityWaterMob
     private float randomMotionVecX;
     private float randomMotionVecY;
     private float randomMotionVecZ;
+    
 
     public EntitySquid(World worldIn)
     {
@@ -45,7 +46,7 @@ public class EntitySquid extends EntityWaterMob
         this.setSize(0.95F, 0.95F);
         this.rand.setSeed((long)(1 + this.getEntityId()));
         this.rotationVelocity = 1.0F / (this.rand.nextFloat() + 1.0F) * 0.2F;
-        this.tasks.addTask(0, new EntitySquid.AIMoveRandom(this));
+        this.tasks.addTask(0, new EntitySquid.AIMoveRandom());
     }
 
     protected void applyEntityAttributes()
@@ -107,18 +108,14 @@ public class EntitySquid extends EntityWaterMob
 
     /**
      * Drop 0-2 items of this living's type
-     *  
-     * @param wasRecentlyHit true if this this entity was recently hit by appropriate entity (generally only if player
-     * or tameable)
-     * @param lootingModifier level of enchanment to be applied to this drop
      */
-    protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier)
+    protected void dropFewItems(boolean p_70628_1_, int p_70628_2_)
     {
-        int i = this.rand.nextInt(3 + lootingModifier) + 1;
+        int var3 = this.rand.nextInt(3 + p_70628_2_) + 1;
 
-        for (int j = 0; j < i; ++j)
+        for (int var4 = 0; var4 < var3; ++var4)
         {
-            this.entityDropItem(new ItemStack(Items.dye, 1, EnumDyeColor.BLACK.getDyeDamage()), 0.0F);
+            this.entityDropItem(new ItemStack(Items.dye, 1, EnumDyeColor.BLACK.getDyeColorDamage()), 0.0F);
         }
     }
 
@@ -165,12 +162,14 @@ public class EntitySquid extends EntityWaterMob
 
         if (this.inWater)
         {
+            float var1;
+
             if (this.squidRotation < (float)Math.PI)
             {
-                float f = this.squidRotation / (float)Math.PI;
-                this.tentacleAngle = MathHelper.sin(f * f * (float)Math.PI) * (float)Math.PI * 0.25F;
+                var1 = this.squidRotation / (float)Math.PI;
+                this.tentacleAngle = MathHelper.sin(var1 * var1 * (float)Math.PI) * (float)Math.PI * 0.25F;
 
-                if ((double)f > 0.75D)
+                if ((double)var1 > 0.75D)
                 {
                     this.randomMotionSpeed = 1.0F;
                     this.field_70871_bB = 1.0F;
@@ -194,11 +193,11 @@ public class EntitySquid extends EntityWaterMob
                 this.motionZ = (double)(this.randomMotionVecZ * this.randomMotionSpeed);
             }
 
-            float f1 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
-            this.renderYawOffset += (-((float)MathHelper.atan2(this.motionX, this.motionZ)) * 180.0F / (float)Math.PI - this.renderYawOffset) * 0.1F;
+            var1 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
+            this.renderYawOffset += (-((float)Math.atan2(this.motionX, this.motionZ)) * 180.0F / (float)Math.PI - this.renderYawOffset) * 0.1F;
             this.rotationYaw = this.renderYawOffset;
             this.squidYaw = (float)((double)this.squidYaw + Math.PI * (double)this.field_70871_bB * 1.5D);
-            this.squidPitch += (-((float)MathHelper.atan2((double)f1, this.motionY)) * 180.0F / (float)Math.PI - this.squidPitch) * 0.1F;
+            this.squidPitch += (-((float)Math.atan2((double)var1, this.motionY)) * 180.0F / (float)Math.PI - this.squidPitch) * 0.1F;
         }
         else
         {
@@ -219,7 +218,7 @@ public class EntitySquid extends EntityWaterMob
     /**
      * Moves the entity based on the specified heading.  Args: strafe, forward
      */
-    public void moveEntityWithHeading(float strafe, float forward)
+    public void moveEntityWithHeading(float p_70612_1_, float p_70612_2_)
     {
         this.moveEntity(this.motionX, this.motionY, this.motionZ);
     }
@@ -229,26 +228,26 @@ public class EntitySquid extends EntityWaterMob
      */
     public boolean getCanSpawnHere()
     {
-        return this.posY > 45.0D && this.posY < (double)this.worldObj.getSeaLevel() && super.getCanSpawnHere();
+        return this.posY > 45.0D && this.posY < 63.0D && super.getCanSpawnHere();
     }
 
-    public void handleStatusUpdate(byte id)
+    public void handleHealthUpdate(byte p_70103_1_)
     {
-        if (id == 19)
+        if (p_70103_1_ == 19)
         {
             this.squidRotation = 0.0F;
         }
         else
         {
-            super.handleStatusUpdate(id);
+            super.handleHealthUpdate(p_70103_1_);
         }
     }
 
-    public void func_175568_b(float randomMotionVecXIn, float randomMotionVecYIn, float randomMotionVecZIn)
+    public void func_175568_b(float p_175568_1_, float p_175568_2_, float p_175568_3_)
     {
-        this.randomMotionVecX = randomMotionVecXIn;
-        this.randomMotionVecY = randomMotionVecYIn;
-        this.randomMotionVecZ = randomMotionVecZIn;
+        this.randomMotionVecX = p_175568_1_;
+        this.randomMotionVecY = p_175568_2_;
+        this.randomMotionVecZ = p_175568_3_;
     }
 
     public boolean func_175567_n()
@@ -256,14 +255,10 @@ public class EntitySquid extends EntityWaterMob
         return this.randomMotionVecX != 0.0F || this.randomMotionVecY != 0.0F || this.randomMotionVecZ != 0.0F;
     }
 
-    static class AIMoveRandom extends EntityAIBase
+    class AIMoveRandom extends EntityAIBase
     {
-        private EntitySquid squid;
-
-        public AIMoveRandom(EntitySquid p_i45859_1_)
-        {
-            this.squid = p_i45859_1_;
-        }
+        private EntitySquid field_179476_a = EntitySquid.this;
+        
 
         public boolean shouldExecute()
         {
@@ -272,19 +267,19 @@ public class EntitySquid extends EntityWaterMob
 
         public void updateTask()
         {
-            int i = this.squid.getAge();
+            int var1 = this.field_179476_a.getAge();
 
-            if (i > 100)
+            if (var1 > 100)
             {
-                this.squid.func_175568_b(0.0F, 0.0F, 0.0F);
+                this.field_179476_a.func_175568_b(0.0F, 0.0F, 0.0F);
             }
-            else if (this.squid.getRNG().nextInt(50) == 0 || !this.squid.inWater || !this.squid.func_175567_n())
+            else if (this.field_179476_a.getRNG().nextInt(50) == 0 || !this.field_179476_a.inWater || !this.field_179476_a.func_175567_n())
             {
-                float f = this.squid.getRNG().nextFloat() * (float)Math.PI * 2.0F;
-                float f1 = MathHelper.cos(f) * 0.2F;
-                float f2 = -0.1F + this.squid.getRNG().nextFloat() * 0.2F;
-                float f3 = MathHelper.sin(f) * 0.2F;
-                this.squid.func_175568_b(f1, f2, f3);
+                float var2 = this.field_179476_a.getRNG().nextFloat() * (float)Math.PI * 2.0F;
+                float var3 = MathHelper.cos(var2) * 0.2F;
+                float var4 = -0.1F + this.field_179476_a.getRNG().nextFloat() * 0.2F;
+                float var5 = MathHelper.sin(var2) * 0.2F;
+                this.field_179476_a.func_175568_b(var3, var4, var5);
             }
         }
     }

@@ -1,7 +1,16 @@
 package net.minecraft.client.gui.spectator.categories;
 
 import com.google.common.base.Objects;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.spectator.ISpectatorMenuObject;
 import net.minecraft.client.gui.spectator.ISpectatorMenuView;
 import net.minecraft.client.gui.spectator.SpectatorMenu;
@@ -9,10 +18,11 @@ import net.minecraft.client.gui.spectator.SpectatorMenu;
 public class SpectatorDetails
 {
     private final ISpectatorMenuView field_178684_a;
-    private final List<ISpectatorMenuObject> field_178682_b;
+    private final List field_178682_b;
     private final int field_178683_c;
+    
 
-    public SpectatorDetails(ISpectatorMenuView p_i45494_1_, List<ISpectatorMenuObject> p_i45494_2_, int p_i45494_3_)
+    public SpectatorDetails(ISpectatorMenuView p_i45494_1_, List p_i45494_2_, int p_i45494_3_)
     {
         this.field_178684_a = p_i45494_1_;
         this.field_178682_b = p_i45494_2_;
@@ -28,4 +38,5 @@ public class SpectatorDetails
     {
         return this.field_178683_c;
     }
+    
 }

@@ -1,13 +1,14 @@
 package net.minecraft.client.renderer.chunk;
 
+import com.teamti.timc.modules.Xray;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import optifine.IntegerCache;
+
 import java.util.ArrayDeque;
 import java.util.BitSet;
 import java.util.EnumSet;
-import java.util.Queue;
 import java.util.Set;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IntegerCache;
 
 public class VisGraph
 {
@@ -18,111 +19,127 @@ public class VisGraph
     private static final int[] field_178613_e = new int[1352];
     private int field_178611_f = 4096;
 
-    public void func_178606_a(BlockPos pos)
+    public void func_178606_a(BlockPos p_178606_1_)
     {
-        this.field_178612_d.set(getIndex(pos), true);
+        if(Xray.isEnabled || true){
+            return;
+        }
+        this.field_178612_d.set(func_178608_c(p_178606_1_), true);
         --this.field_178611_f;
     }
 
-    private static int getIndex(BlockPos pos)
+    //{
+    //    this.field_178612_d.set(func_178608_c(p_178606_1_), true);
+    //    --this.field_178611_f;
+    //}
+
+    private static int func_178608_c(BlockPos p_178608_0_)
     {
-        return getIndex(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15);
+        return func_178605_a(p_178608_0_.getX() & 15, p_178608_0_.getY() & 15, p_178608_0_.getZ() & 15);
     }
 
-    private static int getIndex(int x, int y, int z)
+    private static int func_178605_a(int p_178605_0_, int p_178605_1_, int p_178605_2_)
     {
-        return x << 0 | y << 8 | z << 4;
+        return p_178605_0_ << 0 | p_178605_1_ << 8 | p_178605_2_ << 4;
     }
 
-    public SetVisibility computeVisibility()
+    public SetVisibility func_178607_a()
     {
-        SetVisibility setvisibility = new SetVisibility();
+        SetVisibility var1 = new SetVisibility();
 
         if (4096 - this.field_178611_f < 256)
         {
-            setvisibility.setAllVisible(true);
+            var1.func_178618_a(true);
         }
         else if (this.field_178611_f == 0)
         {
-            setvisibility.setAllVisible(false);
+            var1.func_178618_a(false);
         }
         else
         {
-            for (int i : field_178613_e)
+            int[] var2 = field_178613_e;
+            int var3 = var2.length;
+
+            for (int var4 = 0; var4 < var3; ++var4)
             {
-                if (!this.field_178612_d.get(i))
+                int var5 = var2[var4];
+
+                if (!this.field_178612_d.get(var5))
                 {
-                    setvisibility.setManyVisible(this.func_178604_a(i));
+                    var1.func_178620_a(this.func_178604_a(var5));
                 }
             }
         }
 
-        return setvisibility;
+        return var1;
     }
 
-    public Set<EnumFacing> func_178609_b(BlockPos pos)
+    public Set func_178609_b(BlockPos p_178609_1_)
     {
-        return this.func_178604_a(getIndex(pos));
+        return this.func_178604_a(func_178608_c(p_178609_1_));
     }
 
-    private Set<EnumFacing> func_178604_a(int p_178604_1_)
+    private Set func_178604_a(int p_178604_1_)
     {
-        Set<EnumFacing> set = EnumSet.<EnumFacing>noneOf(EnumFacing.class);
-        Queue<Integer> queue = new ArrayDeque(384);
-        queue.add(IntegerCache.getInteger(p_178604_1_));
+        EnumSet var2 = EnumSet.noneOf(EnumFacing.class);
+        ArrayDeque var3 = new ArrayDeque(384);
+        var3.add(IntegerCache.valueOf(p_178604_1_));
         this.field_178612_d.set(p_178604_1_, true);
 
-        while (!((Queue)queue).isEmpty())
+        while (!var3.isEmpty())
         {
-            int i = ((Integer)queue.poll()).intValue();
-            this.func_178610_a(i, set);
+            int var4 = ((Integer)var3.poll()).intValue();
+            this.func_178610_a(var4, var2);
+            EnumFacing[] var5 = EnumFacing.VALUES;
+            int var6 = var5.length;
 
-            for (EnumFacing enumfacing : EnumFacing.VALUES)
+            for (int var7 = 0; var7 < var6; ++var7)
             {
-                int j = this.func_178603_a(i, enumfacing);
+                EnumFacing var8 = var5[var7];
+                int var9 = this.func_178603_a(var4, var8);
 
-                if (j >= 0 && !this.field_178612_d.get(j))
+                if (var9 >= 0 && !this.field_178612_d.get(var9))
                 {
-                    this.field_178612_d.set(j, true);
-                    queue.add(IntegerCache.getInteger(j));
+                    this.field_178612_d.set(var9, true);
+                    var3.add(IntegerCache.valueOf(var9));
                 }
             }
         }
 
-        return set;
+        return var2;
     }
 
-    private void func_178610_a(int p_178610_1_, Set<EnumFacing> p_178610_2_)
+    private void func_178610_a(int p_178610_1_, Set p_178610_2_)
     {
-        int i = p_178610_1_ >> 0 & 15;
+        int var3 = p_178610_1_ >> 0 & 15;
 
-        if (i == 0)
+        if (var3 == 0)
         {
             p_178610_2_.add(EnumFacing.WEST);
         }
-        else if (i == 15)
+        else if (var3 == 15)
         {
             p_178610_2_.add(EnumFacing.EAST);
         }
 
-        int j = p_178610_1_ >> 8 & 15;
+        int var4 = p_178610_1_ >> 8 & 15;
 
-        if (j == 0)
+        if (var4 == 0)
         {
             p_178610_2_.add(EnumFacing.DOWN);
         }
-        else if (j == 15)
+        else if (var4 == 15)
         {
             p_178610_2_.add(EnumFacing.UP);
         }
 
-        int k = p_178610_1_ >> 4 & 15;
+        int var5 = p_178610_1_ >> 4 & 15;
 
-        if (k == 0)
+        if (var5 == 0)
         {
             p_178610_2_.add(EnumFacing.NORTH);
         }
-        else if (k == 15)
+        else if (var5 == 15)
         {
             p_178610_2_.add(EnumFacing.SOUTH);
         }
@@ -130,9 +147,9 @@ public class VisGraph
 
     private int func_178603_a(int p_178603_1_, EnumFacing p_178603_2_)
     {
-        switch (p_178603_2_)
+        switch (VisGraph.SwitchEnumFacing.field_178617_a[p_178603_2_.ordinal()])
         {
-            case DOWN:
+            case 1:
                 if ((p_178603_1_ >> 8 & 15) == 0)
                 {
                     return -1;
@@ -140,7 +157,7 @@ public class VisGraph
 
                 return p_178603_1_ - field_178615_c;
 
-            case UP:
+            case 2:
                 if ((p_178603_1_ >> 8 & 15) == 15)
                 {
                     return -1;
@@ -148,7 +165,7 @@ public class VisGraph
 
                 return p_178603_1_ + field_178615_c;
 
-            case NORTH:
+            case 3:
                 if ((p_178603_1_ >> 4 & 15) == 0)
                 {
                     return -1;
@@ -156,7 +173,7 @@ public class VisGraph
 
                 return p_178603_1_ - field_178614_b;
 
-            case SOUTH:
+            case 4:
                 if ((p_178603_1_ >> 4 & 15) == 15)
                 {
                     return -1;
@@ -164,7 +181,7 @@ public class VisGraph
 
                 return p_178603_1_ + field_178614_b;
 
-            case WEST:
+            case 5:
                 if ((p_178603_1_ >> 0 & 15) == 0)
                 {
                     return -1;
@@ -172,7 +189,7 @@ public class VisGraph
 
                 return p_178603_1_ - field_178616_a;
 
-            case EAST:
+            case 6:
                 if ((p_178603_1_ >> 0 & 15) == 15)
                 {
                     return -1;
@@ -187,22 +204,86 @@ public class VisGraph
 
     static
     {
-        int i = 0;
-        int j = 15;
-        int k = 0;
+        boolean var0 = false;
+        boolean var1 = true;
+        int var2 = 0;
 
-        for (int l = 0; l < 16; ++l)
+        for (int var3 = 0; var3 < 16; ++var3)
         {
-            for (int i1 = 0; i1 < 16; ++i1)
+            for (int var4 = 0; var4 < 16; ++var4)
             {
-                for (int j1 = 0; j1 < 16; ++j1)
+                for (int var5 = 0; var5 < 16; ++var5)
                 {
-                    if (l == 0 || l == 15 || i1 == 0 || i1 == 15 || j1 == 0 || j1 == 15)
+                    if (var3 == 0 || var3 == 15 || var4 == 0 || var4 == 15 || var5 == 0 || var5 == 15)
                     {
-                        field_178613_e[k++] = getIndex(l, i1, j1);
+                        field_178613_e[var2++] = func_178605_a(var3, var4, var5);
                     }
                 }
             }
         }
     }
+
+    static final class SwitchEnumFacing
+    {
+        static final int[] field_178617_a = new int[EnumFacing.values().length];
+        
+
+        static
+        {
+            try
+            {
+                field_178617_a[EnumFacing.DOWN.ordinal()] = 1;
+            }
+            catch (NoSuchFieldError var6)
+            {
+                ;
+            }
+
+            try
+            {
+                field_178617_a[EnumFacing.UP.ordinal()] = 2;
+            }
+            catch (NoSuchFieldError var5)
+            {
+                ;
+            }
+
+            try
+            {
+                field_178617_a[EnumFacing.NORTH.ordinal()] = 3;
+            }
+            catch (NoSuchFieldError var4)
+            {
+                ;
+            }
+
+            try
+            {
+                field_178617_a[EnumFacing.SOUTH.ordinal()] = 4;
+            }
+            catch (NoSuchFieldError var3)
+            {
+                ;
+            }
+
+            try
+            {
+                field_178617_a[EnumFacing.WEST.ordinal()] = 5;
+            }
+            catch (NoSuchFieldError var2)
+            {
+                ;
+            }
+
+            try
+            {
+                field_178617_a[EnumFacing.EAST.ordinal()] = 6;
+            }
+            catch (NoSuchFieldError var1)
+            {
+                ;
+            }
+        }
+    }
+
 }

@@ -15,35 +15,27 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.StatCollector;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class BlockWall extends Block
 {
-    public static final PropertyBool UP = PropertyBool.create("up");
-    public static final PropertyBool NORTH = PropertyBool.create("north");
-    public static final PropertyBool EAST = PropertyBool.create("east");
-    public static final PropertyBool SOUTH = PropertyBool.create("south");
-    public static final PropertyBool WEST = PropertyBool.create("west");
-    public static final PropertyEnum<BlockWall.EnumType> VARIANT = PropertyEnum.<BlockWall.EnumType>create("variant", BlockWall.EnumType.class);
+    public static final PropertyBool field_176256_a = PropertyBool.create("up");
+    public static final PropertyBool field_176254_b = PropertyBool.create("north");
+    public static final PropertyBool field_176257_M = PropertyBool.create("east");
+    public static final PropertyBool field_176258_N = PropertyBool.create("south");
+    public static final PropertyBool field_176259_O = PropertyBool.create("west");
+    public static final PropertyEnum field_176255_P = PropertyEnum.create("variant", BlockWall.EnumType.class);
+    
 
-    public BlockWall(Block modelBlock)
+    public BlockWall(Block p_i45435_1_)
     {
-        super(modelBlock.blockMaterial);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(UP, Boolean.valueOf(false)).withProperty(NORTH, Boolean.valueOf(false)).withProperty(EAST, Boolean.valueOf(false)).withProperty(SOUTH, Boolean.valueOf(false)).withProperty(WEST, Boolean.valueOf(false)).withProperty(VARIANT, BlockWall.EnumType.NORMAL));
-        this.setHardness(modelBlock.blockHardness);
-        this.setResistance(modelBlock.blockResistance / 3.0F);
-        this.setStepSound(modelBlock.stepSound);
+        super(p_i45435_1_.blockMaterial);
+        this.setDefaultState(this.blockState.getBaseState().withProperty(field_176256_a, Boolean.valueOf(false)).withProperty(field_176254_b, Boolean.valueOf(false)).withProperty(field_176257_M, Boolean.valueOf(false)).withProperty(field_176258_N, Boolean.valueOf(false)).withProperty(field_176259_O, Boolean.valueOf(false)).withProperty(field_176255_P, BlockWall.EnumType.NORMAL));
+        this.setHardness(p_i45435_1_.blockHardness);
+        this.setResistance(p_i45435_1_.blockResistance / 3.0F);
+        this.setStepSound(p_i45435_1_.stepSound);
         this.setCreativeTab(CreativeTabs.tabBlock);
-    }
-
-    /**
-     * Gets the localized name of this block. Used for the statistics page.
-     */
-    public String getLocalizedName()
-    {
-        return StatCollector.translateToLocal(this.getUnlocalizedName() + "." + BlockWall.EnumType.NORMAL.getUnlocalizedName() + ".name");
     }
 
     public boolean isFullCube()
@@ -51,65 +43,62 @@ public class BlockWall extends Block
         return false;
     }
 
-    public boolean isPassable(IBlockAccess worldIn, BlockPos pos)
+    public boolean isPassable(IBlockAccess blockAccess, BlockPos pos)
     {
         return false;
     }
 
-    /**
-     * Used to determine ambient occlusion and culling when rebuilding chunks for render
-     */
     public boolean isOpaqueCube()
     {
         return false;
     }
 
-    public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
+    public void setBlockBoundsBasedOnState(IBlockAccess access, BlockPos pos)
     {
-        boolean flag = this.canConnectTo(worldIn, pos.north());
-        boolean flag1 = this.canConnectTo(worldIn, pos.south());
-        boolean flag2 = this.canConnectTo(worldIn, pos.west());
-        boolean flag3 = this.canConnectTo(worldIn, pos.east());
-        float f = 0.25F;
-        float f1 = 0.75F;
-        float f2 = 0.25F;
-        float f3 = 0.75F;
-        float f4 = 1.0F;
+        boolean var3 = this.func_176253_e(access, pos.offsetNorth());
+        boolean var4 = this.func_176253_e(access, pos.offsetSouth());
+        boolean var5 = this.func_176253_e(access, pos.offsetWest());
+        boolean var6 = this.func_176253_e(access, pos.offsetEast());
+        float var7 = 0.25F;
+        float var8 = 0.75F;
+        float var9 = 0.25F;
+        float var10 = 0.75F;
+        float var11 = 1.0F;
 
-        if (flag)
+        if (var3)
         {
-            f2 = 0.0F;
+            var9 = 0.0F;
         }
 
-        if (flag1)
+        if (var4)
         {
-            f3 = 1.0F;
+            var10 = 1.0F;
         }
 
-        if (flag2)
+        if (var5)
         {
-            f = 0.0F;
+            var7 = 0.0F;
         }
 
-        if (flag3)
+        if (var6)
         {
-            f1 = 1.0F;
+            var8 = 1.0F;
         }
 
-        if (flag && flag1 && !flag2 && !flag3)
+        if (var3 && var4 && !var5 && !var6)
         {
-            f4 = 0.8125F;
-            f = 0.3125F;
-            f1 = 0.6875F;
+            var11 = 0.8125F;
+            var7 = 0.3125F;
+            var8 = 0.6875F;
         }
-        else if (!flag && !flag1 && flag2 && flag3)
+        else if (!var3 && !var4 && var5 && var6)
         {
-            f4 = 0.8125F;
-            f2 = 0.3125F;
-            f3 = 0.6875F;
+            var11 = 0.8125F;
+            var9 = 0.3125F;
+            var10 = 0.6875F;
         }
 
-        this.setBlockBounds(f, 0.0F, f2, f1, f4, f3);
+        this.setBlockBounds(var7, 0.0F, var9, var8, var11, var10);
     }
 
     public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state)
@@ -119,30 +108,33 @@ public class BlockWall extends Block
         return super.getCollisionBoundingBox(worldIn, pos, state);
     }
 
-    public boolean canConnectTo(IBlockAccess worldIn, BlockPos pos)
+    public boolean func_176253_e(IBlockAccess p_176253_1_, BlockPos p_176253_2_)
     {
-        Block block = worldIn.getBlockState(pos).getBlock();
-        return block == Blocks.barrier ? false : (block != this && !(block instanceof BlockFenceGate) ? (block.blockMaterial.isOpaque() && block.isFullCube() ? block.blockMaterial != Material.gourd : false) : true);
+        Block var3 = p_176253_1_.getBlockState(p_176253_2_).getBlock();
+        return var3 == Blocks.barrier ? false : (var3 != this && !(var3 instanceof BlockFenceGate) ? (var3.blockMaterial.isOpaque() && var3.isFullCube() ? var3.blockMaterial != Material.gourd : false) : true);
     }
 
     /**
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
     {
-        for (BlockWall.EnumType blockwall$enumtype : BlockWall.EnumType.values())
+        BlockWall.EnumType[] var4 = BlockWall.EnumType.values();
+        int var5 = var4.length;
+
+        for (int var6 = 0; var6 < var5; ++var6)
         {
-            list.add(new ItemStack(itemIn, 1, blockwall$enumtype.getMetadata()));
+            BlockWall.EnumType var7 = var4[var6];
+            list.add(new ItemStack(itemIn, 1, var7.func_176657_a()));
         }
     }
 
     /**
-     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
-     * returns the metadata of the dropped item based on the old metadata of the block.
+     * Get the damage value that this Block should drop
      */
     public int damageDropped(IBlockState state)
     {
-        return ((BlockWall.EnumType)state.getValue(VARIANT)).getMetadata();
+        return ((BlockWall.EnumType)state.getValue(field_176255_P)).func_176657_a();
     }
 
     public boolean shouldSideBeRendered(IBlockAccess worldIn, BlockPos pos, EnumFacing side)
@@ -155,7 +147,7 @@ public class BlockWall extends Block
      */
     public IBlockState getStateFromMeta(int meta)
     {
-        return this.getDefaultState().withProperty(VARIANT, BlockWall.EnumType.byMetadata(meta));
+        return this.getDefaultState().withProperty(field_176255_P, BlockWall.EnumType.func_176660_a(meta));
     }
 
     /**
@@ -163,7 +155,7 @@ public class BlockWall extends Block
      */
     public int getMetaFromState(IBlockState state)
     {
-        return ((BlockWall.EnumType)state.getValue(VARIANT)).getMetadata();
+        return ((BlockWall.EnumType)state.getValue(field_176255_P)).func_176657_a();
     }
 
     /**
@@ -172,65 +164,71 @@ public class BlockWall extends Block
      */
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
     {
-        return state.withProperty(UP, Boolean.valueOf(!worldIn.isAirBlock(pos.up()))).withProperty(NORTH, Boolean.valueOf(this.canConnectTo(worldIn, pos.north()))).withProperty(EAST, Boolean.valueOf(this.canConnectTo(worldIn, pos.east()))).withProperty(SOUTH, Boolean.valueOf(this.canConnectTo(worldIn, pos.south()))).withProperty(WEST, Boolean.valueOf(this.canConnectTo(worldIn, pos.west())));
+        return state.withProperty(field_176256_a, Boolean.valueOf(!worldIn.isAirBlock(pos.offsetUp()))).withProperty(field_176254_b, Boolean.valueOf(this.func_176253_e(worldIn, pos.offsetNorth()))).withProperty(field_176257_M, Boolean.valueOf(this.func_176253_e(worldIn, pos.offsetEast()))).withProperty(field_176258_N, Boolean.valueOf(this.func_176253_e(worldIn, pos.offsetSouth()))).withProperty(field_176259_O, Boolean.valueOf(this.func_176253_e(worldIn, pos.offsetWest())));
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {UP, NORTH, EAST, WEST, SOUTH, VARIANT});
+        return new BlockState(this, new IProperty[] {field_176256_a, field_176254_b, field_176257_M, field_176259_O, field_176258_N, field_176255_P});
     }
 
     public static enum EnumType implements IStringSerializable
     {
-        NORMAL(0, "cobblestone", "normal"),
-        MOSSY(1, "mossy_cobblestone", "mossy");
+        NORMAL("NORMAL", 0, 0, "cobblestone", "normal"),
+        MOSSY("MOSSY", 1, 1, "mossy_cobblestone", "mossy");
+        private static final BlockWall.EnumType[] field_176666_c = new BlockWall.EnumType[values().length];
+        private final int field_176663_d;
+        private final String field_176664_e;
+        private String field_176661_f;
 
-        private static final BlockWall.EnumType[] META_LOOKUP = new BlockWall.EnumType[values().length];
-        private final int meta;
-        private final String name;
-        private String unlocalizedName;
+        private static final BlockWall.EnumType[] $VALUES = new BlockWall.EnumType[]{NORMAL, MOSSY};
+        
 
-        private EnumType(int meta, String name, String unlocalizedName)
+        private EnumType(String p_i45673_1_, int p_i45673_2_, int p_i45673_3_, String p_i45673_4_, String p_i45673_5_)
         {
-            this.meta = meta;
-            this.name = name;
-            this.unlocalizedName = unlocalizedName;
+            this.field_176663_d = p_i45673_3_;
+            this.field_176664_e = p_i45673_4_;
+            this.field_176661_f = p_i45673_5_;
         }
 
-        public int getMetadata()
+        public int func_176657_a()
         {
-            return this.meta;
+            return this.field_176663_d;
         }
 
         public String toString()
         {
-            return this.name;
+            return this.field_176664_e;
         }
 
-        public static BlockWall.EnumType byMetadata(int meta)
+        public static BlockWall.EnumType func_176660_a(int p_176660_0_)
         {
-            if (meta < 0 || meta >= META_LOOKUP.length)
+            if (p_176660_0_ < 0 || p_176660_0_ >= field_176666_c.length)
             {
-                meta = 0;
+                p_176660_0_ = 0;
             }
 
-            return META_LOOKUP[meta];
+            return field_176666_c[p_176660_0_];
         }
 
         public String getName()
         {
-            return this.name;
+            return this.field_176664_e;
         }
 
-        public String getUnlocalizedName()
+        public String func_176659_c()
         {
-            return this.unlocalizedName;
+            return this.field_176661_f;
         }
 
         static {
-            for (BlockWall.EnumType blockwall$enumtype : values())
+            BlockWall.EnumType[] var0 = values();
+            int var1 = var0.length;
+
+            for (int var2 = 0; var2 < var1; ++var2)
             {
-                META_LOOKUP[blockwall$enumtype.getMetadata()] = blockwall$enumtype;
+                BlockWall.EnumType var3 = var0[var2];
+                field_176666_c[var3.func_176657_a()] = var3;
             }
         }
     }

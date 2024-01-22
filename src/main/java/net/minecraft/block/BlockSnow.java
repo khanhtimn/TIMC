@@ -23,33 +23,31 @@ import net.minecraft.world.World;
 
 public class BlockSnow extends Block
 {
-    public static final PropertyInteger LAYERS = PropertyInteger.create("layers", 1, 8);
+    public static final PropertyInteger LAYERS_PROP = PropertyInteger.create("layers", 1, 8);
+    
 
     protected BlockSnow()
     {
         super(Material.snow);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(LAYERS, Integer.valueOf(1)));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(LAYERS_PROP, Integer.valueOf(1)));
         this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.125F, 1.0F);
         this.setTickRandomly(true);
         this.setCreativeTab(CreativeTabs.tabDecorations);
         this.setBlockBoundsForItemRender();
     }
 
-    public boolean isPassable(IBlockAccess worldIn, BlockPos pos)
+    public boolean isPassable(IBlockAccess blockAccess, BlockPos pos)
     {
-        return ((Integer)worldIn.getBlockState(pos).getValue(LAYERS)).intValue() < 5;
+        return ((Integer)blockAccess.getBlockState(pos).getValue(LAYERS_PROP)).intValue() < 5;
     }
 
     public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state)
     {
-        int i = ((Integer)state.getValue(LAYERS)).intValue() - 1;
-        float f = 0.125F;
-        return new AxisAlignedBB((double)pos.getX() + this.minX, (double)pos.getY() + this.minY, (double)pos.getZ() + this.minZ, (double)pos.getX() + this.maxX, (double)((float)pos.getY() + (float)i * f), (double)pos.getZ() + this.maxZ);
+        int var4 = ((Integer)state.getValue(LAYERS_PROP)).intValue() - 1;
+        float var5 = 0.125F;
+        return new AxisAlignedBB((double)pos.getX() + this.minX, (double)pos.getY() + this.minY, (double)pos.getZ() + this.minZ, (double)pos.getX() + this.maxX, (double)((float)pos.getY() + (float)var4 * var5), (double)pos.getZ() + this.maxZ);
     }
 
-    /**
-     * Used to determine ambient occlusion and culling when rebuilding chunks for render
-     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -68,10 +66,10 @@ public class BlockSnow extends Block
         this.getBoundsForLayers(0);
     }
 
-    public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
+    public void setBlockBoundsBasedOnState(IBlockAccess access, BlockPos pos)
     {
-        IBlockState iblockstate = worldIn.getBlockState(pos);
-        this.getBoundsForLayers(((Integer)iblockstate.getValue(LAYERS)).intValue());
+        IBlockState var3 = access.getBlockState(pos);
+        this.getBoundsForLayers(((Integer)var3.getValue(LAYERS_PROP)).intValue());
     }
 
     protected void getBoundsForLayers(int p_150154_1_)
@@ -81,25 +79,22 @@ public class BlockSnow extends Block
 
     public boolean canPlaceBlockAt(World worldIn, BlockPos pos)
     {
-        IBlockState iblockstate = worldIn.getBlockState(pos.down());
-        Block block = iblockstate.getBlock();
-        return block != Blocks.ice && block != Blocks.packed_ice ? (block.getMaterial() == Material.leaves ? true : (block == this && ((Integer)iblockstate.getValue(LAYERS)).intValue() >= 7 ? true : block.isOpaqueCube() && block.blockMaterial.blocksMovement())) : false;
+        IBlockState var3 = worldIn.getBlockState(pos.offsetDown());
+        Block var4 = var3.getBlock();
+        return var4 != Blocks.ice && var4 != Blocks.packed_ice ? (var4.getMaterial() == Material.leaves ? true : (var4 == this && ((Integer)var3.getValue(LAYERS_PROP)).intValue() == 7 ? true : var4.isOpaqueCube() && var4.blockMaterial.blocksMovement())) : false;
     }
 
-    /**
-     * Called when a neighboring block changes.
-     */
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
     {
         this.checkAndDropBlock(worldIn, pos, state);
     }
 
-    private boolean checkAndDropBlock(World worldIn, BlockPos pos, IBlockState state)
+    private boolean checkAndDropBlock(World worldIn, BlockPos p_176314_2_, IBlockState p_176314_3_)
     {
-        if (!this.canPlaceBlockAt(worldIn, pos))
+        if (!this.canPlaceBlockAt(worldIn, p_176314_2_))
         {
-            this.dropBlockAsItem(worldIn, pos, state, 0);
-            worldIn.setBlockToAir(pos);
+            this.dropBlockAsItem(worldIn, p_176314_2_, p_176314_3_, 0);
+            worldIn.setBlockToAir(p_176314_2_);
             return false;
         }
         else
@@ -108,15 +103,17 @@ public class BlockSnow extends Block
         }
     }
 
-    public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, TileEntity te)
+    public void harvestBlock(World worldIn, EntityPlayer playerIn, BlockPos pos, IBlockState state, TileEntity te)
     {
-        spawnAsEntity(worldIn, pos, new ItemStack(Items.snowball, ((Integer)state.getValue(LAYERS)).intValue() + 1, 0));
+        spawnAsEntity(worldIn, pos, new ItemStack(Items.snowball, ((Integer)state.getValue(LAYERS_PROP)).intValue() + 1, 0));
         worldIn.setBlockToAir(pos);
-        player.triggerAchievement(StatList.mineBlockStatArray[Block.getIdFromBlock(this)]);
+        playerIn.triggerAchievement(StatList.mineBlockStatArray[Block.getIdFromBlock(this)]);
     }
 
     /**
      * Get the Item that this Block should drop when harvested.
+     *  
+     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -150,7 +147,7 @@ public class BlockSnow extends Block
      */
     public IBlockState getStateFromMeta(int meta)
     {
-        return this.getDefaultState().withProperty(LAYERS, Integer.valueOf((meta & 7) + 1));
+        return this.getDefaultState().withProperty(LAYERS_PROP, Integer.valueOf((meta & 7) + 1));
     }
 
     /**
@@ -158,7 +155,7 @@ public class BlockSnow extends Block
      */
     public boolean isReplaceable(World worldIn, BlockPos pos)
     {
-        return ((Integer)worldIn.getBlockState(pos).getValue(LAYERS)).intValue() == 1;
+        return ((Integer)worldIn.getBlockState(pos).getValue(LAYERS_PROP)).intValue() == 1;
     }
 
     /**
@@ -166,11 +163,11 @@ public class BlockSnow extends Block
      */
     public int getMetaFromState(IBlockState state)
     {
-        return ((Integer)state.getValue(LAYERS)).intValue() - 1;
+        return ((Integer)state.getValue(LAYERS_PROP)).intValue() - 1;
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {LAYERS});
+        return new BlockState(this, new IProperty[] {LAYERS_PROP});
     }
 }

@@ -13,5 +13,5 @@ public interface IVertexConsumer
 
     void setQuadColored();
 
-    void put(int var1, float... var2);
+    void put(int var1, float ... var2);
 }

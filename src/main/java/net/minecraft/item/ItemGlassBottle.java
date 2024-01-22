@@ -11,6 +11,8 @@ import net.minecraft.world.World;
 
 public class ItemGlassBottle extends Item
 {
+    
+
     public ItemGlassBottle()
     {
         this.setCreativeTab(CreativeTabs.tabBrewing);
@@ -21,29 +23,29 @@ public class ItemGlassBottle extends Item
      */
     public ItemStack onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn)
     {
-        MovingObjectPosition movingobjectposition = this.getMovingObjectPositionFromPlayer(worldIn, playerIn, true);
+        MovingObjectPosition var4 = this.getMovingObjectPositionFromPlayer(worldIn, playerIn, true);
 
-        if (movingobjectposition == null)
+        if (var4 == null)
         {
             return itemStackIn;
         }
         else
         {
-            if (movingobjectposition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
+            if (var4.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
             {
-                BlockPos blockpos = movingobjectposition.getBlockPos();
+                BlockPos var5 = var4.func_178782_a();
 
-                if (!worldIn.isBlockModifiable(playerIn, blockpos))
+                if (!worldIn.isBlockModifiable(playerIn, var5))
                 {
                     return itemStackIn;
                 }
 
-                if (!playerIn.canPlayerEdit(blockpos.offset(movingobjectposition.sideHit), movingobjectposition.sideHit, itemStackIn))
+                if (!playerIn.func_175151_a(var5.offset(var4.field_178784_b), var4.field_178784_b, itemStackIn))
                 {
                     return itemStackIn;
                 }
 
-                if (worldIn.getBlockState(blockpos).getBlock().getMaterial() == Material.water)
+                if (worldIn.getBlockState(var5).getBlock().getMaterial() == Material.water)
                 {
                     --itemStackIn.stackSize;
                     playerIn.triggerAchievement(StatList.objectUseStats[Item.getIdFromItem(this)]);

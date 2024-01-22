@@ -6,35 +6,40 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.culling.ICamera;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityHanging;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.src.Config;
-import net.optifine.shaders.Shaders;
+import net.minecraft.entity.EntityLivingBase;
+import optifine.Config;
+import shadersmod.client.Shaders;
 
-public abstract class RenderLiving<T extends EntityLiving> extends RendererLivingEntity<T>
+public abstract class RenderLiving extends RendererLivingEntity
 {
-    public RenderLiving(RenderManager rendermanagerIn, ModelBase modelbaseIn, float shadowsizeIn)
+    
+
+    public RenderLiving(RenderManager p_i46153_1_, ModelBase p_i46153_2_, float p_i46153_3_)
     {
-        super(rendermanagerIn, modelbaseIn, shadowsizeIn);
+        super(p_i46153_1_, p_i46153_2_, p_i46153_3_);
     }
 
-    protected boolean canRenderName(T entity)
+    /**
+     * Test if the entity name must be rendered
+     */
+    protected boolean canRenderName(EntityLiving targetEntity)
     {
-        return super.canRenderName(entity) && (entity.getAlwaysRenderNameTagForRender() || entity.hasCustomName() && entity == this.renderManager.pointedEntity);
+        return super.canRenderName(targetEntity) && (targetEntity.getAlwaysRenderNameTagForRender() || targetEntity.hasCustomName() && targetEntity == this.renderManager.field_147941_i);
     }
 
-    public boolean shouldRender(T livingEntity, ICamera camera, double camX, double camY, double camZ)
+    public boolean func_177104_a(EntityLiving p_177104_1_, ICamera p_177104_2_, double p_177104_3_, double p_177104_5_, double p_177104_7_)
     {
-        if (super.shouldRender(livingEntity, camera, camX, camY, camZ))
+        if (super.func_177071_a(p_177104_1_, p_177104_2_, p_177104_3_, p_177104_5_, p_177104_7_))
         {
             return true;
         }
-        else if (livingEntity.getLeashed() && livingEntity.getLeashedToEntity() != null)
+        else if (p_177104_1_.getLeashed() && p_177104_1_.getLeashedToEntity() != null)
         {
-            Entity entity = livingEntity.getLeashedToEntity();
-            return camera.isBoundingBoxInFrustum(entity.getEntityBoundingBox());
+            Entity var9 = p_177104_1_.getLeashedToEntity();
+            return p_177104_2_.isBoundingBoxInFrustum(var9.getEntityBoundingBox());
         }
         else
         {
@@ -43,69 +48,69 @@ public abstract class RenderLiving<T extends EntityLiving> extends RendererLivin
     }
 
     /**
-     * Renders the desired {@code T} type Entity.
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
      */
-    public void doRender(T entity, double x, double y, double z, float entityYaw, float partialTicks)
+    public void doRender(EntityLiving p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
     {
-        super.doRender(entity, x, y, z, entityYaw, partialTicks);
-        this.renderLeash(entity, x, y, z, entityYaw, partialTicks);
+        super.doRender((EntityLivingBase)p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
+        this.func_110827_b(p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
     }
 
-    public void setLightmap(T entityLivingIn, float partialTicks)
+    public void func_177105_a(EntityLiving p_177105_1_, float p_177105_2_)
     {
-        int i = entityLivingIn.getBrightnessForRender(partialTicks);
-        int j = i % 65536;
-        int k = i / 65536;
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)j / 1.0F, (float)k / 1.0F);
+        int var3 = p_177105_1_.getBrightnessForRender(p_177105_2_);
+        int var4 = var3 % 65536;
+        int var5 = var3 / 65536;
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float)var4 / 1.0F, (float)var5 / 1.0F);
     }
 
-    /**
-     * Gets the value between start and end according to pct
-     */
-    private double interpolateValue(double start, double end, double pct)
+    private double func_110828_a(double start, double end, double pct)
     {
         return start + (end - start) * pct;
     }
 
-    protected void renderLeash(T entityLivingIn, double x, double y, double z, float entityYaw, float partialTicks)
+    protected void func_110827_b(EntityLiving p_110827_1_, double p_110827_2_, double p_110827_4_, double p_110827_6_, float p_110827_8_, float p_110827_9_)
     {
         if (!Config.isShaders() || !Shaders.isShadowPass)
         {
-            Entity entity = entityLivingIn.getLeashedToEntity();
+            Entity var10 = p_110827_1_.getLeashedToEntity();
 
-            if (entity != null)
+            if (var10 != null)
             {
-                y = y - (1.6D - (double)entityLivingIn.height) * 0.5D;
-                Tessellator tessellator = Tessellator.getInstance();
-                WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-                double d0 = this.interpolateValue((double)entity.prevRotationYaw, (double)entity.rotationYaw, (double)(partialTicks * 0.5F)) * 0.01745329238474369D;
-                double d1 = this.interpolateValue((double)entity.prevRotationPitch, (double)entity.rotationPitch, (double)(partialTicks * 0.5F)) * 0.01745329238474369D;
-                double d2 = Math.cos(d0);
-                double d3 = Math.sin(d0);
-                double d4 = Math.sin(d1);
+                p_110827_4_ -= (1.6D - (double)p_110827_1_.height) * 0.5D;
+                Tessellator var11 = Tessellator.getInstance();
+                WorldRenderer var12 = var11.getWorldRenderer();
+                double var13 = this.func_110828_a((double)var10.prevRotationYaw, (double)var10.rotationYaw, (double)(p_110827_9_ * 0.5F)) * 0.01745329238474369D;
+                double var15 = this.func_110828_a((double)var10.prevRotationPitch, (double)var10.rotationPitch, (double)(p_110827_9_ * 0.5F)) * 0.01745329238474369D;
+                double var17 = Math.cos(var13);
+                double var19 = Math.sin(var13);
+                double var21 = Math.sin(var15);
 
-                if (entity instanceof EntityHanging)
+                if (var10 instanceof EntityHanging)
                 {
-                    d2 = 0.0D;
-                    d3 = 0.0D;
-                    d4 = -1.0D;
+                    var17 = 0.0D;
+                    var19 = 0.0D;
+                    var21 = -1.0D;
                 }
 
-                double d5 = Math.cos(d1);
-                double d6 = this.interpolateValue(entity.prevPosX, entity.posX, (double)partialTicks) - d2 * 0.7D - d3 * 0.5D * d5;
-                double d7 = this.interpolateValue(entity.prevPosY + (double)entity.getEyeHeight() * 0.7D, entity.posY + (double)entity.getEyeHeight() * 0.7D, (double)partialTicks) - d4 * 0.5D - 0.25D;
-                double d8 = this.interpolateValue(entity.prevPosZ, entity.posZ, (double)partialTicks) - d3 * 0.7D + d2 * 0.5D * d5;
-                double d9 = this.interpolateValue((double)entityLivingIn.prevRenderYawOffset, (double)entityLivingIn.renderYawOffset, (double)partialTicks) * 0.01745329238474369D + (Math.PI / 2D);
-                d2 = Math.cos(d9) * (double)entityLivingIn.width * 0.4D;
-                d3 = Math.sin(d9) * (double)entityLivingIn.width * 0.4D;
-                double d10 = this.interpolateValue(entityLivingIn.prevPosX, entityLivingIn.posX, (double)partialTicks) + d2;
-                double d11 = this.interpolateValue(entityLivingIn.prevPosY, entityLivingIn.posY, (double)partialTicks);
-                double d12 = this.interpolateValue(entityLivingIn.prevPosZ, entityLivingIn.posZ, (double)partialTicks) + d3;
-                x = x + d2;
-                z = z + d3;
-                double d13 = (double)((float)(d6 - d10));
-                double d14 = (double)((float)(d7 - d11));
-                double d15 = (double)((float)(d8 - d12));
+                double var23 = Math.cos(var15);
+                double var25 = this.func_110828_a(var10.prevPosX, var10.posX, (double)p_110827_9_) - var17 * 0.7D - var19 * 0.5D * var23;
+                double var27 = this.func_110828_a(var10.prevPosY + (double)var10.getEyeHeight() * 0.7D, var10.posY + (double)var10.getEyeHeight() * 0.7D, (double)p_110827_9_) - var21 * 0.5D - 0.25D;
+                double var29 = this.func_110828_a(var10.prevPosZ, var10.posZ, (double)p_110827_9_) - var19 * 0.7D + var17 * 0.5D * var23;
+                double var31 = this.func_110828_a((double)p_110827_1_.prevRenderYawOffset, (double)p_110827_1_.renderYawOffset, (double)p_110827_9_) * 0.01745329238474369D + (Math.PI / 2D);
+                var17 = Math.cos(var31) * (double)p_110827_1_.width * 0.4D;
+                var19 = Math.sin(var31) * (double)p_110827_1_.width * 0.4D;
+                double var33 = this.func_110828_a(p_110827_1_.prevPosX, p_110827_1_.posX, (double)p_110827_9_) + var17;
+                double var35 = this.func_110828_a(p_110827_1_.prevPosY, p_110827_1_.posY, (double)p_110827_9_);
+                double var37 = this.func_110828_a(p_110827_1_.prevPosZ, p_110827_1_.posZ, (double)p_110827_9_) + var19;
+                p_110827_2_ += var17;
+                p_110827_6_ += var19;
+                double var39 = (double)((float)(var25 - var33));
+                double var41 = (double)((float)(var27 - var35));
+                double var43 = (double)((float)(var29 - var37));
                 GlStateManager.disableTexture2D();
                 GlStateManager.disableLighting();
                 GlStateManager.disableCull();
@@ -115,50 +120,48 @@ public abstract class RenderLiving<T extends EntityLiving> extends RendererLivin
                     Shaders.beginLeash();
                 }
 
-                int i = 24;
-                double d16 = 0.025D;
-                worldrenderer.begin(5, DefaultVertexFormats.POSITION_COLOR);
+                boolean var45 = true;
+                double var46 = 0.025D;
+                var12.startDrawing(5);
+                int var48;
+                float var49;
 
-                for (int j = 0; j <= 24; ++j)
+                for (var48 = 0; var48 <= 24; ++var48)
                 {
-                    float f = 0.5F;
-                    float f1 = 0.4F;
-                    float f2 = 0.3F;
-
-                    if (j % 2 == 0)
+                    if (var48 % 2 == 0)
                     {
-                        f *= 0.7F;
-                        f1 *= 0.7F;
-                        f2 *= 0.7F;
+                        var12.func_178960_a(0.5F, 0.4F, 0.3F, 1.0F);
+                    }
+                    else
+                    {
+                        var12.func_178960_a(0.35F, 0.28F, 0.21000001F, 1.0F);
                     }
 
-                    float f3 = (float)j / 24.0F;
-                    worldrenderer.pos(x + d13 * (double)f3 + 0.0D, y + d14 * (double)(f3 * f3 + f3) * 0.5D + (double)((24.0F - (float)j) / 18.0F + 0.125F), z + d15 * (double)f3).color(f, f1, f2, 1.0F).endVertex();
-                    worldrenderer.pos(x + d13 * (double)f3 + 0.025D, y + d14 * (double)(f3 * f3 + f3) * 0.5D + (double)((24.0F - (float)j) / 18.0F + 0.125F) + 0.025D, z + d15 * (double)f3).color(f, f1, f2, 1.0F).endVertex();
+                    var49 = (float)var48 / 24.0F;
+                    var12.addVertex(p_110827_2_ + var39 * (double)var49 + 0.0D, p_110827_4_ + var41 * (double)(var49 * var49 + var49) * 0.5D + (double)((24.0F - (float)var48) / 18.0F + 0.125F), p_110827_6_ + var43 * (double)var49);
+                    var12.addVertex(p_110827_2_ + var39 * (double)var49 + 0.025D, p_110827_4_ + var41 * (double)(var49 * var49 + var49) * 0.5D + (double)((24.0F - (float)var48) / 18.0F + 0.125F) + 0.025D, p_110827_6_ + var43 * (double)var49);
                 }
 
-                tessellator.draw();
-                worldrenderer.begin(5, DefaultVertexFormats.POSITION_COLOR);
+                var11.draw();
+                var12.startDrawing(5);
 
-                for (int k = 0; k <= 24; ++k)
+                for (var48 = 0; var48 <= 24; ++var48)
                 {
-                    float f4 = 0.5F;
-                    float f5 = 0.4F;
-                    float f6 = 0.3F;
-
-                    if (k % 2 == 0)
+                    if (var48 % 2 == 0)
                     {
-                        f4 *= 0.7F;
-                        f5 *= 0.7F;
-                        f6 *= 0.7F;
+                        var12.func_178960_a(0.5F, 0.4F, 0.3F, 1.0F);
+                    }
+                    else
+                    {
+                        var12.func_178960_a(0.35F, 0.28F, 0.21000001F, 1.0F);
                     }
 
-                    float f7 = (float)k / 24.0F;
-                    worldrenderer.pos(x + d13 * (double)f7 + 0.0D, y + d14 * (double)(f7 * f7 + f7) * 0.5D + (double)((24.0F - (float)k) / 18.0F + 0.125F) + 0.025D, z + d15 * (double)f7).color(f4, f5, f6, 1.0F).endVertex();
-                    worldrenderer.pos(x + d13 * (double)f7 + 0.025D, y + d14 * (double)(f7 * f7 + f7) * 0.5D + (double)((24.0F - (float)k) / 18.0F + 0.125F), z + d15 * (double)f7 + 0.025D).color(f4, f5, f6, 1.0F).endVertex();
+                    var49 = (float)var48 / 24.0F;
+                    var12.addVertex(p_110827_2_ + var39 * (double)var49 + 0.0D, p_110827_4_ + var41 * (double)(var49 * var49 + var49) * 0.5D + (double)((24.0F - (float)var48) / 18.0F + 0.125F) + 0.025D, p_110827_6_ + var43 * (double)var49);
+                    var12.addVertex(p_110827_2_ + var39 * (double)var49 + 0.025D, p_110827_4_ + var41 * (double)(var49 * var49 + var49) * 0.5D + (double)((24.0F - (float)var48) / 18.0F + 0.125F), p_110827_6_ + var43 * (double)var49 + 0.025D);
                 }
 
-                tessellator.draw();
+                var11.draw();
 
                 if (Config.isShaders())
                 {
@@ -170,5 +173,45 @@ public abstract class RenderLiving<T extends EntityLiving> extends RendererLivin
                 GlStateManager.enableCull();
             }
         }
+    }
+
+    /**
+     * Test if the entity name must be rendered
+     */
+    protected boolean canRenderName(EntityLivingBase targetEntity)
+    {
+        return this.canRenderName((EntityLiving)targetEntity);
+    }
+
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
+    public void doRender(EntityLivingBase p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
+    {
+        this.doRender((EntityLiving)p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
+    }
+
+    protected boolean func_177070_b(Entity p_177070_1_)
+    {
+        return this.canRenderName((EntityLiving)p_177070_1_);
+    }
+
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
+    public void doRender(Entity p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
+    {
+        this.doRender((EntityLiving)p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
+    }
+
+    public boolean func_177071_a(Entity p_177071_1_, ICamera p_177071_2_, double p_177071_3_, double p_177071_5_, double p_177071_7_)
+    {
+        return this.func_177104_a((EntityLiving)p_177071_1_, p_177071_2_, p_177071_3_, p_177071_5_, p_177071_7_);
     }
 }

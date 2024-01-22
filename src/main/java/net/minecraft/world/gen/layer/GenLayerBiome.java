@@ -6,15 +6,20 @@ import net.minecraft.world.gen.ChunkProviderSettings;
 
 public class GenLayerBiome extends GenLayer
 {
-    private BiomeGenBase[] field_151623_c = new BiomeGenBase[] {BiomeGenBase.desert, BiomeGenBase.desert, BiomeGenBase.desert, BiomeGenBase.savanna, BiomeGenBase.savanna, BiomeGenBase.plains};
-    private BiomeGenBase[] field_151621_d = new BiomeGenBase[] {BiomeGenBase.forest, BiomeGenBase.roofedForest, BiomeGenBase.extremeHills, BiomeGenBase.plains, BiomeGenBase.birchForest, BiomeGenBase.swampland};
-    private BiomeGenBase[] field_151622_e = new BiomeGenBase[] {BiomeGenBase.forest, BiomeGenBase.extremeHills, BiomeGenBase.taiga, BiomeGenBase.plains};
-    private BiomeGenBase[] field_151620_f = new BiomeGenBase[] {BiomeGenBase.icePlains, BiomeGenBase.icePlains, BiomeGenBase.icePlains, BiomeGenBase.coldTaiga};
+    private BiomeGenBase[] field_151623_c;
+    private BiomeGenBase[] field_151621_d;
+    private BiomeGenBase[] field_151622_e;
+    private BiomeGenBase[] field_151620_f;
     private final ChunkProviderSettings field_175973_g;
+    
 
     public GenLayerBiome(long p_i45560_1_, GenLayer p_i45560_3_, WorldType p_i45560_4_, String p_i45560_5_)
     {
         super(p_i45560_1_);
+        this.field_151623_c = new BiomeGenBase[] {BiomeGenBase.desert, BiomeGenBase.desert, BiomeGenBase.desert, BiomeGenBase.savanna, BiomeGenBase.savanna, BiomeGenBase.plains};
+        this.field_151621_d = new BiomeGenBase[] {BiomeGenBase.forest, BiomeGenBase.roofedForest, BiomeGenBase.extremeHills, BiomeGenBase.plains, BiomeGenBase.birchForest, BiomeGenBase.swampland};
+        this.field_151622_e = new BiomeGenBase[] {BiomeGenBase.forest, BiomeGenBase.extremeHills, BiomeGenBase.taiga, BiomeGenBase.plains};
+        this.field_151620_f = new BiomeGenBase[] {BiomeGenBase.icePlains, BiomeGenBase.icePlains, BiomeGenBase.icePlains, BiomeGenBase.coldTaiga};
         this.parent = p_i45560_3_;
 
         if (p_i45560_4_ == WorldType.DEFAULT_1_1)
@@ -24,7 +29,7 @@ public class GenLayerBiome extends GenLayer
         }
         else if (p_i45560_4_ == WorldType.CUSTOMIZED)
         {
-            this.field_175973_g = ChunkProviderSettings.Factory.jsonToFactory(p_i45560_5_).func_177864_b();
+            this.field_175973_g = ChunkProviderSettings.Factory.func_177865_a(p_i45560_5_).func_177864_b();
         }
         else
         {
@@ -38,81 +43,81 @@ public class GenLayerBiome extends GenLayer
      */
     public int[] getInts(int areaX, int areaY, int areaWidth, int areaHeight)
     {
-        int[] aint = this.parent.getInts(areaX, areaY, areaWidth, areaHeight);
-        int[] aint1 = IntCache.getIntCache(areaWidth * areaHeight);
+        int[] var5 = this.parent.getInts(areaX, areaY, areaWidth, areaHeight);
+        int[] var6 = IntCache.getIntCache(areaWidth * areaHeight);
 
-        for (int i = 0; i < areaHeight; ++i)
+        for (int var7 = 0; var7 < areaHeight; ++var7)
         {
-            for (int j = 0; j < areaWidth; ++j)
+            for (int var8 = 0; var8 < areaWidth; ++var8)
             {
-                this.initChunkSeed((long)(j + areaX), (long)(i + areaY));
-                int k = aint[j + i * areaWidth];
-                int l = (k & 3840) >> 8;
-                k = k & -3841;
+                this.initChunkSeed((long)(var8 + areaX), (long)(var7 + areaY));
+                int var9 = var5[var8 + var7 * areaWidth];
+                int var10 = (var9 & 3840) >> 8;
+                var9 &= -3841;
 
-                if (this.field_175973_g != null && this.field_175973_g.fixedBiome >= 0)
+                if (this.field_175973_g != null && this.field_175973_g.field_177779_F >= 0)
                 {
-                    aint1[j + i * areaWidth] = this.field_175973_g.fixedBiome;
+                    var6[var8 + var7 * areaWidth] = this.field_175973_g.field_177779_F;
                 }
-                else if (isBiomeOceanic(k))
+                else if (isBiomeOceanic(var9))
                 {
-                    aint1[j + i * areaWidth] = k;
+                    var6[var8 + var7 * areaWidth] = var9;
                 }
-                else if (k == BiomeGenBase.mushroomIsland.biomeID)
+                else if (var9 == BiomeGenBase.mushroomIsland.biomeID)
                 {
-                    aint1[j + i * areaWidth] = k;
+                    var6[var8 + var7 * areaWidth] = var9;
                 }
-                else if (k == 1)
+                else if (var9 == 1)
                 {
-                    if (l > 0)
+                    if (var10 > 0)
                     {
                         if (this.nextInt(3) == 0)
                         {
-                            aint1[j + i * areaWidth] = BiomeGenBase.mesaPlateau.biomeID;
+                            var6[var8 + var7 * areaWidth] = BiomeGenBase.mesaPlateau.biomeID;
                         }
                         else
                         {
-                            aint1[j + i * areaWidth] = BiomeGenBase.mesaPlateau_F.biomeID;
+                            var6[var8 + var7 * areaWidth] = BiomeGenBase.mesaPlateau_F.biomeID;
                         }
                     }
                     else
                     {
-                        aint1[j + i * areaWidth] = this.field_151623_c[this.nextInt(this.field_151623_c.length)].biomeID;
+                        var6[var8 + var7 * areaWidth] = this.field_151623_c[this.nextInt(this.field_151623_c.length)].biomeID;
                     }
                 }
-                else if (k == 2)
+                else if (var9 == 2)
                 {
-                    if (l > 0)
+                    if (var10 > 0)
                     {
-                        aint1[j + i * areaWidth] = BiomeGenBase.jungle.biomeID;
+                        var6[var8 + var7 * areaWidth] = BiomeGenBase.jungle.biomeID;
                     }
                     else
                     {
-                        aint1[j + i * areaWidth] = this.field_151621_d[this.nextInt(this.field_151621_d.length)].biomeID;
+                        var6[var8 + var7 * areaWidth] = this.field_151621_d[this.nextInt(this.field_151621_d.length)].biomeID;
                     }
                 }
-                else if (k == 3)
+                else if (var9 == 3)
                 {
-                    if (l > 0)
+                    if (var10 > 0)
                     {
-                        aint1[j + i * areaWidth] = BiomeGenBase.megaTaiga.biomeID;
+                        var6[var8 + var7 * areaWidth] = BiomeGenBase.megaTaiga.biomeID;
                     }
                     else
                     {
-                        aint1[j + i * areaWidth] = this.field_151622_e[this.nextInt(this.field_151622_e.length)].biomeID;
+                        var6[var8 + var7 * areaWidth] = this.field_151622_e[this.nextInt(this.field_151622_e.length)].biomeID;
                     }
                 }
-                else if (k == 4)
+                else if (var9 == 4)
                 {
-                    aint1[j + i * areaWidth] = this.field_151620_f[this.nextInt(this.field_151620_f.length)].biomeID;
+                    var6[var8 + var7 * areaWidth] = this.field_151620_f[this.nextInt(this.field_151620_f.length)].biomeID;
                 }
                 else
                 {
-                    aint1[j + i * areaWidth] = BiomeGenBase.mushroomIsland.biomeID;
+                    var6[var8 + var7 * areaWidth] = BiomeGenBase.mushroomIsland.biomeID;
                 }
             }
         }
 
-        return aint1;
+        return var6;
     }
 }

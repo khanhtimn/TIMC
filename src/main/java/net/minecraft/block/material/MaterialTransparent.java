@@ -2,15 +2,14 @@ package net.minecraft.block.material;
 
 public class MaterialTransparent extends Material
 {
-    public MaterialTransparent(MapColor color)
+    
+
+    public MaterialTransparent(MapColor p_i2113_1_)
     {
-        super(color);
+        super(p_i2113_1_);
         this.setReplaceable();
     }
 
-    /**
-     * Returns true if the block is a considered solid. This is true by default.
-     */
     public boolean isSolid()
     {
         return false;

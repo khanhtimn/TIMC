@@ -2,6 +2,8 @@ package net.minecraft.client.gui;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.UnmodifiableIterator;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
@@ -11,11 +13,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.src.Config;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.EnumFacing;
@@ -25,11 +24,8 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.Chunk;
-import net.optifine.SmartAnimations;
-import net.optifine.TextureAnimations;
-import net.optifine.reflect.Reflector;
-import net.optifine.util.MemoryMonitor;
-import net.optifine.util.NativeMemory;
+import optifine.Reflector;
+
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
@@ -37,11 +33,7 @@ public class GuiOverlayDebug extends Gui
 {
     private final Minecraft mc;
     private final FontRenderer fontRenderer;
-    private String debugOF = null;
-    private List<String> debugInfoLeft = null;
-    private List<String> debugInfoRight = null;
-    private long updateInfoLeftTimeMs = 0L;
-    private long updateInfoRightTimeMs = 0L;
+    
 
     public GuiOverlayDebug(Minecraft mc)
     {
@@ -49,302 +41,233 @@ public class GuiOverlayDebug extends Gui
         this.fontRenderer = mc.fontRendererObj;
     }
 
-    public void renderDebugInfo(ScaledResolution scaledResolutionIn)
+    public void func_175237_a(ScaledResolution scaledResolutionIn)
     {
         this.mc.mcProfiler.startSection("debug");
         GlStateManager.pushMatrix();
-        this.renderDebugInfoLeft();
-        this.renderDebugInfoRight(scaledResolutionIn);
+        this.func_180798_a();
+        this.func_175239_b(scaledResolutionIn);
         GlStateManager.popMatrix();
-
-        if (this.mc.gameSettings.lastServer)
-        {
-            this.renderLagometer();
-        }
-
         this.mc.mcProfiler.endSection();
     }
 
-    private boolean isReducedDebug()
+    private boolean func_175236_d()
     {
-        return this.mc.thePlayer.hasReducedDebug() || this.mc.gameSettings.reducedDebugInfo;
+        return this.mc.thePlayer.func_175140_cp() || this.mc.gameSettings.field_178879_v;
     }
 
-    protected void renderDebugInfoLeft()
+    protected void func_180798_a()
     {
-        List<String> list = this.debugInfoLeft;
+        List var1 = this.call();
 
-        if (list == null || System.currentTimeMillis() > this.updateInfoLeftTimeMs)
+        for (int var2 = 0; var2 < var1.size(); ++var2)
         {
-            list = this.call();
-            this.debugInfoLeft = list;
-            this.updateInfoLeftTimeMs = System.currentTimeMillis() + 100L;
-        }
+            String var3 = (String)var1.get(var2);
 
-        for (int i = 0; i < list.size(); ++i)
-        {
-            String s = (String)list.get(i);
-
-            if (!Strings.isNullOrEmpty(s))
+            if (!Strings.isNullOrEmpty(var3))
             {
-                int j = this.fontRenderer.FONT_HEIGHT;
-                int k = this.fontRenderer.getStringWidth(s);
-                int l = 2;
-                int i1 = 2 + j * i;
-                drawRect(1, i1 - 1, 2 + k + 1, i1 + j - 1, -1873784752);
-                this.fontRenderer.drawString(s, 2, i1, 14737632);
+                int var4 = this.fontRenderer.FONT_HEIGHT;
+                int var5 = this.fontRenderer.getStringWidth(var3);
+                boolean var6 = true;
+                int var7 = 2 + var4 * var2;
+                drawRect(1, var7 - 1, 2 + var5 + 1, var7 + var4 - 1, -1873784752);
+                this.fontRenderer.drawString(var3, 2, var7, 14737632);
             }
         }
     }
 
-    protected void renderDebugInfoRight(ScaledResolution scaledRes)
+    protected void func_175239_b(ScaledResolution p_175239_1_)
     {
-        List<String> list = this.debugInfoRight;
+        List var2 = this.func_175238_c();
 
-        if (list == null || System.currentTimeMillis() > this.updateInfoRightTimeMs)
+        for (int var3 = 0; var3 < var2.size(); ++var3)
         {
-            list = this.getDebugInfoRight();
-            this.debugInfoRight = list;
-            this.updateInfoRightTimeMs = System.currentTimeMillis() + 100L;
-        }
+            String var4 = (String)var2.get(var3);
 
-        for (int i = 0; i < list.size(); ++i)
-        {
-            String s = (String)list.get(i);
-
-            if (!Strings.isNullOrEmpty(s))
+            if (!Strings.isNullOrEmpty(var4))
             {
-                int j = this.fontRenderer.FONT_HEIGHT;
-                int k = this.fontRenderer.getStringWidth(s);
-                int l = scaledRes.getScaledWidth() - 2 - k;
-                int i1 = 2 + j * i;
-                drawRect(l - 1, i1 - 1, l + k + 1, i1 + j - 1, -1873784752);
-                this.fontRenderer.drawString(s, l, i1, 14737632);
+                int var5 = this.fontRenderer.FONT_HEIGHT;
+                int var6 = this.fontRenderer.getStringWidth(var4);
+                int var7 = p_175239_1_.getScaledWidth() - 2 - var6;
+                int var8 = 2 + var5 * var3;
+                drawRect(var7 - 1, var8 - 1, var7 + var6 + 1, var8 + var5 - 1, -1873784752);
+                this.fontRenderer.drawString(var4, var7, var8, 14737632);
             }
         }
     }
 
-    @SuppressWarnings("incomplete-switch")
-    protected List<String> call()
+    protected List call()
     {
-        BlockPos blockpos = new BlockPos(this.mc.getRenderViewEntity().posX, this.mc.getRenderViewEntity().getEntityBoundingBox().minY, this.mc.getRenderViewEntity().posZ);
+        BlockPos var1 = new BlockPos(this.mc.getRenderViewEntity().posX, this.mc.getRenderViewEntity().getEntityBoundingBox().minY, this.mc.getRenderViewEntity().posZ);
 
-        if (this.mc.debug != this.debugOF)
+        if (this.func_175236_d())
         {
-            StringBuffer stringbuffer = new StringBuffer(this.mc.debug);
-            int i = Config.getFpsMin();
-            int j = this.mc.debug.indexOf(" fps ");
-
-            if (j >= 0)
-            {
-                stringbuffer.insert(j, "/" + i);
-            }
-
-            if (Config.isSmoothFps())
-            {
-                stringbuffer.append(" sf");
-            }
-
-            if (Config.isFastRender())
-            {
-                stringbuffer.append(" fr");
-            }
-
-            if (Config.isAnisotropicFiltering())
-            {
-                stringbuffer.append(" af");
-            }
-
-            if (Config.isAntialiasing())
-            {
-                stringbuffer.append(" aa");
-            }
-
-            if (Config.isRenderRegions())
-            {
-                stringbuffer.append(" reg");
-            }
-
-            if (Config.isShaders())
-            {
-                stringbuffer.append(" sh");
-            }
-
-            this.mc.debug = stringbuffer.toString();
-            this.debugOF = this.mc.debug;
-        }
-
-        StringBuilder stringbuilder = new StringBuilder();
-        TextureMap texturemap = Config.getTextureMap();
-        stringbuilder.append(", A: ");
-
-        if (SmartAnimations.isActive())
-        {
-            stringbuilder.append(texturemap.getCountAnimationsActive() + TextureAnimations.getCountAnimationsActive());
-            stringbuilder.append("/");
-        }
-
-        stringbuilder.append(texturemap.getCountAnimations() + TextureAnimations.getCountAnimations());
-        String s1 = stringbuilder.toString();
-
-        if (this.isReducedDebug())
-        {
-            return Lists.newArrayList(new String[] {"Minecraft 1.8.9 (" + this.mc.getVersion() + "/" + ClientBrandRetriever.getClientModName() + ")", this.mc.debug, this.mc.renderGlobal.getDebugInfoRenders(), this.mc.renderGlobal.getDebugInfoEntities(), "P: " + this.mc.effectRenderer.getStatistics() + ". T: " + this.mc.theWorld.getDebugLoadedEntities() + s1, this.mc.theWorld.getProviderName(), "", String.format("Chunk-relative: %d %d %d", new Object[]{Integer.valueOf(blockpos.getX() & 15), Integer.valueOf(blockpos.getY() & 15), Integer.valueOf(blockpos.getZ() & 15)})});
+            return Lists.newArrayList(new String[] {"Minecraft 1.8 (" + this.mc.func_175600_c() + "/" + ClientBrandRetriever.getClientModName() + ")", this.mc.debug, this.mc.renderGlobal.getDebugInfoRenders(), this.mc.renderGlobal.getDebugInfoEntities(), "P: " + this.mc.effectRenderer.getStatistics() + ". T: " + this.mc.theWorld.getDebugLoadedEntities(), this.mc.theWorld.getProviderName(), "", String.format("Chunk-relative: %d %d %d", new Object[]{Integer.valueOf(var1.getX() & 15), Integer.valueOf(var1.getY() & 15), Integer.valueOf(var1.getZ() & 15)})});
         }
         else
         {
-            Entity entity = this.mc.getRenderViewEntity();
-            EnumFacing enumfacing = entity.getHorizontalFacing();
-            String s = "Invalid";
+            Entity var2 = this.mc.getRenderViewEntity();
+            EnumFacing var3 = var2.func_174811_aO();
+            String var4 = "Invalid";
 
-            switch (enumfacing)
+            switch (GuiOverlayDebug.SwitchEnumFacing.field_178907_a[var3.ordinal()])
             {
-                case NORTH:
-                    s = "Towards negative Z";
+                case 1:
+                    var4 = "Towards negative Z";
                     break;
 
-                case SOUTH:
-                    s = "Towards positive Z";
+                case 2:
+                    var4 = "Towards positive Z";
                     break;
 
-                case WEST:
-                    s = "Towards negative X";
+                case 3:
+                    var4 = "Towards negative X";
                     break;
 
-                case EAST:
-                    s = "Towards positive X";
+                case 4:
+                    var4 = "Towards positive X";
             }
 
-            List<String> list = Lists.newArrayList(new String[] {"Minecraft 1.8.9 (" + this.mc.getVersion() + "/" + ClientBrandRetriever.getClientModName() + ")", this.mc.debug, this.mc.renderGlobal.getDebugInfoRenders(), this.mc.renderGlobal.getDebugInfoEntities(), "P: " + this.mc.effectRenderer.getStatistics() + ". T: " + this.mc.theWorld.getDebugLoadedEntities() + s1, this.mc.theWorld.getProviderName(), "", String.format("XYZ: %.3f / %.5f / %.3f", new Object[]{Double.valueOf(this.mc.getRenderViewEntity().posX), Double.valueOf(this.mc.getRenderViewEntity().getEntityBoundingBox().minY), Double.valueOf(this.mc.getRenderViewEntity().posZ)}), String.format("Block: %d %d %d", new Object[]{Integer.valueOf(blockpos.getX()), Integer.valueOf(blockpos.getY()), Integer.valueOf(blockpos.getZ())}), String.format("Chunk: %d %d %d in %d %d %d", new Object[]{Integer.valueOf(blockpos.getX() & 15), Integer.valueOf(blockpos.getY() & 15), Integer.valueOf(blockpos.getZ() & 15), Integer.valueOf(blockpos.getX() >> 4), Integer.valueOf(blockpos.getY() >> 4), Integer.valueOf(blockpos.getZ() >> 4)}), String.format("Facing: %s (%s) (%.1f / %.1f)", new Object[]{enumfacing, s, Float.valueOf(MathHelper.wrapAngleTo180_float(entity.rotationYaw)), Float.valueOf(MathHelper.wrapAngleTo180_float(entity.rotationPitch))})});
+            ArrayList var5 = Lists.newArrayList(new String[] {"Minecraft 1.8 (" + this.mc.func_175600_c() + "/" + ClientBrandRetriever.getClientModName() + ")", this.mc.debug, this.mc.renderGlobal.getDebugInfoRenders(), this.mc.renderGlobal.getDebugInfoEntities(), "P: " + this.mc.effectRenderer.getStatistics() + ". T: " + this.mc.theWorld.getDebugLoadedEntities(), this.mc.theWorld.getProviderName(), "", String.format("XYZ: %.3f / %.5f / %.3f", new Object[]{Double.valueOf(this.mc.getRenderViewEntity().posX), Double.valueOf(this.mc.getRenderViewEntity().getEntityBoundingBox().minY), Double.valueOf(this.mc.getRenderViewEntity().posZ)}), String.format("Block: %d %d %d", new Object[]{Integer.valueOf(var1.getX()), Integer.valueOf(var1.getY()), Integer.valueOf(var1.getZ())}), String.format("Chunk: %d %d %d in %d %d %d", new Object[]{Integer.valueOf(var1.getX() & 15), Integer.valueOf(var1.getY() & 15), Integer.valueOf(var1.getZ() & 15), Integer.valueOf(var1.getX() >> 4), Integer.valueOf(var1.getY() >> 4), Integer.valueOf(var1.getZ() >> 4)}), String.format("Facing: %s (%s) (%.1f / %.1f)", new Object[]{var3, var4, Float.valueOf(MathHelper.wrapAngleTo180_float(var2.rotationYaw)), Float.valueOf(MathHelper.wrapAngleTo180_float(var2.rotationPitch))})});
 
-            if (this.mc.theWorld != null && this.mc.theWorld.isBlockLoaded(blockpos))
+            if (this.mc.theWorld != null && this.mc.theWorld.isBlockLoaded(var1))
             {
-                Chunk chunk = this.mc.theWorld.getChunkFromBlockCoords(blockpos);
-                list.add("Biome: " + chunk.getBiome(blockpos, this.mc.theWorld.getWorldChunkManager()).biomeName);
-                list.add("Light: " + chunk.getLightSubtracted(blockpos, 0) + " (" + chunk.getLightFor(EnumSkyBlock.SKY, blockpos) + " sky, " + chunk.getLightFor(EnumSkyBlock.BLOCK, blockpos) + " block)");
-                DifficultyInstance difficultyinstance = this.mc.theWorld.getDifficultyForLocation(blockpos);
+                Chunk var9 = this.mc.theWorld.getChunkFromBlockCoords(var1);
+                var5.add("Biome: " + var9.getBiome(var1, this.mc.theWorld.getWorldChunkManager()).biomeName);
+                var5.add("Light: " + var9.setLight(var1, 0) + " (" + var9.getLightFor(EnumSkyBlock.SKY, var1) + " sky, " + var9.getLightFor(EnumSkyBlock.BLOCK, var1) + " block)");
+                DifficultyInstance var7 = this.mc.theWorld.getDifficultyForLocation(var1);
 
                 if (this.mc.isIntegratedServerRunning() && this.mc.getIntegratedServer() != null)
                 {
-                    EntityPlayerMP entityplayermp = this.mc.getIntegratedServer().getConfigurationManager().getPlayerByUUID(this.mc.thePlayer.getUniqueID());
+                    EntityPlayerMP var8 = this.mc.getIntegratedServer().getConfigurationManager().func_177451_a(this.mc.thePlayer.getUniqueID());
 
-                    if (entityplayermp != null)
+                    if (var8 != null)
                     {
-                        DifficultyInstance difficultyinstance1 = this.mc.getIntegratedServer().getDifficultyAsync(entityplayermp.worldObj, new BlockPos(entityplayermp));
-
-                        if (difficultyinstance1 != null)
-                        {
-                            difficultyinstance = difficultyinstance1;
-                        }
+                        var7 = var8.worldObj.getDifficultyForLocation(new BlockPos(var8));
                     }
                 }
 
-                list.add(String.format("Local Difficulty: %.2f (Day %d)", new Object[] {Float.valueOf(difficultyinstance.getAdditionalDifficulty()), Long.valueOf(this.mc.theWorld.getWorldTime() / 24000L)}));
+                var5.add(String.format("Local Difficulty: %.2f (Day %d)", new Object[] {Float.valueOf(var7.func_180168_b()), Long.valueOf(this.mc.theWorld.getWorldTime() / 24000L)}));
             }
 
             if (this.mc.entityRenderer != null && this.mc.entityRenderer.isShaderActive())
             {
-                list.add("Shader: " + this.mc.entityRenderer.getShaderGroup().getShaderGroupName());
+                var5.add("Shader: " + this.mc.entityRenderer.getShaderGroup().getShaderGroupName());
             }
 
-            if (this.mc.objectMouseOver != null && this.mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && this.mc.objectMouseOver.getBlockPos() != null)
+            if (this.mc.objectMouseOver != null && this.mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && this.mc.objectMouseOver.func_178782_a() != null)
             {
-                BlockPos blockpos1 = this.mc.objectMouseOver.getBlockPos();
-                list.add(String.format("Looking at: %d %d %d", new Object[] {Integer.valueOf(blockpos1.getX()), Integer.valueOf(blockpos1.getY()), Integer.valueOf(blockpos1.getZ())}));
+                BlockPos var91 = this.mc.objectMouseOver.func_178782_a();
+                var5.add(String.format("Looking at: %d %d %d", new Object[] {Integer.valueOf(var91.getX()), Integer.valueOf(var91.getY()), Integer.valueOf(var91.getZ())}));
             }
 
-            return list;
+            return var5;
         }
     }
 
-    protected List<String> getDebugInfoRight()
+    protected List func_175238_c()
     {
-        long i = Runtime.getRuntime().maxMemory();
-        long j = Runtime.getRuntime().totalMemory();
-        long k = Runtime.getRuntime().freeMemory();
-        long l = j - k;
-        List<String> list = Lists.newArrayList(new String[] {String.format("Java: %s %dbit", new Object[]{System.getProperty("java.version"), Integer.valueOf(this.mc.isJava64bit() ? 64 : 32)}), String.format("Mem: % 2d%% %03d/%03dMB", new Object[]{Long.valueOf(l * 100L / i), Long.valueOf(bytesToMb(l)), Long.valueOf(bytesToMb(i))}), String.format("Allocated: % 2d%% %03dMB", new Object[]{Long.valueOf(j * 100L / i), Long.valueOf(bytesToMb(j))}), "", String.format("CPU: %s", new Object[]{OpenGlHelper.getCpu()}), "", String.format("Display: %dx%d (%s)", new Object[]{Integer.valueOf(Display.getWidth()), Integer.valueOf(Display.getHeight()), GL11.glGetString(GL11.GL_VENDOR)}), GL11.glGetString(GL11.GL_RENDERER), GL11.glGetString(GL11.GL_VERSION)});
-        long i1 = NativeMemory.getBufferAllocated();
-        long j1 = NativeMemory.getBufferMaximum();
-        String s = "Native: " + bytesToMb(i1) + "/" + bytesToMb(j1) + "MB";
-        list.add(4, s);
-        list.set(5, "GC: " + MemoryMonitor.getAllocationRateMb() + "MB/s");
+        long var1 = Runtime.getRuntime().maxMemory();
+        long var3 = Runtime.getRuntime().totalMemory();
+        long var5 = Runtime.getRuntime().freeMemory();
+        long var7 = var3 - var5;
+        ArrayList var9 = Lists.newArrayList(new String[] {String.format("Java: %s %dbit", new Object[]{System.getProperty("java.version"), Integer.valueOf(this.mc.isJava64bit() ? 64 : 32)}), String.format("Mem: % 2d%% %03d/%03dMB", new Object[]{Long.valueOf(var7 * 100L / var1), Long.valueOf(func_175240_a(var7)), Long.valueOf(func_175240_a(var1))}), String.format("Allocated: % 2d%% %03dMB", new Object[]{Long.valueOf(var3 * 100L / var1), Long.valueOf(func_175240_a(var3))}), "", String.format("Display: %dx%d (%s)", new Object[]{Integer.valueOf(Display.getWidth()), Integer.valueOf(Display.getHeight()), GL11.glGetString(GL11.GL_VENDOR)}), GL11.glGetString(GL11.GL_RENDERER), GL11.glGetString(GL11.GL_VERSION)});
 
         if (Reflector.FMLCommonHandler_getBrandings.exists())
         {
-            Object object = Reflector.call(Reflector.FMLCommonHandler_instance, new Object[0]);
-            list.add("");
-            list.addAll((Collection)Reflector.call(object, Reflector.FMLCommonHandler_getBrandings, new Object[] {Boolean.valueOf(false)}));
+            Object var10 = Reflector.call(Reflector.FMLCommonHandler_instance, new Object[0]);
+            var9.add("");
+            var9.addAll((Collection)Reflector.call(var10, Reflector.FMLCommonHandler_getBrandings, new Object[] {Boolean.valueOf(false)}));
         }
 
-        if (this.isReducedDebug())
+        if (this.func_175236_d())
         {
-            return list;
+            return var9;
         }
         else
         {
-            if (this.mc.objectMouseOver != null && this.mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && this.mc.objectMouseOver.getBlockPos() != null)
+            if (this.mc.objectMouseOver != null && this.mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && this.mc.objectMouseOver.func_178782_a() != null)
             {
-                BlockPos blockpos = this.mc.objectMouseOver.getBlockPos();
-                IBlockState iblockstate = this.mc.theWorld.getBlockState(blockpos);
+                BlockPos var101 = this.mc.objectMouseOver.func_178782_a();
+                IBlockState var11 = this.mc.theWorld.getBlockState(var101);
 
                 if (this.mc.theWorld.getWorldType() != WorldType.DEBUG_WORLD)
                 {
-                    iblockstate = iblockstate.getBlock().getActualState(iblockstate, this.mc.theWorld, blockpos);
+                    var11 = var11.getBlock().getActualState(var11, this.mc.theWorld, var101);
                 }
 
-                list.add("");
-                list.add(String.valueOf(Block.blockRegistry.getNameForObject(iblockstate.getBlock())));
+                var9.add("");
+                var9.add(String.valueOf(Block.blockRegistry.getNameForObject(var11.getBlock())));
+                Entry var13;
+                String var14;
 
-                for (Entry<IProperty, Comparable> entry : iblockstate.getProperties().entrySet())
+                for (UnmodifiableIterator var12 = var11.getProperties().entrySet().iterator(); var12.hasNext(); var9.add(((IProperty)var13.getKey()).getName() + ": " + var14))
                 {
-                    String s1 = ((Comparable)entry.getValue()).toString();
+                    var13 = (Entry)var12.next();
+                    var14 = ((Comparable)var13.getValue()).toString();
 
-                    if (entry.getValue() == Boolean.TRUE)
+                    if (var13.getValue() == Boolean.TRUE)
                     {
-                        s1 = EnumChatFormatting.GREEN + s1;
+                        var14 = EnumChatFormatting.GREEN + var14;
                     }
-                    else if (entry.getValue() == Boolean.FALSE)
+                    else if (var13.getValue() == Boolean.FALSE)
                     {
-                        s1 = EnumChatFormatting.RED + s1;
+                        var14 = EnumChatFormatting.RED + var14;
                     }
-
-                    list.add(((IProperty)entry.getKey()).getName() + ": " + s1);
                 }
             }
 
-            return list;
+            return var9;
         }
     }
 
-    private void renderLagometer()
+    private static long func_175240_a(long p_175240_0_)
     {
+        return p_175240_0_ / 1024L / 1024L;
     }
 
-    private int getFrameColor(int p_181552_1_, int p_181552_2_, int p_181552_3_, int p_181552_4_)
+    static final class SwitchEnumFacing
     {
-        return p_181552_1_ < p_181552_3_ ? this.blendColors(-16711936, -256, (float)p_181552_1_ / (float)p_181552_3_) : this.blendColors(-256, -65536, (float)(p_181552_1_ - p_181552_3_) / (float)(p_181552_4_ - p_181552_3_));
-    }
+        static final int[] field_178907_a = new int[EnumFacing.values().length];
+        
 
-    private int blendColors(int p_181553_1_, int p_181553_2_, float p_181553_3_)
-    {
-        int i = p_181553_1_ >> 24 & 255;
-        int j = p_181553_1_ >> 16 & 255;
-        int k = p_181553_1_ >> 8 & 255;
-        int l = p_181553_1_ & 255;
-        int i1 = p_181553_2_ >> 24 & 255;
-        int j1 = p_181553_2_ >> 16 & 255;
-        int k1 = p_181553_2_ >> 8 & 255;
-        int l1 = p_181553_2_ & 255;
-        int i2 = MathHelper.clamp_int((int)((float)i + (float)(i1 - i) * p_181553_3_), 0, 255);
-        int j2 = MathHelper.clamp_int((int)((float)j + (float)(j1 - j) * p_181553_3_), 0, 255);
-        int k2 = MathHelper.clamp_int((int)((float)k + (float)(k1 - k) * p_181553_3_), 0, 255);
-        int l2 = MathHelper.clamp_int((int)((float)l + (float)(l1 - l) * p_181553_3_), 0, 255);
-        return i2 << 24 | j2 << 16 | k2 << 8 | l2;
-    }
+        static
+        {
+            try
+            {
+                field_178907_a[EnumFacing.NORTH.ordinal()] = 1;
+            }
+            catch (NoSuchFieldError var4)
+            {
+                ;
+            }
 
-    private static long bytesToMb(long bytes)
-    {
-        return bytes / 1024L / 1024L;
+            try
+            {
+                field_178907_a[EnumFacing.SOUTH.ordinal()] = 2;
+            }
+            catch (NoSuchFieldError var3)
+            {
+                ;
+            }
+
+            try
+            {
+                field_178907_a[EnumFacing.WEST.ordinal()] = 3;
+            }
+            catch (NoSuchFieldError var2)
+            {
+                ;
+            }
+
+            try
+            {
+                field_178907_a[EnumFacing.EAST.ordinal()] = 4;
+            }
+            catch (NoSuchFieldError var1)
+            {
+                ;
+            }
+        }
     }
 }

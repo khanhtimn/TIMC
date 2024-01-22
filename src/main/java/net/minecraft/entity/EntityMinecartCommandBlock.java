@@ -14,11 +14,12 @@ import net.minecraft.world.World;
 
 public class EntityMinecartCommandBlock extends EntityMinecart
 {
-    private final CommandBlockLogic commandBlockLogic = new CommandBlockLogic()
+    private final CommandBlockLogic field_145824_a = new CommandBlockLogic()
     {
-        public void updateCommand()
+        
+        public void func_145756_e()
         {
-            EntityMinecartCommandBlock.this.getDataWatcher().updateObject(23, this.getCommand());
+            EntityMinecartCommandBlock.this.getDataWatcher().updateObject(23, this.getCustomName());
             EntityMinecartCommandBlock.this.getDataWatcher().updateObject(24, IChatComponent.Serializer.componentToJson(this.getLastOutput()));
         }
         public int func_145751_f()
@@ -46,18 +47,17 @@ public class EntityMinecartCommandBlock extends EntityMinecart
             return EntityMinecartCommandBlock.this;
         }
     };
-
-    /** Cooldown before command block logic runs again in ticks */
-    private int activatorRailCooldown = 0;
+    private int field_145823_b = 0;
+    
 
     public EntityMinecartCommandBlock(World worldIn)
     {
         super(worldIn);
     }
 
-    public EntityMinecartCommandBlock(World worldIn, double x, double y, double z)
+    public EntityMinecartCommandBlock(World worldIn, double p_i45322_2_, double p_i45322_4_, double p_i45322_6_)
     {
-        super(worldIn, x, y, z);
+        super(worldIn, p_i45322_2_, p_i45322_4_, p_i45322_6_);
     }
 
     protected void entityInit()
@@ -73,9 +73,9 @@ public class EntityMinecartCommandBlock extends EntityMinecart
     protected void readEntityFromNBT(NBTTagCompound tagCompund)
     {
         super.readEntityFromNBT(tagCompund);
-        this.commandBlockLogic.readDataFromNBT(tagCompund);
-        this.getDataWatcher().updateObject(23, this.getCommandBlockLogic().getCommand());
-        this.getDataWatcher().updateObject(24, IChatComponent.Serializer.componentToJson(this.getCommandBlockLogic().getLastOutput()));
+        this.field_145824_a.readDataFromNBT(tagCompund);
+        this.getDataWatcher().updateObject(23, this.func_145822_e().getCustomName());
+        this.getDataWatcher().updateObject(24, IChatComponent.Serializer.componentToJson(this.func_145822_e().getLastOutput()));
     }
 
     /**
@@ -84,33 +84,33 @@ public class EntityMinecartCommandBlock extends EntityMinecart
     protected void writeEntityToNBT(NBTTagCompound tagCompound)
     {
         super.writeEntityToNBT(tagCompound);
-        this.commandBlockLogic.writeDataToNBT(tagCompound);
+        this.field_145824_a.writeDataToNBT(tagCompound);
     }
 
-    public EntityMinecart.EnumMinecartType getMinecartType()
+    public EntityMinecart.EnumMinecartType func_180456_s()
     {
         return EntityMinecart.EnumMinecartType.COMMAND_BLOCK;
     }
 
-    public IBlockState getDefaultDisplayTile()
+    public IBlockState func_180457_u()
     {
         return Blocks.command_block.getDefaultState();
     }
 
-    public CommandBlockLogic getCommandBlockLogic()
+    public CommandBlockLogic func_145822_e()
     {
-        return this.commandBlockLogic;
+        return this.field_145824_a;
     }
 
     /**
      * Called every tick the minecart is on an activator rail. Args: x, y, z, is the rail receiving power
      */
-    public void onActivatorRailPass(int x, int y, int z, boolean receivingPower)
+    public void onActivatorRailPass(int p_96095_1_, int p_96095_2_, int p_96095_3_, boolean p_96095_4_)
     {
-        if (receivingPower && this.ticksExisted - this.activatorRailCooldown >= 4)
+        if (p_96095_4_ && this.ticksExisted - this.field_145823_b >= 4)
         {
-            this.getCommandBlockLogic().trigger(this.worldObj);
-            this.activatorRailCooldown = this.ticksExisted;
+            this.func_145822_e().trigger(this.worldObj);
+            this.field_145823_b = this.ticksExisted;
         }
     }
 
@@ -119,28 +119,28 @@ public class EntityMinecartCommandBlock extends EntityMinecart
      */
     public boolean interactFirst(EntityPlayer playerIn)
     {
-        this.commandBlockLogic.tryOpenEditCommandBlock(playerIn);
+        this.field_145824_a.func_175574_a(playerIn);
         return false;
     }
 
-    public void onDataWatcherUpdate(int dataID)
+    public void func_145781_i(int p_145781_1_)
     {
-        super.onDataWatcherUpdate(dataID);
+        super.func_145781_i(p_145781_1_);
 
-        if (dataID == 24)
+        if (p_145781_1_ == 24)
         {
             try
             {
-                this.commandBlockLogic.setLastOutput(IChatComponent.Serializer.jsonToComponent(this.getDataWatcher().getWatchableObjectString(24)));
+                this.field_145824_a.func_145750_b(IChatComponent.Serializer.jsonToComponent(this.getDataWatcher().getWatchableObjectString(24)));
             }
             catch (Throwable var3)
             {
                 ;
             }
         }
-        else if (dataID == 23)
+        else if (p_145781_1_ == 23)
         {
-            this.commandBlockLogic.setCommand(this.getDataWatcher().getWatchableObjectString(23));
+            this.field_145824_a.setCommand(this.getDataWatcher().getWatchableObjectString(23));
         }
     }
 }

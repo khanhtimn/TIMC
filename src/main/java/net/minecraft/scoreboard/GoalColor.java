@@ -1,25 +1,25 @@
 package net.minecraft.scoreboard;
 
 import java.util.List;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumChatFormatting;
 
 public class GoalColor implements IScoreObjectiveCriteria
 {
-    private final String goalName;
+    private final String field_178794_j;
+    
 
     public GoalColor(String p_i45549_1_, EnumChatFormatting p_i45549_2_)
     {
-        this.goalName = p_i45549_1_ + p_i45549_2_.getFriendlyName();
-        IScoreObjectiveCriteria.INSTANCES.put(this.goalName, this);
+        this.field_178794_j = p_i45549_1_ + p_i45549_2_.getFriendlyName();
+        IScoreObjectiveCriteria.INSTANCES.put(this.field_178794_j, this);
     }
 
     public String getName()
     {
-        return this.goalName;
+        return this.field_178794_j;
     }
 
-    public int setScore(List<EntityPlayer> p_96635_1_)
+    public int func_96635_a(List p_96635_1_)
     {
         return 0;
     }
@@ -29,7 +29,7 @@ public class GoalColor implements IScoreObjectiveCriteria
         return false;
     }
 
-    public IScoreObjectiveCriteria.EnumRenderType getRenderType()
+    public IScoreObjectiveCriteria.EnumRenderType func_178790_c()
     {
         return IScoreObjectiveCriteria.EnumRenderType.INTEGER;
     }

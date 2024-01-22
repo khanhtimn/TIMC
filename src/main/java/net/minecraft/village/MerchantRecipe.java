@@ -22,36 +22,37 @@ public class MerchantRecipe
 
     /** Maximum times this trade can be used. */
     private int maxTradeUses;
-    private boolean rewardsExp;
+    private boolean field_180323_f;
+    
 
-    public MerchantRecipe(NBTTagCompound tagCompound)
+    public MerchantRecipe(NBTTagCompound p_i1940_1_)
     {
-        this.readFromTags(tagCompound);
+        this.readFromTags(p_i1940_1_);
     }
 
-    public MerchantRecipe(ItemStack buy1, ItemStack buy2, ItemStack sell)
+    public MerchantRecipe(ItemStack p_i1941_1_, ItemStack p_i1941_2_, ItemStack p_i1941_3_)
     {
-        this(buy1, buy2, sell, 0, 7);
+        this(p_i1941_1_, p_i1941_2_, p_i1941_3_, 0, 7);
     }
 
-    public MerchantRecipe(ItemStack buy1, ItemStack buy2, ItemStack sell, int toolUsesIn, int maxTradeUsesIn)
+    public MerchantRecipe(ItemStack p_i45760_1_, ItemStack p_i45760_2_, ItemStack p_i45760_3_, int p_i45760_4_, int p_i45760_5_)
     {
-        this.itemToBuy = buy1;
-        this.secondItemToBuy = buy2;
-        this.itemToSell = sell;
-        this.toolUses = toolUsesIn;
-        this.maxTradeUses = maxTradeUsesIn;
-        this.rewardsExp = true;
+        this.itemToBuy = p_i45760_1_;
+        this.secondItemToBuy = p_i45760_2_;
+        this.itemToSell = p_i45760_3_;
+        this.toolUses = p_i45760_4_;
+        this.maxTradeUses = p_i45760_5_;
+        this.field_180323_f = true;
     }
 
-    public MerchantRecipe(ItemStack buy1, ItemStack sell)
+    public MerchantRecipe(ItemStack p_i1942_1_, ItemStack p_i1942_2_)
     {
-        this(buy1, (ItemStack)null, sell);
+        this(p_i1942_1_, (ItemStack)null, p_i1942_2_);
     }
 
-    public MerchantRecipe(ItemStack buy1, Item sellItem)
+    public MerchantRecipe(ItemStack p_i1943_1_, Item p_i1943_2_)
     {
-        this(buy1, new ItemStack(sellItem));
+        this(p_i1943_1_, new ItemStack(p_i1943_2_));
     }
 
     /**
@@ -86,12 +87,12 @@ public class MerchantRecipe
         return this.itemToSell;
     }
 
-    public int getToolUses()
+    public int func_180321_e()
     {
         return this.toolUses;
     }
 
-    public int getMaxTradeUses()
+    public int func_180320_f()
     {
         return this.maxTradeUses;
     }
@@ -101,9 +102,9 @@ public class MerchantRecipe
         ++this.toolUses;
     }
 
-    public void increaseMaxTradeUses(int increment)
+    public void func_82783_a(int p_82783_1_)
     {
-        this.maxTradeUses += increment;
+        this.maxTradeUses += p_82783_1_;
     }
 
     public boolean isRecipeDisabled()
@@ -111,70 +112,66 @@ public class MerchantRecipe
         return this.toolUses >= this.maxTradeUses;
     }
 
-    /**
-     * Compensates {@link net.minecraft.village.MerchantRecipe#toolUses toolUses} with {@link
-     * net.minecraft.village.MerchantRecipe#maxTradeUses maxTradeUses}
-     */
-    public void compensateToolUses()
+    public void func_82785_h()
     {
         this.toolUses = this.maxTradeUses;
     }
 
-    public boolean getRewardsExp()
+    public boolean func_180322_j()
     {
-        return this.rewardsExp;
+        return this.field_180323_f;
     }
 
-    public void readFromTags(NBTTagCompound tagCompound)
+    public void readFromTags(NBTTagCompound p_77390_1_)
     {
-        NBTTagCompound nbttagcompound = tagCompound.getCompoundTag("buy");
-        this.itemToBuy = ItemStack.loadItemStackFromNBT(nbttagcompound);
-        NBTTagCompound nbttagcompound1 = tagCompound.getCompoundTag("sell");
-        this.itemToSell = ItemStack.loadItemStackFromNBT(nbttagcompound1);
+        NBTTagCompound var2 = p_77390_1_.getCompoundTag("buy");
+        this.itemToBuy = ItemStack.loadItemStackFromNBT(var2);
+        NBTTagCompound var3 = p_77390_1_.getCompoundTag("sell");
+        this.itemToSell = ItemStack.loadItemStackFromNBT(var3);
 
-        if (tagCompound.hasKey("buyB", 10))
+        if (p_77390_1_.hasKey("buyB", 10))
         {
-            this.secondItemToBuy = ItemStack.loadItemStackFromNBT(tagCompound.getCompoundTag("buyB"));
+            this.secondItemToBuy = ItemStack.loadItemStackFromNBT(p_77390_1_.getCompoundTag("buyB"));
         }
 
-        if (tagCompound.hasKey("uses", 99))
+        if (p_77390_1_.hasKey("uses", 99))
         {
-            this.toolUses = tagCompound.getInteger("uses");
+            this.toolUses = p_77390_1_.getInteger("uses");
         }
 
-        if (tagCompound.hasKey("maxUses", 99))
+        if (p_77390_1_.hasKey("maxUses", 99))
         {
-            this.maxTradeUses = tagCompound.getInteger("maxUses");
+            this.maxTradeUses = p_77390_1_.getInteger("maxUses");
         }
         else
         {
             this.maxTradeUses = 7;
         }
 
-        if (tagCompound.hasKey("rewardExp", 1))
+        if (p_77390_1_.hasKey("rewardExp", 1))
         {
-            this.rewardsExp = tagCompound.getBoolean("rewardExp");
+            this.field_180323_f = p_77390_1_.getBoolean("rewardExp");
         }
         else
         {
-            this.rewardsExp = true;
+            this.field_180323_f = true;
         }
     }
 
     public NBTTagCompound writeToTags()
     {
-        NBTTagCompound nbttagcompound = new NBTTagCompound();
-        nbttagcompound.setTag("buy", this.itemToBuy.writeToNBT(new NBTTagCompound()));
-        nbttagcompound.setTag("sell", this.itemToSell.writeToNBT(new NBTTagCompound()));
+        NBTTagCompound var1 = new NBTTagCompound();
+        var1.setTag("buy", this.itemToBuy.writeToNBT(new NBTTagCompound()));
+        var1.setTag("sell", this.itemToSell.writeToNBT(new NBTTagCompound()));
 
         if (this.secondItemToBuy != null)
         {
-            nbttagcompound.setTag("buyB", this.secondItemToBuy.writeToNBT(new NBTTagCompound()));
+            var1.setTag("buyB", this.secondItemToBuy.writeToNBT(new NBTTagCompound()));
         }
 
-        nbttagcompound.setInteger("uses", this.toolUses);
-        nbttagcompound.setInteger("maxUses", this.maxTradeUses);
-        nbttagcompound.setBoolean("rewardExp", this.rewardsExp);
-        return nbttagcompound;
+        var1.setInteger("uses", this.toolUses);
+        var1.setInteger("maxUses", this.maxTradeUses);
+        var1.setBoolean("rewardExp", this.field_180323_f);
+        return var1;
     }
 }

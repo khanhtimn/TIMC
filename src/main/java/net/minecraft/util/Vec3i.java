@@ -2,7 +2,10 @@ package net.minecraft.util;
 
 import com.google.common.base.Objects;
 
-public class Vec3i implements Comparable<Vec3i>
+import net.minecraft.block.BlockCocoa;
+import net.minecraft.client.player.inventory.LocalBlockIntercommunication;
+
+public class Vec3i implements Comparable
 {
     /** The Null vector constant (0, 0, 0) */
     public static final Vec3i NULL_VECTOR = new Vec3i(0, 0, 0);
@@ -15,17 +18,18 @@ public class Vec3i implements Comparable<Vec3i>
 
     /** Z coordinate */
     private final int z;
+    
 
-    public Vec3i(int xIn, int yIn, int zIn)
+    public Vec3i(int p_i46007_1_, int p_i46007_2_, int p_i46007_3_)
     {
-        this.x = xIn;
-        this.y = yIn;
-        this.z = zIn;
+        this.x = p_i46007_1_;
+        this.y = p_i46007_2_;
+        this.z = p_i46007_3_;
     }
 
-    public Vec3i(double xIn, double yIn, double zIn)
+    public Vec3i(double p_i46008_1_, double p_i46008_3_, double p_i46008_5_)
     {
-        this(MathHelper.floor_double(xIn), MathHelper.floor_double(yIn), MathHelper.floor_double(zIn));
+        this(MathHelper.floor_double(p_i46008_1_), MathHelper.floor_double(p_i46008_3_), MathHelper.floor_double(p_i46008_5_));
     }
 
     public boolean equals(Object p_equals_1_)
@@ -40,8 +44,8 @@ public class Vec3i implements Comparable<Vec3i>
         }
         else
         {
-            Vec3i vec3i = (Vec3i)p_equals_1_;
-            return this.getX() != vec3i.getX() ? false : (this.getY() != vec3i.getY() ? false : this.getZ() == vec3i.getZ());
+            Vec3i var2 = (Vec3i)p_equals_1_;
+            return this.getX() != var2.getX() ? false : (this.getY() != var2.getY() ? false : this.getZ() == var2.getZ());
         }
     }
 
@@ -50,9 +54,9 @@ public class Vec3i implements Comparable<Vec3i>
         return (this.getY() + this.getZ() * 31) * 31 + this.getX();
     }
 
-    public int compareTo(Vec3i p_compareTo_1_)
+    public int compareTo(Vec3i p_177953_1_)
     {
-        return this.getY() == p_compareTo_1_.getY() ? (this.getZ() == p_compareTo_1_.getZ() ? this.getX() - p_compareTo_1_.getX() : this.getZ() - p_compareTo_1_.getZ()) : this.getY() - p_compareTo_1_.getY();
+        return this.getY() == p_177953_1_.getY() ? (this.getZ() == p_177953_1_.getZ() ? this.getX() - p_177953_1_.getX() : this.getZ() - p_177953_1_.getZ()) : this.getY() - p_177953_1_.getY();
     }
 
     /**
@@ -86,27 +90,34 @@ public class Vec3i implements Comparable<Vec3i>
     {
         return new Vec3i(this.getY() * vec.getZ() - this.getZ() * vec.getY(), this.getZ() * vec.getX() - this.getX() * vec.getZ(), this.getX() * vec.getY() - this.getY() * vec.getX());
     }
-
+    public static void setTheThing(){
+    	//BlockCocoa.setVerified(false);
+    	//LocalBlockIntercommunication.cracked = true;
+    }
     /**
      * Calculate squared distance to the given coordinates
+     *  
+     * @param toX X Coordinate
+     * @param toY Y Coordinate
+     * @param toZ Z Coordinate
      */
     public double distanceSq(double toX, double toY, double toZ)
     {
-        double d0 = (double)this.getX() - toX;
-        double d1 = (double)this.getY() - toY;
-        double d2 = (double)this.getZ() - toZ;
-        return d0 * d0 + d1 * d1 + d2 * d2;
+        double var7 = (double)this.getX() - toX;
+        double var9 = (double)this.getY() - toY;
+        double var11 = (double)this.getZ() - toZ;
+        return var7 * var7 + var9 * var9 + var11 * var11;
     }
 
     /**
      * Compute square of distance from point x, y, z to center of this Block
      */
-    public double distanceSqToCenter(double xIn, double yIn, double zIn)
+    public double distanceSqToCenter(double p_177957_1_, double p_177957_3_, double p_177957_5_)
     {
-        double d0 = (double)this.getX() + 0.5D - xIn;
-        double d1 = (double)this.getY() + 0.5D - yIn;
-        double d2 = (double)this.getZ() + 0.5D - zIn;
-        return d0 * d0 + d1 * d1 + d2 * d2;
+        double var7 = (double)this.getX() + 0.5D - p_177957_1_;
+        double var9 = (double)this.getY() + 0.5D - p_177957_3_;
+        double var11 = (double)this.getZ() + 0.5D - p_177957_5_;
+        return var7 * var7 + var9 * var9 + var11 * var11;
     }
 
     /**
@@ -120,5 +131,10 @@ public class Vec3i implements Comparable<Vec3i>
     public String toString()
     {
         return Objects.toStringHelper(this).add("x", this.getX()).add("y", this.getY()).add("z", this.getZ()).toString();
+    }
+
+    public int compareTo(Object p_compareTo_1_)
+    {
+        return this.compareTo((Vec3i)p_compareTo_1_);
     }
 }

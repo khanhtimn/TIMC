@@ -9,10 +9,11 @@ public class EntityAISit extends EntityAIBase
 
     /** If the EntityTameable is sitting. */
     private boolean isSitting;
+    
 
-    public EntityAISit(EntityTameable entityIn)
+    public EntityAISit(EntityTameable p_i1654_1_)
     {
-        this.theEntity = entityIn;
+        this.theEntity = p_i1654_1_;
         this.setMutexBits(5);
     }
 
@@ -35,8 +36,8 @@ public class EntityAISit extends EntityAIBase
         }
         else
         {
-            EntityLivingBase entitylivingbase = this.theEntity.getOwner();
-            return entitylivingbase == null ? true : (this.theEntity.getDistanceSqToEntity(entitylivingbase) < 144.0D && entitylivingbase.getAITarget() != null ? false : this.isSitting);
+            EntityLivingBase var1 = this.theEntity.func_180492_cm();
+            return var1 == null ? true : (this.theEntity.getDistanceSqToEntity(var1) < 144.0D && var1.getAITarget() != null ? false : this.isSitting);
         }
     }
 
@@ -60,8 +61,8 @@ public class EntityAISit extends EntityAIBase
     /**
      * Sets the sitting flag.
      */
-    public void setSitting(boolean sitting)
+    public void setSitting(boolean p_75270_1_)
     {
-        this.isSitting = sitting;
+        this.isSitting = p_75270_1_;
     }
 }

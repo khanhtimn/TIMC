@@ -8,11 +8,12 @@ public class HoverEvent
 {
     private final HoverEvent.Action action;
     private final IChatComponent value;
+    
 
-    public HoverEvent(HoverEvent.Action actionIn, IChatComponent valueIn)
+    public HoverEvent(HoverEvent.Action p_i45158_1_, IChatComponent p_i45158_2_)
     {
-        this.action = actionIn;
-        this.value = valueIn;
+        this.action = p_i45158_1_;
+        this.value = p_i45158_2_;
     }
 
     /**
@@ -40,9 +41,9 @@ public class HoverEvent
         }
         else if (p_equals_1_ != null && this.getClass() == p_equals_1_.getClass())
         {
-            HoverEvent hoverevent = (HoverEvent)p_equals_1_;
+            HoverEvent var2 = (HoverEvent)p_equals_1_;
 
-            if (this.action != hoverevent.action)
+            if (this.action != var2.action)
             {
                 return false;
             }
@@ -50,12 +51,12 @@ public class HoverEvent
             {
                 if (this.value != null)
                 {
-                    if (!this.value.equals(hoverevent.value))
+                    if (!this.value.equals(var2.value))
                     {
                         return false;
                     }
                 }
-                else if (hoverevent.value != null)
+                else if (var2.value != null)
                 {
                     return false;
                 }
@@ -76,26 +77,28 @@ public class HoverEvent
 
     public int hashCode()
     {
-        int i = this.action.hashCode();
-        i = 31 * i + (this.value != null ? this.value.hashCode() : 0);
-        return i;
+        int var1 = this.action.hashCode();
+        var1 = 31 * var1 + (this.value != null ? this.value.hashCode() : 0);
+        return var1;
     }
 
     public static enum Action
     {
-        SHOW_TEXT("show_text", true),
-        SHOW_ACHIEVEMENT("show_achievement", true),
-        SHOW_ITEM("show_item", true),
-        SHOW_ENTITY("show_entity", true);
-
-        private static final Map<String, HoverEvent.Action> nameMapping = Maps.<String, HoverEvent.Action>newHashMap();
+        SHOW_TEXT("SHOW_TEXT", 0, "show_text", true),
+        SHOW_ACHIEVEMENT("SHOW_ACHIEVEMENT", 1, "show_achievement", true),
+        SHOW_ITEM("SHOW_ITEM", 2, "show_item", true),
+        SHOW_ENTITY("SHOW_ENTITY", 3, "show_entity", true);
+        private static final Map nameMapping = Maps.newHashMap();
         private final boolean allowedInChat;
         private final String canonicalName;
 
-        private Action(String canonicalNameIn, boolean allowedInChatIn)
+        private static final HoverEvent.Action[] $VALUES = new HoverEvent.Action[]{SHOW_TEXT, SHOW_ACHIEVEMENT, SHOW_ITEM, SHOW_ENTITY};
+        
+
+        private Action(String p_i45157_1_, int p_i45157_2_, String p_i45157_3_, boolean p_i45157_4_)
         {
-            this.canonicalName = canonicalNameIn;
-            this.allowedInChat = allowedInChatIn;
+            this.canonicalName = p_i45157_3_;
+            this.allowedInChat = p_i45157_4_;
         }
 
         public boolean shouldAllowInChat()
@@ -108,15 +111,19 @@ public class HoverEvent
             return this.canonicalName;
         }
 
-        public static HoverEvent.Action getValueByCanonicalName(String canonicalNameIn)
+        public static HoverEvent.Action getValueByCanonicalName(String p_150684_0_)
         {
-            return (HoverEvent.Action)nameMapping.get(canonicalNameIn);
+            return (HoverEvent.Action)nameMapping.get(p_150684_0_);
         }
 
         static {
-            for (HoverEvent.Action hoverevent$action : values())
+            HoverEvent.Action[] var0 = values();
+            int var1 = var0.length;
+
+            for (int var2 = 0; var2 < var1; ++var2)
             {
-                nameMapping.put(hoverevent$action.getCanonicalName(), hoverevent$action);
+                HoverEvent.Action var3 = var0[var2];
+                nameMapping.put(var3.getCanonicalName(), var3);
             }
         }
     }

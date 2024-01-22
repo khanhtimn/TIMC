@@ -5,6 +5,7 @@ public class MouseFilter
     private float field_76336_a;
     private float field_76334_b;
     private float field_76335_c;
+    
 
     /**
      * Smooths mouse input
@@ -24,7 +25,7 @@ public class MouseFilter
         return p_76333_1_;
     }
 
-    public void reset()
+    public void func_180179_a()
     {
         this.field_76336_a = 0.0F;
         this.field_76334_b = 0.0F;

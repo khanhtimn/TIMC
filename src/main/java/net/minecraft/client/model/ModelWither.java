@@ -9,6 +9,7 @@ public class ModelWither extends ModelBase
 {
     private ModelRenderer[] field_82905_a;
     private ModelRenderer[] field_82904_b;
+    
 
     public ModelWither(float p_i46302_1_)
     {
@@ -41,18 +42,27 @@ public class ModelWither extends ModelBase
     /**
      * Sets the models various rotation angles then renders the model.
      */
-    public void render(Entity entityIn, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float scale)
+    public void render(Entity p_78088_1_, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float p_78088_7_)
     {
-        this.setRotationAngles(p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, scale, entityIn);
+        this.setRotationAngles(p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, p_78088_7_, p_78088_1_);
+        ModelRenderer[] var8 = this.field_82904_b;
+        int var9 = var8.length;
+        int var10;
+        ModelRenderer var11;
 
-        for (ModelRenderer modelrenderer : this.field_82904_b)
+        for (var10 = 0; var10 < var9; ++var10)
         {
-            modelrenderer.render(scale);
+            var11 = var8[var10];
+            var11.render(p_78088_7_);
         }
 
-        for (ModelRenderer modelrenderer1 : this.field_82905_a)
+        var8 = this.field_82905_a;
+        var9 = var8.length;
+
+        for (var10 = 0; var10 < var9; ++var10)
         {
-            modelrenderer1.render(scale);
+            var11 = var8[var10];
+            var11.render(p_78088_7_);
         }
     }
 
@@ -61,28 +71,28 @@ public class ModelWither extends ModelBase
      * and legs, where par1 represents the time(so that arms and legs swing back and forth) and par2 represents how
      * "far" arms and legs can swing at most.
      */
-    public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn)
+    public void setRotationAngles(float p_78087_1_, float p_78087_2_, float p_78087_3_, float p_78087_4_, float p_78087_5_, float p_78087_6_, Entity p_78087_7_)
     {
-        float f = MathHelper.cos(ageInTicks * 0.1F);
-        this.field_82905_a[1].rotateAngleX = (0.065F + 0.05F * f) * (float)Math.PI;
+        float var8 = MathHelper.cos(p_78087_3_ * 0.1F);
+        this.field_82905_a[1].rotateAngleX = (0.065F + 0.05F * var8) * (float)Math.PI;
         this.field_82905_a[2].setRotationPoint(-2.0F, 6.9F + MathHelper.cos(this.field_82905_a[1].rotateAngleX) * 10.0F, -0.5F + MathHelper.sin(this.field_82905_a[1].rotateAngleX) * 10.0F);
-        this.field_82905_a[2].rotateAngleX = (0.265F + 0.1F * f) * (float)Math.PI;
-        this.field_82904_b[0].rotateAngleY = netHeadYaw / (180F / (float)Math.PI);
-        this.field_82904_b[0].rotateAngleX = headPitch / (180F / (float)Math.PI);
+        this.field_82905_a[2].rotateAngleX = (0.265F + 0.1F * var8) * (float)Math.PI;
+        this.field_82904_b[0].rotateAngleY = p_78087_4_ / (180F / (float)Math.PI);
+        this.field_82904_b[0].rotateAngleX = p_78087_5_ / (180F / (float)Math.PI);
     }
 
     /**
      * Used for easily adding entity-dependent animations. The second and third float params here are the same second
      * and third as in the setRotationAngles method.
      */
-    public void setLivingAnimations(EntityLivingBase entitylivingbaseIn, float p_78086_2_, float p_78086_3_, float partialTickTime)
+    public void setLivingAnimations(EntityLivingBase p_78086_1_, float p_78086_2_, float p_78086_3_, float p_78086_4_)
     {
-        EntityWither entitywither = (EntityWither)entitylivingbaseIn;
+        EntityWither var5 = (EntityWither)p_78086_1_;
 
-        for (int i = 1; i < 3; ++i)
+        for (int var6 = 1; var6 < 3; ++var6)
         {
-            this.field_82904_b[i].rotateAngleY = (entitywither.func_82207_a(i - 1) - entitylivingbaseIn.renderYawOffset) / (180F / (float)Math.PI);
-            this.field_82904_b[i].rotateAngleX = entitywither.func_82210_r(i - 1) / (180F / (float)Math.PI);
+            this.field_82904_b[var6].rotateAngleY = (var5.func_82207_a(var6 - 1) - p_78086_1_.renderYawOffset) / (180F / (float)Math.PI);
+            this.field_82904_b[var6].rotateAngleX = var5.func_82210_r(var6 - 1) / (180F / (float)Math.PI);
         }
     }
 }

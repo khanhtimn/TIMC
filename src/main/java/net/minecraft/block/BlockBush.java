@@ -1,7 +1,6 @@
 package net.minecraft.block;
 
 import java.util.Random;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -13,28 +12,25 @@ import net.minecraft.world.World;
 
 public class BlockBush extends Block
 {
+    
+
+    protected BlockBush(Material materialIn)
+    {
+        super(materialIn);
+        this.setTickRandomly(true);
+        float var2 = 0.2F;
+        this.setBlockBounds(0.5F - var2, 0.0F, 0.5F - var2, 0.5F + var2, var2 * 3.0F, 0.5F + var2);
+        this.setCreativeTab(CreativeTabs.tabDecorations);
+    }
+
     protected BlockBush()
     {
         this(Material.plants);
     }
 
-    protected BlockBush(Material materialIn)
-    {
-        this(materialIn, materialIn.getMaterialMapColor());
-    }
-
-    protected BlockBush(Material p_i46452_1_, MapColor p_i46452_2_)
-    {
-        super(p_i46452_1_, p_i46452_2_);
-        this.setTickRandomly(true);
-        float f = 0.2F;
-        this.setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, f * 3.0F, 0.5F + f);
-        this.setCreativeTab(CreativeTabs.tabDecorations);
-    }
-
     public boolean canPlaceBlockAt(World worldIn, BlockPos pos)
     {
-        return super.canPlaceBlockAt(worldIn, pos) && this.canPlaceBlockOn(worldIn.getBlockState(pos.down()).getBlock());
+        return super.canPlaceBlockAt(worldIn, pos) && this.canPlaceBlockOn(worldIn.getBlockState(pos.offsetDown()).getBlock());
     }
 
     /**
@@ -45,32 +41,29 @@ public class BlockBush extends Block
         return ground == Blocks.grass || ground == Blocks.dirt || ground == Blocks.farmland;
     }
 
-    /**
-     * Called when a neighboring block changes.
-     */
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
     {
         super.onNeighborBlockChange(worldIn, pos, state, neighborBlock);
-        this.checkAndDropBlock(worldIn, pos, state);
+        this.func_176475_e(worldIn, pos, state);
     }
 
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
-        this.checkAndDropBlock(worldIn, pos, state);
+        this.func_176475_e(worldIn, pos, state);
     }
 
-    protected void checkAndDropBlock(World worldIn, BlockPos pos, IBlockState state)
+    protected void func_176475_e(World worldIn, BlockPos p_176475_2_, IBlockState p_176475_3_)
     {
-        if (!this.canBlockStay(worldIn, pos, state))
+        if (!this.canBlockStay(worldIn, p_176475_2_, p_176475_3_))
         {
-            this.dropBlockAsItem(worldIn, pos, state, 0);
-            worldIn.setBlockState(pos, Blocks.air.getDefaultState(), 3);
+            this.dropBlockAsItem(worldIn, p_176475_2_, p_176475_3_, 0);
+            worldIn.setBlockState(p_176475_2_, Blocks.air.getDefaultState(), 3);
         }
     }
 
-    public boolean canBlockStay(World worldIn, BlockPos pos, IBlockState state)
+    public boolean canBlockStay(World worldIn, BlockPos p_180671_2_, IBlockState p_180671_3_)
     {
-        return this.canPlaceBlockOn(worldIn.getBlockState(pos.down()).getBlock());
+        return this.canPlaceBlockOn(worldIn.getBlockState(p_180671_2_.offsetDown()).getBlock());
     }
 
     public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state)
@@ -78,9 +71,6 @@ public class BlockBush extends Block
         return null;
     }
 
-    /**
-     * Used to determine ambient occlusion and culling when rebuilding chunks for render
-     */
     public boolean isOpaqueCube()
     {
         return false;

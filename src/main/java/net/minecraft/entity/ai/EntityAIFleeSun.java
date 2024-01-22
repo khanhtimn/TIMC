@@ -14,12 +14,13 @@ public class EntityAIFleeSun extends EntityAIBase
     private double shelterZ;
     private double movementSpeed;
     private World theWorld;
+    
 
-    public EntityAIFleeSun(EntityCreature theCreatureIn, double movementSpeedIn)
+    public EntityAIFleeSun(EntityCreature p_i1623_1_, double p_i1623_2_)
     {
-        this.theCreature = theCreatureIn;
-        this.movementSpeed = movementSpeedIn;
-        this.theWorld = theCreatureIn.worldObj;
+        this.theCreature = p_i1623_1_;
+        this.movementSpeed = p_i1623_2_;
+        this.theWorld = p_i1623_1_.worldObj;
         this.setMutexBits(1);
     }
 
@@ -36,23 +37,23 @@ public class EntityAIFleeSun extends EntityAIBase
         {
             return false;
         }
-        else if (!this.theWorld.canSeeSky(new BlockPos(this.theCreature.posX, this.theCreature.getEntityBoundingBox().minY, this.theCreature.posZ)))
+        else if (!this.theWorld.isAgainstSky(new BlockPos(this.theCreature.posX, this.theCreature.getEntityBoundingBox().minY, this.theCreature.posZ)))
         {
             return false;
         }
         else
         {
-            Vec3 vec3 = this.findPossibleShelter();
+            Vec3 var1 = this.findPossibleShelter();
 
-            if (vec3 == null)
+            if (var1 == null)
             {
                 return false;
             }
             else
             {
-                this.shelterX = vec3.xCoord;
-                this.shelterY = vec3.yCoord;
-                this.shelterZ = vec3.zCoord;
+                this.shelterX = var1.xCoord;
+                this.shelterY = var1.yCoord;
+                this.shelterZ = var1.zCoord;
                 return true;
             }
         }
@@ -76,16 +77,16 @@ public class EntityAIFleeSun extends EntityAIBase
 
     private Vec3 findPossibleShelter()
     {
-        Random random = this.theCreature.getRNG();
-        BlockPos blockpos = new BlockPos(this.theCreature.posX, this.theCreature.getEntityBoundingBox().minY, this.theCreature.posZ);
+        Random var1 = this.theCreature.getRNG();
+        BlockPos var2 = new BlockPos(this.theCreature.posX, this.theCreature.getEntityBoundingBox().minY, this.theCreature.posZ);
 
-        for (int i = 0; i < 10; ++i)
+        for (int var3 = 0; var3 < 10; ++var3)
         {
-            BlockPos blockpos1 = blockpos.add(random.nextInt(20) - 10, random.nextInt(6) - 3, random.nextInt(20) - 10);
+            BlockPos var4 = var2.add(var1.nextInt(20) - 10, var1.nextInt(6) - 3, var1.nextInt(20) - 10);
 
-            if (!this.theWorld.canSeeSky(blockpos1) && this.theCreature.getBlockPathWeight(blockpos1) < 0.0F)
+            if (!this.theWorld.isAgainstSky(var4) && this.theCreature.func_180484_a(var4) < 0.0F)
             {
-                return new Vec3((double)blockpos1.getX(), (double)blockpos1.getY(), (double)blockpos1.getZ());
+                return new Vec3((double)var4.getX(), (double)var4.getY(), (double)var4.getZ());
             }
         }
 

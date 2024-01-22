@@ -21,15 +21,16 @@ import net.minecraft.world.World;
 
 public class EntityPigZombie extends EntityZombie
 {
-    private static final UUID ATTACK_SPEED_BOOST_MODIFIER_UUID = UUID.fromString("49455A49-7EC5-45BA-B886-3B90B23A1718");
-    private static final AttributeModifier ATTACK_SPEED_BOOST_MODIFIER = (new AttributeModifier(ATTACK_SPEED_BOOST_MODIFIER_UUID, "Attacking speed boost", 0.05D, 0)).setSaved(false);
+    private static final UUID field_110189_bq = UUID.fromString("49455A49-7EC5-45BA-B886-3B90B23A1718");
+    private static final AttributeModifier field_110190_br = (new AttributeModifier(field_110189_bq, "Attacking speed boost", 0.05D, 0)).setSaved(false);
 
     /** Above zero if this PigZombie is Angry. */
     private int angerLevel;
 
     /** A random delay until this PigZombie next makes a sound. */
     private int randomSoundDelay;
-    private UUID angerTargetUUID;
+    private UUID field_175459_bn;
+    
 
     public EntityPigZombie(World worldIn)
     {
@@ -37,26 +38,26 @@ public class EntityPigZombie extends EntityZombie
         this.isImmuneToFire = true;
     }
 
-    public void setRevengeTarget(EntityLivingBase livingBase)
+    public void setRevengeTarget(EntityLivingBase p_70604_1_)
     {
-        super.setRevengeTarget(livingBase);
+        super.setRevengeTarget(p_70604_1_);
 
-        if (livingBase != null)
+        if (p_70604_1_ != null)
         {
-            this.angerTargetUUID = livingBase.getUniqueID();
+            this.field_175459_bn = p_70604_1_.getUniqueID();
         }
     }
 
-    protected void applyEntityAI()
+    protected void func_175456_n()
     {
-        this.targetTasks.addTask(1, new EntityPigZombie.AIHurtByAggressor(this));
-        this.targetTasks.addTask(2, new EntityPigZombie.AITargetAggressor(this));
+        this.targetTasks.addTask(1, new EntityPigZombie.AIHurtByAggressor());
+        this.targetTasks.addTask(2, new EntityPigZombie.AITargetAggressor());
     }
 
     protected void applyEntityAttributes()
     {
         super.applyEntityAttributes();
-        this.getEntityAttribute(reinforcementChance).setBaseValue(0.0D);
+        this.getEntityAttribute(field_110186_bp).setBaseValue(0.0D);
         this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.23000000417232513D);
         this.getEntityAttribute(SharedMonsterAttributes.attackDamage).setBaseValue(5.0D);
     }
@@ -71,20 +72,20 @@ public class EntityPigZombie extends EntityZombie
 
     protected void updateAITasks()
     {
-        IAttributeInstance iattributeinstance = this.getEntityAttribute(SharedMonsterAttributes.movementSpeed);
+        IAttributeInstance var1 = this.getEntityAttribute(SharedMonsterAttributes.movementSpeed);
 
-        if (this.isAngry())
+        if (this.func_175457_ck())
         {
-            if (!this.isChild() && !iattributeinstance.hasModifier(ATTACK_SPEED_BOOST_MODIFIER))
+            if (!this.isChild() && !var1.func_180374_a(field_110190_br))
             {
-                iattributeinstance.applyModifier(ATTACK_SPEED_BOOST_MODIFIER);
+                var1.applyModifier(field_110190_br);
             }
 
             --this.angerLevel;
         }
-        else if (iattributeinstance.hasModifier(ATTACK_SPEED_BOOST_MODIFIER))
+        else if (var1.func_180374_a(field_110190_br))
         {
-            iattributeinstance.removeModifier(ATTACK_SPEED_BOOST_MODIFIER);
+            var1.removeModifier(field_110190_br);
         }
 
         if (this.randomSoundDelay > 0 && --this.randomSoundDelay == 0)
@@ -92,11 +93,11 @@ public class EntityPigZombie extends EntityZombie
             this.playSound("mob.zombiepig.zpigangry", this.getSoundVolume() * 2.0F, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F) * 1.8F);
         }
 
-        if (this.angerLevel > 0 && this.angerTargetUUID != null && this.getAITarget() == null)
+        if (this.angerLevel > 0 && this.field_175459_bn != null && this.getAITarget() == null)
         {
-            EntityPlayer entityplayer = this.worldObj.getPlayerEntityByUUID(this.angerTargetUUID);
-            this.setRevengeTarget(entityplayer);
-            this.attackingPlayer = entityplayer;
+            EntityPlayer var2 = this.worldObj.getPlayerEntityByUUID(this.field_175459_bn);
+            this.setRevengeTarget(var2);
+            this.attackingPlayer = var2;
             this.recentlyHit = this.getRevengeTimer();
         }
 
@@ -112,9 +113,9 @@ public class EntityPigZombie extends EntityZombie
     }
 
     /**
-     * Checks that the entity is not colliding with any blocks / liquids
+     * Whether or not the current entity is in lava
      */
-    public boolean isNotColliding()
+    public boolean handleLavaMovement()
     {
         return this.worldObj.checkNoEntityCollision(this.getEntityBoundingBox(), this) && this.worldObj.getCollidingBoundingBoxes(this, this.getEntityBoundingBox()).isEmpty() && !this.worldObj.isAnyLiquid(this.getEntityBoundingBox());
     }
@@ -127,9 +128,9 @@ public class EntityPigZombie extends EntityZombie
         super.writeEntityToNBT(tagCompound);
         tagCompound.setShort("Anger", (short)this.angerLevel);
 
-        if (this.angerTargetUUID != null)
+        if (this.field_175459_bn != null)
         {
-            tagCompound.setString("HurtBy", this.angerTargetUUID.toString());
+            tagCompound.setString("HurtBy", this.field_175459_bn.toString());
         }
         else
         {
@@ -144,17 +145,17 @@ public class EntityPigZombie extends EntityZombie
     {
         super.readEntityFromNBT(tagCompund);
         this.angerLevel = tagCompund.getShort("Anger");
-        String s = tagCompund.getString("HurtBy");
+        String var2 = tagCompund.getString("HurtBy");
 
-        if (s.length() > 0)
+        if (var2.length() > 0)
         {
-            this.angerTargetUUID = UUID.fromString(s);
-            EntityPlayer entityplayer = this.worldObj.getPlayerEntityByUUID(this.angerTargetUUID);
-            this.setRevengeTarget(entityplayer);
+            this.field_175459_bn = UUID.fromString(var2);
+            EntityPlayer var3 = this.worldObj.getPlayerEntityByUUID(this.field_175459_bn);
+            this.setRevengeTarget(var3);
 
-            if (entityplayer != null)
+            if (var3 != null)
             {
-                this.attackingPlayer = entityplayer;
+                this.attackingPlayer = var3;
                 this.recentlyHit = this.getRevengeTimer();
             }
         }
@@ -165,17 +166,17 @@ public class EntityPigZombie extends EntityZombie
      */
     public boolean attackEntityFrom(DamageSource source, float amount)
     {
-        if (this.isEntityInvulnerable(source))
+        if (this.func_180431_b(source))
         {
             return false;
         }
         else
         {
-            Entity entity = source.getEntity();
+            Entity var3 = source.getEntity();
 
-            if (entity instanceof EntityPlayer)
+            if (var3 instanceof EntityPlayer)
             {
-                this.becomeAngryAt(entity);
+                this.becomeAngryAt(var3);
             }
 
             return super.attackEntityFrom(source, amount);
@@ -196,7 +197,7 @@ public class EntityPigZombie extends EntityZombie
         }
     }
 
-    public boolean isAngry()
+    public boolean func_175457_ck()
     {
         return this.angerLevel > 0;
     }
@@ -227,23 +228,20 @@ public class EntityPigZombie extends EntityZombie
 
     /**
      * Drop 0-2 items of this living's type
-     *  
-     * @param wasRecentlyHit true if this this entity was recently hit by appropriate entity (generally only if player
-     * or tameable)
-     * @param lootingModifier level of enchanment to be applied to this drop
      */
-    protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier)
+    protected void dropFewItems(boolean p_70628_1_, int p_70628_2_)
     {
-        int i = this.rand.nextInt(2 + lootingModifier);
+        int var3 = this.rand.nextInt(2 + p_70628_2_);
+        int var4;
 
-        for (int j = 0; j < i; ++j)
+        for (var4 = 0; var4 < var3; ++var4)
         {
             this.dropItem(Items.rotten_flesh, 1);
         }
 
-        i = this.rand.nextInt(2 + lootingModifier);
+        var3 = this.rand.nextInt(2 + p_70628_2_);
 
-        for (int k = 0; k < i; ++k)
+        for (var4 = 0; var4 < var3; ++var4)
         {
             this.dropItem(Items.gold_nugget, 1);
         }
@@ -252,66 +250,63 @@ public class EntityPigZombie extends EntityZombie
     /**
      * Called when a player interacts with a mob. e.g. gets milk from a cow, gets into the saddle on a pig.
      */
-    public boolean interact(EntityPlayer player)
+    public boolean interact(EntityPlayer p_70085_1_)
     {
         return false;
     }
 
     /**
-     * Causes this Entity to drop a random item.
+     * Makes entity wear random armor based on difficulty
      */
-    protected void addRandomDrop()
+    protected void addRandomArmor()
     {
         this.dropItem(Items.gold_ingot, 1);
     }
 
-    /**
-     * Gives armor or weapon for entity based on given DifficultyInstance
-     */
-    protected void setEquipmentBasedOnDifficulty(DifficultyInstance difficulty)
+    protected void func_180481_a(DifficultyInstance p_180481_1_)
     {
         this.setCurrentItemOrArmor(0, new ItemStack(Items.golden_sword));
     }
 
-    /**
-     * Called only once on an entity when first time spawned, via egg, mob spawner, natural spawning etc, but not called
-     * when entity is reloaded from nbt. Mainly used for initializing attributes and inventory
-     */
-    public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, IEntityLivingData livingdata)
+    public IEntityLivingData func_180482_a(DifficultyInstance p_180482_1_, IEntityLivingData p_180482_2_)
     {
-        super.onInitialSpawn(difficulty, livingdata);
+        super.func_180482_a(p_180482_1_, p_180482_2_);
         this.setVillager(false);
-        return livingdata;
+        return p_180482_2_;
     }
 
-    static class AIHurtByAggressor extends EntityAIHurtByTarget
+    class AIHurtByAggressor extends EntityAIHurtByTarget
     {
-        public AIHurtByAggressor(EntityPigZombie p_i45828_1_)
+        
+
+        public AIHurtByAggressor()
         {
-            super(p_i45828_1_, true, new Class[0]);
+            super(EntityPigZombie.this, true, new Class[0]);
         }
 
-        protected void setEntityAttackTarget(EntityCreature creatureIn, EntityLivingBase entityLivingBaseIn)
+        protected void func_179446_a(EntityCreature p_179446_1_, EntityLivingBase p_179446_2_)
         {
-            super.setEntityAttackTarget(creatureIn, entityLivingBaseIn);
+            super.func_179446_a(p_179446_1_, p_179446_2_);
 
-            if (creatureIn instanceof EntityPigZombie)
+            if (p_179446_1_ instanceof EntityPigZombie)
             {
-                ((EntityPigZombie)creatureIn).becomeAngryAt(entityLivingBaseIn);
+                ((EntityPigZombie)p_179446_1_).becomeAngryAt(p_179446_2_);
             }
         }
     }
 
-    static class AITargetAggressor extends EntityAINearestAttackableTarget<EntityPlayer>
+    class AITargetAggressor extends EntityAINearestAttackableTarget
     {
-        public AITargetAggressor(EntityPigZombie p_i45829_1_)
+        
+
+        public AITargetAggressor()
         {
-            super(p_i45829_1_, EntityPlayer.class, true);
+            super(EntityPigZombie.this, EntityPlayer.class, true);
         }
 
         public boolean shouldExecute()
         {
-            return ((EntityPigZombie)this.taskOwner).isAngry() && super.shouldExecute();
+            return ((EntityPigZombie)this.taskOwner).func_175457_ck() && super.shouldExecute();
         }
     }
 }

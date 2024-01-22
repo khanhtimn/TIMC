@@ -6,14 +6,15 @@ public abstract class BaseAttribute implements IAttribute
     private final String unlocalizedName;
     private final double defaultValue;
     private boolean shouldWatch;
+    
 
-    protected BaseAttribute(IAttribute p_i45892_1_, String unlocalizedNameIn, double defaultValueIn)
+    protected BaseAttribute(IAttribute p_i45892_1_, String p_i45892_2_, double p_i45892_3_)
     {
         this.field_180373_a = p_i45892_1_;
-        this.unlocalizedName = unlocalizedNameIn;
-        this.defaultValue = defaultValueIn;
+        this.unlocalizedName = p_i45892_2_;
+        this.defaultValue = p_i45892_3_;
 
-        if (unlocalizedNameIn == null)
+        if (p_i45892_2_ == null)
         {
             throw new IllegalArgumentException("Name cannot be null!");
         }
@@ -34,9 +35,9 @@ public abstract class BaseAttribute implements IAttribute
         return this.shouldWatch;
     }
 
-    public BaseAttribute setShouldWatch(boolean shouldWatchIn)
+    public BaseAttribute setShouldWatch(boolean p_111112_1_)
     {
-        this.shouldWatch = shouldWatchIn;
+        this.shouldWatch = p_111112_1_;
         return this;
     }
 

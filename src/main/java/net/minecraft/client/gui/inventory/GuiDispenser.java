@@ -9,18 +9,15 @@ import net.minecraft.util.ResourceLocation;
 public class GuiDispenser extends GuiContainer
 {
     private static final ResourceLocation dispenserGuiTextures = new ResourceLocation("textures/gui/container/dispenser.png");
+    private final InventoryPlayer field_175376_w;
+    public IInventory field_175377_u;
+    
 
-    /** The player inventory bound to this GUI. */
-    private final InventoryPlayer playerInventory;
-
-    /** The inventory contained within the corresponding Dispenser. */
-    public IInventory dispenserInventory;
-
-    public GuiDispenser(InventoryPlayer playerInv, IInventory dispenserInv)
+    public GuiDispenser(InventoryPlayer p_i45503_1_, IInventory p_i45503_2_)
     {
-        super(new ContainerDispenser(playerInv, dispenserInv));
-        this.playerInventory = playerInv;
-        this.dispenserInventory = dispenserInv;
+        super(new ContainerDispenser(p_i45503_1_, p_i45503_2_));
+        this.field_175376_w = p_i45503_1_;
+        this.field_175377_u = p_i45503_2_;
     }
 
     /**
@@ -28,9 +25,9 @@ public class GuiDispenser extends GuiContainer
      */
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
-        String s = this.dispenserInventory.getDisplayName().getUnformattedText();
-        this.fontRendererObj.drawString(s, this.xSize / 2 - this.fontRendererObj.getStringWidth(s) / 2, 6, 4210752);
-        this.fontRendererObj.drawString(this.playerInventory.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 4210752);
+        String var3 = this.field_175377_u.getDisplayName().getUnformattedText();
+        this.fontRendererObj.drawString(var3, this.xSize / 2 - this.fontRendererObj.getStringWidth(var3) / 2, 6, 4210752);
+        this.fontRendererObj.drawString(this.field_175376_w.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 4210752);
     }
 
     /**
@@ -40,8 +37,8 @@ public class GuiDispenser extends GuiContainer
     {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(dispenserGuiTextures);
-        int i = (this.width - this.xSize) / 2;
-        int j = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
+        int var4 = (this.width - this.xSize) / 2;
+        int var5 = (this.height - this.ySize) / 2;
+        this.drawTexturedModalRect(var4, var5, 0, 0, this.xSize, this.ySize);
     }
 }

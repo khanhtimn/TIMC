@@ -14,6 +14,8 @@ import net.minecraft.world.World;
 
 public class ItemSign extends Item
 {
+    
+
     public ItemSign()
     {
         this.maxStackSize = 16;
@@ -22,6 +24,9 @@ public class ItemSign extends Item
 
     /**
      * Called when a Block is right-clicked with this Item
+     *  
+     * @param pos The block being right-clicked
+     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
@@ -37,7 +42,7 @@ public class ItemSign extends Item
         {
             pos = pos.offset(side);
 
-            if (!playerIn.canPlayerEdit(pos, side, stack))
+            if (!playerIn.func_175151_a(pos, side, stack))
             {
                 return false;
             }
@@ -53,20 +58,20 @@ public class ItemSign extends Item
             {
                 if (side == EnumFacing.UP)
                 {
-                    int i = MathHelper.floor_double((double)((playerIn.rotationYaw + 180.0F) * 16.0F / 360.0F) + 0.5D) & 15;
-                    worldIn.setBlockState(pos, Blocks.standing_sign.getDefaultState().withProperty(BlockStandingSign.ROTATION, Integer.valueOf(i)), 3);
+                    int var9 = MathHelper.floor_double((double)((playerIn.rotationYaw + 180.0F) * 16.0F / 360.0F) + 0.5D) & 15;
+                    worldIn.setBlockState(pos, Blocks.standing_sign.getDefaultState().withProperty(BlockStandingSign.ROTATION_PROP, Integer.valueOf(var9)), 3);
                 }
                 else
                 {
-                    worldIn.setBlockState(pos, Blocks.wall_sign.getDefaultState().withProperty(BlockWallSign.FACING, side), 3);
+                    worldIn.setBlockState(pos, Blocks.wall_sign.getDefaultState().withProperty(BlockWallSign.field_176412_a, side), 3);
                 }
 
                 --stack.stackSize;
-                TileEntity tileentity = worldIn.getTileEntity(pos);
+                TileEntity var10 = worldIn.getTileEntity(pos);
 
-                if (tileentity instanceof TileEntitySign && !ItemBlock.setTileEntityNBT(worldIn, playerIn, pos, stack))
+                if (var10 instanceof TileEntitySign && !ItemBlock.setTileEntityNBT(worldIn, pos, stack))
                 {
-                    playerIn.openEditSign((TileEntitySign)tileentity);
+                    playerIn.func_175141_a((TileEntitySign)var10);
                 }
 
                 return true;

@@ -10,26 +10,27 @@ public class ScaledResolution
     private int scaledWidth;
     private int scaledHeight;
     private int scaleFactor;
+    
 
-    public ScaledResolution(Minecraft p_i46445_1_)
+    public ScaledResolution(Minecraft mcIn, int p_i46324_2_, int p_i46324_3_)
     {
-        this.scaledWidth = p_i46445_1_.displayWidth;
-        this.scaledHeight = p_i46445_1_.displayHeight;
+        this.scaledWidth = p_i46324_2_;
+        this.scaledHeight = p_i46324_3_;
         this.scaleFactor = 1;
-        boolean flag = p_i46445_1_.isUnicode();
-        int i = p_i46445_1_.gameSettings.particleSetting;
+        boolean var4 = mcIn.isUnicode();
+        int var5 = mcIn.gameSettings.guiScale;
 
-        if (i == 0)
+        if (var5 == 0)
         {
-            i = 1000;
+            var5 = 1000;
         }
 
-        while (this.scaleFactor < i && this.scaledWidth / (this.scaleFactor + 1) >= 320 && this.scaledHeight / (this.scaleFactor + 1) >= 240)
+        while (this.scaleFactor < var5 && this.scaledWidth / (this.scaleFactor + 1) >= 320 && this.scaledHeight / (this.scaleFactor + 1) >= 240)
         {
             ++this.scaleFactor;
         }
 
-        if (flag && this.scaleFactor % 2 != 0 && this.scaleFactor != 1)
+        if (var4 && this.scaleFactor % 2 != 0 && this.scaleFactor != 1)
         {
             --this.scaleFactor;
         }

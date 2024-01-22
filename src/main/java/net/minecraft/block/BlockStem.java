@@ -1,6 +1,7 @@
 package net.minecraft.block;
 
 import com.google.common.base.Predicate;
+import java.util.Iterator;
 import java.util.Random;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -21,23 +22,29 @@ import net.minecraft.world.World;
 
 public class BlockStem extends BlockBush implements IGrowable
 {
-    public static final PropertyInteger AGE = PropertyInteger.create("age", 0, 7);
-    public static final PropertyDirection FACING = PropertyDirection.create("facing", new Predicate<EnumFacing>()
+    public static final PropertyInteger AGE_PROP = PropertyInteger.create("age", 0, 7);
+    public static final PropertyDirection FACING_PROP = PropertyDirection.create("facing", new Predicate()
     {
-        public boolean apply(EnumFacing p_apply_1_)
+        
+        public boolean apply(EnumFacing p_177218_1_)
         {
-            return p_apply_1_ != EnumFacing.DOWN;
+            return p_177218_1_ != EnumFacing.DOWN;
+        }
+        public boolean apply(Object p_apply_1_)
+        {
+            return this.apply((EnumFacing)p_apply_1_);
         }
     });
-    private final Block crop;
+    private final Block cropBlock;
+    
 
-    protected BlockStem(Block crop)
+    protected BlockStem(Block p_i45430_1_)
     {
-        this.setDefaultState(this.blockState.getBaseState().withProperty(AGE, Integer.valueOf(0)).withProperty(FACING, EnumFacing.UP));
-        this.crop = crop;
+        this.setDefaultState(this.blockState.getBaseState().withProperty(AGE_PROP, Integer.valueOf(0)).withProperty(FACING_PROP, EnumFacing.UP));
+        this.cropBlock = p_i45430_1_;
         this.setTickRandomly(true);
-        float f = 0.125F;
-        this.setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, 0.25F, 0.5F + f);
+        float var2 = 0.125F;
+        this.setBlockBounds(0.5F - var2, 0.0F, 0.5F - var2, 0.5F + var2, 0.25F, 0.5F + var2);
         this.setCreativeTab((CreativeTabs)null);
     }
 
@@ -47,13 +54,16 @@ public class BlockStem extends BlockBush implements IGrowable
      */
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
     {
-        state = state.withProperty(FACING, EnumFacing.UP);
+        state = state.withProperty(FACING_PROP, EnumFacing.UP);
+        Iterator var4 = EnumFacing.Plane.HORIZONTAL.iterator();
 
-        for (EnumFacing enumfacing : EnumFacing.Plane.HORIZONTAL)
+        while (var4.hasNext())
         {
-            if (worldIn.getBlockState(pos.offset(enumfacing)).getBlock() == this.crop)
+            EnumFacing var5 = (EnumFacing)var4.next();
+
+            if (worldIn.getBlockState(pos.offset(var5)).getBlock() == this.cropBlock)
             {
-                state = state.withProperty(FACING, enumfacing);
+                state = state.withProperty(FACING_PROP, var5);
                 break;
             }
         }
@@ -73,45 +83,49 @@ public class BlockStem extends BlockBush implements IGrowable
     {
         super.updateTick(worldIn, pos, state, rand);
 
-        if (worldIn.getLightFromNeighbors(pos.up()) >= 9)
+        if (worldIn.getLightFromNeighbors(pos.offsetUp()) >= 9)
         {
-            float f = BlockCrops.getGrowthChance(this, worldIn, pos);
+            float var5 = BlockCrops.getGrowthChance(this, worldIn, pos);
 
-            if (rand.nextInt((int)(25.0F / f) + 1) == 0)
+            if (rand.nextInt((int)(25.0F / var5) + 1) == 0)
             {
-                int i = ((Integer)state.getValue(AGE)).intValue();
+                int var6 = ((Integer)state.getValue(AGE_PROP)).intValue();
 
-                if (i < 7)
+                if (var6 < 7)
                 {
-                    state = state.withProperty(AGE, Integer.valueOf(i + 1));
+                    state = state.withProperty(AGE_PROP, Integer.valueOf(var6 + 1));
                     worldIn.setBlockState(pos, state, 2);
                 }
                 else
                 {
-                    for (EnumFacing enumfacing : EnumFacing.Plane.HORIZONTAL)
+                    Iterator var7 = EnumFacing.Plane.HORIZONTAL.iterator();
+
+                    while (var7.hasNext())
                     {
-                        if (worldIn.getBlockState(pos.offset(enumfacing)).getBlock() == this.crop)
+                        EnumFacing var8 = (EnumFacing)var7.next();
+
+                        if (worldIn.getBlockState(pos.offset(var8)).getBlock() == this.cropBlock)
                         {
                             return;
                         }
                     }
 
                     pos = pos.offset(EnumFacing.Plane.HORIZONTAL.random(rand));
-                    Block block = worldIn.getBlockState(pos.down()).getBlock();
+                    Block var9 = worldIn.getBlockState(pos.offsetDown()).getBlock();
 
-                    if (worldIn.getBlockState(pos).getBlock().blockMaterial == Material.air && (block == Blocks.farmland || block == Blocks.dirt || block == Blocks.grass))
+                    if (worldIn.getBlockState(pos).getBlock().blockMaterial == Material.air && (var9 == Blocks.farmland || var9 == Blocks.dirt || var9 == Blocks.grass))
                     {
-                        worldIn.setBlockState(pos, this.crop.getDefaultState());
+                        worldIn.setBlockState(pos, this.cropBlock.getDefaultState());
                     }
                 }
             }
         }
     }
 
-    public void growStem(World worldIn, BlockPos pos, IBlockState state)
+    public void growStem(World worldIn, BlockPos p_176482_2_, IBlockState p_176482_3_)
     {
-        int i = ((Integer)state.getValue(AGE)).intValue() + MathHelper.getRandomIntegerInRange(worldIn.rand, 2, 5);
-        worldIn.setBlockState(pos, state.withProperty(AGE, Integer.valueOf(Math.min(7, i))), 2);
+        int var4 = ((Integer)p_176482_3_.getValue(AGE_PROP)).intValue() + MathHelper.getRandomIntegerInRange(worldIn.rand, 2, 5);
+        worldIn.setBlockState(p_176482_2_, p_176482_3_.withProperty(AGE_PROP, Integer.valueOf(Math.min(7, var4))), 2);
     }
 
     public int getRenderColor(IBlockState state)
@@ -122,11 +136,11 @@ public class BlockStem extends BlockBush implements IGrowable
         }
         else
         {
-            int i = ((Integer)state.getValue(AGE)).intValue();
-            int j = i * 32;
-            int k = 255 - i * 8;
-            int l = i * 4;
-            return j << 16 | k << 8 | l;
+            int var2 = ((Integer)state.getValue(AGE_PROP)).intValue();
+            int var3 = var2 * 32;
+            int var4 = 255 - var2 * 8;
+            int var5 = var2 * 4;
+            return var3 << 16 | var4 << 8 | var5;
         }
     }
 
@@ -140,19 +154,22 @@ public class BlockStem extends BlockBush implements IGrowable
      */
     public void setBlockBoundsForItemRender()
     {
-        float f = 0.125F;
-        this.setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, 0.25F, 0.5F + f);
+        float var1 = 0.125F;
+        this.setBlockBounds(0.5F - var1, 0.0F, 0.5F - var1, 0.5F + var1, 0.25F, 0.5F + var1);
     }
 
-    public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
+    public void setBlockBoundsBasedOnState(IBlockAccess access, BlockPos pos)
     {
-        this.maxY = (double)((float)(((Integer)worldIn.getBlockState(pos).getValue(AGE)).intValue() * 2 + 2) / 16.0F);
-        float f = 0.125F;
-        this.setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, (float)this.maxY, 0.5F + f);
+        this.maxY = (double)((float)(((Integer)access.getBlockState(pos).getValue(AGE_PROP)).intValue() * 2 + 2) / 16.0F);
+        float var3 = 0.125F;
+        this.setBlockBounds(0.5F - var3, 0.0F, 0.5F - var3, 0.5F + var3, (float)this.maxY, 0.5F + var3);
     }
 
     /**
      * Spawns this Block's drops into the World as EntityItems.
+     *  
+     * @param chance The chance that each Item is actually spawned (1.0 = always, 0.0 = never)
+     * @param fortune The player's fortune level
      */
     public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
     {
@@ -160,17 +177,17 @@ public class BlockStem extends BlockBush implements IGrowable
 
         if (!worldIn.isRemote)
         {
-            Item item = this.getSeedItem();
+            Item var6 = this.getSeedItem();
 
-            if (item != null)
+            if (var6 != null)
             {
-                int i = ((Integer)state.getValue(AGE)).intValue();
+                int var7 = ((Integer)state.getValue(AGE_PROP)).intValue();
 
-                for (int j = 0; j < 3; ++j)
+                for (int var8 = 0; var8 < 3; ++var8)
                 {
-                    if (worldIn.rand.nextInt(15) <= i)
+                    if (worldIn.rand.nextInt(15) <= var7)
                     {
-                        spawnAsEntity(worldIn, pos, new ItemStack(item));
+                        spawnAsEntity(worldIn, pos, new ItemStack(var6));
                     }
                 }
             }
@@ -179,11 +196,13 @@ public class BlockStem extends BlockBush implements IGrowable
 
     protected Item getSeedItem()
     {
-        return this.crop == Blocks.pumpkin ? Items.pumpkin_seeds : (this.crop == Blocks.melon_block ? Items.melon_seeds : null);
+        return this.cropBlock == Blocks.pumpkin ? Items.pumpkin_seeds : (this.cropBlock == Blocks.melon_block ? Items.melon_seeds : null);
     }
 
     /**
      * Get the Item that this Block should drop when harvested.
+     *  
+     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -192,26 +211,23 @@ public class BlockStem extends BlockBush implements IGrowable
 
     public Item getItem(World worldIn, BlockPos pos)
     {
-        Item item = this.getSeedItem();
-        return item != null ? item : null;
+        Item var3 = this.getSeedItem();
+        return var3 != null ? var3 : null;
     }
 
-    /**
-     * Whether this IGrowable can grow
-     */
-    public boolean canGrow(World worldIn, BlockPos pos, IBlockState state, boolean isClient)
+    public boolean isStillGrowing(World worldIn, BlockPos p_176473_2_, IBlockState p_176473_3_, boolean p_176473_4_)
     {
-        return ((Integer)state.getValue(AGE)).intValue() != 7;
+        return ((Integer)p_176473_3_.getValue(AGE_PROP)).intValue() != 7;
     }
 
-    public boolean canUseBonemeal(World worldIn, Random rand, BlockPos pos, IBlockState state)
+    public boolean canUseBonemeal(World worldIn, Random p_180670_2_, BlockPos p_180670_3_, IBlockState p_180670_4_)
     {
         return true;
     }
 
-    public void grow(World worldIn, Random rand, BlockPos pos, IBlockState state)
+    public void grow(World worldIn, Random p_176474_2_, BlockPos p_176474_3_, IBlockState p_176474_4_)
     {
-        this.growStem(worldIn, pos, state);
+        this.growStem(worldIn, p_176474_3_, p_176474_4_);
     }
 
     /**
@@ -219,7 +235,7 @@ public class BlockStem extends BlockBush implements IGrowable
      */
     public IBlockState getStateFromMeta(int meta)
     {
-        return this.getDefaultState().withProperty(AGE, Integer.valueOf(meta));
+        return this.getDefaultState().withProperty(AGE_PROP, Integer.valueOf(meta));
     }
 
     /**
@@ -227,11 +243,11 @@ public class BlockStem extends BlockBush implements IGrowable
      */
     public int getMetaFromState(IBlockState state)
     {
-        return ((Integer)state.getValue(AGE)).intValue();
+        return ((Integer)state.getValue(AGE_PROP)).intValue();
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {AGE, FACING});
+        return new BlockState(this, new IProperty[] {AGE_PROP, FACING_PROP});
     }
 }

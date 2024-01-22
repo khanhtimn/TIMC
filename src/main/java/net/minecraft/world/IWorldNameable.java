@@ -5,7 +5,7 @@ import net.minecraft.util.IChatComponent;
 public interface IWorldNameable
 {
     /**
-     * Get the name of this object. For players this returns their username
+     * Gets the name of this command sender (usually username, but possibly "Rcon")
      */
     String getName();
 
@@ -14,8 +14,5 @@ public interface IWorldNameable
      */
     boolean hasCustomName();
 
-    /**
-     * Get the formatted ChatComponent that will be used for the sender's username in chat
-     */
     IChatComponent getDisplayName();
 }

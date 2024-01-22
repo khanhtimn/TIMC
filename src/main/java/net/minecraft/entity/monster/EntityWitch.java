@@ -1,5 +1,6 @@
 package net.minecraft.entity.monster;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import net.minecraft.block.material.Material;
@@ -29,8 +30,8 @@ import net.minecraft.world.World;
 
 public class EntityWitch extends EntityMob implements IRangedAttackMob
 {
-    private static final UUID MODIFIER_UUID = UUID.fromString("5CD17E52-A79A-43D3-A529-90FDE04B181E");
-    private static final AttributeModifier MODIFIER = (new AttributeModifier(MODIFIER_UUID, "Drinking speed penalty", -0.25D, 0)).setSaved(false);
+    private static final UUID field_110184_bp = UUID.fromString("5CD17E52-A79A-43D3-A529-90FDE04B181E");
+    private static final AttributeModifier field_110185_bq = (new AttributeModifier(field_110184_bp, "Drinking speed penalty", -0.25D, 0)).setSaved(false);
 
     /** List of items a witch should drop on death. */
     private static final Item[] witchDrops = new Item[] {Items.glowstone_dust, Items.sugar, Items.redstone, Items.spider_eye, Items.glass_bottle, Items.gunpowder, Items.stick, Items.stick};
@@ -40,6 +41,7 @@ public class EntityWitch extends EntityMob implements IRangedAttackMob
      * will throw a potion at the target entity.
      */
     private int witchAttackTimer;
+    
 
     public EntityWitch(World worldIn)
     {
@@ -48,6 +50,7 @@ public class EntityWitch extends EntityMob implements IRangedAttackMob
         this.tasks.addTask(1, new EntityAISwimming(this));
         this.tasks.addTask(2, new EntityAIArrowAttack(this, 1.0D, 60, 10.0F));
         this.tasks.addTask(2, new EntityAIWander(this, 1.0D));
+        this.tasks.addTask(2, this.field_175455_a);
         this.tasks.addTask(3, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
         this.tasks.addTask(3, new EntityAILookIdle(this));
         this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, false, new Class[0]));
@@ -87,9 +90,9 @@ public class EntityWitch extends EntityMob implements IRangedAttackMob
     /**
      * Set whether this witch is aggressive at an entity.
      */
-    public void setAggressive(boolean aggressive)
+    public void setAggressive(boolean p_82197_1_)
     {
-        this.getDataWatcher().updateObject(21, Byte.valueOf((byte)(aggressive ? 1 : 0)));
+        this.getDataWatcher().updateObject(21, Byte.valueOf((byte)(p_82197_1_ ? 1 : 0)));
     }
 
     /**
@@ -120,58 +123,61 @@ public class EntityWitch extends EntityMob implements IRangedAttackMob
                 if (this.witchAttackTimer-- <= 0)
                 {
                     this.setAggressive(false);
-                    ItemStack itemstack = this.getHeldItem();
+                    ItemStack var1 = this.getHeldItem();
                     this.setCurrentItemOrArmor(0, (ItemStack)null);
 
-                    if (itemstack != null && itemstack.getItem() == Items.potionitem)
+                    if (var1 != null && var1.getItem() == Items.potionitem)
                     {
-                        List<PotionEffect> list = Items.potionitem.getEffects(itemstack);
+                        List var2 = Items.potionitem.getEffects(var1);
 
-                        if (list != null)
+                        if (var2 != null)
                         {
-                            for (PotionEffect potioneffect : list)
+                            Iterator var3 = var2.iterator();
+
+                            while (var3.hasNext())
                             {
-                                this.addPotionEffect(new PotionEffect(potioneffect));
+                                PotionEffect var4 = (PotionEffect)var3.next();
+                                this.addPotionEffect(new PotionEffect(var4));
                             }
                         }
                     }
 
-                    this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).removeModifier(MODIFIER);
+                    this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).removeModifier(field_110185_bq);
                 }
             }
             else
             {
-                int i = -1;
+                short var5 = -1;
 
                 if (this.rand.nextFloat() < 0.15F && this.isInsideOfMaterial(Material.water) && !this.isPotionActive(Potion.waterBreathing))
                 {
-                    i = 8237;
+                    var5 = 8237;
                 }
                 else if (this.rand.nextFloat() < 0.15F && this.isBurning() && !this.isPotionActive(Potion.fireResistance))
                 {
-                    i = 16307;
+                    var5 = 16307;
                 }
                 else if (this.rand.nextFloat() < 0.05F && this.getHealth() < this.getMaxHealth())
                 {
-                    i = 16341;
+                    var5 = 16341;
                 }
                 else if (this.rand.nextFloat() < 0.25F && this.getAttackTarget() != null && !this.isPotionActive(Potion.moveSpeed) && this.getAttackTarget().getDistanceSqToEntity(this) > 121.0D)
                 {
-                    i = 16274;
+                    var5 = 16274;
                 }
                 else if (this.rand.nextFloat() < 0.25F && this.getAttackTarget() != null && !this.isPotionActive(Potion.moveSpeed) && this.getAttackTarget().getDistanceSqToEntity(this) > 121.0D)
                 {
-                    i = 16274;
+                    var5 = 16274;
                 }
 
-                if (i > -1)
+                if (var5 > -1)
                 {
-                    this.setCurrentItemOrArmor(0, new ItemStack(Items.potionitem, 1, i));
+                    this.setCurrentItemOrArmor(0, new ItemStack(Items.potionitem, 1, var5));
                     this.witchAttackTimer = this.getHeldItem().getMaxItemUseDuration();
                     this.setAggressive(true);
-                    IAttributeInstance iattributeinstance = this.getEntityAttribute(SharedMonsterAttributes.movementSpeed);
-                    iattributeinstance.removeModifier(MODIFIER);
-                    iattributeinstance.applyModifier(MODIFIER);
+                    IAttributeInstance var6 = this.getEntityAttribute(SharedMonsterAttributes.movementSpeed);
+                    var6.removeModifier(field_110185_bq);
+                    var6.applyModifier(field_110185_bq);
                 }
             }
 
@@ -184,65 +190,61 @@ public class EntityWitch extends EntityMob implements IRangedAttackMob
         super.onLivingUpdate();
     }
 
-    public void handleStatusUpdate(byte id)
+    public void handleHealthUpdate(byte p_70103_1_)
     {
-        if (id == 15)
+        if (p_70103_1_ == 15)
         {
-            for (int i = 0; i < this.rand.nextInt(35) + 10; ++i)
+            for (int var2 = 0; var2 < this.rand.nextInt(35) + 10; ++var2)
             {
                 this.worldObj.spawnParticle(EnumParticleTypes.SPELL_WITCH, this.posX + this.rand.nextGaussian() * 0.12999999523162842D, this.getEntityBoundingBox().maxY + 0.5D + this.rand.nextGaussian() * 0.12999999523162842D, this.posZ + this.rand.nextGaussian() * 0.12999999523162842D, 0.0D, 0.0D, 0.0D, new int[0]);
             }
         }
         else
         {
-            super.handleStatusUpdate(id);
+            super.handleHealthUpdate(p_70103_1_);
         }
     }
 
     /**
      * Reduces damage, depending on potions
      */
-    protected float applyPotionDamageCalculations(DamageSource source, float damage)
+    protected float applyPotionDamageCalculations(DamageSource p_70672_1_, float p_70672_2_)
     {
-        damage = super.applyPotionDamageCalculations(source, damage);
+        p_70672_2_ = super.applyPotionDamageCalculations(p_70672_1_, p_70672_2_);
 
-        if (source.getEntity() == this)
+        if (p_70672_1_.getEntity() == this)
         {
-            damage = 0.0F;
+            p_70672_2_ = 0.0F;
         }
 
-        if (source.isMagicDamage())
+        if (p_70672_1_.isMagicDamage())
         {
-            damage = (float)((double)damage * 0.15D);
+            p_70672_2_ = (float)((double)p_70672_2_ * 0.15D);
         }
 
-        return damage;
+        return p_70672_2_;
     }
 
     /**
      * Drop 0-2 items of this living's type
-     *  
-     * @param wasRecentlyHit true if this this entity was recently hit by appropriate entity (generally only if player
-     * or tameable)
-     * @param lootingModifier level of enchanment to be applied to this drop
      */
-    protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier)
+    protected void dropFewItems(boolean p_70628_1_, int p_70628_2_)
     {
-        int i = this.rand.nextInt(3) + 1;
+        int var3 = this.rand.nextInt(3) + 1;
 
-        for (int j = 0; j < i; ++j)
+        for (int var4 = 0; var4 < var3; ++var4)
         {
-            int k = this.rand.nextInt(3);
-            Item item = witchDrops[this.rand.nextInt(witchDrops.length)];
+            int var5 = this.rand.nextInt(3);
+            Item var6 = witchDrops[this.rand.nextInt(witchDrops.length)];
 
-            if (lootingModifier > 0)
+            if (p_70628_2_ > 0)
             {
-                k += this.rand.nextInt(lootingModifier + 1);
+                var5 += this.rand.nextInt(p_70628_2_ + 1);
             }
 
-            for (int l = 0; l < k; ++l)
+            for (int var7 = 0; var7 < var5; ++var7)
             {
-                this.dropItem(item, 1);
+                this.dropItem(var6, 1);
             }
         }
     }
@@ -250,33 +252,33 @@ public class EntityWitch extends EntityMob implements IRangedAttackMob
     /**
      * Attack the specified entity using a ranged attack.
      */
-    public void attackEntityWithRangedAttack(EntityLivingBase target, float p_82196_2_)
+    public void attackEntityWithRangedAttack(EntityLivingBase p_82196_1_, float p_82196_2_)
     {
         if (!this.getAggressive())
         {
-            EntityPotion entitypotion = new EntityPotion(this.worldObj, this, 32732);
-            double d0 = target.posY + (double)target.getEyeHeight() - 1.100000023841858D;
-            entitypotion.rotationPitch -= -20.0F;
-            double d1 = target.posX + target.motionX - this.posX;
-            double d2 = d0 - this.posY;
-            double d3 = target.posZ + target.motionZ - this.posZ;
-            float f = MathHelper.sqrt_double(d1 * d1 + d3 * d3);
+            EntityPotion var3 = new EntityPotion(this.worldObj, this, 32732);
+            double var4 = p_82196_1_.posY + (double)p_82196_1_.getEyeHeight() - 1.100000023841858D;
+            var3.rotationPitch -= -20.0F;
+            double var6 = p_82196_1_.posX + p_82196_1_.motionX - this.posX;
+            double var8 = var4 - this.posY;
+            double var10 = p_82196_1_.posZ + p_82196_1_.motionZ - this.posZ;
+            float var12 = MathHelper.sqrt_double(var6 * var6 + var10 * var10);
 
-            if (f >= 8.0F && !target.isPotionActive(Potion.moveSlowdown))
+            if (var12 >= 8.0F && !p_82196_1_.isPotionActive(Potion.moveSlowdown))
             {
-                entitypotion.setPotionDamage(32698);
+                var3.setPotionDamage(32698);
             }
-            else if (target.getHealth() >= 8.0F && !target.isPotionActive(Potion.poison))
+            else if (p_82196_1_.getHealth() >= 8.0F && !p_82196_1_.isPotionActive(Potion.poison))
             {
-                entitypotion.setPotionDamage(32660);
+                var3.setPotionDamage(32660);
             }
-            else if (f <= 3.0F && !target.isPotionActive(Potion.weakness) && this.rand.nextFloat() < 0.25F)
+            else if (var12 <= 3.0F && !p_82196_1_.isPotionActive(Potion.weakness) && this.rand.nextFloat() < 0.25F)
             {
-                entitypotion.setPotionDamage(32696);
+                var3.setPotionDamage(32696);
             }
 
-            entitypotion.setThrowableHeading(d1, d2 + (double)(f * 0.2F), d3, 0.75F, 8.0F);
-            this.worldObj.spawnEntityInWorld(entitypotion);
+            var3.setThrowableHeading(var6, var8 + (double)(var12 * 0.2F), var10, 0.75F, 8.0F);
+            this.worldObj.spawnEntityInWorld(var3);
         }
     }
 

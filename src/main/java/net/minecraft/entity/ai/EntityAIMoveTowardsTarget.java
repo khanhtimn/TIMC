@@ -17,12 +17,13 @@ public class EntityAIMoveTowardsTarget extends EntityAIBase
      * If the distance to the target entity is further than this, this AI task will not run.
      */
     private float maxTargetDistance;
+    
 
-    public EntityAIMoveTowardsTarget(EntityCreature creature, double speedIn, float targetMaxDistance)
+    public EntityAIMoveTowardsTarget(EntityCreature p_i1640_1_, double p_i1640_2_, float p_i1640_4_)
     {
-        this.theEntity = creature;
-        this.speed = speedIn;
-        this.maxTargetDistance = targetMaxDistance;
+        this.theEntity = p_i1640_1_;
+        this.speed = p_i1640_2_;
+        this.maxTargetDistance = p_i1640_4_;
         this.setMutexBits(1);
     }
 
@@ -43,17 +44,17 @@ public class EntityAIMoveTowardsTarget extends EntityAIBase
         }
         else
         {
-            Vec3 vec3 = RandomPositionGenerator.findRandomTargetBlockTowards(this.theEntity, 16, 7, new Vec3(this.targetEntity.posX, this.targetEntity.posY, this.targetEntity.posZ));
+            Vec3 var1 = RandomPositionGenerator.findRandomTargetBlockTowards(this.theEntity, 16, 7, new Vec3(this.targetEntity.posX, this.targetEntity.posY, this.targetEntity.posZ));
 
-            if (vec3 == null)
+            if (var1 == null)
             {
                 return false;
             }
             else
             {
-                this.movePosX = vec3.xCoord;
-                this.movePosY = vec3.yCoord;
-                this.movePosZ = vec3.zCoord;
+                this.movePosX = var1.xCoord;
+                this.movePosY = var1.yCoord;
+                this.movePosZ = var1.zCoord;
                 return true;
             }
         }

@@ -8,6 +8,8 @@ import net.minecraft.world.World;
 
 public class ItemBucketMilk extends Item
 {
+    
+
     public ItemBucketMilk()
     {
         this.setMaxStackSize(1);

@@ -1,12 +1,13 @@
 package net.minecraft.world;
 
+import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 import net.minecraft.nbt.NBTTagCompound;
 
 public class GameRules
 {
-    private TreeMap<String, GameRules.Value> theGameRules = new TreeMap();
+    private TreeMap theGameRules = new TreeMap();
 
     public GameRules()
     {
@@ -16,7 +17,6 @@ public class GameRules
         this.addGameRule("doMobSpawning", "true", GameRules.ValueType.BOOLEAN_VALUE);
         this.addGameRule("doMobLoot", "true", GameRules.ValueType.BOOLEAN_VALUE);
         this.addGameRule("doTileDrops", "true", GameRules.ValueType.BOOLEAN_VALUE);
-        this.addGameRule("doEntityDrops", "true", GameRules.ValueType.BOOLEAN_VALUE);
         this.addGameRule("commandBlockOutput", "true", GameRules.ValueType.BOOLEAN_VALUE);
         this.addGameRule("naturalRegeneration", "true", GameRules.ValueType.BOOLEAN_VALUE);
         this.addGameRule("doDaylightCycle", "true", GameRules.ValueType.BOOLEAN_VALUE);
@@ -34,11 +34,11 @@ public class GameRules
 
     public void setOrCreateGameRule(String key, String ruleValue)
     {
-        GameRules.Value gamerules$value = (GameRules.Value)this.theGameRules.get(key);
+        GameRules.Value var3 = (GameRules.Value)this.theGameRules.get(key);
 
-        if (gamerules$value != null)
+        if (var3 != null)
         {
-            gamerules$value.setValue(ruleValue);
+            var3.setValue(ruleValue);
         }
         else
         {
@@ -49,52 +49,58 @@ public class GameRules
     /**
      * Gets the string Game Rule value.
      */
-    public String getString(String name)
+    public String getGameRuleStringValue(String name)
     {
-        GameRules.Value gamerules$value = (GameRules.Value)this.theGameRules.get(name);
-        return gamerules$value != null ? gamerules$value.getString() : "";
+        GameRules.Value var2 = (GameRules.Value)this.theGameRules.get(name);
+        return var2 != null ? var2.getGameRuleStringValue() : "";
     }
 
     /**
      * Gets the boolean Game Rule value.
      */
-    public boolean getBoolean(String name)
+    public boolean getGameRuleBooleanValue(String name)
     {
-        GameRules.Value gamerules$value = (GameRules.Value)this.theGameRules.get(name);
-        return gamerules$value != null ? gamerules$value.getBoolean() : false;
+        GameRules.Value var2 = (GameRules.Value)this.theGameRules.get(name);
+        return var2 != null ? var2.getGameRuleBooleanValue() : false;
     }
 
     public int getInt(String name)
     {
-        GameRules.Value gamerules$value = (GameRules.Value)this.theGameRules.get(name);
-        return gamerules$value != null ? gamerules$value.getInt() : 0;
+        GameRules.Value var2 = (GameRules.Value)this.theGameRules.get(name);
+        return var2 != null ? var2.getInt() : 0;
     }
 
     /**
      * Return the defined game rules as NBT.
      */
-    public NBTTagCompound writeToNBT()
+    public NBTTagCompound writeGameRulesToNBT()
     {
-        NBTTagCompound nbttagcompound = new NBTTagCompound();
+        NBTTagCompound var1 = new NBTTagCompound();
+        Iterator var2 = this.theGameRules.keySet().iterator();
 
-        for (String s : this.theGameRules.keySet())
+        while (var2.hasNext())
         {
-            GameRules.Value gamerules$value = (GameRules.Value)this.theGameRules.get(s);
-            nbttagcompound.setString(s, gamerules$value.getString());
+            String var3 = (String)var2.next();
+            GameRules.Value var4 = (GameRules.Value)this.theGameRules.get(var3);
+            var1.setString(var3, var4.getGameRuleStringValue());
         }
 
-        return nbttagcompound;
+        return var1;
     }
 
     /**
      * Set defined game rules from NBT.
      */
-    public void readFromNBT(NBTTagCompound nbt)
+    public void readGameRulesFromNBT(NBTTagCompound nbt)
     {
-        for (String s : nbt.getKeySet())
+        Set var2 = nbt.getKeySet();
+        Iterator var3 = var2.iterator();
+
+        while (var3.hasNext())
         {
-            String s1 = nbt.getString(s);
-            this.setOrCreateGameRule(s, s1);
+            String var4 = (String)var3.next();
+            String var6 = nbt.getString(var4);
+            this.setOrCreateGameRule(var4, var6);
         }
     }
 
@@ -103,8 +109,7 @@ public class GameRules
      */
     public String[] getRules()
     {
-        Set<String> set = this.theGameRules.keySet();
-        return (String[])((String[])set.toArray(new String[set.size()]));
+        return (String[])((String[])this.theGameRules.keySet().toArray(new String[0]));
     }
 
     /**
@@ -117,8 +122,8 @@ public class GameRules
 
     public boolean areSameType(String key, GameRules.ValueType otherValue)
     {
-        GameRules.Value gamerules$value = (GameRules.Value)this.theGameRules.get(key);
-        return gamerules$value != null && (gamerules$value.getType() == otherValue || otherValue == GameRules.ValueType.ANY_VALUE);
+        GameRules.Value var3 = (GameRules.Value)this.theGameRules.get(key);
+        return var3 != null && (var3.getType() == otherValue || otherValue == GameRules.ValueType.ANY_VALUE);
     }
 
     static class Value
@@ -128,6 +133,7 @@ public class GameRules
         private int valueInteger;
         private double valueDouble;
         private final GameRules.ValueType type;
+        
 
         public Value(String value, GameRules.ValueType type)
         {
@@ -176,12 +182,12 @@ public class GameRules
             }
         }
 
-        public String getString()
+        public String getGameRuleStringValue()
         {
             return this.valueString;
         }
 
-        public boolean getBoolean()
+        public boolean getGameRuleBooleanValue()
         {
             return this.valueBoolean;
         }
@@ -199,8 +205,10 @@ public class GameRules
 
     public static enum ValueType
     {
-        ANY_VALUE,
-        BOOLEAN_VALUE,
-        NUMERICAL_VALUE;
+        ANY_VALUE("ANY_VALUE", 0, "ANY_VALUE", 0),
+        BOOLEAN_VALUE("BOOLEAN_VALUE", 1, "BOOLEAN_VALUE", 1),
+        NUMERICAL_VALUE("NUMERICAL_VALUE", 2, "NUMERICAL_VALUE", 2);
+        private static final GameRules.ValueType[] $VALUES = new GameRules.ValueType[]{ANY_VALUE, BOOLEAN_VALUE, NUMERICAL_VALUE};
+        private ValueType(String p_i46394_1_, int p_i46394_2_, String p_i45750_1_, int p_i45750_2_) {}
     }
 }

@@ -25,6 +25,7 @@ public class VillageSiege
     private int field_75532_g;
     private int field_75538_h;
     private int field_75539_i;
+    
 
     public VillageSiege(World worldIn)
     {
@@ -44,9 +45,9 @@ public class VillageSiege
         {
             if (this.field_75536_c == 0)
             {
-                float f = this.worldObj.getCelestialAngle(0.0F);
+                float var1 = this.worldObj.getCelestialAngle(0.0F);
 
-                if ((double)f < 0.5D || (double)f > 0.501D)
+                if ((double)var1 < 0.5D || (double)var1 > 0.501D)
                 {
                     return;
                 }
@@ -96,112 +97,117 @@ public class VillageSiege
 
     private boolean func_75529_b()
     {
-        List<EntityPlayer> list = this.worldObj.playerEntities;
-        Iterator iterator = list.iterator();
+        List var1 = this.worldObj.playerEntities;
+        Iterator var2 = var1.iterator();
 
-        while (true)
+        while (var2.hasNext())
         {
-            if (!iterator.hasNext())
-            {
-                return false;
-            }
+            EntityPlayer var3 = (EntityPlayer)var2.next();
 
-            EntityPlayer entityplayer = (EntityPlayer)iterator.next();
-
-            if (!entityplayer.isSpectator())
+            if (!var3.func_175149_v())
             {
-                this.theVillage = this.worldObj.getVillageCollection().getNearestVillage(new BlockPos(entityplayer), 1);
+                this.theVillage = this.worldObj.getVillageCollection().func_176056_a(new BlockPos(var3), 1);
 
                 if (this.theVillage != null && this.theVillage.getNumVillageDoors() >= 10 && this.theVillage.getTicksSinceLastDoorAdding() >= 20 && this.theVillage.getNumVillagers() >= 20)
                 {
-                    BlockPos blockpos = this.theVillage.getCenter();
-                    float f = (float)this.theVillage.getVillageRadius();
-                    boolean flag = false;
+                    BlockPos var4 = this.theVillage.func_180608_a();
+                    float var5 = (float)this.theVillage.getVillageRadius();
+                    boolean var6 = false;
+                    int var7 = 0;
 
-                    for (int i = 0; i < 10; ++i)
+                    while (true)
                     {
-                        float f1 = this.worldObj.rand.nextFloat() * (float)Math.PI * 2.0F;
-                        this.field_75532_g = blockpos.getX() + (int)((double)(MathHelper.cos(f1) * f) * 0.9D);
-                        this.field_75538_h = blockpos.getY();
-                        this.field_75539_i = blockpos.getZ() + (int)((double)(MathHelper.sin(f1) * f) * 0.9D);
-                        flag = false;
-
-                        for (Village village : this.worldObj.getVillageCollection().getVillageList())
+                        if (var7 < 10)
                         {
-                            if (village != this.theVillage && village.func_179866_a(new BlockPos(this.field_75532_g, this.field_75538_h, this.field_75539_i)))
+                            float var8 = this.worldObj.rand.nextFloat() * (float)Math.PI * 2.0F;
+                            this.field_75532_g = var4.getX() + (int)((double)(MathHelper.cos(var8) * var5) * 0.9D);
+                            this.field_75538_h = var4.getY();
+                            this.field_75539_i = var4.getZ() + (int)((double)(MathHelper.sin(var8) * var5) * 0.9D);
+                            var6 = false;
+                            Iterator var9 = this.worldObj.getVillageCollection().getVillageList().iterator();
+
+                            while (var9.hasNext())
                             {
-                                flag = true;
-                                break;
+                                Village var10 = (Village)var9.next();
+
+                                if (var10 != this.theVillage && var10.func_179866_a(new BlockPos(this.field_75532_g, this.field_75538_h, this.field_75539_i)))
+                                {
+                                    var6 = true;
+                                    break;
+                                }
+                            }
+
+                            if (var6)
+                            {
+                                ++var7;
+                                continue;
                             }
                         }
 
-                        if (!flag)
+                        if (var6)
                         {
-                            break;
+                            return false;
                         }
-                    }
 
-                    if (flag)
-                    {
-                        return false;
-                    }
+                        Vec3 var11 = this.func_179867_a(new BlockPos(this.field_75532_g, this.field_75538_h, this.field_75539_i));
 
-                    Vec3 vec3 = this.func_179867_a(new BlockPos(this.field_75532_g, this.field_75538_h, this.field_75539_i));
+                        if (var11 != null)
+                        {
+                            this.field_75534_e = 0;
+                            this.field_75533_d = 20;
+                            return true;
+                        }
 
-                    if (vec3 != null)
-                    {
                         break;
                     }
                 }
             }
         }
 
-        this.field_75534_e = 0;
-        this.field_75533_d = 20;
-        return true;
+        return false;
     }
 
     private boolean spawnZombie()
     {
-        Vec3 vec3 = this.func_179867_a(new BlockPos(this.field_75532_g, this.field_75538_h, this.field_75539_i));
+        Vec3 var1 = this.func_179867_a(new BlockPos(this.field_75532_g, this.field_75538_h, this.field_75539_i));
 
-        if (vec3 == null)
+        if (var1 == null)
         {
             return false;
         }
         else
         {
-            EntityZombie entityzombie;
+            EntityZombie var2;
 
             try
             {
-                entityzombie = new EntityZombie(this.worldObj);
-                entityzombie.onInitialSpawn(this.worldObj.getDifficultyForLocation(new BlockPos(entityzombie)), (IEntityLivingData)null);
-                entityzombie.setVillager(false);
+                var2 = new EntityZombie(this.worldObj);
+                var2.func_180482_a(this.worldObj.getDifficultyForLocation(new BlockPos(var2)), (IEntityLivingData)null);
+                var2.setVillager(false);
             }
-            catch (Exception exception)
+            catch (Exception var4)
             {
-                exception.printStackTrace();
+                var4.printStackTrace();
                 return false;
             }
 
-            entityzombie.setLocationAndAngles(vec3.xCoord, vec3.yCoord, vec3.zCoord, this.worldObj.rand.nextFloat() * 360.0F, 0.0F);
-            this.worldObj.spawnEntityInWorld(entityzombie);
-            BlockPos blockpos = this.theVillage.getCenter();
-            entityzombie.setHomePosAndDistance(blockpos, this.theVillage.getVillageRadius());
+            var2.setLocationAndAngles(var1.xCoord, var1.yCoord, var1.zCoord, this.worldObj.rand.nextFloat() * 360.0F, 0.0F);
+            this.worldObj.spawnEntityInWorld(var2);
+            BlockPos var3 = this.theVillage.func_180608_a();
+            var2.func_175449_a(var3, this.theVillage.getVillageRadius());
             return true;
         }
     }
 
     private Vec3 func_179867_a(BlockPos p_179867_1_)
     {
-        for (int i = 0; i < 10; ++i)
+        for (int var2 = 0; var2 < 10; ++var2)
         {
-            BlockPos blockpos = p_179867_1_.add(this.worldObj.rand.nextInt(16) - 8, this.worldObj.rand.nextInt(6) - 3, this.worldObj.rand.nextInt(16) - 8);
+            BlockPos var3 = p_179867_1_.add(this.worldObj.rand.nextInt(16) - 8, this.worldObj.rand.nextInt(6) - 3, this.worldObj.rand.nextInt(16) - 8);
 
-            if (this.theVillage.func_179866_a(blockpos) && SpawnerAnimals.canCreatureTypeSpawnAtLocation(EntityLiving.SpawnPlacementType.ON_GROUND, this.worldObj, blockpos))
+            if (this.theVillage.func_179866_a(var3) && SpawnerAnimals.func_180267_a(EntityLiving.SpawnPlacementType.ON_GROUND, this.worldObj, var3))
             {
-                return new Vec3((double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ());
+                return new Vec3((double)var3.getX(), (double)var3.getY(), (double)var3.getZ());
             }
         }
 

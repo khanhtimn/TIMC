@@ -1,9 +1,8 @@
 package net.minecraft.entity.projectile;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.boss.EntityWither;
+import net.minecraft.init.Blocks;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.BlockPos;
@@ -15,15 +14,17 @@ import net.minecraft.world.World;
 
 public class EntityWitherSkull extends EntityFireball
 {
+    
+
     public EntityWitherSkull(World worldIn)
     {
         super(worldIn);
         this.setSize(0.3125F, 0.3125F);
     }
 
-    public EntityWitherSkull(World worldIn, EntityLivingBase shooter, double accelX, double accelY, double accelZ)
+    public EntityWitherSkull(World worldIn, EntityLivingBase p_i1794_2_, double p_i1794_3_, double p_i1794_5_, double p_i1794_7_)
     {
-        super(worldIn, shooter, accelX, accelY, accelZ);
+        super(worldIn, p_i1794_2_, p_i1794_3_, p_i1794_5_, p_i1794_7_);
         this.setSize(0.3125F, 0.3125F);
     }
 
@@ -35,9 +36,9 @@ public class EntityWitherSkull extends EntityFireball
         return this.isInvulnerable() ? 0.73F : super.getMotionFactor();
     }
 
-    public EntityWitherSkull(World worldIn, double x, double y, double z, double accelX, double accelY, double accelZ)
+    public EntityWitherSkull(World worldIn, double p_i1795_2_, double p_i1795_4_, double p_i1795_6_, double p_i1795_8_, double p_i1795_10_, double p_i1795_12_)
     {
-        super(worldIn, x, y, z, accelX, accelY, accelZ);
+        super(worldIn, p_i1795_2_, p_i1795_4_, p_i1795_6_, p_i1795_8_, p_i1795_10_, p_i1795_12_);
         this.setSize(0.3125F, 0.3125F);
     }
 
@@ -52,68 +53,67 @@ public class EntityWitherSkull extends EntityFireball
     /**
      * Explosion resistance of a block relative to this entity
      */
-    public float getExplosionResistance(Explosion explosionIn, World worldIn, BlockPos pos, IBlockState blockStateIn)
+    public float getExplosionResistance(Explosion p_180428_1_, World worldIn, BlockPos p_180428_3_, IBlockState p_180428_4_)
     {
-        float f = super.getExplosionResistance(explosionIn, worldIn, pos, blockStateIn);
-        Block block = blockStateIn.getBlock();
+        float var5 = super.getExplosionResistance(p_180428_1_, worldIn, p_180428_3_, p_180428_4_);
 
-        if (this.isInvulnerable() && EntityWither.canDestroyBlock(block))
+        if (this.isInvulnerable() && p_180428_4_.getBlock() != Blocks.bedrock && p_180428_4_.getBlock() != Blocks.end_portal && p_180428_4_.getBlock() != Blocks.end_portal_frame && p_180428_4_.getBlock() != Blocks.command_block)
         {
-            f = Math.min(0.8F, f);
+            var5 = Math.min(0.8F, var5);
         }
 
-        return f;
+        return var5;
     }
 
     /**
      * Called when this EntityFireball hits a block or entity.
      */
-    protected void onImpact(MovingObjectPosition movingObject)
+    protected void onImpact(MovingObjectPosition p_70227_1_)
     {
         if (!this.worldObj.isRemote)
         {
-            if (movingObject.entityHit != null)
+            if (p_70227_1_.entityHit != null)
             {
                 if (this.shootingEntity != null)
                 {
-                    if (movingObject.entityHit.attackEntityFrom(DamageSource.causeMobDamage(this.shootingEntity), 8.0F))
+                    if (p_70227_1_.entityHit.attackEntityFrom(DamageSource.causeMobDamage(this.shootingEntity), 8.0F))
                     {
-                        if (!movingObject.entityHit.isEntityAlive())
+                        if (!p_70227_1_.entityHit.isEntityAlive())
                         {
                             this.shootingEntity.heal(5.0F);
                         }
                         else
                         {
-                            this.applyEnchantments(this.shootingEntity, movingObject.entityHit);
+                            this.func_174815_a(this.shootingEntity, p_70227_1_.entityHit);
                         }
                     }
                 }
                 else
                 {
-                    movingObject.entityHit.attackEntityFrom(DamageSource.magic, 5.0F);
+                    p_70227_1_.entityHit.attackEntityFrom(DamageSource.magic, 5.0F);
                 }
 
-                if (movingObject.entityHit instanceof EntityLivingBase)
+                if (p_70227_1_.entityHit instanceof EntityLivingBase)
                 {
-                    int i = 0;
+                    byte var2 = 0;
 
                     if (this.worldObj.getDifficulty() == EnumDifficulty.NORMAL)
                     {
-                        i = 10;
+                        var2 = 10;
                     }
                     else if (this.worldObj.getDifficulty() == EnumDifficulty.HARD)
                     {
-                        i = 40;
+                        var2 = 40;
                     }
 
-                    if (i > 0)
+                    if (var2 > 0)
                     {
-                        ((EntityLivingBase)movingObject.entityHit).addPotionEffect(new PotionEffect(Potion.wither.id, 20 * i, 1));
+                        ((EntityLivingBase)p_70227_1_.entityHit).addPotionEffect(new PotionEffect(Potion.wither.id, 20 * var2, 1));
                     }
                 }
             }
 
-            this.worldObj.newExplosion(this, this.posX, this.posY, this.posZ, 1.0F, false, this.worldObj.getGameRules().getBoolean("mobGriefing"));
+            this.worldObj.newExplosion(this, this.posX, this.posY, this.posZ, 1.0F, false, this.worldObj.getGameRules().getGameRuleBooleanValue("mobGriefing"));
             this.setDead();
         }
     }
@@ -150,8 +150,8 @@ public class EntityWitherSkull extends EntityFireball
     /**
      * Set whether this skull comes from an invulnerable (aura) wither boss.
      */
-    public void setInvulnerable(boolean invulnerable)
+    public void setInvulnerable(boolean p_82343_1_)
     {
-        this.dataWatcher.updateObject(10, Byte.valueOf((byte)(invulnerable ? 1 : 0)));
+        this.dataWatcher.updateObject(10, Byte.valueOf((byte)(p_82343_1_ ? 1 : 0)));
     }
 }

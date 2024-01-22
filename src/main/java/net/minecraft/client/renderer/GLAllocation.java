@@ -9,64 +9,65 @@ import org.lwjgl.util.glu.GLU;
 
 public class GLAllocation
 {
+    
 
     /**
      * Generates the specified number of display lists and returns the first index.
      */
-    public static synchronized int generateDisplayLists(int range)
+    public static synchronized int generateDisplayLists(int p_74526_0_)
     {
-        int i = GL11.glGenLists(range);
+        int var1 = GL11.glGenLists(p_74526_0_);
 
-        if (i == 0)
+        if (var1 == 0)
         {
-            int j = GL11.glGetError();
-            String s = "No error code reported";
+            int var2 = GL11.glGetError();
+            String var3 = "No error code reported";
 
-            if (j != 0)
+            if (var2 != 0)
             {
-                s = GLU.gluErrorString(j);
+                var3 = GLU.gluErrorString(var2);
             }
 
-            throw new IllegalStateException("glGenLists returned an ID of 0 for a count of " + range + ", GL error (" + j + "): " + s);
+            throw new IllegalStateException("glGenLists returned an ID of 0 for a count of " + p_74526_0_ + ", GL error (" + var2 + "): " + var3);
         }
         else
         {
-            return i;
+            return var1;
         }
     }
 
-    public static synchronized void deleteDisplayLists(int list, int range)
+    public static synchronized void func_178874_a(int p_178874_0_, int p_178874_1_)
     {
-        GL11.glDeleteLists(list, range);
+        GL11.glDeleteLists(p_178874_0_, p_178874_1_);
     }
 
-    public static synchronized void deleteDisplayLists(int list)
+    public static synchronized void deleteDisplayLists(int p_74523_0_)
     {
-        GL11.glDeleteLists(list, 1);
+        GL11.glDeleteLists(p_74523_0_, 1);
     }
 
     /**
      * Creates and returns a direct byte buffer with the specified capacity. Applies native ordering to speed up access.
      */
-    public static synchronized ByteBuffer createDirectByteBuffer(int capacity)
+    public static synchronized ByteBuffer createDirectByteBuffer(int p_74524_0_)
     {
-        return ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
+        return ByteBuffer.allocateDirect(p_74524_0_).order(ByteOrder.nativeOrder());
     }
 
     /**
      * Creates and returns a direct int buffer with the specified capacity. Applies native ordering to speed up access.
      */
-    public static IntBuffer createDirectIntBuffer(int capacity)
+    public static IntBuffer createDirectIntBuffer(int p_74527_0_)
     {
-        return createDirectByteBuffer(capacity << 2).asIntBuffer();
+        return createDirectByteBuffer(p_74527_0_ << 2).asIntBuffer();
     }
 
     /**
      * Creates and returns a direct float buffer with the specified capacity. Applies native ordering to speed up
      * access.
      */
-    public static FloatBuffer createDirectFloatBuffer(int capacity)
+    public static FloatBuffer createDirectFloatBuffer(int p_74529_0_)
     {
-        return createDirectByteBuffer(capacity << 2).asFloatBuffer();
+        return createDirectByteBuffer(p_74529_0_ << 2).asFloatBuffer();
     }
 }

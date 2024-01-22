@@ -5,35 +5,34 @@ import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.IProgressUpdate;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
 
 public interface IChunkProvider
 {
     /**
-     * Checks to see if a chunk exists at x, z
+     * Checks to see if a chunk exists at x, y
      */
-    boolean chunkExists(int x, int z);
+    boolean chunkExists(int var1, int var2);
 
     /**
      * Will return back a chunk, if it doesn't exist and its not a MP client it will generates all the blocks for the
      * specified chunk from the map seed and chunk seed
      */
-    Chunk provideChunk(int x, int z);
+    Chunk provideChunk(int var1, int var2);
 
-    Chunk provideChunk(BlockPos blockPosIn);
+    Chunk func_177459_a(BlockPos var1);
 
     /**
      * Populates chunk with ores etc etc
      */
-    void populate(IChunkProvider chunkProvider, int x, int z);
+    void populate(IChunkProvider var1, int var2, int var3);
 
-    boolean populateChunk(IChunkProvider chunkProvider, Chunk chunkIn, int x, int z);
+    boolean func_177460_a(IChunkProvider var1, Chunk var2, int var3, int var4);
 
     /**
      * Two modes of operation: if passed true, save all Chunks in one go.  If passed false, save up to two chunks.
      * Return true if all chunks have been saved.
      */
-    boolean saveChunks(boolean saveAllChunks, IProgressUpdate progressCallback);
+    boolean saveChunks(boolean var1, IProgressUpdate var2);
 
     /**
      * Unloads chunks that are marked to be unloaded. This is not guaranteed to unload every such chunk.
@@ -50,13 +49,13 @@ public interface IChunkProvider
      */
     String makeString();
 
-    List<BiomeGenBase.SpawnListEntry> getPossibleCreatures(EnumCreatureType creatureType, BlockPos pos);
+    List func_177458_a(EnumCreatureType var1, BlockPos var2);
 
-    BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position);
+    BlockPos func_180513_a(World var1, String var2, BlockPos var3);
 
     int getLoadedChunkCount();
 
-    void recreateStructures(Chunk chunkIn, int x, int z);
+    void func_180514_a(Chunk var1, int var2, int var3);
 
     /**
      * Save extra data not associated with any Chunk.  Not saved during autosave, only during world unload.  Currently

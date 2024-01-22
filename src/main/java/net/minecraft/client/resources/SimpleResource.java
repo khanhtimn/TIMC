@@ -6,7 +6,6 @@ import com.google.gson.JsonParser;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.Map;
 import net.minecraft.client.resources.data.IMetadataSection;
 import net.minecraft.client.resources.data.IMetadataSerializer;
@@ -15,25 +14,26 @@ import org.apache.commons.io.IOUtils;
 
 public class SimpleResource implements IResource
 {
-    private final Map<String, IMetadataSection> mapMetadataSections = Maps.<String, IMetadataSection>newHashMap();
-    private final String resourcePackName;
+    private final Map mapMetadataSections = Maps.newHashMap();
+    private final String field_177242_b;
     private final ResourceLocation srResourceLocation;
     private final InputStream resourceInputStream;
     private final InputStream mcmetaInputStream;
     private final IMetadataSerializer srMetadataSerializer;
     private boolean mcmetaJsonChecked;
     private JsonObject mcmetaJson;
+    
 
-    public SimpleResource(String resourcePackNameIn, ResourceLocation srResourceLocationIn, InputStream resourceInputStreamIn, InputStream mcmetaInputStreamIn, IMetadataSerializer srMetadataSerializerIn)
+    public SimpleResource(String p_i46090_1_, ResourceLocation p_i46090_2_, InputStream p_i46090_3_, InputStream p_i46090_4_, IMetadataSerializer p_i46090_5_)
     {
-        this.resourcePackName = resourcePackNameIn;
-        this.srResourceLocation = srResourceLocationIn;
-        this.resourceInputStream = resourceInputStreamIn;
-        this.mcmetaInputStream = mcmetaInputStreamIn;
-        this.srMetadataSerializer = srMetadataSerializerIn;
+        this.field_177242_b = p_i46090_1_;
+        this.srResourceLocation = p_i46090_2_;
+        this.resourceInputStream = p_i46090_3_;
+        this.mcmetaInputStream = p_i46090_4_;
+        this.srMetadataSerializer = p_i46090_5_;
     }
 
-    public ResourceLocation getResourceLocation()
+    public ResourceLocation func_177241_a()
     {
         return this.srResourceLocation;
     }
@@ -48,44 +48,44 @@ public class SimpleResource implements IResource
         return this.mcmetaInputStream != null;
     }
 
-    public <T extends IMetadataSection> T getMetadata(String p_110526_1_)
+    public IMetadataSection getMetadata(String p_110526_1_)
     {
         if (!this.hasMetadata())
         {
-            return (T)null;
+            return null;
         }
         else
         {
             if (this.mcmetaJson == null && !this.mcmetaJsonChecked)
             {
                 this.mcmetaJsonChecked = true;
-                BufferedReader bufferedreader = null;
+                BufferedReader var2 = null;
 
                 try
                 {
-                    bufferedreader = new BufferedReader(new InputStreamReader(this.mcmetaInputStream));
-                    this.mcmetaJson = (new JsonParser()).parse((Reader)bufferedreader).getAsJsonObject();
+                    var2 = new BufferedReader(new InputStreamReader(this.mcmetaInputStream));
+                    this.mcmetaJson = (new JsonParser()).parse(var2).getAsJsonObject();
                 }
                 finally
                 {
-                    IOUtils.closeQuietly((Reader)bufferedreader);
+                    IOUtils.closeQuietly(var2);
                 }
             }
 
-            T t = (T)this.mapMetadataSections.get(p_110526_1_);
+            IMetadataSection var6 = (IMetadataSection)this.mapMetadataSections.get(p_110526_1_);
 
-            if (t == null)
+            if (var6 == null)
             {
-                t = this.srMetadataSerializer.parseMetadataSection(p_110526_1_, this.mcmetaJson);
+                var6 = this.srMetadataSerializer.parseMetadataSection(p_110526_1_, this.mcmetaJson);
             }
 
-            return t;
+            return var6;
         }
     }
 
-    public String getResourcePackName()
+    public String func_177240_d()
     {
-        return this.resourcePackName;
+        return this.field_177242_b;
     }
 
     public boolean equals(Object p_equals_1_)
@@ -100,28 +100,28 @@ public class SimpleResource implements IResource
         }
         else
         {
-            SimpleResource simpleresource = (SimpleResource)p_equals_1_;
+            SimpleResource var2 = (SimpleResource)p_equals_1_;
 
             if (this.srResourceLocation != null)
             {
-                if (!this.srResourceLocation.equals(simpleresource.srResourceLocation))
+                if (!this.srResourceLocation.equals(var2.srResourceLocation))
                 {
                     return false;
                 }
             }
-            else if (simpleresource.srResourceLocation != null)
+            else if (var2.srResourceLocation != null)
             {
                 return false;
             }
 
-            if (this.resourcePackName != null)
+            if (this.field_177242_b != null)
             {
-                if (!this.resourcePackName.equals(simpleresource.resourcePackName))
+                if (!this.field_177242_b.equals(var2.field_177242_b))
                 {
                     return false;
                 }
             }
-            else if (simpleresource.resourcePackName != null)
+            else if (var2.field_177242_b != null)
             {
                 return false;
             }
@@ -132,8 +132,8 @@ public class SimpleResource implements IResource
 
     public int hashCode()
     {
-        int i = this.resourcePackName != null ? this.resourcePackName.hashCode() : 0;
-        i = 31 * i + (this.srResourceLocation != null ? this.srResourceLocation.hashCode() : 0);
-        return i;
+        int var1 = this.field_177242_b != null ? this.field_177242_b.hashCode() : 0;
+        var1 = 31 * var1 + (this.srResourceLocation != null ? this.srResourceLocation.hashCode() : 0);
+        return var1;
     }
 }

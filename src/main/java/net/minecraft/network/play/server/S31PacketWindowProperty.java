@@ -1,67 +1,72 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
+import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 
-public class S31PacketWindowProperty implements Packet<INetHandlerPlayClient>
+public class S31PacketWindowProperty implements Packet
 {
-    private int windowId;
-    private int varIndex;
-    private int varValue;
+    private int field_149186_a;
+    private int field_149184_b;
+    private int field_149185_c;
+    
 
-    public S31PacketWindowProperty()
+    public S31PacketWindowProperty() {}
+
+    public S31PacketWindowProperty(int p_i45187_1_, int p_i45187_2_, int p_i45187_3_)
     {
+        this.field_149186_a = p_i45187_1_;
+        this.field_149184_b = p_i45187_2_;
+        this.field_149185_c = p_i45187_3_;
     }
 
-    public S31PacketWindowProperty(int windowIdIn, int varIndexIn, int varValueIn)
+    public void func_180733_a(INetHandlerPlayClient p_180733_1_)
     {
-        this.windowId = windowIdIn;
-        this.varIndex = varIndexIn;
-        this.varValue = varValueIn;
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandlerPlayClient handler)
-    {
-        handler.handleWindowProperty(this);
+        p_180733_1_.handleWindowProperty(this);
     }
 
     /**
      * Reads the raw packet data from the data stream.
      */
-    public void readPacketData(PacketBuffer buf) throws IOException
+    public void readPacketData(PacketBuffer data) throws IOException
     {
-        this.windowId = buf.readUnsignedByte();
-        this.varIndex = buf.readShort();
-        this.varValue = buf.readShort();
+        this.field_149186_a = data.readUnsignedByte();
+        this.field_149184_b = data.readShort();
+        this.field_149185_c = data.readShort();
     }
 
     /**
      * Writes the raw packet data to the data stream.
      */
-    public void writePacketData(PacketBuffer buf) throws IOException
+    public void writePacketData(PacketBuffer data) throws IOException
     {
-        buf.writeByte(this.windowId);
-        buf.writeShort(this.varIndex);
-        buf.writeShort(this.varValue);
+        data.writeByte(this.field_149186_a);
+        data.writeShort(this.field_149184_b);
+        data.writeShort(this.field_149185_c);
     }
 
-    public int getWindowId()
+    public int func_149182_c()
     {
-        return this.windowId;
+        return this.field_149186_a;
     }
 
-    public int getVarIndex()
+    public int func_149181_d()
     {
-        return this.varIndex;
+        return this.field_149184_b;
     }
 
-    public int getVarValue()
+    public int func_149180_e()
     {
-        return this.varValue;
+        return this.field_149185_c;
+    }
+
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandler handler)
+    {
+        this.func_180733_a((INetHandlerPlayClient)handler);
     }
 }

@@ -23,12 +23,13 @@ public class SlotCrafting extends Slot
      * The number of items that have been crafted so far. Gets passed to ItemStack.onCrafting before being reset.
      */
     private int amountCrafted;
+    
 
-    public SlotCrafting(EntityPlayer player, InventoryCrafting craftingInventory, IInventory p_i45790_3_, int slotIndex, int xPosition, int yPosition)
+    public SlotCrafting(EntityPlayer p_i45790_1_, InventoryCrafting p_i45790_2_, IInventory p_i45790_3_, int p_i45790_4_, int p_i45790_5_, int p_i45790_6_)
     {
-        super(p_i45790_3_, slotIndex, xPosition, yPosition);
-        this.thePlayer = player;
-        this.craftMatrix = craftingInventory;
+        super(p_i45790_3_, p_i45790_4_, p_i45790_5_, p_i45790_6_);
+        this.thePlayer = p_i45790_1_;
+        this.craftMatrix = p_i45790_2_;
     }
 
     /**
@@ -43,89 +44,89 @@ public class SlotCrafting extends Slot
      * Decrease the size of the stack in slot (first int arg) by the amount of the second int arg. Returns the new
      * stack.
      */
-    public ItemStack decrStackSize(int amount)
+    public ItemStack decrStackSize(int p_75209_1_)
     {
         if (this.getHasStack())
         {
-            this.amountCrafted += Math.min(amount, this.getStack().stackSize);
+            this.amountCrafted += Math.min(p_75209_1_, this.getStack().stackSize);
         }
 
-        return super.decrStackSize(amount);
+        return super.decrStackSize(p_75209_1_);
     }
 
     /**
      * the itemStack passed in is the output - ie, iron ingots, and pickaxes, not ore and wood. Typically increases an
      * internal count then calls onCrafting(item).
      */
-    protected void onCrafting(ItemStack stack, int amount)
+    protected void onCrafting(ItemStack p_75210_1_, int p_75210_2_)
     {
-        this.amountCrafted += amount;
-        this.onCrafting(stack);
+        this.amountCrafted += p_75210_2_;
+        this.onCrafting(p_75210_1_);
     }
 
     /**
      * the itemStack passed in is the output - ie, iron ingots, and pickaxes, not ore and wood.
      */
-    protected void onCrafting(ItemStack stack)
+    protected void onCrafting(ItemStack p_75208_1_)
     {
         if (this.amountCrafted > 0)
         {
-            stack.onCrafting(this.thePlayer.worldObj, this.thePlayer, this.amountCrafted);
+            p_75208_1_.onCrafting(this.thePlayer.worldObj, this.thePlayer, this.amountCrafted);
         }
 
         this.amountCrafted = 0;
 
-        if (stack.getItem() == Item.getItemFromBlock(Blocks.crafting_table))
+        if (p_75208_1_.getItem() == Item.getItemFromBlock(Blocks.crafting_table))
         {
             this.thePlayer.triggerAchievement(AchievementList.buildWorkBench);
         }
 
-        if (stack.getItem() instanceof ItemPickaxe)
+        if (p_75208_1_.getItem() instanceof ItemPickaxe)
         {
             this.thePlayer.triggerAchievement(AchievementList.buildPickaxe);
         }
 
-        if (stack.getItem() == Item.getItemFromBlock(Blocks.furnace))
+        if (p_75208_1_.getItem() == Item.getItemFromBlock(Blocks.furnace))
         {
             this.thePlayer.triggerAchievement(AchievementList.buildFurnace);
         }
 
-        if (stack.getItem() instanceof ItemHoe)
+        if (p_75208_1_.getItem() instanceof ItemHoe)
         {
             this.thePlayer.triggerAchievement(AchievementList.buildHoe);
         }
 
-        if (stack.getItem() == Items.bread)
+        if (p_75208_1_.getItem() == Items.bread)
         {
             this.thePlayer.triggerAchievement(AchievementList.makeBread);
         }
 
-        if (stack.getItem() == Items.cake)
+        if (p_75208_1_.getItem() == Items.cake)
         {
             this.thePlayer.triggerAchievement(AchievementList.bakeCake);
         }
 
-        if (stack.getItem() instanceof ItemPickaxe && ((ItemPickaxe)stack.getItem()).getToolMaterial() != Item.ToolMaterial.WOOD)
+        if (p_75208_1_.getItem() instanceof ItemPickaxe && ((ItemPickaxe)p_75208_1_.getItem()).getToolMaterial() != Item.ToolMaterial.WOOD)
         {
             this.thePlayer.triggerAchievement(AchievementList.buildBetterPickaxe);
         }
 
-        if (stack.getItem() instanceof ItemSword)
+        if (p_75208_1_.getItem() instanceof ItemSword)
         {
             this.thePlayer.triggerAchievement(AchievementList.buildSword);
         }
 
-        if (stack.getItem() == Item.getItemFromBlock(Blocks.enchanting_table))
+        if (p_75208_1_.getItem() == Item.getItemFromBlock(Blocks.enchanting_table))
         {
             this.thePlayer.triggerAchievement(AchievementList.enchantments);
         }
 
-        if (stack.getItem() == Item.getItemFromBlock(Blocks.bookshelf))
+        if (p_75208_1_.getItem() == Item.getItemFromBlock(Blocks.bookshelf))
         {
             this.thePlayer.triggerAchievement(AchievementList.bookcase);
         }
 
-        if (stack.getItem() == Items.golden_apple && stack.getMetadata() == 1)
+        if (p_75208_1_.getItem() == Items.golden_apple && p_75208_1_.getMetadata() == 1)
         {
             this.thePlayer.triggerAchievement(AchievementList.overpowered);
         }
@@ -134,27 +135,27 @@ public class SlotCrafting extends Slot
     public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack)
     {
         this.onCrafting(stack);
-        ItemStack[] aitemstack = CraftingManager.getInstance().func_180303_b(this.craftMatrix, playerIn.worldObj);
+        ItemStack[] var3 = CraftingManager.getInstance().func_180303_b(this.craftMatrix, playerIn.worldObj);
 
-        for (int i = 0; i < aitemstack.length; ++i)
+        for (int var4 = 0; var4 < var3.length; ++var4)
         {
-            ItemStack itemstack = this.craftMatrix.getStackInSlot(i);
-            ItemStack itemstack1 = aitemstack[i];
+            ItemStack var5 = this.craftMatrix.getStackInSlot(var4);
+            ItemStack var6 = var3[var4];
 
-            if (itemstack != null)
+            if (var5 != null)
             {
-                this.craftMatrix.decrStackSize(i, 1);
+                this.craftMatrix.decrStackSize(var4, 1);
             }
 
-            if (itemstack1 != null)
+            if (var6 != null)
             {
-                if (this.craftMatrix.getStackInSlot(i) == null)
+                if (this.craftMatrix.getStackInSlot(var4) == null)
                 {
-                    this.craftMatrix.setInventorySlotContents(i, itemstack1);
+                    this.craftMatrix.setInventorySlotContents(var4, var6);
                 }
-                else if (!this.thePlayer.inventory.addItemStackToInventory(itemstack1))
+                else if (!this.thePlayer.inventory.addItemStackToInventory(var6))
                 {
-                    this.thePlayer.dropPlayerItemWithRandomChoice(itemstack1, false);
+                    this.thePlayer.dropPlayerItemWithRandomChoice(var6, false);
                 }
             }
         }

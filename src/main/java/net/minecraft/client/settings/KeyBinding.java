@@ -2,34 +2,36 @@ package net.minecraft.client.settings;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.IntHashMap;
 
-public class KeyBinding implements Comparable<KeyBinding>
+public class KeyBinding implements Comparable
 {
-    private static final List<KeyBinding> keybindArray = Lists.<KeyBinding>newArrayList();
-    private static final IntHashMap<KeyBinding> hash = new IntHashMap();
-    private static final Set<String> keybindSet = Sets.<String>newHashSet();
+    private static final List keybindArray = Lists.newArrayList();
+    private static final IntHashMap hash = new IntHashMap();
+    private static final Set keybindSet = Sets.newHashSet();
     private final String keyDescription;
     private final int keyCodeDefault;
     private final String keyCategory;
     private int keyCode;
 
-    /** Is the key held down? */
-    private boolean pressed;
+    /** because _303 wanted me to call it that(Caironater) */
+    public boolean pressed;
     private int pressTime;
+    
 
     public static void onTick(int keyCode)
     {
         if (keyCode != 0)
         {
-            KeyBinding keybinding = (KeyBinding)hash.lookup(keyCode);
+            KeyBinding var1 = (KeyBinding)hash.lookup(keyCode);
 
-            if (keybinding != null)
+            if (var1 != null)
             {
-                ++keybinding.pressTime;
+                ++var1.pressTime;
             }
         }
     }
@@ -38,34 +40,39 @@ public class KeyBinding implements Comparable<KeyBinding>
     {
         if (keyCode != 0)
         {
-            KeyBinding keybinding = (KeyBinding)hash.lookup(keyCode);
+            KeyBinding var2 = (KeyBinding)hash.lookup(keyCode);
 
-            if (keybinding != null)
+            if (var2 != null)
             {
-                keybinding.pressed = pressed;
+                var2.pressed = pressed;
             }
         }
     }
 
     public static void unPressAllKeys()
     {
-        for (KeyBinding keybinding : keybindArray)
+        Iterator var0 = keybindArray.iterator();
+
+        while (var0.hasNext())
         {
-            keybinding.unpressKey();
+            KeyBinding var1 = (KeyBinding)var0.next();
+            var1.unpressKey();
         }
     }
 
     public static void resetKeyBindingArrayAndHash()
     {
         hash.clearMap();
+        Iterator var0 = keybindArray.iterator();
 
-        for (KeyBinding keybinding : keybindArray)
+        while (var0.hasNext())
         {
-            hash.addKey(keybinding.keyCode, keybinding);
+            KeyBinding var1 = (KeyBinding)var0.next();
+            hash.addKey(var1.keyCode, var1);
         }
     }
 
-    public static Set<String> getKeybinds()
+    public static Set getKeybinds()
     {
         return keybindSet;
     }
@@ -81,10 +88,7 @@ public class KeyBinding implements Comparable<KeyBinding>
         keybindSet.add(category);
     }
 
-    /**
-     * Returns true if the key is pressed (used for continuous querying). Should be used in tickers.
-     */
-    public boolean isKeyDown()
+    public boolean getIsKeyPressed()
     {
         return this.pressed;
     }
@@ -94,10 +98,6 @@ public class KeyBinding implements Comparable<KeyBinding>
         return this.keyCategory;
     }
 
-    /**
-     * Returns true on the initial key press. For continuous querying use {@link isKeyDown()}. Should be used in key
-     * events.
-     */
     public boolean isPressed()
     {
         if (this.pressTime == 0)
@@ -139,13 +139,18 @@ public class KeyBinding implements Comparable<KeyBinding>
 
     public int compareTo(KeyBinding p_compareTo_1_)
     {
-        int i = I18n.format(this.keyCategory, new Object[0]).compareTo(I18n.format(p_compareTo_1_.keyCategory, new Object[0]));
+        int var2 = I18n.format(this.keyCategory, new Object[0]).compareTo(I18n.format(p_compareTo_1_.keyCategory, new Object[0]));
 
-        if (i == 0)
+        if (var2 == 0)
         {
-            i = I18n.format(this.keyDescription, new Object[0]).compareTo(I18n.format(p_compareTo_1_.keyDescription, new Object[0]));
+            var2 = I18n.format(this.keyDescription, new Object[0]).compareTo(I18n.format(p_compareTo_1_.keyDescription, new Object[0]));
         }
 
-        return i;
+        return var2;
+    }
+
+    public int compareTo(Object p_compareTo_1_)
+    {
+        return this.compareTo((KeyBinding)p_compareTo_1_);
     }
 }

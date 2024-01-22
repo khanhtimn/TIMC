@@ -5,6 +5,7 @@ import net.minecraft.client.gui.GuiClickableScrolledSelectionListProxy;
 public class RealmsClickableScrolledSelectionList
 {
     private final GuiClickableScrolledSelectionListProxy proxy;
+    
 
     public RealmsClickableScrolledSelectionList(int p_i46052_1_, int p_i46052_2_, int p_i46052_3_, int p_i46052_4_, int p_i46052_5_)
     {
@@ -31,9 +32,7 @@ public class RealmsClickableScrolledSelectionList
         return this.proxy.func_178045_g();
     }
 
-    protected void renderItem(int p_renderItem_1_, int p_renderItem_2_, int p_renderItem_3_, int p_renderItem_4_, Tezzelator p_renderItem_5_, int p_renderItem_6_, int p_renderItem_7_)
-    {
-    }
+    protected void renderItem(int p_renderItem_1_, int p_renderItem_2_, int p_renderItem_3_, int p_renderItem_4_, Tezzelator p_renderItem_5_, int p_renderItem_6_, int p_renderItem_7_) {}
 
     public void renderItem(int p_renderItem_1_, int p_renderItem_2_, int p_renderItem_3_, int p_renderItem_4_, int p_renderItem_5_, int p_renderItem_6_)
     {
@@ -45,18 +44,14 @@ public class RealmsClickableScrolledSelectionList
         return 0;
     }
 
-    public void selectItem(int p_selectItem_1_, boolean p_selectItem_2_, int p_selectItem_3_, int p_selectItem_4_)
-    {
-    }
+    public void selectItem(int p_selectItem_1_, boolean p_selectItem_2_, int p_selectItem_3_, int p_selectItem_4_) {}
 
     public boolean isSelectedItem(int p_isSelectedItem_1_)
     {
         return false;
     }
 
-    public void renderBackground()
-    {
-    }
+    public void renderBackground() {}
 
     public int getMaxPosition()
     {
@@ -70,12 +65,10 @@ public class RealmsClickableScrolledSelectionList
 
     public void mouseEvent()
     {
-        this.proxy.handleMouseInput();
+        this.proxy.func_178039_p();
     }
 
-    public void customMouseEvent(int p_customMouseEvent_1_, int p_customMouseEvent_2_, int p_customMouseEvent_3_, float p_customMouseEvent_4_, int p_customMouseEvent_5_)
-    {
-    }
+    public void customMouseEvent(int p_customMouseEvent_1_, int p_customMouseEvent_2_, int p_customMouseEvent_3_, float p_customMouseEvent_4_, int p_customMouseEvent_5_) {}
 
     public void scroll(int p_scroll_1_)
     {
@@ -87,17 +80,11 @@ public class RealmsClickableScrolledSelectionList
         return this.proxy.getAmountScrolled();
     }
 
-    protected void renderList(int p_renderList_1_, int p_renderList_2_, int p_renderList_3_, int p_renderList_4_)
-    {
-    }
+    protected void renderList(int p_renderList_1_, int p_renderList_2_, int p_renderList_3_, int p_renderList_4_) {}
 
-    public void itemClicked(int p_itemClicked_1_, int p_itemClicked_2_, int p_itemClicked_3_, int p_itemClicked_4_, int p_itemClicked_5_)
-    {
-    }
+    public void itemClicked(int p_itemClicked_1_, int p_itemClicked_2_, int p_itemClicked_3_, int p_itemClicked_4_, int p_itemClicked_5_) {}
 
-    public void renderSelected(int p_renderSelected_1_, int p_renderSelected_2_, int p_renderSelected_3_, Tezzelator p_renderSelected_4_)
-    {
-    }
+    public void renderSelected(int p_renderSelected_1_, int p_renderSelected_2_, int p_renderSelected_3_, Tezzelator p_renderSelected_4_) {}
 
     public void setLeftPos(int p_setLeftPos_1_)
     {

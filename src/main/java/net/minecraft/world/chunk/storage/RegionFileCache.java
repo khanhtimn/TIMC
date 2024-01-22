@@ -5,27 +5,30 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map;
 
 public class RegionFileCache
 {
-    private static final Map<File, RegionFile> regionsByFilename = Maps.<File, RegionFile>newHashMap();
+    /** A map containing Files as keys and RegionFiles as values */
+    private static final Map regionsByFilename = Maps.newHashMap();
+    
 
     public static synchronized RegionFile createOrLoadRegionFile(File worldDir, int chunkX, int chunkZ)
     {
-        File file1 = new File(worldDir, "region");
-        File file2 = new File(file1, "r." + (chunkX >> 5) + "." + (chunkZ >> 5) + ".mca");
-        RegionFile regionfile = (RegionFile)regionsByFilename.get(file2);
+        File var3 = new File(worldDir, "region");
+        File var4 = new File(var3, "r." + (chunkX >> 5) + "." + (chunkZ >> 5) + ".mca");
+        RegionFile var5 = (RegionFile)regionsByFilename.get(var4);
 
-        if (regionfile != null)
+        if (var5 != null)
         {
-            return regionfile;
+            return var5;
         }
         else
         {
-            if (!file1.exists())
+            if (!var3.exists())
             {
-                file1.mkdirs();
+                var3.mkdirs();
             }
 
             if (regionsByFilename.size() >= 256)
@@ -33,9 +36,9 @@ public class RegionFileCache
                 clearRegionFileReferences();
             }
 
-            RegionFile regionfile1 = new RegionFile(file2);
-            regionsByFilename.put(file2, regionfile1);
-            return regionfile1;
+            RegionFile var6 = new RegionFile(var4);
+            regionsByFilename.put(var4, var6);
+            return var6;
         }
     }
 
@@ -44,18 +47,22 @@ public class RegionFileCache
      */
     public static synchronized void clearRegionFileReferences()
     {
-        for (RegionFile regionfile : regionsByFilename.values())
+        Iterator var0 = regionsByFilename.values().iterator();
+
+        while (var0.hasNext())
         {
+            RegionFile var1 = (RegionFile)var0.next();
+
             try
             {
-                if (regionfile != null)
+                if (var1 != null)
                 {
-                    regionfile.close();
+                    var1.close();
                 }
             }
-            catch (IOException ioexception)
+            catch (IOException var3)
             {
-                ioexception.printStackTrace();
+                var3.printStackTrace();
             }
         }
 
@@ -67,8 +74,8 @@ public class RegionFileCache
      */
     public static DataInputStream getChunkInputStream(File worldDir, int chunkX, int chunkZ)
     {
-        RegionFile regionfile = createOrLoadRegionFile(worldDir, chunkX, chunkZ);
-        return regionfile.getChunkDataInputStream(chunkX & 31, chunkZ & 31);
+        RegionFile var3 = createOrLoadRegionFile(worldDir, chunkX, chunkZ);
+        return var3.getChunkDataInputStream(chunkX & 31, chunkZ & 31);
     }
 
     /**
@@ -76,7 +83,7 @@ public class RegionFileCache
      */
     public static DataOutputStream getChunkOutputStream(File worldDir, int chunkX, int chunkZ)
     {
-        RegionFile regionfile = createOrLoadRegionFile(worldDir, chunkX, chunkZ);
-        return regionfile.getChunkDataOutputStream(chunkX & 31, chunkZ & 31);
+        RegionFile var3 = createOrLoadRegionFile(worldDir, chunkX, chunkZ);
+        return var3.getChunkDataOutputStream(chunkX & 31, chunkZ & 31);
     }
 }

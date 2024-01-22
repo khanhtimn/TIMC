@@ -3,14 +3,13 @@ package net.minecraft.client.resources;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.Reader;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import net.minecraft.util.JsonUtils;
@@ -20,54 +19,58 @@ import org.apache.logging.log4j.Logger;
 
 public class ResourceIndex
 {
-    private static final Logger logger = LogManager.getLogger();
-    private final Map<String, File> resourceMap = Maps.<String, File>newHashMap();
+    private static final Logger field_152783_a = LogManager.getLogger();
+    private final Map field_152784_b = Maps.newHashMap();
+    
 
     public ResourceIndex(File p_i1047_1_, String p_i1047_2_)
     {
         if (p_i1047_2_ != null)
         {
-            File file1 = new File(p_i1047_1_, "objects");
-            File file2 = new File(p_i1047_1_, "indexes/" + p_i1047_2_ + ".json");
-            BufferedReader bufferedreader = null;
+            File var3 = new File(p_i1047_1_, "objects");
+            File var4 = new File(p_i1047_1_, "indexes/" + p_i1047_2_ + ".json");
+            BufferedReader var5 = null;
 
             try
             {
-                bufferedreader = Files.newReader(file2, Charsets.UTF_8);
-                JsonObject jsonobject = (new JsonParser()).parse((Reader)bufferedreader).getAsJsonObject();
-                JsonObject jsonobject1 = JsonUtils.getJsonObject(jsonobject, "objects", (JsonObject)null);
+                var5 = Files.newReader(var4, Charsets.UTF_8);
+                JsonObject var6 = (new JsonParser()).parse(var5).getAsJsonObject();
+                JsonObject var7 = JsonUtils.getJsonObjectFieldOrDefault(var6, "objects", (JsonObject)null);
 
-                if (jsonobject1 != null)
+                if (var7 != null)
                 {
-                    for (Entry<String, JsonElement> entry : jsonobject1.entrySet())
+                    Iterator var8 = var7.entrySet().iterator();
+
+                    while (var8.hasNext())
                     {
-                        JsonObject jsonobject2 = (JsonObject)entry.getValue();
-                        String s = (String)entry.getKey();
-                        String[] astring = s.split("/", 2);
-                        String s1 = astring.length == 1 ? astring[0] : astring[0] + ":" + astring[1];
-                        String s2 = JsonUtils.getString(jsonobject2, "hash");
-                        File file3 = new File(file1, s2.substring(0, 2) + "/" + s2);
-                        this.resourceMap.put(s1, file3);
+                        Entry var9 = (Entry)var8.next();
+                        JsonObject var10 = (JsonObject)var9.getValue();
+                        String var11 = (String)var9.getKey();
+                        String[] var12 = var11.split("/", 2);
+                        String var13 = var12.length == 1 ? var12[0] : var12[0] + ":" + var12[1];
+                        String var14 = JsonUtils.getJsonObjectStringFieldValue(var10, "hash");
+                        File var15 = new File(var3, var14.substring(0, 2) + "/" + var14);
+                        this.field_152784_b.put(var13, var15);
                     }
                 }
             }
             catch (JsonParseException var20)
             {
-                logger.error("Unable to parse resource index file: " + file2);
+                field_152783_a.error("Unable to parse resource index file: " + var4);
             }
             catch (FileNotFoundException var21)
             {
-                logger.error("Can\'t find the resource index file: " + file2);
+                field_152783_a.error("Can\'t find the resource index file: " + var4);
             }
             finally
             {
-                IOUtils.closeQuietly((Reader)bufferedreader);
+                IOUtils.closeQuietly(var5);
             }
         }
     }
 
-    public Map<String, File> getResourceMap()
+    public Map func_152782_a()
     {
-        return this.resourceMap;
+        return this.field_152784_b;
     }
 }

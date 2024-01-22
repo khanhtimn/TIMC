@@ -9,25 +9,26 @@ import net.minecraft.world.World;
 
 public class BlockRail extends BlockRailBase
 {
-    public static final PropertyEnum<BlockRailBase.EnumRailDirection> SHAPE = PropertyEnum.<BlockRailBase.EnumRailDirection>create("shape", BlockRailBase.EnumRailDirection.class);
+    public static final PropertyEnum field_176565_b = PropertyEnum.create("shape", BlockRailBase.EnumRailDirection.class);
+    
 
     protected BlockRail()
     {
         super(false);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(SHAPE, BlockRailBase.EnumRailDirection.NORTH_SOUTH));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(field_176565_b, BlockRailBase.EnumRailDirection.NORTH_SOUTH));
     }
 
-    protected void onNeighborChangedInternal(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
+    protected void func_176561_b(World worldIn, BlockPos p_176561_2_, IBlockState p_176561_3_, Block p_176561_4_)
     {
-        if (neighborBlock.canProvidePower() && (new BlockRailBase.Rail(worldIn, pos, state)).countAdjacentRails() == 3)
+        if (p_176561_4_.canProvidePower() && (new BlockRailBase.Rail(worldIn, p_176561_2_, p_176561_3_)).countAdjacentRails() == 3)
         {
-            this.func_176564_a(worldIn, pos, state, false);
+            this.func_176564_a(worldIn, p_176561_2_, p_176561_3_, false);
         }
     }
 
-    public IProperty<BlockRailBase.EnumRailDirection> getShapeProperty()
+    public IProperty func_176560_l()
     {
-        return SHAPE;
+        return field_176565_b;
     }
 
     /**
@@ -35,7 +36,7 @@ public class BlockRail extends BlockRailBase
      */
     public IBlockState getStateFromMeta(int meta)
     {
-        return this.getDefaultState().withProperty(SHAPE, BlockRailBase.EnumRailDirection.byMetadata(meta));
+        return this.getDefaultState().withProperty(field_176565_b, BlockRailBase.EnumRailDirection.func_177016_a(meta));
     }
 
     /**
@@ -43,11 +44,11 @@ public class BlockRail extends BlockRailBase
      */
     public int getMetaFromState(IBlockState state)
     {
-        return ((BlockRailBase.EnumRailDirection)state.getValue(SHAPE)).getMetadata();
+        return ((BlockRailBase.EnumRailDirection)state.getValue(field_176565_b)).func_177015_a();
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {SHAPE});
+        return new BlockState(this, new IProperty[] {field_176565_b});
     }
 }

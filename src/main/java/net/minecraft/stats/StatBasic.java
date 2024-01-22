@@ -4,14 +4,16 @@ import net.minecraft.util.IChatComponent;
 
 public class StatBasic extends StatBase
 {
-    public StatBasic(String statIdIn, IChatComponent statNameIn, IStatType typeIn)
+    
+
+    public StatBasic(String p_i45303_1_, IChatComponent p_i45303_2_, IStatType p_i45303_3_)
     {
-        super(statIdIn, statNameIn, typeIn);
+        super(p_i45303_1_, p_i45303_2_, p_i45303_3_);
     }
 
-    public StatBasic(String statIdIn, IChatComponent statNameIn)
+    public StatBasic(String p_i45304_1_, IChatComponent p_i45304_2_)
     {
-        super(statIdIn, statNameIn);
+        super(p_i45304_1_, p_i45304_2_);
     }
 
     /**

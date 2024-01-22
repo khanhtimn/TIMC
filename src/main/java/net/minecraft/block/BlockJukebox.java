@@ -1,6 +1,5 @@
 package net.minecraft.block;
 
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -21,10 +20,11 @@ import net.minecraft.world.World;
 public class BlockJukebox extends BlockContainer
 {
     public static final PropertyBool HAS_RECORD = PropertyBool.create("has_record");
+    
 
     protected BlockJukebox()
     {
-        super(Material.wood, MapColor.dirtColor);
+        super(Material.wood);
         this.setDefaultState(this.blockState.getBaseState().withProperty(HAS_RECORD, Boolean.valueOf(false)));
         this.setCreativeTab(CreativeTabs.tabDecorations);
     }
@@ -48,11 +48,11 @@ public class BlockJukebox extends BlockContainer
     {
         if (!worldIn.isRemote)
         {
-            TileEntity tileentity = worldIn.getTileEntity(pos);
+            TileEntity var5 = worldIn.getTileEntity(pos);
 
-            if (tileentity instanceof BlockJukebox.TileEntityJukebox)
+            if (var5 instanceof BlockJukebox.TileEntityJukebox)
             {
-                ((BlockJukebox.TileEntityJukebox)tileentity).setRecord(new ItemStack(recordStack.getItem(), 1, recordStack.getMetadata()));
+                ((BlockJukebox.TileEntityJukebox)var5).setRecord(new ItemStack(recordStack.getItem(), 1, recordStack.getMetadata()));
                 worldIn.setBlockState(pos, state.withProperty(HAS_RECORD, Boolean.valueOf(true)), 2);
             }
         }
@@ -62,26 +62,26 @@ public class BlockJukebox extends BlockContainer
     {
         if (!worldIn.isRemote)
         {
-            TileEntity tileentity = worldIn.getTileEntity(pos);
+            TileEntity var4 = worldIn.getTileEntity(pos);
 
-            if (tileentity instanceof BlockJukebox.TileEntityJukebox)
+            if (var4 instanceof BlockJukebox.TileEntityJukebox)
             {
-                BlockJukebox.TileEntityJukebox blockjukebox$tileentityjukebox = (BlockJukebox.TileEntityJukebox)tileentity;
-                ItemStack itemstack = blockjukebox$tileentityjukebox.getRecord();
+                BlockJukebox.TileEntityJukebox var5 = (BlockJukebox.TileEntityJukebox)var4;
+                ItemStack var6 = var5.getRecord();
 
-                if (itemstack != null)
+                if (var6 != null)
                 {
                     worldIn.playAuxSFX(1005, pos, 0);
-                    worldIn.playRecord(pos, (String)null);
-                    blockjukebox$tileentityjukebox.setRecord((ItemStack)null);
-                    float f = 0.7F;
-                    double d0 = (double)(worldIn.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
-                    double d1 = (double)(worldIn.rand.nextFloat() * f) + (double)(1.0F - f) * 0.2D + 0.6D;
-                    double d2 = (double)(worldIn.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
-                    ItemStack itemstack1 = itemstack.copy();
-                    EntityItem entityitem = new EntityItem(worldIn, (double)pos.getX() + d0, (double)pos.getY() + d1, (double)pos.getZ() + d2, itemstack1);
-                    entityitem.setDefaultPickupDelay();
-                    worldIn.spawnEntityInWorld(entityitem);
+                    worldIn.func_175717_a(pos, (String)null);
+                    var5.setRecord((ItemStack)null);
+                    float var7 = 0.7F;
+                    double var8 = (double)(worldIn.rand.nextFloat() * var7) + (double)(1.0F - var7) * 0.5D;
+                    double var10 = (double)(worldIn.rand.nextFloat() * var7) + (double)(1.0F - var7) * 0.2D + 0.6D;
+                    double var12 = (double)(worldIn.rand.nextFloat() * var7) + (double)(1.0F - var7) * 0.5D;
+                    ItemStack var14 = var6.copy();
+                    EntityItem var15 = new EntityItem(worldIn, (double)pos.getX() + var8, (double)pos.getY() + var10, (double)pos.getZ() + var12, var14);
+                    var15.setDefaultPickupDelay();
+                    worldIn.spawnEntityInWorld(var15);
                 }
             }
         }
@@ -95,6 +95,9 @@ public class BlockJukebox extends BlockContainer
 
     /**
      * Spawns this Block's drops into the World as EntityItems.
+     *  
+     * @param chance The chance that each Item is actually spawned (1.0 = always, 0.0 = never)
+     * @param fortune The player's fortune level
      */
     public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
     {
@@ -119,15 +122,15 @@ public class BlockJukebox extends BlockContainer
 
     public int getComparatorInputOverride(World worldIn, BlockPos pos)
     {
-        TileEntity tileentity = worldIn.getTileEntity(pos);
+        TileEntity var3 = worldIn.getTileEntity(pos);
 
-        if (tileentity instanceof BlockJukebox.TileEntityJukebox)
+        if (var3 instanceof BlockJukebox.TileEntityJukebox)
         {
-            ItemStack itemstack = ((BlockJukebox.TileEntityJukebox)tileentity).getRecord();
+            ItemStack var4 = ((BlockJukebox.TileEntityJukebox)var3).getRecord();
 
-            if (itemstack != null)
+            if (var4 != null)
             {
-                return Item.getIdFromItem(itemstack.getItem()) + 1 - Item.getIdFromItem(Items.record_13);
+                return Item.getIdFromItem(var4.getItem()) + 1 - Item.getIdFromItem(Items.record_13);
             }
         }
 
@@ -135,7 +138,7 @@ public class BlockJukebox extends BlockContainer
     }
 
     /**
-     * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
+     * The type of render function that is called for this block
      */
     public int getRenderType()
     {
@@ -166,6 +169,7 @@ public class BlockJukebox extends BlockContainer
     public static class TileEntityJukebox extends TileEntity
     {
         private ItemStack record;
+        
 
         public void readFromNBT(NBTTagCompound compound)
         {

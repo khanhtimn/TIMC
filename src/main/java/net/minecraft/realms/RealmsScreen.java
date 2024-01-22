@@ -27,19 +27,16 @@ public class RealmsScreen
     public int width;
     public int height;
     private GuiScreenRealmsProxy proxy = new GuiScreenRealmsProxy(this);
+    
 
     public GuiScreenRealmsProxy getProxy()
     {
         return this.proxy;
     }
 
-    public void init()
-    {
-    }
+    public void init() {}
 
-    public void init(Minecraft p_init_1_, int p_init_2_, int p_init_3_)
-    {
-    }
+    public void init(Minecraft p_init_1_, int p_init_2_, int p_init_3_) {}
 
     public void drawCenteredString(String p_drawCenteredString_1_, int p_drawCenteredString_2_, int p_drawCenteredString_3_, int p_drawCenteredString_4_)
     {
@@ -48,12 +45,7 @@ public class RealmsScreen
 
     public void drawString(String p_drawString_1_, int p_drawString_2_, int p_drawString_3_, int p_drawString_4_)
     {
-        this.drawString(p_drawString_1_, p_drawString_2_, p_drawString_3_, p_drawString_4_, true);
-    }
-
-    public void drawString(String p_drawString_1_, int p_drawString_2_, int p_drawString_3_, int p_drawString_4_, boolean p_drawString_5_)
-    {
-        this.proxy.a(p_drawString_1_, p_drawString_2_, p_drawString_3_, p_drawString_4_, false);
+        this.proxy.func_154322_b(p_drawString_1_, p_drawString_2_, p_drawString_3_, p_drawString_4_);
     }
 
     public void blit(int p_blit_1_, int p_blit_2_, int p_blit_3_, int p_blit_4_, int p_blit_5_, int p_blit_6_)
@@ -93,9 +85,9 @@ public class RealmsScreen
 
     public void render(int p_render_1_, int p_render_2_, float p_render_3_)
     {
-        for (int i = 0; i < this.proxy.func_154320_j().size(); ++i)
+        for (int var4 = 0; var4 < this.proxy.func_154320_j().size(); ++var4)
         {
-            ((RealmsButton)this.proxy.func_154320_j().get(i)).render(p_render_1_, p_render_2_);
+            ((RealmsButton)this.proxy.func_154320_j().get(var4)).render(p_render_1_, p_render_2_);
         }
     }
 
@@ -109,33 +101,31 @@ public class RealmsScreen
         this.proxy.drawCreativeTabHoveringText(p_renderTooltip_1_, p_renderTooltip_2_, p_renderTooltip_3_);
     }
 
-    public void renderTooltip(List<String> p_renderTooltip_1_, int p_renderTooltip_2_, int p_renderTooltip_3_)
+    public void renderTooltip(List p_renderTooltip_1_, int p_renderTooltip_2_, int p_renderTooltip_3_)
     {
         this.proxy.drawHoveringText(p_renderTooltip_1_, p_renderTooltip_2_, p_renderTooltip_3_);
     }
 
     public static void bindFace(String p_bindFace_0_, String p_bindFace_1_)
     {
-        ResourceLocation resourcelocation = AbstractClientPlayer.getLocationSkin(p_bindFace_1_);
+        ResourceLocation var2 = AbstractClientPlayer.getLocationSkin(p_bindFace_1_);
 
-        if (resourcelocation == null)
+        if (var2 == null)
         {
-            resourcelocation = DefaultPlayerSkin.getDefaultSkin(UUIDTypeAdapter.fromString(p_bindFace_0_));
+            var2 = DefaultPlayerSkin.func_177334_a(UUIDTypeAdapter.fromString(p_bindFace_0_));
         }
 
-        AbstractClientPlayer.getDownloadImageSkin(resourcelocation, p_bindFace_1_);
-        Minecraft.getMinecraft().getTextureManager().bindTexture(resourcelocation);
+        AbstractClientPlayer.getDownloadImageSkin(var2, p_bindFace_1_);
+        Minecraft.getMinecraft().getTextureManager().bindTexture(var2);
     }
 
     public static void bind(String p_bind_0_)
     {
-        ResourceLocation resourcelocation = new ResourceLocation(p_bind_0_);
-        Minecraft.getMinecraft().getTextureManager().bindTexture(resourcelocation);
+        ResourceLocation var1 = new ResourceLocation(p_bind_0_);
+        Minecraft.getMinecraft().getTextureManager().bindTexture(var1);
     }
 
-    public void tick()
-    {
-    }
+    public void tick() {}
 
     public int width()
     {
@@ -159,17 +149,15 @@ public class RealmsScreen
 
     public void fontDrawShadow(String p_fontDrawShadow_1_, int p_fontDrawShadow_2_, int p_fontDrawShadow_3_, int p_fontDrawShadow_4_)
     {
-        this.proxy.func_154322_b(p_fontDrawShadow_1_, p_fontDrawShadow_2_, p_fontDrawShadow_3_, p_fontDrawShadow_4_);
+        this.proxy.func_154319_c(p_fontDrawShadow_1_, p_fontDrawShadow_2_, p_fontDrawShadow_3_, p_fontDrawShadow_4_);
     }
 
-    public List<String> fontSplit(String p_fontSplit_1_, int p_fontSplit_2_)
+    public List fontSplit(String p_fontSplit_1_, int p_fontSplit_2_)
     {
         return this.proxy.func_154323_a(p_fontSplit_1_, p_fontSplit_2_);
     }
 
-    public void buttonClicked(RealmsButton p_buttonClicked_1_)
-    {
-    }
+    public void buttonClicked(RealmsButton p_buttonClicked_1_) {}
 
     public static RealmsButton newButton(int p_newButton_0_, int p_newButton_1_, int p_newButton_2_, String p_newButton_3_)
     {
@@ -191,7 +179,7 @@ public class RealmsScreen
         this.proxy.func_154327_a(p_buttonsAdd_1_);
     }
 
-    public List<RealmsButton> buttons()
+    public List buttons()
     {
         return this.proxy.func_154320_j();
     }
@@ -206,40 +194,26 @@ public class RealmsScreen
         return new RealmsEditBox(p_newEditBox_1_, p_newEditBox_2_, p_newEditBox_3_, p_newEditBox_4_, p_newEditBox_5_);
     }
 
-    public void mouseClicked(int p_mouseClicked_1_, int p_mouseClicked_2_, int p_mouseClicked_3_)
-    {
-    }
+    public void mouseClicked(int p_mouseClicked_1_, int p_mouseClicked_2_, int p_mouseClicked_3_) {}
 
-    public void mouseEvent()
-    {
-    }
+    public void mouseEvent() {}
 
-    public void keyboardEvent()
-    {
-    }
+    public void keyboardEvent() {}
 
-    public void mouseReleased(int p_mouseReleased_1_, int p_mouseReleased_2_, int p_mouseReleased_3_)
-    {
-    }
+    public void mouseReleased(int p_mouseReleased_1_, int p_mouseReleased_2_, int p_mouseReleased_3_) {}
 
-    public void mouseDragged(int p_mouseDragged_1_, int p_mouseDragged_2_, int p_mouseDragged_3_, long p_mouseDragged_4_)
-    {
-    }
+    public void mouseDragged(int p_mouseDragged_1_, int p_mouseDragged_2_, int p_mouseDragged_3_, long p_mouseDragged_4_) {}
 
-    public void keyPressed(char p_keyPressed_1_, int p_keyPressed_2_)
-    {
-    }
+    public void keyPressed(char p_keyPressed_1_, int p_keyPressed_2_) {}
 
-    public void confirmResult(boolean p_confirmResult_1_, int p_confirmResult_2_)
-    {
-    }
+    public void confirmResult(boolean p_confirmResult_1_, int p_confirmResult_2_) {}
 
     public static String getLocalizedString(String p_getLocalizedString_0_)
     {
         return I18n.format(p_getLocalizedString_0_, new Object[0]);
     }
 
-    public static String getLocalizedString(String p_getLocalizedString_0_, Object... p_getLocalizedString_1_)
+    public static String getLocalizedString(String p_getLocalizedString_0_, Object ... p_getLocalizedString_1_)
     {
         return I18n.format(p_getLocalizedString_0_, p_getLocalizedString_1_);
     }
@@ -249,7 +223,5 @@ public class RealmsScreen
         return new RealmsAnvilLevelStorageSource(Minecraft.getMinecraft().getSaveLoader());
     }
 
-    public void removed()
-    {
-    }
+    public void removed() {}
 }

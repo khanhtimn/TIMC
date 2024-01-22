@@ -1,6 +1,7 @@
 package net.minecraft.client.renderer;
 
 import java.util.Collection;
+import java.util.Iterator;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.inventory.Container;
@@ -11,23 +12,23 @@ public abstract class InventoryEffectRenderer extends GuiContainer
 {
     /** True if there is some potion effect to display */
     private boolean hasActivePotionEffects;
+    
 
-    public InventoryEffectRenderer(Container inventorySlotsIn)
+    public InventoryEffectRenderer(Container p_i1089_1_)
     {
-        super(inventorySlotsIn);
+        super(p_i1089_1_);
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
-     * window resizes, the buttonList is cleared beforehand.
+     * Adds the buttons (and other controls) to the screen in question.
      */
     public void initGui()
     {
         super.initGui();
-        this.updateActivePotionEffects();
+        this.func_175378_g();
     }
 
-    protected void updateActivePotionEffects()
+    protected void func_175378_g()
     {
         if (!this.mc.thePlayer.getActivePotionEffects().isEmpty())
         {
@@ -59,54 +60,54 @@ public abstract class InventoryEffectRenderer extends GuiContainer
      */
     private void drawActivePotionEffects()
     {
-        int i = this.guiLeft - 124;
-        int j = this.guiTop;
-        int k = 166;
-        Collection<PotionEffect> collection = this.mc.thePlayer.getActivePotionEffects();
+        int var1 = this.guiLeft - 124;
+        int var2 = this.guiTop;
+        boolean var3 = true;
+        Collection var4 = this.mc.thePlayer.getActivePotionEffects();
 
-        if (!collection.isEmpty())
+        if (!var4.isEmpty())
         {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             GlStateManager.disableLighting();
-            int l = 33;
+            int var5 = 33;
 
-            if (collection.size() > 5)
+            if (var4.size() > 5)
             {
-                l = 132 / (collection.size() - 1);
+                var5 = 132 / (var4.size() - 1);
             }
 
-            for (PotionEffect potioneffect : this.mc.thePlayer.getActivePotionEffects())
+            for (Iterator var6 = this.mc.thePlayer.getActivePotionEffects().iterator(); var6.hasNext(); var2 += var5)
             {
-                Potion potion = Potion.potionTypes[potioneffect.getPotionID()];
+                PotionEffect var7 = (PotionEffect)var6.next();
+                Potion var8 = Potion.potionTypes[var7.getPotionID()];
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                 this.mc.getTextureManager().bindTexture(inventoryBackground);
-                this.drawTexturedModalRect(i, j, 0, 166, 140, 32);
+                this.drawTexturedModalRect(var1, var2, 0, 166, 140, 32);
 
-                if (potion.hasStatusIcon())
+                if (var8.hasStatusIcon())
                 {
-                    int i1 = potion.getStatusIconIndex();
-                    this.drawTexturedModalRect(i + 6, j + 7, 0 + i1 % 8 * 18, 198 + i1 / 8 * 18, 18, 18);
+                    int var9 = var8.getStatusIconIndex();
+                    this.drawTexturedModalRect(var1 + 6, var2 + 7, 0 + var9 % 8 * 18, 198 + var9 / 8 * 18, 18, 18);
                 }
 
-                String s1 = I18n.format(potion.getName(), new Object[0]);
+                String var11 = I18n.format(var8.getName(), new Object[0]);
 
-                if (potioneffect.getAmplifier() == 1)
+                if (var7.getAmplifier() == 1)
                 {
-                    s1 = s1 + " " + I18n.format("enchantment.level.2", new Object[0]);
+                    var11 = var11 + " " + I18n.format("enchantment.level.2", new Object[0]);
                 }
-                else if (potioneffect.getAmplifier() == 2)
+                else if (var7.getAmplifier() == 2)
                 {
-                    s1 = s1 + " " + I18n.format("enchantment.level.3", new Object[0]);
+                    var11 = var11 + " " + I18n.format("enchantment.level.3", new Object[0]);
                 }
-                else if (potioneffect.getAmplifier() == 3)
+                else if (var7.getAmplifier() == 3)
                 {
-                    s1 = s1 + " " + I18n.format("enchantment.level.4", new Object[0]);
+                    var11 = var11 + " " + I18n.format("enchantment.level.4", new Object[0]);
                 }
 
-                this.fontRendererObj.drawStringWithShadow(s1, (float)(i + 10 + 18), (float)(j + 6), 16777215);
-                String s = Potion.getDurationString(potioneffect);
-                this.fontRendererObj.drawStringWithShadow(s, (float)(i + 10 + 18), (float)(j + 6 + 10), 8355711);
-                j += l;
+                this.fontRendererObj.func_175063_a(var11, (float)(var1 + 10 + 18), (float)(var2 + 6), 16777215);
+                String var10 = Potion.getDurationString(var7);
+                this.fontRendererObj.func_175063_a(var10, (float)(var1 + 10 + 18), (float)(var2 + 6 + 10), 8355711);
             }
         }
     }

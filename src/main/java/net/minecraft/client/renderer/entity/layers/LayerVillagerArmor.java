@@ -5,14 +5,16 @@ import net.minecraft.client.renderer.entity.RendererLivingEntity;
 
 public class LayerVillagerArmor extends LayerBipedArmor
 {
-    public LayerVillagerArmor(RendererLivingEntity<?> rendererIn)
+    
+
+    public LayerVillagerArmor(RendererLivingEntity p_i46108_1_)
     {
-        super(rendererIn);
+        super(p_i46108_1_);
     }
 
-    protected void initArmor()
+    protected void func_177177_a()
     {
-        this.modelLeggings = new ModelZombieVillager(0.5F, 0.0F, true);
-        this.modelArmor = new ModelZombieVillager(1.0F, 0.0F, true);
+        this.field_177189_c = new ModelZombieVillager(0.5F, 0.0F, true);
+        this.field_177186_d = new ModelZombieVillager(1.0F, 0.0F, true);
     }
 }

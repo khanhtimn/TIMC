@@ -7,6 +7,7 @@ public abstract class EntityAIBase
      * zero, the two tasks may run concurrently, if not - they must run exclusively from each other.
      */
     private int mutexBits;
+    
 
     /**
      * Returns whether the EntityAIBase should begin execution.
@@ -33,31 +34,25 @@ public abstract class EntityAIBase
     /**
      * Execute a one shot task or start executing a continuous task
      */
-    public void startExecuting()
-    {
-    }
+    public void startExecuting() {}
 
     /**
      * Resets the task
      */
-    public void resetTask()
-    {
-    }
+    public void resetTask() {}
 
     /**
      * Updates the task
      */
-    public void updateTask()
-    {
-    }
+    public void updateTask() {}
 
     /**
      * Sets a bitmask telling which other tasks may not run concurrently. The test is a simple bitwise AND - if it
      * yields zero, the two tasks may run concurrently, if not - they must run exclusively from each other.
      */
-    public void setMutexBits(int mutexBitsIn)
+    public void setMutexBits(int p_75248_1_)
     {
-        this.mutexBits = mutexBitsIn;
+        this.mutexBits = p_75248_1_;
     }
 
     /**

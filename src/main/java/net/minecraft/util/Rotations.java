@@ -5,36 +5,32 @@ import net.minecraft.nbt.NBTTagList;
 
 public class Rotations
 {
-    /** Rotation on the X axis */
-    protected final float x;
+    protected final float field_179419_a;
+    protected final float field_179417_b;
+    protected final float field_179418_c;
+    
 
-    /** Rotation on the Y axis */
-    protected final float y;
-
-    /** Rotation on the Z axis */
-    protected final float z;
-
-    public Rotations(float x, float y, float z)
+    public Rotations(float p_i46009_1_, float p_i46009_2_, float p_i46009_3_)
     {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.field_179419_a = p_i46009_1_;
+        this.field_179417_b = p_i46009_2_;
+        this.field_179418_c = p_i46009_3_;
     }
 
-    public Rotations(NBTTagList nbt)
+    public Rotations(NBTTagList p_i46010_1_)
     {
-        this.x = nbt.getFloatAt(0);
-        this.y = nbt.getFloatAt(1);
-        this.z = nbt.getFloatAt(2);
+        this.field_179419_a = p_i46010_1_.getFloat(0);
+        this.field_179417_b = p_i46010_1_.getFloat(1);
+        this.field_179418_c = p_i46010_1_.getFloat(2);
     }
 
-    public NBTTagList writeToNBT()
+    public NBTTagList func_179414_a()
     {
-        NBTTagList nbttaglist = new NBTTagList();
-        nbttaglist.appendTag(new NBTTagFloat(this.x));
-        nbttaglist.appendTag(new NBTTagFloat(this.y));
-        nbttaglist.appendTag(new NBTTagFloat(this.z));
-        return nbttaglist;
+        NBTTagList var1 = new NBTTagList();
+        var1.appendTag(new NBTTagFloat(this.field_179419_a));
+        var1.appendTag(new NBTTagFloat(this.field_179417_b));
+        var1.appendTag(new NBTTagFloat(this.field_179418_c));
+        return var1;
     }
 
     public boolean equals(Object p_equals_1_)
@@ -45,32 +41,23 @@ public class Rotations
         }
         else
         {
-            Rotations rotations = (Rotations)p_equals_1_;
-            return this.x == rotations.x && this.y == rotations.y && this.z == rotations.z;
+            Rotations var2 = (Rotations)p_equals_1_;
+            return this.field_179419_a == var2.field_179419_a && this.field_179417_b == var2.field_179417_b && this.field_179418_c == var2.field_179418_c;
         }
     }
 
-    /**
-     * Gets the X axis rotation
-     */
-    public float getX()
+    public float func_179415_b()
     {
-        return this.x;
+        return this.field_179419_a;
     }
 
-    /**
-     * Gets the Y axis rotation
-     */
-    public float getY()
+    public float func_179416_c()
     {
-        return this.y;
+        return this.field_179417_b;
     }
 
-    /**
-     * Gets the Z axis rotation
-     */
-    public float getZ()
+    public float func_179413_d()
     {
-        return this.z;
+        return this.field_179418_c;
     }
 }

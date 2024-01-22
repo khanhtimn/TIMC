@@ -6,6 +6,7 @@ public interface IBehaviorDispenseItem
 {
     IBehaviorDispenseItem itemDispenseBehaviorProvider = new IBehaviorDispenseItem()
     {
+        
         public ItemStack dispense(IBlockSource source, ItemStack stack)
         {
             return stack;
@@ -15,5 +16,5 @@ public interface IBehaviorDispenseItem
     /**
      * Dispenses the specified ItemStack from a dispenser.
      */
-    ItemStack dispense(IBlockSource source, ItemStack stack);
+    ItemStack dispense(IBlockSource var1, ItemStack var2);
 }

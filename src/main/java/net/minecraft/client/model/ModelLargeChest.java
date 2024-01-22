@@ -2,6 +2,8 @@ package net.minecraft.client.model;
 
 public class ModelLargeChest extends ModelChest
 {
+    
+
     public ModelLargeChest()
     {
         this.chestLid = (new ModelRenderer(this, 0, 0)).setTextureSize(128, 64);

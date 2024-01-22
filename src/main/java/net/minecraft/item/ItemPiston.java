@@ -4,9 +4,11 @@ import net.minecraft.block.Block;
 
 public class ItemPiston extends ItemBlock
 {
-    public ItemPiston(Block block)
+    
+
+    public ItemPiston(Block p_i45348_1_)
     {
-        super(block);
+        super(p_i45348_1_);
     }
 
     /**

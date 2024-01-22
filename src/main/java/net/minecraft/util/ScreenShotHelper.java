@@ -7,14 +7,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.imageio.ImageIO;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.event.ClickEvent;
-import net.minecraft.src.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
@@ -33,55 +30,40 @@ public class ScreenShotHelper
      * The built-up array that contains all the pixel values returned by OpenGL.
      */
     private static int[] pixelValues;
+    
 
     /**
      * Saves a screenshot in the game directory with a time-stamped filename.  Args: gameDirectory,
      * requestedWidthInPixels, requestedHeightInPixels, frameBuffer
      */
-    public static IChatComponent saveScreenshot(File gameDirectory, int width, int height, Framebuffer buffer)
+    public static IChatComponent saveScreenshot(File p_148260_0_, int p_148260_1_, int p_148260_2_, Framebuffer p_148260_3_)
     {
-        return saveScreenshot(gameDirectory, (String)null, width, height, buffer);
+        return saveScreenshot(p_148260_0_, (String)null, p_148260_1_, p_148260_2_, p_148260_3_);
     }
 
     /**
      * Saves a screenshot in the game directory with the given file name (or null to generate a time-stamped name).
      * Args: gameDirectory, fileName, requestedWidthInPixels, requestedHeightInPixels, frameBuffer
      */
-    public static IChatComponent saveScreenshot(File gameDirectory, String screenshotName, int width, int height, Framebuffer buffer)
+    public static IChatComponent saveScreenshot(File p_148259_0_, String p_148259_1_, int p_148259_2_, int p_148259_3_, Framebuffer p_148259_4_)
     {
         try
         {
-            File file1 = new File(gameDirectory, "screenshots");
-            file1.mkdir();
-            Minecraft minecraft = Minecraft.getMinecraft();
-            int i = Config.getGameSettings().particleSetting;
-            ScaledResolution scaledresolution = new ScaledResolution(minecraft);
-            int j = scaledresolution.getScaleFactor();
-            int k = Config.getScreenshotSize();
-            boolean flag = OpenGlHelper.isFramebufferEnabled() && k > 1;
-
-            if (flag)
-            {
-                Config.getGameSettings().particleSetting = j * k;
-                resize(width * k, height * k);
-                GlStateManager.pushMatrix();
-                GlStateManager.clear(16640);
-                minecraft.getFramebuffer().bindFramebuffer(true);
-                minecraft.entityRenderer.updateCameraAndRender(Config.renderPartialTicks, System.nanoTime());
-            }
+            File var5 = new File(p_148259_0_, "screenshots");
+            var5.mkdir();
 
             if (OpenGlHelper.isFramebufferEnabled())
             {
-                width = buffer.framebufferTextureWidth;
-                height = buffer.framebufferTextureHeight;
+                p_148259_2_ = p_148259_4_.framebufferTextureWidth;
+                p_148259_3_ = p_148259_4_.framebufferTextureHeight;
             }
 
-            int l = width * height;
+            int var6 = p_148259_2_ * p_148259_3_;
 
-            if (pixelBuffer == null || pixelBuffer.capacity() < l)
+            if (pixelBuffer == null || pixelBuffer.capacity() < var6)
             {
-                pixelBuffer = BufferUtils.createIntBuffer(l);
-                pixelValues = new int[l];
+                pixelBuffer = BufferUtils.createIntBuffer(var6);
+                pixelValues = new int[var6];
             }
 
             GL11.glPixelStorei(GL11.GL_PACK_ALIGNMENT, 1);
@@ -90,67 +72,62 @@ public class ScreenShotHelper
 
             if (OpenGlHelper.isFramebufferEnabled())
             {
-                GlStateManager.bindTexture(buffer.framebufferTexture);
-                GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, (IntBuffer)pixelBuffer);
+                GlStateManager.func_179144_i(p_148259_4_.framebufferTexture);
+                GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, pixelBuffer);
             }
             else
             {
-                GL11.glReadPixels(0, 0, width, height, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, (IntBuffer)pixelBuffer);
+                GL11.glReadPixels(0, 0, p_148259_2_, p_148259_3_, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, pixelBuffer);
             }
 
             pixelBuffer.get(pixelValues);
-            TextureUtil.processPixelValues(pixelValues, width, height);
-            BufferedImage bufferedimage = null;
+            TextureUtil.func_147953_a(pixelValues, p_148259_2_, p_148259_3_);
+            BufferedImage var7 = null;
 
             if (OpenGlHelper.isFramebufferEnabled())
             {
-                bufferedimage = new BufferedImage(buffer.framebufferWidth, buffer.framebufferHeight, 1);
-                int i1 = buffer.framebufferTextureHeight - buffer.framebufferHeight;
+                var7 = new BufferedImage(p_148259_4_.framebufferWidth, p_148259_4_.framebufferHeight, 1);
+                int var8 = p_148259_4_.framebufferTextureHeight - p_148259_4_.framebufferHeight;
 
-                for (int j1 = i1; j1 < buffer.framebufferTextureHeight; ++j1)
+                for (int var9 = var8; var9 < p_148259_4_.framebufferTextureHeight; ++var9)
                 {
-                    for (int k1 = 0; k1 < buffer.framebufferWidth; ++k1)
+                    for (int var10 = 0; var10 < p_148259_4_.framebufferWidth; ++var10)
                     {
-                        bufferedimage.setRGB(k1, j1 - i1, pixelValues[j1 * buffer.framebufferTextureWidth + k1]);
+                    	//if(var9 == 42 && var10 == 40){
+                        	//Jello.addChatMessage(pixelValues[var9 * p_148259_4_.framebufferTextureWidth + var10]+"");
+                        	//}
+                        var7.setRGB(var10, var9 - var8, pixelValues[var9 * p_148259_4_.framebufferTextureWidth + var10]);
                     }
                 }
             }
             else
             {
-                bufferedimage = new BufferedImage(width, height, 1);
-                bufferedimage.setRGB(0, 0, width, height, pixelValues, 0, width);
+            	//Jello.addChatMessage("HEY");
+                var7 = new BufferedImage(p_148259_2_, p_148259_3_, 1);
+                var7.setRGB(0, 0, p_148259_2_, p_148259_3_, pixelValues, 0, p_148259_2_);
             }
 
-            if (flag)
-            {
-                minecraft.getFramebuffer().unbindFramebuffer();
-                GlStateManager.popMatrix();
-                Config.getGameSettings().particleSetting = i;
-                resize(width, height);
-            }
+            File var12;
 
-            File file2;
-
-            if (screenshotName == null)
+            if (p_148259_1_ == null)
             {
-                file2 = getTimestampedPNGFileForDirectory(file1);
+                var12 = getTimestampedPNGFileForDirectory(var5);
             }
             else
             {
-                file2 = new File(file1, screenshotName);
+                var12 = new File(var5, p_148259_1_);
             }
 
-            file2 = file2.getCanonicalFile();
-            ImageIO.write(bufferedimage, "png", (File)file2);
-            IChatComponent ichatcomponent = new ChatComponentText(file2.getName());
-            ichatcomponent.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file2.getAbsolutePath()));
-            ichatcomponent.getChatStyle().setUnderlined(Boolean.valueOf(true));
-            return new ChatComponentTranslation("screenshot.success", new Object[] {ichatcomponent});
+            ImageIO.write(var7, "png", var12);
+            ChatComponentText var13 = new ChatComponentText(var12.getName());
+            var13.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, var12.getAbsolutePath()));
+            var13.getChatStyle().setUnderlined(Boolean.valueOf(true));
+            return new ChatComponentTranslation("screenshot.success", new Object[] {var13});
         }
-        catch (Exception exception)
+        catch (Exception var11)
         {
-            logger.warn((String)"Couldn\'t save screenshot", (Throwable)exception);
-            return new ChatComponentTranslation("screenshot.failure", new Object[] {exception.getMessage()});
+            logger.warn("Couldn\'t save screenshot", var11);
+            return new ChatComponentTranslation("screenshot.failure", new Object[] {var11.getMessage()});
         }
     }
 
@@ -160,47 +137,21 @@ public class ScreenShotHelper
      * the filename was unique when this method was called, but another process or thread created a file at the same
      * path immediately after this method returned.
      */
-    private static File getTimestampedPNGFileForDirectory(File gameDirectory)
+    private static File getTimestampedPNGFileForDirectory(File p_74290_0_)
     {
-        String s = dateFormat.format(new Date()).toString();
-        int i = 1;
+        String var2 = dateFormat.format(new Date()).toString();
+        int var3 = 1;
 
         while (true)
         {
-            File file1 = new File(gameDirectory, s + (i == 1 ? "" : "_" + i) + ".png");
+            File var1 = new File(p_74290_0_, var2 + (var3 == 1 ? "" : "_" + var3) + ".png");
 
-            if (!file1.exists())
+            if (!var1.exists())
             {
-                return file1;
+                return var1;
             }
 
-            ++i;
-        }
-    }
-
-    private static void resize(int p_resize_0_, int p_resize_1_)
-    {
-        Minecraft minecraft = Minecraft.getMinecraft();
-        minecraft.displayWidth = Math.max(1, p_resize_0_);
-        minecraft.displayHeight = Math.max(1, p_resize_1_);
-
-        if (minecraft.currentScreen != null)
-        {
-            ScaledResolution scaledresolution = new ScaledResolution(minecraft);
-            minecraft.currentScreen.onResize(minecraft, scaledresolution.getScaledWidth(), scaledresolution.getScaledHeight());
-        }
-
-        updateFramebufferSize();
-    }
-
-    private static void updateFramebufferSize()
-    {
-        Minecraft minecraft = Minecraft.getMinecraft();
-        minecraft.getFramebuffer().createBindFramebuffer(minecraft.displayWidth, minecraft.displayHeight);
-
-        if (minecraft.entityRenderer != null)
-        {
-            minecraft.entityRenderer.updateShaderGroupSize(minecraft.displayWidth, minecraft.displayHeight);
+            ++var3;
         }
     }
 }

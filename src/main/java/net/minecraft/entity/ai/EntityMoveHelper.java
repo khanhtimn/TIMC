@@ -15,13 +15,14 @@ public class EntityMoveHelper
     /** The speed at which the entity should move */
     protected double speed;
     protected boolean update;
+    
 
-    public EntityMoveHelper(EntityLiving entitylivingIn)
+    public EntityMoveHelper(EntityLiving p_i1614_1_)
     {
-        this.entity = entitylivingIn;
-        this.posX = entitylivingIn.posX;
-        this.posY = entitylivingIn.posY;
-        this.posZ = entitylivingIn.posZ;
+        this.entity = p_i1614_1_;
+        this.posX = p_i1614_1_.posX;
+        this.posY = p_i1614_1_.posY;
+        this.posZ = p_i1614_1_.posZ;
     }
 
     public boolean isUpdating()
@@ -37,12 +38,12 @@ public class EntityMoveHelper
     /**
      * Sets the speed and location to move to
      */
-    public void setMoveTo(double x, double y, double z, double speedIn)
+    public void setMoveTo(double p_75642_1_, double p_75642_3_, double p_75642_5_, double p_75642_7_)
     {
-        this.posX = x;
-        this.posY = y;
-        this.posZ = z;
-        this.speed = speedIn;
+        this.posX = p_75642_1_;
+        this.posY = p_75642_3_;
+        this.posZ = p_75642_5_;
+        this.speed = p_75642_7_;
         this.update = true;
     }
 
@@ -53,19 +54,19 @@ public class EntityMoveHelper
         if (this.update)
         {
             this.update = false;
-            int i = MathHelper.floor_double(this.entity.getEntityBoundingBox().minY + 0.5D);
-            double d0 = this.posX - this.entity.posX;
-            double d1 = this.posZ - this.entity.posZ;
-            double d2 = this.posY - (double)i;
-            double d3 = d0 * d0 + d2 * d2 + d1 * d1;
+            int var1 = MathHelper.floor_double(this.entity.getEntityBoundingBox().minY + 0.5D);
+            double var2 = this.posX - this.entity.posX;
+            double var4 = this.posZ - this.entity.posZ;
+            double var6 = this.posY - (double)var1;
+            double var8 = var2 * var2 + var6 * var6 + var4 * var4;
 
-            if (d3 >= 2.500000277905201E-7D)
+            if (var8 >= 2.500000277905201E-7D)
             {
-                float f = (float)(MathHelper.atan2(d1, d0) * 180.0D / Math.PI) - 90.0F;
-                this.entity.rotationYaw = this.limitAngle(this.entity.rotationYaw, f, 30.0F);
+                float var10 = (float)(Math.atan2(var4, var2) * 180.0D / Math.PI) - 90.0F;
+                this.entity.rotationYaw = this.limitAngle(this.entity.rotationYaw, var10, 30.0F);
                 this.entity.setAIMoveSpeed((float)(this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue()));
 
-                if (d2 > 0.0D && d0 * d0 + d1 * d1 < 1.0D)
+                if (var6 > 0.0D && var2 * var2 + var4 * var4 < 1.0D)
                 {
                     this.entity.getJumpHelper().setJumping();
                 }
@@ -78,43 +79,43 @@ public class EntityMoveHelper
      */
     protected float limitAngle(float p_75639_1_, float p_75639_2_, float p_75639_3_)
     {
-        float f = MathHelper.wrapAngleTo180_float(p_75639_2_ - p_75639_1_);
+        float var4 = MathHelper.wrapAngleTo180_float(p_75639_2_ - p_75639_1_);
 
-        if (f > p_75639_3_)
+        if (var4 > p_75639_3_)
         {
-            f = p_75639_3_;
+            var4 = p_75639_3_;
         }
 
-        if (f < -p_75639_3_)
+        if (var4 < -p_75639_3_)
         {
-            f = -p_75639_3_;
+            var4 = -p_75639_3_;
         }
 
-        float f1 = p_75639_1_ + f;
+        float var5 = p_75639_1_ + var4;
 
-        if (f1 < 0.0F)
+        if (var5 < 0.0F)
         {
-            f1 += 360.0F;
+            var5 += 360.0F;
         }
-        else if (f1 > 360.0F)
+        else if (var5 > 360.0F)
         {
-            f1 -= 360.0F;
+            var5 -= 360.0F;
         }
 
-        return f1;
+        return var5;
     }
 
-    public double getX()
+    public double func_179917_d()
     {
         return this.posX;
     }
 
-    public double getY()
+    public double func_179919_e()
     {
         return this.posY;
     }
 
-    public double getZ()
+    public double func_179918_f()
     {
         return this.posZ;
     }

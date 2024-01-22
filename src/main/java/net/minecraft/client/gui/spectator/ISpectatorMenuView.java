@@ -5,7 +5,7 @@ import net.minecraft.util.IChatComponent;
 
 public interface ISpectatorMenuView
 {
-    List<ISpectatorMenuObject> func_178669_a();
+    List func_178669_a();
 
     IChatComponent func_178670_b();
 }

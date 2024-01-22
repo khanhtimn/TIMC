@@ -7,45 +7,55 @@ import net.minecraft.client.settings.GameSettings;
 public class ScreenChatOptions extends GuiScreen
 {
     private static final GameSettings.Options[] field_146399_a = new GameSettings.Options[] {GameSettings.Options.CHAT_VISIBILITY, GameSettings.Options.CHAT_COLOR, GameSettings.Options.CHAT_LINKS, GameSettings.Options.CHAT_OPACITY, GameSettings.Options.CHAT_LINKS_PROMPT, GameSettings.Options.CHAT_SCALE, GameSettings.Options.CHAT_HEIGHT_FOCUSED, GameSettings.Options.CHAT_HEIGHT_UNFOCUSED, GameSettings.Options.CHAT_WIDTH, GameSettings.Options.REDUCED_DEBUG_INFO};
-    private final GuiScreen parentScreen;
+    private final GuiScreen field_146396_g;
     private final GameSettings game_settings;
     private String field_146401_i;
+    private String field_146398_r;
+    private int field_146397_s;
+    
 
-    public ScreenChatOptions(GuiScreen parentScreenIn, GameSettings gameSettingsIn)
+    public ScreenChatOptions(GuiScreen p_i1023_1_, GameSettings p_i1023_2_)
     {
-        this.parentScreen = parentScreenIn;
-        this.game_settings = gameSettingsIn;
+        this.field_146396_g = p_i1023_1_;
+        this.game_settings = p_i1023_2_;
     }
 
     /**
-     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
-     * window resizes, the buttonList is cleared beforehand.
+     * Adds the buttons (and other controls) to the screen in question.
      */
     public void initGui()
     {
-        int i = 0;
+        int var1 = 0;
         this.field_146401_i = I18n.format("options.chat.title", new Object[0]);
+        this.field_146398_r = I18n.format("options.multiplayer.title", new Object[0]);
+        GameSettings.Options[] var2 = field_146399_a;
+        int var3 = var2.length;
 
-        for (GameSettings.Options gamesettings$options : field_146399_a)
+        for (int var4 = 0; var4 < var3; ++var4)
         {
-            if (gamesettings$options.getEnumFloat())
+            GameSettings.Options var5 = var2[var4];
+
+            if (var5.getEnumFloat())
             {
-                this.buttonList.add(new GuiOptionSlider(gamesettings$options.returnEnumOrdinal(), this.width / 2 - 155 + i % 2 * 160, this.height / 6 + 24 * (i >> 1), gamesettings$options));
+                this.buttonList.add(new GuiOptionSlider(var5.returnEnumOrdinal(), this.width / 2 - 155 + var1 % 2 * 160, this.height / 6 + 24 * (var1 >> 1), var5));
             }
             else
             {
-                this.buttonList.add(new GuiOptionButton(gamesettings$options.returnEnumOrdinal(), this.width / 2 - 155 + i % 2 * 160, this.height / 6 + 24 * (i >> 1), gamesettings$options, this.game_settings.getKeyBinding(gamesettings$options)));
+                this.buttonList.add(new GuiOptionButton(var5.returnEnumOrdinal(), this.width / 2 - 155 + var1 % 2 * 160, this.height / 6 + 24 * (var1 >> 1), var5, this.game_settings.getKeyBinding(var5)));
             }
 
-            ++i;
+            ++var1;
         }
 
+        if (var1 % 2 == 1)
+        {
+            ++var1;
+        }
+
+        this.field_146397_s = this.height / 6 + 24 * (var1 >> 1);
         this.buttonList.add(new GuiButton(200, this.width / 2 - 100, this.height / 6 + 120, I18n.format("gui.done", new Object[0])));
     }
 
-    /**
-     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
-     */
     protected void actionPerformed(GuiButton button) throws IOException
     {
         if (button.enabled)
@@ -59,7 +69,7 @@ public class ScreenChatOptions extends GuiScreen
             if (button.id == 200)
             {
                 this.mc.gameSettings.saveOptions();
-                this.mc.displayGuiScreen(this.parentScreen);
+                this.mc.displayGuiScreen(this.field_146396_g);
             }
         }
     }
@@ -71,6 +81,7 @@ public class ScreenChatOptions extends GuiScreen
     {
         this.drawDefaultBackground();
         this.drawCenteredString(this.fontRendererObj, this.field_146401_i, this.width / 2, 20, 16777215);
+        this.drawCenteredString(this.fontRendererObj, this.field_146398_r, this.width / 2, this.field_146397_s + 27, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 }

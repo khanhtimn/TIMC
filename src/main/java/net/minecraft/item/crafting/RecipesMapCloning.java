@@ -7,89 +7,91 @@ import net.minecraft.world.World;
 
 public class RecipesMapCloning implements IRecipe
 {
+    
+
     /**
      * Used to check if a recipe matches current crafting inventory
      */
-    public boolean matches(InventoryCrafting inv, World worldIn)
+    public boolean matches(InventoryCrafting p_77569_1_, World worldIn)
     {
-        int i = 0;
-        ItemStack itemstack = null;
+        int var3 = 0;
+        ItemStack var4 = null;
 
-        for (int j = 0; j < inv.getSizeInventory(); ++j)
+        for (int var5 = 0; var5 < p_77569_1_.getSizeInventory(); ++var5)
         {
-            ItemStack itemstack1 = inv.getStackInSlot(j);
+            ItemStack var6 = p_77569_1_.getStackInSlot(var5);
 
-            if (itemstack1 != null)
+            if (var6 != null)
             {
-                if (itemstack1.getItem() == Items.filled_map)
+                if (var6.getItem() == Items.filled_map)
                 {
-                    if (itemstack != null)
+                    if (var4 != null)
                     {
                         return false;
                     }
 
-                    itemstack = itemstack1;
+                    var4 = var6;
                 }
                 else
                 {
-                    if (itemstack1.getItem() != Items.map)
+                    if (var6.getItem() != Items.map)
                     {
                         return false;
                     }
 
-                    ++i;
+                    ++var3;
                 }
             }
         }
 
-        return itemstack != null && i > 0;
+        return var4 != null && var3 > 0;
     }
 
     /**
      * Returns an Item that is the result of this recipe
      */
-    public ItemStack getCraftingResult(InventoryCrafting inv)
+    public ItemStack getCraftingResult(InventoryCrafting p_77572_1_)
     {
-        int i = 0;
-        ItemStack itemstack = null;
+        int var2 = 0;
+        ItemStack var3 = null;
 
-        for (int j = 0; j < inv.getSizeInventory(); ++j)
+        for (int var4 = 0; var4 < p_77572_1_.getSizeInventory(); ++var4)
         {
-            ItemStack itemstack1 = inv.getStackInSlot(j);
+            ItemStack var5 = p_77572_1_.getStackInSlot(var4);
 
-            if (itemstack1 != null)
+            if (var5 != null)
             {
-                if (itemstack1.getItem() == Items.filled_map)
+                if (var5.getItem() == Items.filled_map)
                 {
-                    if (itemstack != null)
+                    if (var3 != null)
                     {
                         return null;
                     }
 
-                    itemstack = itemstack1;
+                    var3 = var5;
                 }
                 else
                 {
-                    if (itemstack1.getItem() != Items.map)
+                    if (var5.getItem() != Items.map)
                     {
                         return null;
                     }
 
-                    ++i;
+                    ++var2;
                 }
             }
         }
 
-        if (itemstack != null && i >= 1)
+        if (var3 != null && var2 >= 1)
         {
-            ItemStack itemstack2 = new ItemStack(Items.filled_map, i + 1, itemstack.getMetadata());
+            ItemStack var6 = new ItemStack(Items.filled_map, var2 + 1, var3.getMetadata());
 
-            if (itemstack.hasDisplayName())
+            if (var3.hasDisplayName())
             {
-                itemstack2.setStackDisplayName(itemstack.getDisplayName());
+                var6.setStackDisplayName(var3.getDisplayName());
             }
 
-            return itemstack2;
+            return var6;
         }
         else
         {
@@ -110,20 +112,20 @@ public class RecipesMapCloning implements IRecipe
         return null;
     }
 
-    public ItemStack[] getRemainingItems(InventoryCrafting inv)
+    public ItemStack[] func_179532_b(InventoryCrafting p_179532_1_)
     {
-        ItemStack[] aitemstack = new ItemStack[inv.getSizeInventory()];
+        ItemStack[] var2 = new ItemStack[p_179532_1_.getSizeInventory()];
 
-        for (int i = 0; i < aitemstack.length; ++i)
+        for (int var3 = 0; var3 < var2.length; ++var3)
         {
-            ItemStack itemstack = inv.getStackInSlot(i);
+            ItemStack var4 = p_179532_1_.getStackInSlot(var3);
 
-            if (itemstack != null && itemstack.getItem().hasContainerItem())
+            if (var4 != null && var4.getItem().hasContainerItem())
             {
-                aitemstack[i] = new ItemStack(itemstack.getItem().getContainerItem());
+                var2[var3] = new ItemStack(var4.getItem().getContainerItem());
             }
         }
 
-        return aitemstack;
+        return var2;
     }
 }

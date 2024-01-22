@@ -1,7 +1,9 @@
 package net.minecraft.entity.player;
 
+import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import net.minecraft.block.Block;
+import net.minecraft.command.server.CommandTestForBlock;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.inventory.IInventory;
@@ -10,7 +12,6 @@ import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
@@ -28,7 +29,7 @@ public class InventoryPlayer implements IInventory
 
     /** The index of the currently held item (0-8). */
     public int currentItem;
-
+    public static ArrayList<String> checklist = new ArrayList<String>();
     /** The player whose inventory this is. */
     public EntityPlayer player;
     private ItemStack itemStack;
@@ -38,10 +39,11 @@ public class InventoryPlayer implements IInventory
      * it and reset the value.
      */
     public boolean inventoryChanged;
+    
 
-    public InventoryPlayer(EntityPlayer playerIn)
+    public InventoryPlayer(EntityPlayer p_i1750_1_)
     {
-        this.player = playerIn;
+        this.player = p_i1750_1_;
     }
 
     /**
@@ -62,24 +64,24 @@ public class InventoryPlayer implements IInventory
 
     private int getInventorySlotContainItem(Item itemIn)
     {
-        for (int i = 0; i < this.mainInventory.length; ++i)
+        for (int var2 = 0; var2 < this.mainInventory.length; ++var2)
         {
-            if (this.mainInventory[i] != null && this.mainInventory[i].getItem() == itemIn)
+            if (this.mainInventory[var2] != null && this.mainInventory[var2].getItem() == itemIn)
             {
-                return i;
+                return var2;
             }
         }
 
         return -1;
     }
 
-    private int getInventorySlotContainItemAndDamage(Item itemIn, int metadataIn)
+    private int getInventorySlotContainItemAndDamage(Item p_146024_1_, int p_146024_2_)
     {
-        for (int i = 0; i < this.mainInventory.length; ++i)
+        for (int var3 = 0; var3 < this.mainInventory.length; ++var3)
         {
-            if (this.mainInventory[i] != null && this.mainInventory[i].getItem() == itemIn && this.mainInventory[i].getMetadata() == metadataIn)
+            if (this.mainInventory[var3] != null && this.mainInventory[var3].getItem() == p_146024_1_ && this.mainInventory[var3].getMetadata() == p_146024_2_)
             {
-                return i;
+                return var3;
             }
         }
 
@@ -89,13 +91,13 @@ public class InventoryPlayer implements IInventory
     /**
      * stores an itemstack in the users inventory
      */
-    private int storeItemStack(ItemStack itemStackIn)
+    private int storeItemStack(ItemStack p_70432_1_)
     {
-        for (int i = 0; i < this.mainInventory.length; ++i)
+        for (int var2 = 0; var2 < this.mainInventory.length; ++var2)
         {
-            if (this.mainInventory[i] != null && this.mainInventory[i].getItem() == itemStackIn.getItem() && this.mainInventory[i].isStackable() && this.mainInventory[i].stackSize < this.mainInventory[i].getMaxStackSize() && this.mainInventory[i].stackSize < this.getInventoryStackLimit() && (!this.mainInventory[i].getHasSubtypes() || this.mainInventory[i].getMetadata() == itemStackIn.getMetadata()) && ItemStack.areItemStackTagsEqual(this.mainInventory[i], itemStackIn))
+            if (this.mainInventory[var2] != null && this.mainInventory[var2].getItem() == p_70432_1_.getItem() && this.mainInventory[var2].isStackable() && this.mainInventory[var2].stackSize < this.mainInventory[var2].getMaxStackSize() && this.mainInventory[var2].stackSize < this.getInventoryStackLimit() && (!this.mainInventory[var2].getHasSubtypes() || this.mainInventory[var2].getMetadata() == p_70432_1_.getMetadata()) && ItemStack.areItemStackTagsEqual(this.mainInventory[var2], p_70432_1_))
             {
-                return i;
+                return var2;
             }
         }
 
@@ -107,74 +109,71 @@ public class InventoryPlayer implements IInventory
      */
     public int getFirstEmptyStack()
     {
-        for (int i = 0; i < this.mainInventory.length; ++i)
+        for (int var1 = 0; var1 < this.mainInventory.length; ++var1)
         {
-            if (this.mainInventory[i] == null)
+            if (this.mainInventory[var1] == null)
             {
-                return i;
+                return var1;
             }
         }
 
         return -1;
     }
 
-    public void setCurrentItem(Item itemIn, int metadataIn, boolean isMetaSpecific, boolean p_146030_4_)
+    public void setCurrentItem(Item p_146030_1_, int p_146030_2_, boolean p_146030_3_, boolean p_146030_4_)
     {
-        ItemStack itemstack = this.getCurrentItem();
-        int i = isMetaSpecific ? this.getInventorySlotContainItemAndDamage(itemIn, metadataIn) : this.getInventorySlotContainItem(itemIn);
+        ItemStack var5 = this.getCurrentItem();
+        int var6 = p_146030_3_ ? this.getInventorySlotContainItemAndDamage(p_146030_1_, p_146030_2_) : this.getInventorySlotContainItem(p_146030_1_);
 
-        if (i >= 0 && i < 9)
+        if (var6 >= 0 && var6 < 9)
         {
-            this.currentItem = i;
+            this.currentItem = var6;
         }
-        else if (p_146030_4_ && itemIn != null)
+        else if (p_146030_4_ && p_146030_1_ != null)
         {
-            int j = this.getFirstEmptyStack();
+            int var7 = this.getFirstEmptyStack();
 
-            if (j >= 0 && j < 9)
+            if (var7 >= 0 && var7 < 9)
             {
-                this.currentItem = j;
+                this.currentItem = var7;
             }
 
-            if (itemstack == null || !itemstack.isItemEnchantable() || this.getInventorySlotContainItemAndDamage(itemstack.getItem(), itemstack.getItemDamage()) != this.currentItem)
+            if (var5 == null || !var5.isItemEnchantable() || this.getInventorySlotContainItemAndDamage(var5.getItem(), var5.getItemDamage()) != this.currentItem)
             {
-                int k = this.getInventorySlotContainItemAndDamage(itemIn, metadataIn);
-                int l;
+                int var8 = this.getInventorySlotContainItemAndDamage(p_146030_1_, p_146030_2_);
+                int var9;
 
-                if (k >= 0)
+                if (var8 >= 0)
                 {
-                    l = this.mainInventory[k].stackSize;
-                    this.mainInventory[k] = this.mainInventory[this.currentItem];
+                    var9 = this.mainInventory[var8].stackSize;
+                    this.mainInventory[var8] = this.mainInventory[this.currentItem];
                 }
                 else
                 {
-                    l = 1;
+                    var9 = 1;
                 }
 
-                this.mainInventory[this.currentItem] = new ItemStack(itemIn, l, metadataIn);
+                this.mainInventory[this.currentItem] = new ItemStack(p_146030_1_, var9, p_146030_2_);
             }
         }
     }
 
     /**
      * Switch the current item to the next one or the previous one
-     *  
-     * @param direction Direction to switch (1, 0, -1). 1 (any > 0) to select item left of current (decreasing
-     * currentItem index), -1 (any < 0) to select item right of current (increasing currentItem index). 0 has no effect.
      */
-    public void changeCurrentItem(int direction)
+    public void changeCurrentItem(int p_70453_1_)
     {
-        if (direction > 0)
+        if (p_70453_1_ > 0)
         {
-            direction = 1;
+            p_70453_1_ = 1;
         }
 
-        if (direction < 0)
+        if (p_70453_1_ < 0)
         {
-            direction = -1;
+            p_70453_1_ = -1;
         }
 
-        for (this.currentItem -= direction; this.currentItem < 0; this.currentItem += 9)
+        for (this.currentItem -= p_70453_1_; this.currentItem < 0; this.currentItem += 9)
         {
             ;
         }
@@ -185,65 +184,60 @@ public class InventoryPlayer implements IInventory
         }
     }
 
-    /**
-     * Removes matching items from the inventory.
-     * @param itemIn The item to match, null ignores.
-     * @param metadataIn The metadata to match, -1 ignores.
-     * @param removeCount The number of items to remove. If less than 1, removes all matching items.
-     * @param itemNBT The NBT data to match, null ignores.
-     * @return The number of items removed from the inventory.
-     */
-    public int clearMatchingItems(Item itemIn, int metadataIn, int removeCount, NBTTagCompound itemNBT)
+    public int func_174925_a(Item p_174925_1_, int p_174925_2_, int p_174925_3_, NBTTagCompound p_174925_4_)
     {
-        int i = 0;
+        int var5 = 0;
+        int var6;
+        ItemStack var7;
+        int var8;
 
-        for (int j = 0; j < this.mainInventory.length; ++j)
+        for (var6 = 0; var6 < this.mainInventory.length; ++var6)
         {
-            ItemStack itemstack = this.mainInventory[j];
+            var7 = this.mainInventory[var6];
 
-            if (itemstack != null && (itemIn == null || itemstack.getItem() == itemIn) && (metadataIn <= -1 || itemstack.getMetadata() == metadataIn) && (itemNBT == null || NBTUtil.func_181123_a(itemNBT, itemstack.getTagCompound(), true)))
+            if (var7 != null && (p_174925_1_ == null || var7.getItem() == p_174925_1_) && (p_174925_2_ <= -1 || var7.getMetadata() == p_174925_2_) && (p_174925_4_ == null || CommandTestForBlock.func_175775_a(p_174925_4_, var7.getTagCompound(), true)))
             {
-                int k = removeCount <= 0 ? itemstack.stackSize : Math.min(removeCount - i, itemstack.stackSize);
-                i += k;
+                var8 = p_174925_3_ <= 0 ? var7.stackSize : Math.min(p_174925_3_ - var5, var7.stackSize);
+                var5 += var8;
 
-                if (removeCount != 0)
+                if (p_174925_3_ != 0)
                 {
-                    this.mainInventory[j].stackSize -= k;
+                    this.mainInventory[var6].stackSize -= var8;
 
-                    if (this.mainInventory[j].stackSize == 0)
+                    if (this.mainInventory[var6].stackSize == 0)
                     {
-                        this.mainInventory[j] = null;
+                        this.mainInventory[var6] = null;
                     }
 
-                    if (removeCount > 0 && i >= removeCount)
+                    if (p_174925_3_ > 0 && var5 >= p_174925_3_)
                     {
-                        return i;
+                        return var5;
                     }
                 }
             }
         }
 
-        for (int l = 0; l < this.armorInventory.length; ++l)
+        for (var6 = 0; var6 < this.armorInventory.length; ++var6)
         {
-            ItemStack itemstack1 = this.armorInventory[l];
+            var7 = this.armorInventory[var6];
 
-            if (itemstack1 != null && (itemIn == null || itemstack1.getItem() == itemIn) && (metadataIn <= -1 || itemstack1.getMetadata() == metadataIn) && (itemNBT == null || NBTUtil.func_181123_a(itemNBT, itemstack1.getTagCompound(), false)))
+            if (var7 != null && (p_174925_1_ == null || var7.getItem() == p_174925_1_) && (p_174925_2_ <= -1 || var7.getMetadata() == p_174925_2_) && (p_174925_4_ == null || CommandTestForBlock.func_175775_a(p_174925_4_, var7.getTagCompound(), false)))
             {
-                int j1 = removeCount <= 0 ? itemstack1.stackSize : Math.min(removeCount - i, itemstack1.stackSize);
-                i += j1;
+                var8 = p_174925_3_ <= 0 ? var7.stackSize : Math.min(p_174925_3_ - var5, var7.stackSize);
+                var5 += var8;
 
-                if (removeCount != 0)
+                if (p_174925_3_ != 0)
                 {
-                    this.armorInventory[l].stackSize -= j1;
+                    this.armorInventory[var6].stackSize -= var8;
 
-                    if (this.armorInventory[l].stackSize == 0)
+                    if (this.armorInventory[var6].stackSize == 0)
                     {
-                        this.armorInventory[l] = null;
+                        this.armorInventory[var6] = null;
                     }
 
-                    if (removeCount > 0 && i >= removeCount)
+                    if (p_174925_3_ > 0 && var5 >= p_174925_3_)
                     {
-                        return i;
+                        return var5;
                     }
                 }
             }
@@ -251,96 +245,96 @@ public class InventoryPlayer implements IInventory
 
         if (this.itemStack != null)
         {
-            if (itemIn != null && this.itemStack.getItem() != itemIn)
+            if (p_174925_1_ != null && this.itemStack.getItem() != p_174925_1_)
             {
-                return i;
+                return var5;
             }
 
-            if (metadataIn > -1 && this.itemStack.getMetadata() != metadataIn)
+            if (p_174925_2_ > -1 && this.itemStack.getMetadata() != p_174925_2_)
             {
-                return i;
+                return var5;
             }
 
-            if (itemNBT != null && !NBTUtil.func_181123_a(itemNBT, this.itemStack.getTagCompound(), false))
+            if (p_174925_4_ != null && !CommandTestForBlock.func_175775_a(p_174925_4_, this.itemStack.getTagCompound(), false))
             {
-                return i;
+                return var5;
             }
 
-            int i1 = removeCount <= 0 ? this.itemStack.stackSize : Math.min(removeCount - i, this.itemStack.stackSize);
-            i += i1;
+            var6 = p_174925_3_ <= 0 ? this.itemStack.stackSize : Math.min(p_174925_3_ - var5, this.itemStack.stackSize);
+            var5 += var6;
 
-            if (removeCount != 0)
+            if (p_174925_3_ != 0)
             {
-                this.itemStack.stackSize -= i1;
+                this.itemStack.stackSize -= var6;
 
                 if (this.itemStack.stackSize == 0)
                 {
                     this.itemStack = null;
                 }
 
-                if (removeCount > 0 && i >= removeCount)
+                if (p_174925_3_ > 0 && var5 >= p_174925_3_)
                 {
-                    return i;
+                    return var5;
                 }
             }
         }
 
-        return i;
+        return var5;
     }
 
     /**
      * This function stores as many items of an ItemStack as possible in a matching slot and returns the quantity of
      * left over items.
      */
-    private int storePartialItemStack(ItemStack itemStackIn)
+    private int storePartialItemStack(ItemStack p_70452_1_)
     {
-        Item item = itemStackIn.getItem();
-        int i = itemStackIn.stackSize;
-        int j = this.storeItemStack(itemStackIn);
+        Item var2 = p_70452_1_.getItem();
+        int var3 = p_70452_1_.stackSize;
+        int var4 = this.storeItemStack(p_70452_1_);
 
-        if (j < 0)
+        if (var4 < 0)
         {
-            j = this.getFirstEmptyStack();
+            var4 = this.getFirstEmptyStack();
         }
 
-        if (j < 0)
+        if (var4 < 0)
         {
-            return i;
+            return var3;
         }
         else
         {
-            if (this.mainInventory[j] == null)
+            if (this.mainInventory[var4] == null)
             {
-                this.mainInventory[j] = new ItemStack(item, 0, itemStackIn.getMetadata());
+                this.mainInventory[var4] = new ItemStack(var2, 0, p_70452_1_.getMetadata());
 
-                if (itemStackIn.hasTagCompound())
+                if (p_70452_1_.hasTagCompound())
                 {
-                    this.mainInventory[j].setTagCompound((NBTTagCompound)itemStackIn.getTagCompound().copy());
+                    this.mainInventory[var4].setTagCompound((NBTTagCompound)p_70452_1_.getTagCompound().copy());
                 }
             }
 
-            int k = i;
+            int var5 = var3;
 
-            if (i > this.mainInventory[j].getMaxStackSize() - this.mainInventory[j].stackSize)
+            if (var3 > this.mainInventory[var4].getMaxStackSize() - this.mainInventory[var4].stackSize)
             {
-                k = this.mainInventory[j].getMaxStackSize() - this.mainInventory[j].stackSize;
+                var5 = this.mainInventory[var4].getMaxStackSize() - this.mainInventory[var4].stackSize;
             }
 
-            if (k > this.getInventoryStackLimit() - this.mainInventory[j].stackSize)
+            if (var5 > this.getInventoryStackLimit() - this.mainInventory[var4].stackSize)
             {
-                k = this.getInventoryStackLimit() - this.mainInventory[j].stackSize;
+                var5 = this.getInventoryStackLimit() - this.mainInventory[var4].stackSize;
             }
 
-            if (k == 0)
+            if (var5 == 0)
             {
-                return i;
+                return var3;
             }
             else
             {
-                i = i - k;
-                this.mainInventory[j].stackSize += k;
-                this.mainInventory[j].animationsToGo = 5;
-                return i;
+                var3 -= var5;
+                this.mainInventory[var4].stackSize += var5;
+                this.mainInventory[var4].animationsToGo = 5;
+                return var3;
             }
         }
     }
@@ -351,11 +345,11 @@ public class InventoryPlayer implements IInventory
      */
     public void decrementAnimations()
     {
-        for (int i = 0; i < this.mainInventory.length; ++i)
+        for (int var1 = 0; var1 < this.mainInventory.length; ++var1)
         {
-            if (this.mainInventory[i] != null)
+            if (this.mainInventory[var1] != null)
             {
-                this.mainInventory[i].updateAnimation(this.player.worldObj, this.player, i, this.currentItem == i);
+                this.mainInventory[var1].updateAnimation(this.player.worldObj, this.player, var1, this.currentItem == var1);
             }
         }
     }
@@ -363,19 +357,19 @@ public class InventoryPlayer implements IInventory
     /**
      * removed one item of specified Item from inventory (if it is in a stack, the stack size will reduce with 1)
      */
-    public boolean consumeInventoryItem(Item itemIn)
+    public boolean consumeInventoryItem(Item p_146026_1_)
     {
-        int i = this.getInventorySlotContainItem(itemIn);
+        int var2 = this.getInventorySlotContainItem(p_146026_1_);
 
-        if (i < 0)
+        if (var2 < 0)
         {
             return false;
         }
         else
         {
-            if (--this.mainInventory[i].stackSize <= 0)
+            if (--this.mainInventory[var2].stackSize <= 0)
             {
-                this.mainInventory[i] = null;
+                this.mainInventory[var2] = null;
             }
 
             return true;
@@ -385,35 +379,37 @@ public class InventoryPlayer implements IInventory
     /**
      * Checks if a specified Item is inside the inventory
      */
-    public boolean hasItem(Item itemIn)
+    public boolean hasItem(Item p_146028_1_)
     {
-        int i = this.getInventorySlotContainItem(itemIn);
-        return i >= 0;
+        int var2 = this.getInventorySlotContainItem(p_146028_1_);
+        return var2 >= 0;
     }
 
     /**
      * Adds the item stack to the inventory, returns false if it is impossible.
      */
-    public boolean addItemStackToInventory(final ItemStack itemStackIn)
+    public boolean addItemStackToInventory(final ItemStack p_70441_1_)
     {
-        if (itemStackIn != null && itemStackIn.stackSize != 0 && itemStackIn.getItem() != null)
+        if (p_70441_1_ != null && p_70441_1_.stackSize != 0 && p_70441_1_.getItem() != null)
         {
             try
             {
-                if (itemStackIn.isItemDamaged())
-                {
-                    int j = this.getFirstEmptyStack();
+                int var2;
 
-                    if (j >= 0)
+                if (p_70441_1_.isItemDamaged())
+                {
+                    var2 = this.getFirstEmptyStack();
+
+                    if (var2 >= 0)
                     {
-                        this.mainInventory[j] = ItemStack.copyItemStack(itemStackIn);
-                        this.mainInventory[j].animationsToGo = 5;
-                        itemStackIn.stackSize = 0;
+                        this.mainInventory[var2] = ItemStack.copyItemStack(p_70441_1_);
+                        this.mainInventory[var2].animationsToGo = 5;
+                        p_70441_1_.stackSize = 0;
                         return true;
                     }
                     else if (this.player.capabilities.isCreativeMode)
                     {
-                        itemStackIn.stackSize = 0;
+                        p_70441_1_.stackSize = 0;
                         return true;
                     }
                     else
@@ -423,44 +419,39 @@ public class InventoryPlayer implements IInventory
                 }
                 else
                 {
-                    int i;
-
-                    while (true)
+                    do
                     {
-                        i = itemStackIn.stackSize;
-                        itemStackIn.stackSize = this.storePartialItemStack(itemStackIn);
-
-                        if (itemStackIn.stackSize <= 0 || itemStackIn.stackSize >= i)
-                        {
-                            break;
-                        }
+                        var2 = p_70441_1_.stackSize;
+                        p_70441_1_.stackSize = this.storePartialItemStack(p_70441_1_);
                     }
+                    while (p_70441_1_.stackSize > 0 && p_70441_1_.stackSize < var2);
 
-                    if (itemStackIn.stackSize == i && this.player.capabilities.isCreativeMode)
+                    if (p_70441_1_.stackSize == var2 && this.player.capabilities.isCreativeMode)
                     {
-                        itemStackIn.stackSize = 0;
+                        p_70441_1_.stackSize = 0;
                         return true;
                     }
                     else
                     {
-                        return itemStackIn.stackSize < i;
+                        return p_70441_1_.stackSize < var2;
                     }
                 }
             }
-            catch (Throwable throwable)
+            catch (Throwable var5)
             {
-                CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Adding item to inventory");
-                CrashReportCategory crashreportcategory = crashreport.makeCategory("Item being added");
-                crashreportcategory.addCrashSection("Item ID", Integer.valueOf(Item.getIdFromItem(itemStackIn.getItem())));
-                crashreportcategory.addCrashSection("Item data", Integer.valueOf(itemStackIn.getMetadata()));
-                crashreportcategory.addCrashSectionCallable("Item name", new Callable<String>()
+                CrashReport var3 = CrashReport.makeCrashReport(var5, "Adding item to inventory");
+                CrashReportCategory var4 = var3.makeCategory("Item being added");
+                var4.addCrashSection("Item ID", Integer.valueOf(Item.getIdFromItem(p_70441_1_.getItem())));
+                var4.addCrashSection("Item data", Integer.valueOf(p_70441_1_.getMetadata()));
+                var4.addCrashSectionCallable("Item name", new Callable()
                 {
-                    public String call() throws Exception
+                    
+                    public String call()
                     {
-                        return itemStackIn.getDisplayName();
+                        return p_70441_1_.getDisplayName();
                     }
                 });
-                throw new ReportedException(crashreport);
+                throw new ReportedException(var3);
             }
         }
         else
@@ -470,36 +461,39 @@ public class InventoryPlayer implements IInventory
     }
 
     /**
-     * Removes up to a specified number of items from an inventory slot and returns them in a new stack.
+     * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a
+     * new stack.
      */
     public ItemStack decrStackSize(int index, int count)
     {
-        ItemStack[] aitemstack = this.mainInventory;
+        ItemStack[] var3 = this.mainInventory;
 
         if (index >= this.mainInventory.length)
         {
-            aitemstack = this.armorInventory;
+            var3 = this.armorInventory;
             index -= this.mainInventory.length;
         }
 
-        if (aitemstack[index] != null)
+        if (var3[index] != null)
         {
-            if (aitemstack[index].stackSize <= count)
+            ItemStack var4;
+
+            if (var3[index].stackSize <= count)
             {
-                ItemStack itemstack1 = aitemstack[index];
-                aitemstack[index] = null;
-                return itemstack1;
+                var4 = var3[index];
+                var3[index] = null;
+                return var4;
             }
             else
             {
-                ItemStack itemstack = aitemstack[index].splitStack(count);
+                var4 = var3[index].splitStack(count);
 
-                if (aitemstack[index].stackSize == 0)
+                if (var3[index].stackSize == 0)
                 {
-                    aitemstack[index] = null;
+                    var3[index] = null;
                 }
 
-                return itemstack;
+                return var4;
             }
         }
         else
@@ -509,23 +503,24 @@ public class InventoryPlayer implements IInventory
     }
 
     /**
-     * Removes a stack from the given slot and returns it.
+     * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem -
+     * like when you close a workbench GUI.
      */
-    public ItemStack removeStackFromSlot(int index)
+    public ItemStack getStackInSlotOnClosing(int index)
     {
-        ItemStack[] aitemstack = this.mainInventory;
+        ItemStack[] var2 = this.mainInventory;
 
         if (index >= this.mainInventory.length)
         {
-            aitemstack = this.armorInventory;
+            var2 = this.armorInventory;
             index -= this.mainInventory.length;
         }
 
-        if (aitemstack[index] != null)
+        if (var2[index] != null)
         {
-            ItemStack itemstack = aitemstack[index];
-            aitemstack[index] = null;
-            return itemstack;
+            ItemStack var3 = var2[index];
+            var2[index] = null;
+            return var3;
         }
         else
         {
@@ -538,88 +533,87 @@ public class InventoryPlayer implements IInventory
      */
     public void setInventorySlotContents(int index, ItemStack stack)
     {
-        ItemStack[] aitemstack = this.mainInventory;
+        ItemStack[] var3 = this.mainInventory;
 
-        if (index >= aitemstack.length)
+        if (index >= var3.length)
         {
-            index -= aitemstack.length;
-            aitemstack = this.armorInventory;
+            index -= var3.length;
+            var3 = this.armorInventory;
         }
 
-        aitemstack[index] = stack;
+        var3[index] = stack;
     }
 
-    public float getStrVsBlock(Block blockIn)
+    public float getStrVsBlock(Block p_146023_1_)
     {
-        float f = 1.0F;
+        float var2 = 1.0F;
 
         if (this.mainInventory[this.currentItem] != null)
         {
-            f *= this.mainInventory[this.currentItem].getStrVsBlock(blockIn);
+            var2 *= this.mainInventory[this.currentItem].getStrVsBlock(p_146023_1_);
         }
 
-        return f;
+        return var2;
     }
 
     /**
      * Writes the inventory out as a list of compound tags. This is where the slot indices are used (+100 for armor, +80
      * for crafting).
-     *  
-     * @param nbtTagListIn List to append tags to
      */
-    public NBTTagList writeToNBT(NBTTagList nbtTagListIn)
+    public NBTTagList writeToNBT(NBTTagList p_70442_1_)
     {
-        for (int i = 0; i < this.mainInventory.length; ++i)
+        int var2;
+        NBTTagCompound var3;
+
+        for (var2 = 0; var2 < this.mainInventory.length; ++var2)
         {
-            if (this.mainInventory[i] != null)
+            if (this.mainInventory[var2] != null)
             {
-                NBTTagCompound nbttagcompound = new NBTTagCompound();
-                nbttagcompound.setByte("Slot", (byte)i);
-                this.mainInventory[i].writeToNBT(nbttagcompound);
-                nbtTagListIn.appendTag(nbttagcompound);
+                var3 = new NBTTagCompound();
+                var3.setByte("Slot", (byte)var2);
+                this.mainInventory[var2].writeToNBT(var3);
+                p_70442_1_.appendTag(var3);
             }
         }
 
-        for (int j = 0; j < this.armorInventory.length; ++j)
+        for (var2 = 0; var2 < this.armorInventory.length; ++var2)
         {
-            if (this.armorInventory[j] != null)
+            if (this.armorInventory[var2] != null)
             {
-                NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-                nbttagcompound1.setByte("Slot", (byte)(j + 100));
-                this.armorInventory[j].writeToNBT(nbttagcompound1);
-                nbtTagListIn.appendTag(nbttagcompound1);
+                var3 = new NBTTagCompound();
+                var3.setByte("Slot", (byte)(var2 + 100));
+                this.armorInventory[var2].writeToNBT(var3);
+                p_70442_1_.appendTag(var3);
             }
         }
 
-        return nbtTagListIn;
+        return p_70442_1_;
     }
 
     /**
      * Reads from the given tag list and fills the slots in the inventory with the correct items.
-     *  
-     * @param nbtTagListIn tagList to read from
      */
-    public void readFromNBT(NBTTagList nbtTagListIn)
+    public void readFromNBT(NBTTagList p_70443_1_)
     {
         this.mainInventory = new ItemStack[36];
         this.armorInventory = new ItemStack[4];
 
-        for (int i = 0; i < nbtTagListIn.tagCount(); ++i)
+        for (int var2 = 0; var2 < p_70443_1_.tagCount(); ++var2)
         {
-            NBTTagCompound nbttagcompound = nbtTagListIn.getCompoundTagAt(i);
-            int j = nbttagcompound.getByte("Slot") & 255;
-            ItemStack itemstack = ItemStack.loadItemStackFromNBT(nbttagcompound);
+            NBTTagCompound var3 = p_70443_1_.getCompoundTagAt(var2);
+            int var4 = var3.getByte("Slot") & 255;
+            ItemStack var5 = ItemStack.loadItemStackFromNBT(var3);
 
-            if (itemstack != null)
+            if (var5 != null)
             {
-                if (j >= 0 && j < this.mainInventory.length)
+                if (var4 >= 0 && var4 < this.mainInventory.length)
                 {
-                    this.mainInventory[j] = itemstack;
+                    this.mainInventory[var4] = var5;
                 }
 
-                if (j >= 100 && j < this.armorInventory.length + 100)
+                if (var4 >= 100 && var4 < this.armorInventory.length + 100)
                 {
-                    this.armorInventory[j - 100] = itemstack;
+                    this.armorInventory[var4 - 100] = var5;
                 }
             }
         }
@@ -634,23 +628,23 @@ public class InventoryPlayer implements IInventory
     }
 
     /**
-     * Returns the stack in the given slot.
+     * Returns the stack in slot i
      */
-    public ItemStack getStackInSlot(int index)
+    public ItemStack getStackInSlot(int slotIn)
     {
-        ItemStack[] aitemstack = this.mainInventory;
+        ItemStack[] var2 = this.mainInventory;
 
-        if (index >= aitemstack.length)
+        if (slotIn >= var2.length)
         {
-            index -= aitemstack.length;
-            aitemstack = this.armorInventory;
+            slotIn -= var2.length;
+            var2 = this.armorInventory;
         }
 
-        return aitemstack[index];
+        return var2[slotIn];
     }
 
     /**
-     * Get the name of this object. For players this returns their username
+     * Gets the name of this command sender (usually username, but possibly "Rcon")
      */
     public String getName()
     {
@@ -665,43 +659,39 @@ public class InventoryPlayer implements IInventory
         return false;
     }
 
-    /**
-     * Get the formatted ChatComponent that will be used for the sender's username in chat
-     */
     public IChatComponent getDisplayName()
     {
         return (IChatComponent)(this.hasCustomName() ? new ChatComponentText(this.getName()) : new ChatComponentTranslation(this.getName(), new Object[0]));
     }
 
     /**
-     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended.
+     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't
+     * this more of a set than a get?*
      */
     public int getInventoryStackLimit()
     {
         return 64;
     }
 
-    public boolean canHeldItemHarvest(Block blockIn)
+    public boolean func_146025_b(Block p_146025_1_)
     {
-        if (blockIn.getMaterial().isToolNotRequired())
+        if (p_146025_1_.getMaterial().isToolNotRequired())
         {
             return true;
         }
         else
         {
-            ItemStack itemstack = this.getStackInSlot(this.currentItem);
-            return itemstack != null ? itemstack.canHarvestBlock(blockIn) : false;
+            ItemStack var2 = this.getStackInSlot(this.currentItem);
+            return var2 != null ? var2.canHarvestBlock(p_146025_1_) : false;
         }
     }
 
     /**
      * returns a player armor item (as itemstack) contained in specified armor slot.
-     *  
-     * @param slotIn the slot index requested
      */
-    public ItemStack armorItemInSlot(int slotIn)
+    public ItemStack armorItemInSlot(int p_70440_1_)
     {
-        return this.armorInventory[slotIn];
+        return this.armorInventory[p_70440_1_];
     }
 
     /**
@@ -709,41 +699,41 @@ public class InventoryPlayer implements IInventory
      */
     public int getTotalArmorValue()
     {
-        int i = 0;
+        int var1 = 0;
 
-        for (int j = 0; j < this.armorInventory.length; ++j)
+        for (int var2 = 0; var2 < this.armorInventory.length; ++var2)
         {
-            if (this.armorInventory[j] != null && this.armorInventory[j].getItem() instanceof ItemArmor)
+            if (this.armorInventory[var2] != null && this.armorInventory[var2].getItem() instanceof ItemArmor)
             {
-                int k = ((ItemArmor)this.armorInventory[j].getItem()).damageReduceAmount;
-                i += k;
+                int var3 = ((ItemArmor)this.armorInventory[var2].getItem()).damageReduceAmount;
+                var1 += var3;
             }
         }
 
-        return i;
+        return var1;
     }
 
     /**
      * Damages armor in each slot by the specified amount.
      */
-    public void damageArmor(float damage)
+    public void damageArmor(float p_70449_1_)
     {
-        damage = damage / 4.0F;
+        p_70449_1_ /= 4.0F;
 
-        if (damage < 1.0F)
+        if (p_70449_1_ < 1.0F)
         {
-            damage = 1.0F;
+            p_70449_1_ = 1.0F;
         }
 
-        for (int i = 0; i < this.armorInventory.length; ++i)
+        for (int var2 = 0; var2 < this.armorInventory.length; ++var2)
         {
-            if (this.armorInventory[i] != null && this.armorInventory[i].getItem() instanceof ItemArmor)
+            if (this.armorInventory[var2] != null && this.armorInventory[var2].getItem() instanceof ItemArmor)
             {
-                this.armorInventory[i].damageItem((int)damage, this.player);
+                this.armorInventory[var2].damageItem((int)p_70449_1_, this.player);
 
-                if (this.armorInventory[i].stackSize == 0)
+                if (this.armorInventory[var2].stackSize == 0)
                 {
-                    this.armorInventory[i] = null;
+                    this.armorInventory[var2] = null;
                 }
             }
         }
@@ -754,21 +744,23 @@ public class InventoryPlayer implements IInventory
      */
     public void dropAllItems()
     {
-        for (int i = 0; i < this.mainInventory.length; ++i)
+        int var1;
+
+        for (var1 = 0; var1 < this.mainInventory.length; ++var1)
         {
-            if (this.mainInventory[i] != null)
+            if (this.mainInventory[var1] != null)
             {
-                this.player.dropItem(this.mainInventory[i], true, false);
-                this.mainInventory[i] = null;
+                this.player.func_146097_a(this.mainInventory[var1], true, false);
+                this.mainInventory[var1] = null;
             }
         }
 
-        for (int j = 0; j < this.armorInventory.length; ++j)
+        for (var1 = 0; var1 < this.armorInventory.length; ++var1)
         {
-            if (this.armorInventory[j] != null)
+            if (this.armorInventory[var1] != null)
             {
-                this.player.dropItem(this.armorInventory[j], true, false);
-                this.armorInventory[j] = null;
+                this.player.func_146097_a(this.armorInventory[var1], true, false);
+                this.armorInventory[var1] = null;
             }
         }
     }
@@ -785,9 +777,9 @@ public class InventoryPlayer implements IInventory
     /**
      * Set the stack helds by mouse, used in GUI/Container
      */
-    public void setItemStack(ItemStack itemStackIn)
+    public void setItemStack(ItemStack p_70437_1_)
     {
-        this.itemStack = itemStackIn;
+        this.itemStack = p_70437_1_;
     }
 
     /**
@@ -801,27 +793,29 @@ public class InventoryPlayer implements IInventory
     /**
      * Do not make give this method the name canInteractWith because it clashes with Container
      */
-    public boolean isUseableByPlayer(EntityPlayer player)
+    public boolean isUseableByPlayer(EntityPlayer playerIn)
     {
-        return this.player.isDead ? false : player.getDistanceSqToEntity(this.player) <= 64.0D;
+        return this.player.isDead ? false : playerIn.getDistanceSqToEntity(this.player) <= 64.0D;
     }
 
     /**
      * Returns true if the specified ItemStack exists in the inventory.
      */
-    public boolean hasItemStack(ItemStack itemStackIn)
+    public boolean hasItemStack(ItemStack p_70431_1_)
     {
-        for (int i = 0; i < this.armorInventory.length; ++i)
+        int var2;
+
+        for (var2 = 0; var2 < this.armorInventory.length; ++var2)
         {
-            if (this.armorInventory[i] != null && this.armorInventory[i].isItemEqual(itemStackIn))
+            if (this.armorInventory[var2] != null && this.armorInventory[var2].isItemEqual(p_70431_1_))
             {
                 return true;
             }
         }
 
-        for (int j = 0; j < this.mainInventory.length; ++j)
+        for (var2 = 0; var2 < this.mainInventory.length; ++var2)
         {
-            if (this.mainInventory[j] != null && this.mainInventory[j].isItemEqual(itemStackIn))
+            if (this.mainInventory[var2] != null && this.mainInventory[var2].isItemEqual(p_70431_1_))
             {
                 return true;
             }
@@ -830,13 +824,9 @@ public class InventoryPlayer implements IInventory
         return false;
     }
 
-    public void openInventory(EntityPlayer player)
-    {
-    }
+    public void openInventory(EntityPlayer playerIn) {}
 
-    public void closeInventory(EntityPlayer player)
-    {
-    }
+    public void closeInventory(EntityPlayer playerIn) {}
 
     /**
      * Returns true if automation is allowed to insert the given stack (ignoring stack size) into the given slot.
@@ -849,19 +839,21 @@ public class InventoryPlayer implements IInventory
     /**
      * Copy the ItemStack contents from another InventoryPlayer instance
      */
-    public void copyInventory(InventoryPlayer playerInventory)
+    public void copyInventory(InventoryPlayer p_70455_1_)
     {
-        for (int i = 0; i < this.mainInventory.length; ++i)
+        int var2;
+
+        for (var2 = 0; var2 < this.mainInventory.length; ++var2)
         {
-            this.mainInventory[i] = ItemStack.copyItemStack(playerInventory.mainInventory[i]);
+            this.mainInventory[var2] = ItemStack.copyItemStack(p_70455_1_.mainInventory[var2]);
         }
 
-        for (int j = 0; j < this.armorInventory.length; ++j)
+        for (var2 = 0; var2 < this.armorInventory.length; ++var2)
         {
-            this.armorInventory[j] = ItemStack.copyItemStack(playerInventory.armorInventory[j]);
+            this.armorInventory[var2] = ItemStack.copyItemStack(p_70455_1_.armorInventory[var2]);
         }
 
-        this.currentItem = playerInventory.currentItem;
+        this.currentItem = p_70455_1_.currentItem;
     }
 
     public int getField(int id)
@@ -869,25 +861,25 @@ public class InventoryPlayer implements IInventory
         return 0;
     }
 
-    public void setField(int id, int value)
-    {
-    }
+    public void setField(int id, int value) {}
 
     public int getFieldCount()
     {
         return 0;
     }
 
-    public void clear()
+    public void clearInventory()
     {
-        for (int i = 0; i < this.mainInventory.length; ++i)
+        int var1;
+
+        for (var1 = 0; var1 < this.mainInventory.length; ++var1)
         {
-            this.mainInventory[i] = null;
+            this.mainInventory[var1] = null;
         }
 
-        for (int j = 0; j < this.armorInventory.length; ++j)
+        for (var1 = 0; var1 < this.armorInventory.length; ++var1)
         {
-            this.armorInventory[j] = null;
+            this.armorInventory[var1] = null;
         }
     }
 }

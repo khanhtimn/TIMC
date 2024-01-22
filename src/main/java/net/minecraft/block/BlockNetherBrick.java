@@ -7,6 +7,8 @@ import net.minecraft.creativetab.CreativeTabs;
 
 public class BlockNetherBrick extends Block
 {
+    
+
     public BlockNetherBrick()
     {
         super(Material.rock);

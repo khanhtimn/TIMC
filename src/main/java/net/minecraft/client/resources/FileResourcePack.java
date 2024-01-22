@@ -7,9 +7,10 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -18,10 +19,11 @@ public class FileResourcePack extends AbstractResourcePack implements Closeable
 {
     public static final Splitter entryNameSplitter = Splitter.on('/').omitEmptyStrings().limit(3);
     private ZipFile resourcePackZipFile;
+    
 
-    public FileResourcePack(File resourcePackFileIn)
+    public FileResourcePack(File p_i1290_1_)
     {
-        super(resourcePackFileIn);
+        super(p_i1290_1_);
     }
 
     private ZipFile getResourcePackZipFile() throws IOException
@@ -34,26 +36,26 @@ public class FileResourcePack extends AbstractResourcePack implements Closeable
         return this.resourcePackZipFile;
     }
 
-    protected InputStream getInputStreamByName(String name) throws IOException
+    protected InputStream getInputStreamByName(String p_110591_1_) throws IOException
     {
-        ZipFile zipfile = this.getResourcePackZipFile();
-        ZipEntry zipentry = zipfile.getEntry(name);
+        ZipFile var2 = this.getResourcePackZipFile();
+        ZipEntry var3 = var2.getEntry(p_110591_1_);
 
-        if (zipentry == null)
+        if (var3 == null)
         {
-            throw new ResourcePackFileNotFoundException(this.resourcePackFile, name);
+            throw new ResourcePackFileNotFoundException(this.resourcePackFile, p_110591_1_);
         }
         else
         {
-            return zipfile.getInputStream(zipentry);
+            return var2.getInputStream(var3);
         }
     }
 
-    public boolean hasResourceName(String name)
+    public boolean hasResourceName(String p_110593_1_)
     {
         try
         {
-            return this.getResourcePackZipFile().getEntry(name) != null;
+            return this.getResourcePackZipFile().getEntry(p_110593_1_) != null;
         }
         catch (IOException var3)
         {
@@ -61,48 +63,48 @@ public class FileResourcePack extends AbstractResourcePack implements Closeable
         }
     }
 
-    public Set<String> getResourceDomains()
+    public Set getResourceDomains()
     {
-        ZipFile zipfile;
+        ZipFile var1;
 
         try
         {
-            zipfile = this.getResourcePackZipFile();
+            var1 = this.getResourcePackZipFile();
         }
         catch (IOException var8)
         {
-            return Collections.<String>emptySet();
+            return Collections.emptySet();
         }
 
-        Enumeration <? extends ZipEntry > enumeration = zipfile.entries();
-        Set<String> set = Sets.<String>newHashSet();
+        Enumeration var2 = var1.entries();
+        HashSet var3 = Sets.newHashSet();
 
-        while (enumeration.hasMoreElements())
+        while (var2.hasMoreElements())
         {
-            ZipEntry zipentry = (ZipEntry)enumeration.nextElement();
-            String s = zipentry.getName();
+            ZipEntry var4 = (ZipEntry)var2.nextElement();
+            String var5 = var4.getName();
 
-            if (s.startsWith("assets/"))
+            if (var5.startsWith("assets/"))
             {
-                List<String> list = Lists.newArrayList(entryNameSplitter.split(s));
+                ArrayList var6 = Lists.newArrayList(entryNameSplitter.split(var5));
 
-                if (list.size() > 1)
+                if (var6.size() > 1)
                 {
-                    String s1 = (String)list.get(1);
+                    String var7 = (String)var6.get(1);
 
-                    if (!s1.equals(s1.toLowerCase()))
+                    if (!var7.equals(var7.toLowerCase()))
                     {
-                        this.logNameNotLowercase(s1);
+                        this.logNameNotLowercase(var7);
                     }
                     else
                     {
-                        set.add(s1);
+                        var3.add(var7);
                     }
                 }
             }
         }
 
-        return set;
+        return var3;
     }
 
     protected void finalize() throws Throwable

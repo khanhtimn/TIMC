@@ -12,6 +12,7 @@ public class DemoWorldServer extends WorldServer
 {
     private static final long demoWorldSeed = (long)"North Carolina".hashCode();
     public static final WorldSettings demoWorldSettings = (new WorldSettings(demoWorldSeed, WorldSettings.GameType.SURVIVAL, true, false, WorldType.DEFAULT)).enableBonusChest();
+    
 
     public DemoWorldServer(MinecraftServer server, ISaveHandler saveHandlerIn, WorldInfo worldInfoIn, int dimensionId, Profiler profilerIn)
     {

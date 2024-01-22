@@ -16,6 +16,8 @@ import net.minecraft.world.World;
 
 public class ItemBoat extends Item
 {
+    
+
     public ItemBoat()
     {
         this.maxStackSize = 1;
@@ -27,76 +29,76 @@ public class ItemBoat extends Item
      */
     public ItemStack onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn)
     {
-        float f = 1.0F;
-        float f1 = playerIn.prevRotationPitch + (playerIn.rotationPitch - playerIn.prevRotationPitch) * f;
-        float f2 = playerIn.prevRotationYaw + (playerIn.rotationYaw - playerIn.prevRotationYaw) * f;
-        double d0 = playerIn.prevPosX + (playerIn.posX - playerIn.prevPosX) * (double)f;
-        double d1 = playerIn.prevPosY + (playerIn.posY - playerIn.prevPosY) * (double)f + (double)playerIn.getEyeHeight();
-        double d2 = playerIn.prevPosZ + (playerIn.posZ - playerIn.prevPosZ) * (double)f;
-        Vec3 vec3 = new Vec3(d0, d1, d2);
-        float f3 = MathHelper.cos(-f2 * 0.017453292F - (float)Math.PI);
-        float f4 = MathHelper.sin(-f2 * 0.017453292F - (float)Math.PI);
-        float f5 = -MathHelper.cos(-f1 * 0.017453292F);
-        float f6 = MathHelper.sin(-f1 * 0.017453292F);
-        float f7 = f4 * f5;
-        float f8 = f3 * f5;
-        double d3 = 5.0D;
-        Vec3 vec31 = vec3.addVector((double)f7 * d3, (double)f6 * d3, (double)f8 * d3);
-        MovingObjectPosition movingobjectposition = worldIn.rayTraceBlocks(vec3, vec31, true);
+        float var4 = 1.0F;
+        float var5 = playerIn.prevRotationPitch + (playerIn.rotationPitch - playerIn.prevRotationPitch) * var4;
+        float var6 = playerIn.prevRotationYaw + (playerIn.rotationYaw - playerIn.prevRotationYaw) * var4;
+        double var7 = playerIn.prevPosX + (playerIn.posX - playerIn.prevPosX) * (double)var4;
+        double var9 = playerIn.prevPosY + (playerIn.posY - playerIn.prevPosY) * (double)var4 + (double)playerIn.getEyeHeight();
+        double var11 = playerIn.prevPosZ + (playerIn.posZ - playerIn.prevPosZ) * (double)var4;
+        Vec3 var13 = new Vec3(var7, var9, var11);
+        float var14 = MathHelper.cos(-var6 * 0.017453292F - (float)Math.PI);
+        float var15 = MathHelper.sin(-var6 * 0.017453292F - (float)Math.PI);
+        float var16 = -MathHelper.cos(-var5 * 0.017453292F);
+        float var17 = MathHelper.sin(-var5 * 0.017453292F);
+        float var18 = var15 * var16;
+        float var20 = var14 * var16;
+        double var21 = 5.0D;
+        Vec3 var23 = var13.addVector((double)var18 * var21, (double)var17 * var21, (double)var20 * var21);
+        MovingObjectPosition var24 = worldIn.rayTraceBlocks(var13, var23, true);
 
-        if (movingobjectposition == null)
+        if (var24 == null)
         {
             return itemStackIn;
         }
         else
         {
-            Vec3 vec32 = playerIn.getLook(f);
-            boolean flag = false;
-            float f9 = 1.0F;
-            List<Entity> list = worldIn.getEntitiesWithinAABBExcludingEntity(playerIn, playerIn.getEntityBoundingBox().addCoord(vec32.xCoord * d3, vec32.yCoord * d3, vec32.zCoord * d3).expand((double)f9, (double)f9, (double)f9));
+            Vec3 var25 = playerIn.getLook(var4);
+            boolean var26 = false;
+            float var27 = 1.0F;
+            List var28 = worldIn.getEntitiesWithinAABBExcludingEntity(playerIn, playerIn.getEntityBoundingBox().addCoord(var25.xCoord * var21, var25.yCoord * var21, var25.zCoord * var21).expand((double)var27, (double)var27, (double)var27));
 
-            for (int i = 0; i < list.size(); ++i)
+            for (int var29 = 0; var29 < var28.size(); ++var29)
             {
-                Entity entity = (Entity)list.get(i);
+                Entity var30 = (Entity)var28.get(var29);
 
-                if (entity.canBeCollidedWith())
+                if (var30.canBeCollidedWith())
                 {
-                    float f10 = entity.getCollisionBorderSize();
-                    AxisAlignedBB axisalignedbb = entity.getEntityBoundingBox().expand((double)f10, (double)f10, (double)f10);
+                    float var31 = var30.getCollisionBorderSize();
+                    AxisAlignedBB var32 = var30.getEntityBoundingBox().expand((double)var31, (double)var31, (double)var31);
 
-                    if (axisalignedbb.isVecInside(vec3))
+                    if (var32.isVecInside(var13))
                     {
-                        flag = true;
+                        var26 = true;
                     }
                 }
             }
 
-            if (flag)
+            if (var26)
             {
                 return itemStackIn;
             }
             else
             {
-                if (movingobjectposition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
+                if (var24.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
                 {
-                    BlockPos blockpos = movingobjectposition.getBlockPos();
+                    BlockPos var33 = var24.func_178782_a();
 
-                    if (worldIn.getBlockState(blockpos).getBlock() == Blocks.snow_layer)
+                    if (worldIn.getBlockState(var33).getBlock() == Blocks.snow_layer)
                     {
-                        blockpos = blockpos.down();
+                        var33 = var33.offsetDown();
                     }
 
-                    EntityBoat entityboat = new EntityBoat(worldIn, (double)((float)blockpos.getX() + 0.5F), (double)((float)blockpos.getY() + 1.0F), (double)((float)blockpos.getZ() + 0.5F));
-                    entityboat.rotationYaw = (float)(((MathHelper.floor_double((double)(playerIn.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3) - 1) * 90);
+                    EntityBoat var34 = new EntityBoat(worldIn, (double)((float)var33.getX() + 0.5F), (double)((float)var33.getY() + 1.0F), (double)((float)var33.getZ() + 0.5F));
+                    var34.rotationYaw = (float)(((MathHelper.floor_double((double)(playerIn.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3) - 1) * 90);
 
-                    if (!worldIn.getCollidingBoundingBoxes(entityboat, entityboat.getEntityBoundingBox().expand(-0.1D, -0.1D, -0.1D)).isEmpty())
+                    if (!worldIn.getCollidingBoundingBoxes(var34, var34.getEntityBoundingBox().expand(-0.1D, -0.1D, -0.1D)).isEmpty())
                     {
                         return itemStackIn;
                     }
 
                     if (!worldIn.isRemote)
                     {
-                        worldIn.spawnEntityInWorld(entityboat);
+                        worldIn.spawnEntityInWorld(var34);
                     }
 
                     if (!playerIn.capabilities.isCreativeMode)

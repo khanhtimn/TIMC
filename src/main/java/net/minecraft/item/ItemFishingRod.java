@@ -8,6 +8,8 @@ import net.minecraft.world.World;
 
 public class ItemFishingRod extends Item
 {
+    
+
     public ItemFishingRod()
     {
         this.setMaxDamage(64);
@@ -39,8 +41,8 @@ public class ItemFishingRod extends Item
     {
         if (playerIn.fishEntity != null)
         {
-            int i = playerIn.fishEntity.handleHookRetraction();
-            itemStackIn.damageItem(i, playerIn);
+            int var4 = playerIn.fishEntity.handleHookRetraction();
+            itemStackIn.damageItem(var4, playerIn);
             playerIn.swingItem();
         }
         else

@@ -1,18 +1,19 @@
 package net.minecraft.client.resources;
 
-public class Language implements Comparable<Language>
+public class Language implements Comparable
 {
     private final String languageCode;
     private final String region;
     private final String name;
     private final boolean bidirectional;
+    
 
-    public Language(String languageCodeIn, String regionIn, String nameIn, boolean bidirectionalIn)
+    public Language(String p_i1303_1_, String p_i1303_2_, String p_i1303_3_, boolean p_i1303_4_)
     {
-        this.languageCode = languageCodeIn;
-        this.region = regionIn;
-        this.name = nameIn;
-        this.bidirectional = bidirectionalIn;
+        this.languageCode = p_i1303_1_;
+        this.region = p_i1303_2_;
+        this.name = p_i1303_3_;
+        this.bidirectional = p_i1303_4_;
     }
 
     public String getLanguageCode()
@@ -43,5 +44,10 @@ public class Language implements Comparable<Language>
     public int compareTo(Language p_compareTo_1_)
     {
         return this.languageCode.compareTo(p_compareTo_1_.languageCode);
+    }
+
+    public int compareTo(Object p_compareTo_1_)
+    {
+        return this.compareTo((Language)p_compareTo_1_);
     }
 }

@@ -6,10 +6,11 @@ import net.minecraft.realms.RealmsScrolledSelectionList;
 public class GuiSlotRealmsProxy extends GuiSlot
 {
     private final RealmsScrolledSelectionList selectionList;
+    
 
-    public GuiSlotRealmsProxy(RealmsScrolledSelectionList selectionListIn, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn)
+    public GuiSlotRealmsProxy(RealmsScrolledSelectionList selectionListIn, int p_i1085_2_, int p_i1085_3_, int p_i1085_4_, int p_i1085_5_, int p_i1085_6_)
     {
-        super(Minecraft.getMinecraft(), widthIn, heightIn, topIn, bottomIn, slotHeightIn);
+        super(Minecraft.getMinecraft(), p_i1085_2_, p_i1085_3_, p_i1085_4_, p_i1085_5_, p_i1085_6_);
         this.selectionList = selectionListIn;
     }
 
@@ -39,22 +40,22 @@ public class GuiSlotRealmsProxy extends GuiSlot
         this.selectionList.renderBackground();
     }
 
-    protected void drawSlot(int entryID, int p_180791_2_, int p_180791_3_, int p_180791_4_, int mouseXIn, int mouseYIn)
+    protected void drawSlot(int p_180791_1_, int p_180791_2_, int p_180791_3_, int p_180791_4_, int p_180791_5_, int p_180791_6_)
     {
-        this.selectionList.renderItem(entryID, p_180791_2_, p_180791_3_, p_180791_4_, mouseXIn, mouseYIn);
+        this.selectionList.renderItem(p_180791_1_, p_180791_2_, p_180791_3_, p_180791_4_, p_180791_5_, p_180791_6_);
     }
 
-    public int getWidth()
+    public int func_154338_k()
     {
         return super.width;
     }
 
-    public int getMouseY()
+    public int func_154339_l()
     {
         return super.mouseY;
     }
 
-    public int getMouseX()
+    public int func_154337_m()
     {
         return super.mouseX;
     }
@@ -72,8 +73,8 @@ public class GuiSlotRealmsProxy extends GuiSlot
         return this.selectionList.getScrollbarPosition();
     }
 
-    public void handleMouseInput()
+    public void func_178039_p()
     {
-        super.handleMouseInput();
+        super.func_178039_p();
     }
 }

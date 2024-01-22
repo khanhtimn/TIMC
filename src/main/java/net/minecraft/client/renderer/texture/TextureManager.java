@@ -3,7 +3,6 @@ package net.minecraft.client.renderer.texture;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -13,74 +12,59 @@ import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
-import net.minecraft.src.Config;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.ResourceLocation;
-import net.optifine.CustomGuis;
-import net.optifine.EmissiveTextures;
-import net.optifine.RandomEntities;
-import net.optifine.shaders.ShadersTex;
+import optifine.Config;
+import optifine.RandomMobs;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import shadersmod.client.ShadersTex;
 
 public class TextureManager implements ITickable, IResourceManagerReloadListener
 {
     private static final Logger logger = LogManager.getLogger();
-    private final Map<ResourceLocation, ITextureObject> mapTextureObjects = Maps.<ResourceLocation, ITextureObject>newHashMap();
-    private final List<ITickable> listTickables = Lists.<ITickable>newArrayList();
-    private final Map<String, Integer> mapTextureCounters = Maps.<String, Integer>newHashMap();
+    private final Map mapTextureObjects = Maps.newHashMap();
+    private final List listTickables = Lists.newArrayList();
+    private final Map mapTextureCounters = Maps.newHashMap();
     private IResourceManager theResourceManager;
-    private ITextureObject boundTexture;
-    private ResourceLocation boundTextureLocation;
+    
 
-    public TextureManager(IResourceManager resourceManager)
+    public TextureManager(IResourceManager p_i1284_1_)
     {
-        this.theResourceManager = resourceManager;
+        this.theResourceManager = p_i1284_1_;
     }
 
     public void bindTexture(ResourceLocation resource)
     {
-        if (Config.isRandomEntities())
+        if (Config.isRandomMobs())
         {
-            resource = RandomEntities.getTextureLocation(resource);
+            resource = RandomMobs.getTextureLocation(resource);
         }
 
-        if (Config.isCustomGuis())
-        {
-            resource = CustomGuis.getTextureLocation(resource);
-        }
+        Object var2 = (ITextureObject)this.mapTextureObjects.get(resource);
 
-        ITextureObject itextureobject = (ITextureObject)this.mapTextureObjects.get(resource);
-
-        if (EmissiveTextures.isActive())
+        if (var2 == null)
         {
-            itextureobject = EmissiveTextures.getEmissiveTexture(itextureobject, this.mapTextureObjects);
-        }
-
-        if (itextureobject == null)
-        {
-            itextureobject = new SimpleTexture(resource);
-            this.loadTexture(resource, itextureobject);
+            var2 = new SimpleTexture(resource);
+            this.loadTexture(resource, (ITextureObject)var2);
         }
 
         if (Config.isShaders())
         {
-            ShadersTex.bindTexture(itextureobject);
+            ShadersTex.bindTexture((ITextureObject)var2);
         }
         else
         {
-            TextureUtil.bindTexture(itextureobject.getGlTextureId());
+            TextureUtil.bindTexture(((ITextureObject)var2).getGlTextureId());
         }
-
-        this.boundTexture = itextureobject;
-        this.boundTextureLocation = resource;
     }
 
-    public boolean loadTickableTexture(ResourceLocation textureLocation, ITickableTextureObject textureObj)
+    public boolean loadTickableTexture(ResourceLocation p_110580_1_, ITickableTextureObject p_110580_2_)
     {
-        if (this.loadTexture(textureLocation, textureObj))
+        if (this.loadTexture(p_110580_1_, p_110580_2_))
         {
-            this.listTickables.add(textureObj);
+            this.listTickables.add(p_110580_2_);
             return true;
         }
         else
@@ -89,86 +73,89 @@ public class TextureManager implements ITickable, IResourceManagerReloadListener
         }
     }
 
-    public boolean loadTexture(ResourceLocation textureLocation, ITextureObject textureObj)
+    public boolean loadTexture(ResourceLocation p_110579_1_, final ITextureObject p_110579_2_)
     {
-        boolean flag = true;
+        boolean var3 = true;
+        Object p_110579_2_2 = p_110579_2_;
 
         try
         {
-            ((ITextureObject)textureObj).loadTexture(this.theResourceManager);
+            p_110579_2_.loadTexture(this.theResourceManager);
         }
-        catch (IOException ioexception)
+        catch (IOException var8)
         {
-            logger.warn((String)("Failed to load texture: " + textureLocation), (Throwable)ioexception);
-            textureObj = TextureUtil.missingTexture;
-            this.mapTextureObjects.put(textureLocation, (ITextureObject)textureObj);
-            flag = false;
+            logger.warn("Failed to load texture: " + p_110579_1_, var8);
+            p_110579_2_2 = TextureUtil.missingTexture;
+            this.mapTextureObjects.put(p_110579_1_, p_110579_2_2);
+            var3 = false;
         }
-        catch (Throwable throwable)
+        catch (Throwable var9)
         {
-            final ITextureObject textureObjf = textureObj;
-            CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Registering texture");
-            CrashReportCategory crashreportcategory = crashreport.makeCategory("Resource location being registered");
-            crashreportcategory.addCrashSection("Resource location", textureLocation);
-            crashreportcategory.addCrashSectionCallable("Texture object class", new Callable<String>()
+            CrashReport var5 = CrashReport.makeCrashReport(var9, "Registering texture");
+            CrashReportCategory var6 = var5.makeCategory("Resource location being registered");
+            var6.addCrashSection("Resource location", p_110579_1_);
+            var6.addCrashSectionCallable("Texture object class", new Callable()
             {
-                public String call() throws Exception
+                
+                public String call()
                 {
-                    return textureObjf.getClass().getName();
+                    return p_110579_2_.getClass().getName();
                 }
             });
-            throw new ReportedException(crashreport);
+            throw new ReportedException(var5);
         }
 
-        this.mapTextureObjects.put(textureLocation, (ITextureObject)textureObj);
-        return flag;
+        this.mapTextureObjects.put(p_110579_1_, p_110579_2_2);
+        return var3;
     }
 
-    public ITextureObject getTexture(ResourceLocation textureLocation)
+    public ITextureObject getTexture(ResourceLocation p_110581_1_)
     {
-        return (ITextureObject)this.mapTextureObjects.get(textureLocation);
+        return (ITextureObject)this.mapTextureObjects.get(p_110581_1_);
     }
 
-    public ResourceLocation getDynamicTextureLocation(String name, DynamicTexture texture)
+    public ResourceLocation getDynamicTextureLocation(String p_110578_1_, DynamicTexture p_110578_2_)
     {
-        if (name.equals("logo"))
+        if (p_110578_1_.equals("logo"))
         {
-            texture = Config.getMojangLogoTexture(texture);
+            p_110578_2_ = Config.getMojangLogoTexture(p_110578_2_);
         }
 
-        Integer integer = (Integer)this.mapTextureCounters.get(name);
+        Integer var3 = (Integer)this.mapTextureCounters.get(p_110578_1_);
 
-        if (integer == null)
+        if (var3 == null)
         {
-            integer = Integer.valueOf(1);
+            var3 = Integer.valueOf(1);
         }
         else
         {
-            integer = Integer.valueOf(integer.intValue() + 1);
+            var3 = Integer.valueOf(var3.intValue() + 1);
         }
 
-        this.mapTextureCounters.put(name, integer);
-        ResourceLocation resourcelocation = new ResourceLocation(String.format("dynamic/%s_%d", new Object[] {name, integer}));
-        this.loadTexture(resourcelocation, texture);
-        return resourcelocation;
+        this.mapTextureCounters.put(p_110578_1_, var3);
+        ResourceLocation var4 = new ResourceLocation(String.format("dynamic/%s_%d", new Object[] {p_110578_1_, var3}));
+        this.loadTexture(var4, p_110578_2_);
+        return var4;
     }
 
     public void tick()
     {
-        for (ITickable itickable : this.listTickables)
+        Iterator var1 = this.listTickables.iterator();
+
+        while (var1.hasNext())
         {
-            itickable.tick();
+            ITickable var2 = (ITickable)var1.next();
+            var2.tick();
         }
     }
 
-    public void deleteTexture(ResourceLocation textureLocation)
+    public void deleteTexture(ResourceLocation p_147645_1_)
     {
-        ITextureObject itextureobject = this.getTexture(textureLocation);
+        ITextureObject var2 = this.getTexture(p_147645_1_);
 
-        if (itextureobject != null)
+        if (var2 != null)
         {
-            this.mapTextureObjects.remove(textureLocation);
-            TextureUtil.deleteTexture(itextureobject.getGlTextureId());
+            TextureUtil.deleteTexture(var2.getGlTextureId());
         }
     }
 
@@ -176,58 +163,32 @@ public class TextureManager implements ITickable, IResourceManagerReloadListener
     {
         Config.dbg("*** Reloading textures ***");
         Config.log("Resource packs: " + Config.getResourcePackNames());
-        Iterator iterator = this.mapTextureObjects.keySet().iterator();
+        Iterator it = this.mapTextureObjects.keySet().iterator();
 
-        while (iterator.hasNext())
+        while (it.hasNext())
         {
-            ResourceLocation resourcelocation = (ResourceLocation)iterator.next();
-            String s = resourcelocation.getResourcePath();
+            ResourceLocation var2 = (ResourceLocation)it.next();
 
-            if (s.startsWith("mcpatcher/") || s.startsWith("optifine/") || EmissiveTextures.isEmissive(resourcelocation))
+            if (var2.getResourcePath().startsWith("mcpatcher/"))
             {
-                ITextureObject itextureobject = (ITextureObject)this.mapTextureObjects.get(resourcelocation);
+                ITextureObject var3 = (ITextureObject)this.mapTextureObjects.get(var2);
 
-                if (itextureobject instanceof AbstractTexture)
+                if (var3 instanceof AbstractTexture)
                 {
-                    AbstractTexture abstracttexture = (AbstractTexture)itextureobject;
-                    abstracttexture.deleteGlTexture();
+                    AbstractTexture at = (AbstractTexture)var3;
+                    at.deleteGlTexture();
                 }
 
-                iterator.remove();
+                it.remove();
             }
         }
 
-        EmissiveTextures.update();
+        Iterator var21 = this.mapTextureObjects.entrySet().iterator();
 
-        for (Object entry0 : new HashSet(this.mapTextureObjects.entrySet()))
+        while (var21.hasNext())
         {
-            Entry<ResourceLocation, ITextureObject> entry = (Entry<ResourceLocation, ITextureObject>) entry0;
-            this.loadTexture((ResourceLocation)entry.getKey(), (ITextureObject)entry.getValue());
+            Entry var31 = (Entry)var21.next();
+            this.loadTexture((ResourceLocation)var31.getKey(), (ITextureObject)var31.getValue());
         }
-    }
-
-    public void reloadBannerTextures()
-    {
-        for (Object entry0 : new HashSet(this.mapTextureObjects.entrySet()))
-        {
-            Entry<ResourceLocation, ITextureObject> entry = (Entry<ResourceLocation, ITextureObject>) entry0;
-            ResourceLocation resourcelocation = (ResourceLocation)entry.getKey();
-            ITextureObject itextureobject = (ITextureObject)entry.getValue();
-
-            if (itextureobject instanceof LayeredColorMaskTexture)
-            {
-                this.loadTexture(resourcelocation, itextureobject);
-            }
-        }
-    }
-
-    public ITextureObject getBoundTexture()
-    {
-        return this.boundTexture;
-    }
-
-    public ResourceLocation getBoundTextureLocation()
-    {
-        return this.boundTextureLocation;
     }
 }

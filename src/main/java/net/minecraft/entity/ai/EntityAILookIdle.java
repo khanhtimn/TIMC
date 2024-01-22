@@ -17,10 +17,11 @@ public class EntityAILookIdle extends EntityAIBase
      * A decrementing tick that stops the entity from being idle once it reaches 0.
      */
     private int idleTime;
+    
 
-    public EntityAILookIdle(EntityLiving entitylivingIn)
+    public EntityAILookIdle(EntityLiving p_i1647_1_)
     {
-        this.idleEntity = entitylivingIn;
+        this.idleEntity = p_i1647_1_;
         this.setMutexBits(3);
     }
 
@@ -45,9 +46,9 @@ public class EntityAILookIdle extends EntityAIBase
      */
     public void startExecuting()
     {
-        double d0 = (Math.PI * 2D) * this.idleEntity.getRNG().nextDouble();
-        this.lookX = Math.cos(d0);
-        this.lookZ = Math.sin(d0);
+        double var1 = (Math.PI * 2D) * this.idleEntity.getRNG().nextDouble();
+        this.lookX = Math.cos(var1);
+        this.lookZ = Math.sin(var1);
         this.idleTime = 20 + this.idleEntity.getRNG().nextInt(20);
     }
 

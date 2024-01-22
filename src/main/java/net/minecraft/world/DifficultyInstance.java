@@ -4,48 +4,49 @@ import net.minecraft.util.MathHelper;
 
 public class DifficultyInstance
 {
-    private final EnumDifficulty worldDifficulty;
-    private final float additionalDifficulty;
+    private final EnumDifficulty field_180172_a;
+    private final float field_180171_b;
+    
 
-    public DifficultyInstance(EnumDifficulty worldDifficulty, long worldTime, long chunkInhabitedTime, float moonPhaseFactor)
+    public DifficultyInstance(EnumDifficulty p_i45904_1_, long p_i45904_2_, long p_i45904_4_, float p_i45904_6_)
     {
-        this.worldDifficulty = worldDifficulty;
-        this.additionalDifficulty = this.calculateAdditionalDifficulty(worldDifficulty, worldTime, chunkInhabitedTime, moonPhaseFactor);
+        this.field_180172_a = p_i45904_1_;
+        this.field_180171_b = this.func_180169_a(p_i45904_1_, p_i45904_2_, p_i45904_4_, p_i45904_6_);
     }
 
-    public float getAdditionalDifficulty()
+    public float func_180168_b()
     {
-        return this.additionalDifficulty;
+        return this.field_180171_b;
     }
 
-    public float getClampedAdditionalDifficulty()
+    public float func_180170_c()
     {
-        return this.additionalDifficulty < 2.0F ? 0.0F : (this.additionalDifficulty > 4.0F ? 1.0F : (this.additionalDifficulty - 2.0F) / 2.0F);
+        return this.field_180171_b < 2.0F ? 0.0F : (this.field_180171_b > 4.0F ? 1.0F : (this.field_180171_b - 2.0F) / 2.0F);
     }
 
-    private float calculateAdditionalDifficulty(EnumDifficulty difficulty, long worldTime, long chunkInhabitedTime, float moonPhaseFactor)
+    private float func_180169_a(EnumDifficulty p_180169_1_, long p_180169_2_, long p_180169_4_, float p_180169_6_)
     {
-        if (difficulty == EnumDifficulty.PEACEFUL)
+        if (p_180169_1_ == EnumDifficulty.PEACEFUL)
         {
             return 0.0F;
         }
         else
         {
-            boolean flag = difficulty == EnumDifficulty.HARD;
-            float f = 0.75F;
-            float f1 = MathHelper.clamp_float(((float)worldTime + -72000.0F) / 1440000.0F, 0.0F, 1.0F) * 0.25F;
-            f = f + f1;
-            float f2 = 0.0F;
-            f2 = f2 + MathHelper.clamp_float((float)chunkInhabitedTime / 3600000.0F, 0.0F, 1.0F) * (flag ? 1.0F : 0.75F);
-            f2 = f2 + MathHelper.clamp_float(moonPhaseFactor * 0.25F, 0.0F, f1);
+            boolean var7 = p_180169_1_ == EnumDifficulty.HARD;
+            float var8 = 0.75F;
+            float var9 = MathHelper.clamp_float(((float)p_180169_2_ + -72000.0F) / 1440000.0F, 0.0F, 1.0F) * 0.25F;
+            var8 += var9;
+            float var10 = 0.0F;
+            var10 += MathHelper.clamp_float((float)p_180169_4_ / 3600000.0F, 0.0F, 1.0F) * (var7 ? 1.0F : 0.75F);
+            var10 += MathHelper.clamp_float(p_180169_6_ * 0.25F, 0.0F, var9);
 
-            if (difficulty == EnumDifficulty.EASY)
+            if (p_180169_1_ == EnumDifficulty.EASY)
             {
-                f2 *= 0.5F;
+                var10 *= 0.5F;
             }
 
-            f = f + f2;
-            return (float)difficulty.getDifficultyId() * f;
+            var8 += var10;
+            return (float)p_180169_1_.getDifficultyId() * var8;
         }
     }
 }

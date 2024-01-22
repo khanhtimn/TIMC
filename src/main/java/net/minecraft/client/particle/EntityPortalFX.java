@@ -10,19 +10,20 @@ public class EntityPortalFX extends EntityFX
     private double portalPosX;
     private double portalPosY;
     private double portalPosZ;
+    
 
-    protected EntityPortalFX(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn)
+    protected EntityPortalFX(World worldIn, double p_i46351_2_, double p_i46351_4_, double p_i46351_6_, double p_i46351_8_, double p_i46351_10_, double p_i46351_12_)
     {
-        super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
-        this.motionX = xSpeedIn;
-        this.motionY = ySpeedIn;
-        this.motionZ = zSpeedIn;
-        this.portalPosX = this.posX = xCoordIn;
-        this.portalPosY = this.posY = yCoordIn;
-        this.portalPosZ = this.posZ = zCoordIn;
-        float f = this.rand.nextFloat() * 0.6F + 0.4F;
+        super(worldIn, p_i46351_2_, p_i46351_4_, p_i46351_6_, p_i46351_8_, p_i46351_10_, p_i46351_12_);
+        this.motionX = p_i46351_8_;
+        this.motionY = p_i46351_10_;
+        this.motionZ = p_i46351_12_;
+        this.portalPosX = this.posX = p_i46351_2_;
+        this.portalPosY = this.posY = p_i46351_4_;
+        this.portalPosZ = this.posZ = p_i46351_6_;
+        float var14 = this.rand.nextFloat() * 0.6F + 0.4F;
         this.portalParticleScale = this.particleScale = this.rand.nextFloat() * 0.2F + 0.5F;
-        this.particleRed = this.particleGreen = this.particleBlue = 1.0F * f;
+        this.particleRed = this.particleGreen = this.particleBlue = 1.0F * var14;
         this.particleGreen *= 0.3F;
         this.particleRed *= 0.9F;
         this.particleMaxAge = (int)(Math.random() * 10.0D) + 40;
@@ -30,46 +31,43 @@ public class EntityPortalFX extends EntityFX
         this.setParticleTextureIndex((int)(Math.random() * 8.0D));
     }
 
-    /**
-     * Renders the particle
-     */
-    public void renderParticle(WorldRenderer worldRendererIn, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ)
+    public void func_180434_a(WorldRenderer p_180434_1_, Entity p_180434_2_, float p_180434_3_, float p_180434_4_, float p_180434_5_, float p_180434_6_, float p_180434_7_, float p_180434_8_)
     {
-        float f = ((float)this.particleAge + partialTicks) / (float)this.particleMaxAge;
-        f = 1.0F - f;
-        f = f * f;
-        f = 1.0F - f;
-        this.particleScale = this.portalParticleScale * f;
-        super.renderParticle(worldRendererIn, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+        float var9 = ((float)this.particleAge + p_180434_3_) / (float)this.particleMaxAge;
+        var9 = 1.0F - var9;
+        var9 *= var9;
+        var9 = 1.0F - var9;
+        this.particleScale = this.portalParticleScale * var9;
+        super.func_180434_a(p_180434_1_, p_180434_2_, p_180434_3_, p_180434_4_, p_180434_5_, p_180434_6_, p_180434_7_, p_180434_8_);
     }
 
-    public int getBrightnessForRender(float partialTicks)
+    public int getBrightnessForRender(float p_70070_1_)
     {
-        int i = super.getBrightnessForRender(partialTicks);
-        float f = (float)this.particleAge / (float)this.particleMaxAge;
-        f = f * f;
-        f = f * f;
-        int j = i & 255;
-        int k = i >> 16 & 255;
-        k = k + (int)(f * 15.0F * 16.0F);
+        int var2 = super.getBrightnessForRender(p_70070_1_);
+        float var3 = (float)this.particleAge / (float)this.particleMaxAge;
+        var3 *= var3;
+        var3 *= var3;
+        int var4 = var2 & 255;
+        int var5 = var2 >> 16 & 255;
+        var5 += (int)(var3 * 15.0F * 16.0F);
 
-        if (k > 240)
+        if (var5 > 240)
         {
-            k = 240;
+            var5 = 240;
         }
 
-        return j | k << 16;
+        return var4 | var5 << 16;
     }
 
     /**
      * Gets how bright this entity is.
      */
-    public float getBrightness(float partialTicks)
+    public float getBrightness(float p_70013_1_)
     {
-        float f = super.getBrightness(partialTicks);
-        float f1 = (float)this.particleAge / (float)this.particleMaxAge;
-        f1 = f1 * f1 * f1 * f1;
-        return f * (1.0F - f1) + f1;
+        float var2 = super.getBrightness(p_70013_1_);
+        float var3 = (float)this.particleAge / (float)this.particleMaxAge;
+        var3 = var3 * var3 * var3 * var3;
+        return var2 * (1.0F - var3) + var3;
     }
 
     /**
@@ -80,12 +78,13 @@ public class EntityPortalFX extends EntityFX
         this.prevPosX = this.posX;
         this.prevPosY = this.posY;
         this.prevPosZ = this.posZ;
-        float f = (float)this.particleAge / (float)this.particleMaxAge;
-        f = -f + f * f * 2.0F;
-        f = 1.0F - f;
-        this.posX = this.portalPosX + this.motionX * (double)f;
-        this.posY = this.portalPosY + this.motionY * (double)f + (double)(1.0F - f);
-        this.posZ = this.portalPosZ + this.motionZ * (double)f;
+        float var1 = (float)this.particleAge / (float)this.particleMaxAge;
+        float var2 = var1;
+        var1 = -var1 + var1 * var1 * 2.0F;
+        var1 = 1.0F - var1;
+        this.posX = this.portalPosX + this.motionX * (double)var1;
+        this.posY = this.portalPosY + this.motionY * (double)var1 + (double)(1.0F - var2);
+        this.posZ = this.portalPosZ + this.motionZ * (double)var1;
 
         if (this.particleAge++ >= this.particleMaxAge)
         {
@@ -95,9 +94,11 @@ public class EntityPortalFX extends EntityFX
 
     public static class Factory implements IParticleFactory
     {
-        public EntityFX getEntityFX(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn, int... p_178902_15_)
+        
+
+        public EntityFX func_178902_a(int p_178902_1_, World worldIn, double p_178902_3_, double p_178902_5_, double p_178902_7_, double p_178902_9_, double p_178902_11_, double p_178902_13_, int ... p_178902_15_)
         {
-            return new EntityPortalFX(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
+            return new EntityPortalFX(worldIn, p_178902_3_, p_178902_5_, p_178902_7_, p_178902_9_, p_178902_11_, p_178902_13_);
         }
     }
 }

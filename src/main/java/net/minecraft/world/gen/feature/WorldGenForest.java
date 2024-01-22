@@ -2,121 +2,119 @@ package net.minecraft.world.gen.feature;
 
 import java.util.Random;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockOldLeaf;
-import net.minecraft.block.BlockOldLog;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
 public class WorldGenForest extends WorldGenAbstractTree
 {
-    private static final IBlockState field_181629_a = Blocks.log.getDefaultState().withProperty(BlockOldLog.VARIANT, BlockPlanks.EnumType.BIRCH);
-    private static final IBlockState field_181630_b = Blocks.leaves.getDefaultState().withProperty(BlockOldLeaf.VARIANT, BlockPlanks.EnumType.BIRCH).withProperty(BlockOldLeaf.CHECK_DECAY, Boolean.valueOf(false));
-    private boolean useExtraRandomHeight;
+    private boolean field_150531_a;
+    
 
     public WorldGenForest(boolean p_i45449_1_, boolean p_i45449_2_)
     {
         super(p_i45449_1_);
-        this.useExtraRandomHeight = p_i45449_2_;
+        this.field_150531_a = p_i45449_2_;
     }
 
-    public boolean generate(World worldIn, Random rand, BlockPos position)
+    public boolean generate(World worldIn, Random p_180709_2_, BlockPos p_180709_3_)
     {
-        int i = rand.nextInt(3) + 5;
+        int var4 = p_180709_2_.nextInt(3) + 5;
 
-        if (this.useExtraRandomHeight)
+        if (this.field_150531_a)
         {
-            i += rand.nextInt(7);
+            var4 += p_180709_2_.nextInt(7);
         }
 
-        boolean flag = true;
+        boolean var5 = true;
 
-        if (position.getY() >= 1 && position.getY() + i + 1 <= 256)
+        if (p_180709_3_.getY() >= 1 && p_180709_3_.getY() + var4 + 1 <= 256)
         {
-            for (int j = position.getY(); j <= position.getY() + 1 + i; ++j)
+            int var8;
+            int var9;
+
+            for (int var6 = p_180709_3_.getY(); var6 <= p_180709_3_.getY() + 1 + var4; ++var6)
             {
-                int k = 1;
+                byte var7 = 1;
 
-                if (j == position.getY())
+                if (var6 == p_180709_3_.getY())
                 {
-                    k = 0;
+                    var7 = 0;
                 }
 
-                if (j >= position.getY() + 1 + i - 2)
+                if (var6 >= p_180709_3_.getY() + 1 + var4 - 2)
                 {
-                    k = 2;
+                    var7 = 2;
                 }
 
-                BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
-
-                for (int l = position.getX() - k; l <= position.getX() + k && flag; ++l)
+                for (var8 = p_180709_3_.getX() - var7; var8 <= p_180709_3_.getX() + var7 && var5; ++var8)
                 {
-                    for (int i1 = position.getZ() - k; i1 <= position.getZ() + k && flag; ++i1)
+                    for (var9 = p_180709_3_.getZ() - var7; var9 <= p_180709_3_.getZ() + var7 && var5; ++var9)
                     {
-                        if (j >= 0 && j < 256)
+                        if (var6 >= 0 && var6 < 256)
                         {
-                            if (!this.func_150523_a(worldIn.getBlockState(blockpos$mutableblockpos.set(l, j, i1)).getBlock()))
+                            if (!this.func_150523_a(worldIn.getBlockState(new BlockPos(var8, var6, var9)).getBlock()))
                             {
-                                flag = false;
+                                var5 = false;
                             }
                         }
                         else
                         {
-                            flag = false;
+                            var5 = false;
                         }
                     }
                 }
             }
 
-            if (!flag)
+            if (!var5)
             {
                 return false;
             }
             else
             {
-                Block block1 = worldIn.getBlockState(position.down()).getBlock();
+                Block var16 = worldIn.getBlockState(p_180709_3_.offsetDown()).getBlock();
 
-                if ((block1 == Blocks.grass || block1 == Blocks.dirt || block1 == Blocks.farmland) && position.getY() < 256 - i - 1)
+                if ((var16 == Blocks.grass || var16 == Blocks.dirt || var16 == Blocks.farmland) && p_180709_3_.getY() < 256 - var4 - 1)
                 {
-                    this.func_175921_a(worldIn, position.down());
+                    this.func_175921_a(worldIn, p_180709_3_.offsetDown());
+                    int var17;
 
-                    for (int i2 = position.getY() - 3 + i; i2 <= position.getY() + i; ++i2)
+                    for (var17 = p_180709_3_.getY() - 3 + var4; var17 <= p_180709_3_.getY() + var4; ++var17)
                     {
-                        int k2 = i2 - (position.getY() + i);
-                        int l2 = 1 - k2 / 2;
+                        var8 = var17 - (p_180709_3_.getY() + var4);
+                        var9 = 1 - var8 / 2;
 
-                        for (int i3 = position.getX() - l2; i3 <= position.getX() + l2; ++i3)
+                        for (int var10 = p_180709_3_.getX() - var9; var10 <= p_180709_3_.getX() + var9; ++var10)
                         {
-                            int j1 = i3 - position.getX();
+                            int var11 = var10 - p_180709_3_.getX();
 
-                            for (int k1 = position.getZ() - l2; k1 <= position.getZ() + l2; ++k1)
+                            for (int var12 = p_180709_3_.getZ() - var9; var12 <= p_180709_3_.getZ() + var9; ++var12)
                             {
-                                int l1 = k1 - position.getZ();
+                                int var13 = var12 - p_180709_3_.getZ();
 
-                                if (Math.abs(j1) != l2 || Math.abs(l1) != l2 || rand.nextInt(2) != 0 && k2 != 0)
+                                if (Math.abs(var11) != var9 || Math.abs(var13) != var9 || p_180709_2_.nextInt(2) != 0 && var8 != 0)
                                 {
-                                    BlockPos blockpos = new BlockPos(i3, i2, k1);
-                                    Block block = worldIn.getBlockState(blockpos).getBlock();
+                                    BlockPos var14 = new BlockPos(var10, var17, var12);
+                                    Block var15 = worldIn.getBlockState(var14).getBlock();
 
-                                    if (block.getMaterial() == Material.air || block.getMaterial() == Material.leaves)
+                                    if (var15.getMaterial() == Material.air || var15.getMaterial() == Material.leaves)
                                     {
-                                        this.setBlockAndNotifyAdequately(worldIn, blockpos, field_181630_b);
+                                        this.func_175905_a(worldIn, var14, Blocks.leaves, BlockPlanks.EnumType.BIRCH.func_176839_a());
                                     }
                                 }
                             }
                         }
                     }
 
-                    for (int j2 = 0; j2 < i; ++j2)
+                    for (var17 = 0; var17 < var4; ++var17)
                     {
-                        Block block2 = worldIn.getBlockState(position.up(j2)).getBlock();
+                        Block var18 = worldIn.getBlockState(p_180709_3_.offsetUp(var17)).getBlock();
 
-                        if (block2.getMaterial() == Material.air || block2.getMaterial() == Material.leaves)
+                        if (var18.getMaterial() == Material.air || var18.getMaterial() == Material.leaves)
                         {
-                            this.setBlockAndNotifyAdequately(worldIn, position.up(j2), field_181629_a);
+                            this.func_175905_a(worldIn, p_180709_3_.offsetUp(var17), Blocks.log, BlockPlanks.EnumType.BIRCH.func_176839_a());
                         }
                     }
 

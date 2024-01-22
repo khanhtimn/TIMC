@@ -14,24 +14,22 @@ import net.minecraft.world.World;
 
 public class EntityMinecartChest extends EntityMinecartContainer
 {
+    
+
     public EntityMinecartChest(World worldIn)
     {
         super(worldIn);
     }
 
-    public EntityMinecartChest(World worldIn, double x, double y, double z)
+    public EntityMinecartChest(World worldIn, double p_i1715_2_, double p_i1715_4_, double p_i1715_6_)
     {
-        super(worldIn, x, y, z);
+        super(worldIn, p_i1715_2_, p_i1715_4_, p_i1715_6_);
     }
 
-    public void killMinecart(DamageSource source)
+    public void killMinecart(DamageSource p_94095_1_)
     {
-        super.killMinecart(source);
-
-        if (this.worldObj.getGameRules().getBoolean("doEntityDrops"))
-        {
-            this.dropItemWithOffset(Item.getItemFromBlock(Blocks.chest), 1, 0.0F);
-        }
+        super.killMinecart(p_94095_1_);
+        this.dropItemWithOffset(Item.getItemFromBlock(Blocks.chest), 1, 0.0F);
     }
 
     /**
@@ -42,14 +40,14 @@ public class EntityMinecartChest extends EntityMinecartContainer
         return 27;
     }
 
-    public EntityMinecart.EnumMinecartType getMinecartType()
+    public EntityMinecart.EnumMinecartType func_180456_s()
     {
         return EntityMinecart.EnumMinecartType.CHEST;
     }
 
-    public IBlockState getDefaultDisplayTile()
+    public IBlockState func_180457_u()
     {
-        return Blocks.chest.getDefaultState().withProperty(BlockChest.FACING, EnumFacing.NORTH);
+        return Blocks.chest.getDefaultState().withProperty(BlockChest.FACING_PROP, EnumFacing.NORTH);
     }
 
     public int getDefaultDisplayTileOffset()

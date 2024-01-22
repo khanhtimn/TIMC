@@ -10,6 +10,8 @@ import net.minecraft.world.gen.ChunkProviderEnd;
 
 public class WorldProviderEnd extends WorldProvider
 {
+    
+
     /**
      * creates a new world chunk manager for WorldProvider
      */
@@ -31,7 +33,7 @@ public class WorldProviderEnd extends WorldProvider
     /**
      * Calculates the angle of sun and moon in the sky relative to a specified time (usually worldTime)
      */
-    public float calculateCelestialAngle(long worldTime, float partialTicks)
+    public float calculateCelestialAngle(long p_76563_1_, float p_76563_3_)
     {
         return 0.0F;
     }
@@ -39,7 +41,7 @@ public class WorldProviderEnd extends WorldProvider
     /**
      * Returns array with sunrise/sunset colors
      */
-    public float[] calcSunriseSunsetColors(float celestialAngle, float partialTicks)
+    public float[] calcSunriseSunsetColors(float p_76560_1_, float p_76560_2_)
     {
         return null;
     }
@@ -49,16 +51,16 @@ public class WorldProviderEnd extends WorldProvider
      */
     public Vec3 getFogColor(float p_76562_1_, float p_76562_2_)
     {
-        int i = 10518688;
-        float f = MathHelper.cos(p_76562_1_ * (float)Math.PI * 2.0F) * 2.0F + 0.5F;
-        f = MathHelper.clamp_float(f, 0.0F, 1.0F);
-        float f1 = (float)(i >> 16 & 255) / 255.0F;
-        float f2 = (float)(i >> 8 & 255) / 255.0F;
-        float f3 = (float)(i & 255) / 255.0F;
-        f1 = f1 * (f * 0.0F + 0.15F);
-        f2 = f2 * (f * 0.0F + 0.15F);
-        f3 = f3 * (f * 0.0F + 0.15F);
-        return new Vec3((double)f1, (double)f2, (double)f3);
+        int var3 = 10518688;
+        float var4 = MathHelper.cos(p_76562_1_ * (float)Math.PI * 2.0F) * 2.0F + 0.5F;
+        var4 = MathHelper.clamp_float(var4, 0.0F, 1.0F);
+        float var5 = (float)(var3 >> 16 & 255) / 255.0F;
+        float var6 = (float)(var3 >> 8 & 255) / 255.0F;
+        float var7 = (float)(var3 & 255) / 255.0F;
+        var5 *= var4 * 0.0F + 0.15F;
+        var6 *= var4 * 0.0F + 0.15F;
+        var7 *= var4 * 0.0F + 0.15F;
+        return new Vec3((double)var5, (double)var6, (double)var7);
     }
 
     public boolean isSkyColored()
@@ -98,7 +100,7 @@ public class WorldProviderEnd extends WorldProvider
         return this.worldObj.getGroundAboveSeaLevel(new BlockPos(x, 0, z)).getMaterial().blocksMovement();
     }
 
-    public BlockPos getSpawnCoordinate()
+    public BlockPos func_177496_h()
     {
         return new BlockPos(100, 50, 0);
     }
@@ -111,7 +113,7 @@ public class WorldProviderEnd extends WorldProvider
     /**
      * Returns true if the given X,Z coordinate should show environmental fog.
      */
-    public boolean doesXZShowFog(int x, int z)
+    public boolean doesXZShowFog(int p_76568_1_, int p_76568_2_)
     {
         return true;
     }

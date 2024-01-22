@@ -1,47 +1,51 @@
 package net.minecraft.client.renderer.entity.layers;
 
 import com.google.common.collect.Maps;
-import java.util.Map;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.src.Config;
 import net.minecraft.util.ResourceLocation;
-import net.optifine.CustomItems;
-import net.optifine.reflect.Reflector;
-import net.optifine.reflect.ReflectorForge;
-import net.optifine.shaders.Shaders;
-import net.optifine.shaders.ShadersRender;
+import optifine.Config;
+import optifine.CustomItems;
+import optifine.Reflector;
+import shadersmod.client.Shaders;
+import shadersmod.client.ShadersRender;
 
-public abstract class LayerArmorBase<T extends ModelBase> implements LayerRenderer<EntityLivingBase>
+import java.util.Map;
+
+public abstract class LayerArmorBase implements LayerRenderer
 {
-    protected static final ResourceLocation ENCHANTED_ITEM_GLINT_RES = new ResourceLocation("textures/misc/enchanted_item_glint.png");
-    protected T modelLeggings;
-    protected T modelArmor;
-    private final RendererLivingEntity<?> renderer;
-    private float alpha = 1.0F;
-    private float colorR = 1.0F;
-    private float colorG = 1.0F;
-    private float colorB = 1.0F;
-    private boolean skipRenderGlint;
-    private static final Map<String, ResourceLocation> ARMOR_TEXTURE_RES_MAP = Maps.<String, ResourceLocation>newHashMap();
+    protected static final ResourceLocation field_177188_b = new ResourceLocation("textures/misc/enchanted_item_glint.png");
+    protected ModelBase field_177189_c;
+    protected ModelBase field_177186_d;
+    private final RendererLivingEntity field_177190_a;
+    private float field_177187_e = 1.0F;
+    private float field_177184_f = 1.0F;
+    private float field_177185_g = 1.0F;
+    private float field_177192_h = 1.0F;
+    private boolean field_177193_i;
+    private static final Map field_177191_j = Maps.newHashMap();
+    
 
-    public LayerArmorBase(RendererLivingEntity<?> rendererIn)
+    public LayerArmorBase(RendererLivingEntity p_i46125_1_)
     {
-        this.renderer = rendererIn;
-        this.initArmor();
+        this.field_177190_a = p_i46125_1_;
+        this.func_177177_a();
     }
 
-    public void doRenderLayer(EntityLivingBase entitylivingbaseIn, float p_177141_2_, float p_177141_3_, float partialTicks, float p_177141_5_, float p_177141_6_, float p_177141_7_, float scale)
+    public void doRenderLayer(EntityLivingBase p_177141_1_, float p_177141_2_, float p_177141_3_, float p_177141_4_, float p_177141_5_, float p_177141_6_, float p_177141_7_, float p_177141_8_)
     {
-        this.renderLayer(entitylivingbaseIn, p_177141_2_, p_177141_3_, partialTicks, p_177141_5_, p_177141_6_, p_177141_7_, scale, 4);
-        this.renderLayer(entitylivingbaseIn, p_177141_2_, p_177141_3_, partialTicks, p_177141_5_, p_177141_6_, p_177141_7_, scale, 3);
-        this.renderLayer(entitylivingbaseIn, p_177141_2_, p_177141_3_, partialTicks, p_177141_5_, p_177141_6_, p_177141_7_, scale, 2);
-        this.renderLayer(entitylivingbaseIn, p_177141_2_, p_177141_3_, partialTicks, p_177141_5_, p_177141_6_, p_177141_7_, scale, 1);
+        this.func_177182_a(p_177141_1_, p_177141_2_, p_177141_3_, p_177141_4_, p_177141_5_, p_177141_6_, p_177141_7_, p_177141_8_, 4);
+        this.func_177182_a(p_177141_1_, p_177141_2_, p_177141_3_, p_177141_4_, p_177141_5_, p_177141_6_, p_177141_7_, p_177141_8_, 3);
+        this.func_177182_a(p_177141_1_, p_177141_2_, p_177141_3_, p_177141_4_, p_177141_5_, p_177141_6_, p_177141_7_, p_177141_8_, 2);
+        this.func_177182_a(p_177141_1_, p_177141_2_, p_177141_3_, p_177141_4_, p_177141_5_, p_177141_6_, p_177141_7_, p_177141_8_, 1);
     }
 
     public boolean shouldCombineTextures()
@@ -49,142 +53,159 @@ public abstract class LayerArmorBase<T extends ModelBase> implements LayerRender
         return false;
     }
 
-    private void renderLayer(EntityLivingBase entitylivingbaseIn, float p_177182_2_, float p_177182_3_, float partialTicks, float p_177182_5_, float p_177182_6_, float p_177182_7_, float scale, int armorSlot)
+    private void func_177182_a(EntityLivingBase p_177182_1_, float p_177182_2_, float p_177182_3_, float p_177182_4_, float p_177182_5_, float p_177182_6_, float p_177182_7_, float p_177182_8_, int p_177182_9_)
     {
-        ItemStack itemstack = this.getCurrentArmor(entitylivingbaseIn, armorSlot);
-
-        if (itemstack != null && itemstack.getItem() instanceof ItemArmor)
+        ItemStack var10 = this.func_177176_a(p_177182_1_, p_177182_9_);
+        //TODO: unrender helmet in perspective 3
+        if (var10 != null && var10.getItem() instanceof ItemArmor)
         {
-            ItemArmor itemarmor = (ItemArmor)itemstack.getItem();
-            T t = this.getArmorModel(armorSlot);
-            t.setModelAttributes(this.renderer.getMainModel());
-            t.setLivingAnimations(entitylivingbaseIn, p_177182_2_, p_177182_3_, partialTicks);
-
-            if (Reflector.ForgeHooksClient.exists())
-            {
-                t = this.getArmorModelHook(entitylivingbaseIn, itemstack, armorSlot, t);
+            if(Minecraft.getMinecraft().gameSettings.thirdPersonView == 3 && p_177182_1_ instanceof EntityPlayerSP){
+                if(var10.getItem() == Items.diamond_helmet || var10.getItem() == Items.iron_helmet || var10.getItem() == Items.golden_helmet || var10.getItem() == Items.leather_helmet || var10.getItem() == Items.chainmail_helmet){
+                    return;
+                }
             }
 
-            this.setModelPartVisible(t, armorSlot);
-            boolean flag = this.isSlotForLeggings(armorSlot);
+            ItemArmor var11 = (ItemArmor)var10.getItem();
+            ModelBase var12 = this.func_177175_a(p_177182_9_);
+            var12.setModelAttributes(this.field_177190_a.getMainModel());
+            var12.setLivingAnimations(p_177182_1_, p_177182_2_, p_177182_3_, p_177182_4_);
 
-            if (!Config.isCustomItems() || !CustomItems.bindCustomArmorTexture(itemstack, flag ? 2 : 1, (String)null))
+            if (Reflector.ForgeHooksClient_getArmorModel.exists())
+            {
+                var12 = (ModelBase)Reflector.call(Reflector.ForgeHooksClient_getArmorModel, new Object[] {p_177182_1_, var10, Integer.valueOf(p_177182_9_), var12});
+            }
+
+            this.func_177179_a(var12, p_177182_9_);
+            boolean var13 = this.func_177180_b(p_177182_9_);
+
+            if (!Config.isCustomItems() || !CustomItems.bindCustomArmorTexture(var10, var13 ? 2 : 1, (String)null))
             {
                 if (Reflector.ForgeHooksClient_getArmorTexture.exists())
                 {
-                    this.renderer.bindTexture(this.getArmorResource(entitylivingbaseIn, itemstack, flag ? 2 : 1, (String)null));
+                    this.field_177190_a.bindTexture(this.getArmorResource(p_177182_1_, var10, var13 ? 2 : 1, (String)null));
                 }
                 else
                 {
-                    this.renderer.bindTexture(this.getArmorResource(itemarmor, flag));
+                    this.field_177190_a.bindTexture(this.func_177181_a(var11, var13));
                 }
             }
 
+            int var14;
+            float var15;
+            float var16;
+            float var17;
+
             if (Reflector.ForgeHooksClient_getArmorTexture.exists())
             {
-                if (ReflectorForge.armorHasOverlay(itemarmor, itemstack))
-                {
-                    int j = itemarmor.getColor(itemstack);
-                    float f3 = (float)(j >> 16 & 255) / 255.0F;
-                    float f4 = (float)(j >> 8 & 255) / 255.0F;
-                    float f5 = (float)(j & 255) / 255.0F;
-                    GlStateManager.color(this.colorR * f3, this.colorG * f4, this.colorB * f5, this.alpha);
-                    t.render(entitylivingbaseIn, p_177182_2_, p_177182_3_, p_177182_5_, p_177182_6_, p_177182_7_, scale);
+                var14 = var11.getColor(var10);
 
-                    if (!Config.isCustomItems() || !CustomItems.bindCustomArmorTexture(itemstack, flag ? 2 : 1, "overlay"))
+                if (var14 != -1)
+                {
+                    var15 = (float)(var14 >> 16 & 255) / 255.0F;
+                    var16 = (float)(var14 >> 8 & 255) / 255.0F;
+                    var17 = (float)(var14 & 255) / 255.0F;
+                    GlStateManager.color(this.field_177184_f * var15, this.field_177185_g * var16, this.field_177192_h * var17, this.field_177187_e);
+                    var12.render(p_177182_1_, p_177182_2_, p_177182_3_, p_177182_5_, p_177182_6_, p_177182_7_, p_177182_8_);
+
+                    if (!Config.isCustomItems() || !CustomItems.bindCustomArmorTexture(var10, var13 ? 2 : 1, "overlay"))
                     {
-                        this.renderer.bindTexture(this.getArmorResource(entitylivingbaseIn, itemstack, flag ? 2 : 1, "overlay"));
+                        this.field_177190_a.bindTexture(this.getArmorResource(p_177182_1_, var10, var13 ? 2 : 1, "overlay"));
                     }
                 }
 
-                GlStateManager.color(this.colorR, this.colorG, this.colorB, this.alpha);
-                t.render(entitylivingbaseIn, p_177182_2_, p_177182_3_, p_177182_5_, p_177182_6_, p_177182_7_, scale);
+                GlStateManager.color(this.field_177184_f, this.field_177185_g, this.field_177192_h, this.field_177187_e);
+                var12.render(p_177182_1_, p_177182_2_, p_177182_3_, p_177182_5_, p_177182_6_, p_177182_7_, p_177182_8_);
 
-                if (!this.skipRenderGlint && itemstack.hasEffect() && (!Config.isCustomItems() || !CustomItems.renderCustomArmorEffect(entitylivingbaseIn, itemstack, t, p_177182_2_, p_177182_3_, partialTicks, p_177182_5_, p_177182_6_, p_177182_7_, scale)))
+                if (!this.field_177193_i && var10.isItemEnchanted() && (!Config.isCustomItems() || !CustomItems.renderCustomArmorEffect(p_177182_1_, var10, var12, p_177182_2_, p_177182_3_, p_177182_4_, p_177182_5_, p_177182_6_, p_177182_7_, p_177182_8_)))
                 {
-                    this.renderGlint(entitylivingbaseIn, t, p_177182_2_, p_177182_3_, partialTicks, p_177182_5_, p_177182_6_, p_177182_7_, scale);
+                    this.func_177183_a(p_177182_1_, var12, p_177182_2_, p_177182_3_, p_177182_4_, p_177182_5_, p_177182_6_, p_177182_7_, p_177182_8_);
                 }
 
                 return;
             }
 
-            switch (itemarmor.getArmorMaterial())
+            switch (LayerArmorBase.SwitchArmorMaterial.field_178747_a[var11.getArmorMaterial().ordinal()])
             {
-                case LEATHER:
-                    int i = itemarmor.getColor(itemstack);
-                    float f = (float)(i >> 16 & 255) / 255.0F;
-                    float f1 = (float)(i >> 8 & 255) / 255.0F;
-                    float f2 = (float)(i & 255) / 255.0F;
-                    GlStateManager.color(this.colorR * f, this.colorG * f1, this.colorB * f2, this.alpha);
-                    t.render(entitylivingbaseIn, p_177182_2_, p_177182_3_, p_177182_5_, p_177182_6_, p_177182_7_, scale);
+                case 1:
+                    var14 = var11.getColor(var10);
+                    var15 = (float)(var14 >> 16 & 255) / 255.0F;
+                    var16 = (float)(var14 >> 8 & 255) / 255.0F;
+                    var17 = (float)(var14 & 255) / 255.0F;
+                    GlStateManager.color(this.field_177184_f * var15, this.field_177185_g * var16, this.field_177192_h * var17, this.field_177187_e);
+                    var12.render(p_177182_1_, p_177182_2_, p_177182_3_, p_177182_5_, p_177182_6_, p_177182_7_, p_177182_8_);
 
-                    if (!Config.isCustomItems() || !CustomItems.bindCustomArmorTexture(itemstack, flag ? 2 : 1, "overlay"))
+                    if (!Config.isCustomItems() || !CustomItems.bindCustomArmorTexture(var10, var13 ? 2 : 1, "overlay"))
                     {
-                        this.renderer.bindTexture(this.getArmorResource(itemarmor, flag, "overlay"));
+                        this.field_177190_a.bindTexture(this.func_177178_a(var11, var13, "overlay"));
                     }
 
-                case CHAIN:
-                case IRON:
-                case GOLD:
-                case DIAMOND:
-                    GlStateManager.color(this.colorR, this.colorG, this.colorB, this.alpha);
-                    t.render(entitylivingbaseIn, p_177182_2_, p_177182_3_, p_177182_5_, p_177182_6_, p_177182_7_, scale);
-            }
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                    GlStateManager.color(this.field_177184_f, this.field_177185_g, this.field_177192_h, this.field_177187_e);
+                    var12.render(p_177182_1_, p_177182_2_, p_177182_3_, p_177182_5_, p_177182_6_, p_177182_7_, p_177182_8_);
 
-            if (!this.skipRenderGlint && itemstack.isItemEnchanted() && (!Config.isCustomItems() || !CustomItems.renderCustomArmorEffect(entitylivingbaseIn, itemstack, t, p_177182_2_, p_177182_3_, partialTicks, p_177182_5_, p_177182_6_, p_177182_7_, scale)))
-            {
-                this.renderGlint(entitylivingbaseIn, t, p_177182_2_, p_177182_3_, partialTicks, p_177182_5_, p_177182_6_, p_177182_7_, scale);
+                default:
+                    if (!this.field_177193_i && var10.isItemEnchanted() && (!Config.isCustomItems() || !CustomItems.renderCustomArmorEffect(p_177182_1_, var10, var12, p_177182_2_, p_177182_3_, p_177182_4_, p_177182_5_, p_177182_6_, p_177182_7_, p_177182_8_)))
+                    {
+                        this.func_177183_a(p_177182_1_, var12, p_177182_2_, p_177182_3_, p_177182_4_, p_177182_5_, p_177182_6_, p_177182_7_, p_177182_8_);
+                    }
             }
         }
     }
 
-    public ItemStack getCurrentArmor(EntityLivingBase entitylivingbaseIn, int armorSlot)
+    public ItemStack func_177176_a(EntityLivingBase p_177176_1_, int p_177176_2_)
     {
-        return entitylivingbaseIn.getCurrentArmor(armorSlot - 1);
+        return p_177176_1_.getCurrentArmor(p_177176_2_ - 1);
     }
 
-    public T getArmorModel(int armorSlot)
+    public ModelBase func_177175_a(int p_177175_1_)
     {
-        return (T)(this.isSlotForLeggings(armorSlot) ? this.modelLeggings : this.modelArmor);
+        return this.func_177180_b(p_177175_1_) ? this.field_177189_c : this.field_177186_d;
     }
 
-    private boolean isSlotForLeggings(int armorSlot)
+    private boolean func_177180_b(int p_177180_1_)
     {
-        return armorSlot == 2;
+        return p_177180_1_ == 2;
     }
 
-    private void renderGlint(EntityLivingBase entitylivingbaseIn, T modelbaseIn, float p_177183_3_, float p_177183_4_, float partialTicks, float p_177183_6_, float p_177183_7_, float p_177183_8_, float scale)
+    private void func_177183_a(EntityLivingBase p_177183_1_, ModelBase p_177183_2_, float p_177183_3_, float p_177183_4_, float p_177183_5_, float p_177183_6_, float p_177183_7_, float p_177183_8_, float p_177183_9_)
     {
-        if (!Config.isShaders() || !Shaders.isShadowPass)
+        if (!Config.isCustomItems() || CustomItems.isUseGlint())
         {
-            float f = (float)entitylivingbaseIn.ticksExisted + partialTicks;
-            this.renderer.bindTexture(ENCHANTED_ITEM_GLINT_RES);
-
             if (Config.isShaders())
             {
-                ShadersRender.renderEnchantedGlintBegin();
+                if (Shaders.isShadowPass)
+                {
+                    return;
+                }
+
+                ShadersRender.layerArmorBaseDrawEnchantedGlintBegin();
             }
 
+            float var10 = (float)p_177183_1_.ticksExisted + p_177183_5_;
+            this.field_177190_a.bindTexture(field_177188_b);
             GlStateManager.enableBlend();
             GlStateManager.depthFunc(514);
             GlStateManager.depthMask(false);
-            float f1 = 0.5F;
-            GlStateManager.color(f1, f1, f1, 1.0F);
+            float var11 = 0.5F;
+            GlStateManager.color(var11, var11, var11, 1.0F);
 
-            for (int i = 0; i < 2; ++i)
+            for (int var12 = 0; var12 < 2; ++var12)
             {
                 GlStateManager.disableLighting();
                 GlStateManager.blendFunc(768, 1);
-                float f2 = 0.76F;
-                GlStateManager.color(0.5F * f2, 0.25F * f2, 0.8F * f2, 1.0F);
+                float var13 = 0.76F;
+                GlStateManager.color(0.5F * var13, 0.25F * var13, 0.8F * var13, 1.0F);
                 GlStateManager.matrixMode(5890);
                 GlStateManager.loadIdentity();
-                float f3 = 0.33333334F;
-                GlStateManager.scale(f3, f3, f3);
-                GlStateManager.rotate(30.0F - (float)i * 60.0F, 0.0F, 0.0F, 1.0F);
-                GlStateManager.translate(0.0F, f * (0.001F + (float)i * 0.003F) * 20.0F, 0.0F);
+                float var14 = 0.33333334F;
+                GlStateManager.scale(var14, var14, var14);
+                GlStateManager.rotate(30.0F - (float)var12 * 60.0F, 0.0F, 0.0F, 1.0F);
+                GlStateManager.translate(0.0F, var10 * (0.001F + (float)var12 * 0.003F) * 20.0F, 0.0F);
                 GlStateManager.matrixMode(5888);
-                modelbaseIn.render(entitylivingbaseIn, p_177183_3_, p_177183_4_, p_177183_6_, p_177183_7_, p_177183_8_, scale);
+                p_177183_2_.render(p_177183_1_, p_177183_3_, p_177183_4_, p_177183_6_, p_177183_7_, p_177183_8_, p_177183_9_);
             }
 
             GlStateManager.matrixMode(5890);
@@ -197,62 +218,111 @@ public abstract class LayerArmorBase<T extends ModelBase> implements LayerRender
 
             if (Config.isShaders())
             {
-                ShadersRender.renderEnchantedGlintEnd();
+                ShadersRender.layerArmorBaseDrawEnchantedGlintEnd();
             }
         }
     }
 
-    private ResourceLocation getArmorResource(ItemArmor p_177181_1_, boolean p_177181_2_)
+    private ResourceLocation func_177181_a(ItemArmor p_177181_1_, boolean p_177181_2_)
     {
-        return this.getArmorResource(p_177181_1_, p_177181_2_, (String)null);
+        return this.func_177178_a(p_177181_1_, p_177181_2_, (String)null);
     }
 
-    private ResourceLocation getArmorResource(ItemArmor p_177178_1_, boolean p_177178_2_, String p_177178_3_)
+    private ResourceLocation func_177178_a(ItemArmor p_177178_1_, boolean p_177178_2_, String p_177178_3_)
     {
-        String s = String.format("textures/models/armor/%s_layer_%d%s.png", new Object[] {p_177178_1_.getArmorMaterial().getName(), Integer.valueOf(p_177178_2_ ? 2 : 1), p_177178_3_ == null ? "" : String.format("_%s", new Object[]{p_177178_3_})});
-        ResourceLocation resourcelocation = (ResourceLocation)ARMOR_TEXTURE_RES_MAP.get(s);
+        String var4 = String.format("textures/models/armor/%s_layer_%d%s.png", new Object[] {p_177178_1_.getArmorMaterial().func_179242_c(), Integer.valueOf(p_177178_2_ ? 2 : 1), p_177178_3_ == null ? "" : String.format("_%s", new Object[]{p_177178_3_})});
+        ResourceLocation var5 = (ResourceLocation)field_177191_j.get(var4);
+
+        if (var5 == null)
+        {
+            var5 = new ResourceLocation(var4);
+            field_177191_j.put(var4, var5);
+        }
+
+        return var5;
+    }
+
+    protected abstract void func_177177_a();
+
+    protected abstract void func_177179_a(ModelBase var1, int var2);
+
+    public ResourceLocation getArmorResource(Entity entity, ItemStack stack, int slot, String type)
+    {
+        ItemArmor item = (ItemArmor)stack.getItem();
+        String texture = ((ItemArmor)stack.getItem()).getArmorMaterial().func_179242_c();
+        String domain = "minecraft";
+        int idx = texture.indexOf(58);
+
+        if (idx != -1)
+        {
+            domain = texture.substring(0, idx);
+            texture = texture.substring(idx + 1);
+        }
+
+        String s1 = String.format("%s:textures/models/armor/%s_layer_%d%s.png", new Object[] {domain, texture, Integer.valueOf(slot == 2 ? 2 : 1), type == null ? "" : String.format("_%s", new Object[]{type})});
+        s1 = Reflector.callString(Reflector.ForgeHooksClient_getArmorTexture, new Object[] {entity, stack, s1, Integer.valueOf(slot), type});
+        ResourceLocation resourcelocation = (ResourceLocation)field_177191_j.get(s1);
 
         if (resourcelocation == null)
         {
-            resourcelocation = new ResourceLocation(s);
-            ARMOR_TEXTURE_RES_MAP.put(s, resourcelocation);
+            resourcelocation = new ResourceLocation(s1);
+            field_177191_j.put(s1, resourcelocation);
         }
 
         return resourcelocation;
     }
 
-    protected abstract void initArmor();
-
-    protected abstract void setModelPartVisible(T model, int armorSlot);
-
-    protected T getArmorModelHook(EntityLivingBase p_getArmorModelHook_1_, ItemStack p_getArmorModelHook_2_, int p_getArmorModelHook_3_, T p_getArmorModelHook_4_)
+    static final class SwitchArmorMaterial
     {
-        return (T)p_getArmorModelHook_4_;
-    }
+        static final int[] field_178747_a = new int[ItemArmor.ArmorMaterial.values().length];
+        
 
-    public ResourceLocation getArmorResource(Entity p_getArmorResource_1_, ItemStack p_getArmorResource_2_, int p_getArmorResource_3_, String p_getArmorResource_4_)
-    {
-        ItemArmor itemarmor = (ItemArmor)p_getArmorResource_2_.getItem();
-        String s = itemarmor.getArmorMaterial().getName();
-        String s1 = "minecraft";
-        int i = s.indexOf(58);
-
-        if (i != -1)
+        static
         {
-            s1 = s.substring(0, i);
-            s = s.substring(i + 1);
+            try
+            {
+                field_178747_a[ItemArmor.ArmorMaterial.LEATHER.ordinal()] = 1;
+            }
+            catch (NoSuchFieldError var5)
+            {
+                ;
+            }
+
+            try
+            {
+                field_178747_a[ItemArmor.ArmorMaterial.CHAIN.ordinal()] = 2;
+            }
+            catch (NoSuchFieldError var4)
+            {
+                ;
+            }
+
+            try
+            {
+                field_178747_a[ItemArmor.ArmorMaterial.IRON.ordinal()] = 3;
+            }
+            catch (NoSuchFieldError var3)
+            {
+                ;
+            }
+
+            try
+            {
+                field_178747_a[ItemArmor.ArmorMaterial.GOLD.ordinal()] = 4;
+            }
+            catch (NoSuchFieldError var2)
+            {
+                ;
+            }
+
+            try
+            {
+                field_178747_a[ItemArmor.ArmorMaterial.DIAMOND.ordinal()] = 5;
+            }
+            catch (NoSuchFieldError var1)
+            {
+                ;
+            }
         }
-
-        String s2 = String.format("%s:textures/models/armor/%s_layer_%d%s.png", new Object[] {s1, s, Integer.valueOf(this.isSlotForLeggings(p_getArmorResource_3_) ? 2 : 1), p_getArmorResource_4_ == null ? "" : String.format("_%s", new Object[]{p_getArmorResource_4_})});
-        s2 = Reflector.callString(Reflector.ForgeHooksClient_getArmorTexture, new Object[] {p_getArmorResource_1_, p_getArmorResource_2_, s2, Integer.valueOf(p_getArmorResource_3_), p_getArmorResource_4_});
-        ResourceLocation resourcelocation = (ResourceLocation)ARMOR_TEXTURE_RES_MAP.get(s2);
-
-        if (resourcelocation == null)
-        {
-            resourcelocation = new ResourceLocation(s2);
-            ARMOR_TEXTURE_RES_MAP.put(s2, resourcelocation);
-        }
-
-        return resourcelocation;
     }
 }

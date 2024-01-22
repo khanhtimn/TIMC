@@ -8,6 +8,8 @@ import net.minecraft.world.World;
 
 public class ItemSnowball extends Item
 {
+    
+
     public ItemSnowball()
     {
         this.maxStackSize = 16;

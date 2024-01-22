@@ -11,7 +11,6 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityDaylightDetector;
 import net.minecraft.util.BlockPos;
@@ -23,14 +22,15 @@ import net.minecraft.world.World;
 
 public class BlockDaylightDetector extends BlockContainer
 {
-    public static final PropertyInteger POWER = PropertyInteger.create("power", 0, 15);
-    private final boolean inverted;
+    public static final PropertyInteger field_176436_a = PropertyInteger.create("power", 0, 15);
+    private final boolean field_176435_b;
+    
 
-    public BlockDaylightDetector(boolean inverted)
+    public BlockDaylightDetector(boolean p_i45729_1_)
     {
         super(Material.wood);
-        this.inverted = inverted;
-        this.setDefaultState(this.blockState.getBaseState().withProperty(POWER, Integer.valueOf(0)));
+        this.field_176435_b = p_i45729_1_;
+        this.setDefaultState(this.blockState.getBaseState().withProperty(field_176436_a, Integer.valueOf(0)));
         this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.375F, 1.0F);
         this.setCreativeTab(CreativeTabs.tabRedstone);
         this.setHardness(0.2F);
@@ -38,43 +38,43 @@ public class BlockDaylightDetector extends BlockContainer
         this.setUnlocalizedName("daylightDetector");
     }
 
-    public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
+    public void setBlockBoundsBasedOnState(IBlockAccess access, BlockPos pos)
     {
         this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.375F, 1.0F);
     }
 
-    public int getWeakPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
+    public int isProvidingWeakPower(IBlockAccess worldIn, BlockPos pos, IBlockState state, EnumFacing side)
     {
-        return ((Integer)state.getValue(POWER)).intValue();
+        return ((Integer)state.getValue(field_176436_a)).intValue();
     }
 
-    public void updatePower(World worldIn, BlockPos pos)
+    public void func_180677_d(World worldIn, BlockPos p_180677_2_)
     {
         if (!worldIn.provider.getHasNoSky())
         {
-            IBlockState iblockstate = worldIn.getBlockState(pos);
-            int i = worldIn.getLightFor(EnumSkyBlock.SKY, pos) - worldIn.getSkylightSubtracted();
-            float f = worldIn.getCelestialAngleRadians(1.0F);
-            float f1 = f < (float)Math.PI ? 0.0F : ((float)Math.PI * 2F);
-            f = f + (f1 - f) * 0.2F;
-            i = Math.round((float)i * MathHelper.cos(f));
-            i = MathHelper.clamp_int(i, 0, 15);
+            IBlockState var3 = worldIn.getBlockState(p_180677_2_);
+            int var4 = worldIn.getLightFor(EnumSkyBlock.SKY, p_180677_2_) - worldIn.getSkylightSubtracted();
+            float var5 = worldIn.getCelestialAngleRadians(1.0F);
+            float var6 = var5 < (float)Math.PI ? 0.0F : ((float)Math.PI * 2F);
+            var5 += (var6 - var5) * 0.2F;
+            var4 = Math.round((float)var4 * MathHelper.cos(var5));
+            var4 = MathHelper.clamp_int(var4, 0, 15);
 
-            if (this.inverted)
+            if (this.field_176435_b)
             {
-                i = 15 - i;
+                var4 = 15 - var4;
             }
 
-            if (((Integer)iblockstate.getValue(POWER)).intValue() != i)
+            if (((Integer)var3.getValue(field_176436_a)).intValue() != var4)
             {
-                worldIn.setBlockState(pos, iblockstate.withProperty(POWER, Integer.valueOf(i)), 3);
+                worldIn.setBlockState(p_180677_2_, var3.withProperty(field_176436_a, Integer.valueOf(var4)), 3);
             }
         }
     }
 
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ)
     {
-        if (playerIn.isAllowEdit())
+        if (playerIn.func_175142_cm())
         {
             if (worldIn.isRemote)
             {
@@ -82,15 +82,15 @@ public class BlockDaylightDetector extends BlockContainer
             }
             else
             {
-                if (this.inverted)
+                if (this.field_176435_b)
                 {
-                    worldIn.setBlockState(pos, Blocks.daylight_detector.getDefaultState().withProperty(POWER, state.getValue(POWER)), 4);
-                    Blocks.daylight_detector.updatePower(worldIn, pos);
+                    worldIn.setBlockState(pos, Blocks.daylight_detector.getDefaultState().withProperty(field_176436_a, state.getValue(field_176436_a)), 4);
+                    Blocks.daylight_detector.func_180677_d(worldIn, pos);
                 }
                 else
                 {
-                    worldIn.setBlockState(pos, Blocks.daylight_detector_inverted.getDefaultState().withProperty(POWER, state.getValue(POWER)), 4);
-                    Blocks.daylight_detector_inverted.updatePower(worldIn, pos);
+                    worldIn.setBlockState(pos, Blocks.daylight_detector_inverted.getDefaultState().withProperty(field_176436_a, state.getValue(field_176436_a)), 4);
+                    Blocks.daylight_detector_inverted.func_180677_d(worldIn, pos);
                 }
 
                 return true;
@@ -104,6 +104,8 @@ public class BlockDaylightDetector extends BlockContainer
 
     /**
      * Get the Item that this Block should drop when harvested.
+     *  
+     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -120,16 +122,13 @@ public class BlockDaylightDetector extends BlockContainer
         return false;
     }
 
-    /**
-     * Used to determine ambient occlusion and culling when rebuilding chunks for render
-     */
     public boolean isOpaqueCube()
     {
         return false;
     }
 
     /**
-     * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
+     * The type of render function that is called for this block
      */
     public int getRenderType()
     {
@@ -157,7 +156,7 @@ public class BlockDaylightDetector extends BlockContainer
      */
     public IBlockState getStateFromMeta(int meta)
     {
-        return this.getDefaultState().withProperty(POWER, Integer.valueOf(meta));
+        return this.getDefaultState().withProperty(field_176436_a, Integer.valueOf(meta));
     }
 
     /**
@@ -165,20 +164,20 @@ public class BlockDaylightDetector extends BlockContainer
      */
     public int getMetaFromState(IBlockState state)
     {
-        return ((Integer)state.getValue(POWER)).intValue();
+        return ((Integer)state.getValue(field_176436_a)).intValue();
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {POWER});
+        return new BlockState(this, new IProperty[] {field_176436_a});
     }
 
     /**
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
     {
-        if (!this.inverted)
+        if (!this.field_176435_b)
         {
             super.getSubBlocks(itemIn, tab, list);
         }

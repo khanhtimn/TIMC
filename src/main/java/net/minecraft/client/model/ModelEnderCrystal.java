@@ -13,6 +13,7 @@ public class ModelEnderCrystal extends ModelBase
 
     /** The base model for the Ender Crystal. */
     private ModelRenderer base;
+    
 
     public ModelEnderCrystal(float p_i1170_1_, boolean p_i1170_2_)
     {
@@ -30,7 +31,7 @@ public class ModelEnderCrystal extends ModelBase
     /**
      * Sets the models various rotation angles then renders the model.
      */
-    public void render(Entity entityIn, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float scale)
+    public void render(Entity p_78088_1_, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float p_78088_7_)
     {
         GlStateManager.pushMatrix();
         GlStateManager.scale(2.0F, 2.0F, 2.0F);
@@ -38,22 +39,22 @@ public class ModelEnderCrystal extends ModelBase
 
         if (this.base != null)
         {
-            this.base.render(scale);
+            this.base.render(p_78088_7_);
         }
 
         GlStateManager.rotate(p_78088_3_, 0.0F, 1.0F, 0.0F);
         GlStateManager.translate(0.0F, 0.8F + p_78088_4_, 0.0F);
         GlStateManager.rotate(60.0F, 0.7071F, 0.0F, 0.7071F);
-        this.glass.render(scale);
-        float f = 0.875F;
-        GlStateManager.scale(f, f, f);
+        this.glass.render(p_78088_7_);
+        float var8 = 0.875F;
+        GlStateManager.scale(var8, var8, var8);
         GlStateManager.rotate(60.0F, 0.7071F, 0.0F, 0.7071F);
         GlStateManager.rotate(p_78088_3_, 0.0F, 1.0F, 0.0F);
-        this.glass.render(scale);
-        GlStateManager.scale(f, f, f);
+        this.glass.render(p_78088_7_);
+        GlStateManager.scale(var8, var8, var8);
         GlStateManager.rotate(60.0F, 0.7071F, 0.0F, 0.7071F);
         GlStateManager.rotate(p_78088_3_, 0.0F, 1.0F, 0.0F);
-        this.cube.render(scale);
+        this.cube.render(p_78088_7_);
         GlStateManager.popMatrix();
     }
 }

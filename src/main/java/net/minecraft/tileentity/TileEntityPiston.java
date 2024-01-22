@@ -1,20 +1,21 @@
 package net.minecraft.tileentity;
 
 import com.google.common.collect.Lists;
+import java.util.Iterator;
 import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
 
-public class TileEntityPiston extends TileEntity implements ITickable
+public class TileEntityPiston extends TileEntity implements IUpdatePlayerListBox
 {
-    private IBlockState pistonState;
-    private EnumFacing pistonFacing;
+    private IBlockState field_174932_a;
+    private EnumFacing field_174931_f;
 
     /** if this piston is extending or not */
     private boolean extending;
@@ -23,23 +24,22 @@ public class TileEntityPiston extends TileEntity implements ITickable
 
     /** the progress in (de)extending */
     private float lastProgress;
-    private List<Entity> field_174933_k = Lists.<Entity>newArrayList();
+    private List field_174933_k = Lists.newArrayList();
+    
 
-    public TileEntityPiston()
+    public TileEntityPiston() {}
+
+    public TileEntityPiston(IBlockState p_i45665_1_, EnumFacing p_i45665_2_, boolean p_i45665_3_, boolean p_i45665_4_)
     {
+        this.field_174932_a = p_i45665_1_;
+        this.field_174931_f = p_i45665_2_;
+        this.extending = p_i45665_3_;
+        this.shouldHeadBeRendered = p_i45665_4_;
     }
 
-    public TileEntityPiston(IBlockState pistonStateIn, EnumFacing pistonFacingIn, boolean extendingIn, boolean shouldHeadBeRenderedIn)
+    public IBlockState func_174927_b()
     {
-        this.pistonState = pistonStateIn;
-        this.pistonFacing = pistonFacingIn;
-        this.extending = extendingIn;
-        this.shouldHeadBeRendered = shouldHeadBeRenderedIn;
-    }
-
-    public IBlockState getPistonState()
-    {
-        return this.pistonState;
+        return this.field_174932_a;
     }
 
     public int getBlockMetadata()
@@ -55,9 +55,9 @@ public class TileEntityPiston extends TileEntity implements ITickable
         return this.extending;
     }
 
-    public EnumFacing getFacing()
+    public EnumFacing func_174930_e()
     {
-        return this.pistonFacing;
+        return this.field_174931_f;
     }
 
     public boolean shouldPistonHeadBeRendered()
@@ -65,36 +65,32 @@ public class TileEntityPiston extends TileEntity implements ITickable
         return this.shouldHeadBeRendered;
     }
 
-    /**
-     * Get interpolated progress value (between lastProgress and progress) given the fractional time between ticks as an
-     * argument
-     */
-    public float getProgress(float ticks)
+    public float func_145860_a(float p_145860_1_)
     {
-        if (ticks > 1.0F)
+        if (p_145860_1_ > 1.0F)
         {
-            ticks = 1.0F;
+            p_145860_1_ = 1.0F;
         }
 
-        return this.lastProgress + (this.progress - this.lastProgress) * ticks;
+        return this.lastProgress + (this.progress - this.lastProgress) * p_145860_1_;
     }
 
-    public float getOffsetX(float ticks)
+    public float func_174929_b(float p_174929_1_)
     {
-        return this.extending ? (this.getProgress(ticks) - 1.0F) * (float)this.pistonFacing.getFrontOffsetX() : (1.0F - this.getProgress(ticks)) * (float)this.pistonFacing.getFrontOffsetX();
+        return this.extending ? (this.func_145860_a(p_174929_1_) - 1.0F) * (float)this.field_174931_f.getFrontOffsetX() : (1.0F - this.func_145860_a(p_174929_1_)) * (float)this.field_174931_f.getFrontOffsetX();
     }
 
-    public float getOffsetY(float ticks)
+    public float func_174928_c(float p_174928_1_)
     {
-        return this.extending ? (this.getProgress(ticks) - 1.0F) * (float)this.pistonFacing.getFrontOffsetY() : (1.0F - this.getProgress(ticks)) * (float)this.pistonFacing.getFrontOffsetY();
+        return this.extending ? (this.func_145860_a(p_174928_1_) - 1.0F) * (float)this.field_174931_f.getFrontOffsetY() : (1.0F - this.func_145860_a(p_174928_1_)) * (float)this.field_174931_f.getFrontOffsetY();
     }
 
-    public float getOffsetZ(float ticks)
+    public float func_174926_d(float p_174926_1_)
     {
-        return this.extending ? (this.getProgress(ticks) - 1.0F) * (float)this.pistonFacing.getFrontOffsetZ() : (1.0F - this.getProgress(ticks)) * (float)this.pistonFacing.getFrontOffsetZ();
+        return this.extending ? (this.func_145860_a(p_174926_1_) - 1.0F) * (float)this.field_174931_f.getFrontOffsetZ() : (1.0F - this.func_145860_a(p_174926_1_)) * (float)this.field_174931_f.getFrontOffsetZ();
     }
 
-    private void launchWithSlimeBlock(float p_145863_1_, float p_145863_2_)
+    private void func_145863_a(float p_145863_1_, float p_145863_2_)
     {
         if (this.extending)
         {
@@ -105,37 +101,40 @@ public class TileEntityPiston extends TileEntity implements ITickable
             --p_145863_1_;
         }
 
-        AxisAlignedBB axisalignedbb = Blocks.piston_extension.getBoundingBox(this.worldObj, this.pos, this.pistonState, p_145863_1_, this.pistonFacing);
+        AxisAlignedBB var3 = Blocks.piston_extension.func_176424_a(this.worldObj, this.pos, this.field_174932_a, p_145863_1_, this.field_174931_f);
 
-        if (axisalignedbb != null)
+        if (var3 != null)
         {
-            List<Entity> list = this.worldObj.getEntitiesWithinAABBExcludingEntity((Entity)null, axisalignedbb);
+            List var4 = this.worldObj.getEntitiesWithinAABBExcludingEntity((Entity)null, var3);
 
-            if (!list.isEmpty())
+            if (!var4.isEmpty())
             {
-                this.field_174933_k.addAll(list);
+                this.field_174933_k.addAll(var4);
+                Iterator var5 = this.field_174933_k.iterator();
 
-                for (Entity entity : this.field_174933_k)
+                while (var5.hasNext())
                 {
-                    if (this.pistonState.getBlock() == Blocks.slime_block && this.extending)
+                    Entity var6 = (Entity)var5.next();
+
+                    if (this.field_174932_a.getBlock() == Blocks.slime_block && this.extending)
                     {
-                        switch (this.pistonFacing.getAxis())
+                        switch (TileEntityPiston.SwitchAxis.field_177248_a[this.field_174931_f.getAxis().ordinal()])
                         {
-                            case X:
-                                entity.motionX = (double)this.pistonFacing.getFrontOffsetX();
+                            case 1:
+                                var6.motionX = (double)this.field_174931_f.getFrontOffsetX();
                                 break;
 
-                            case Y:
-                                entity.motionY = (double)this.pistonFacing.getFrontOffsetY();
+                            case 2:
+                                var6.motionY = (double)this.field_174931_f.getFrontOffsetY();
                                 break;
 
-                            case Z:
-                                entity.motionZ = (double)this.pistonFacing.getFrontOffsetZ();
+                            case 3:
+                                var6.motionZ = (double)this.field_174931_f.getFrontOffsetZ();
                         }
                     }
                     else
                     {
-                        entity.moveEntity((double)(p_145863_2_ * (float)this.pistonFacing.getFrontOffsetX()), (double)(p_145863_2_ * (float)this.pistonFacing.getFrontOffsetY()), (double)(p_145863_2_ * (float)this.pistonFacing.getFrontOffsetZ()));
+                        var6.moveEntity((double)(p_145863_2_ * (float)this.field_174931_f.getFrontOffsetX()), (double)(p_145863_2_ * (float)this.field_174931_f.getFrontOffsetY()), (double)(p_145863_2_ * (float)this.field_174931_f.getFrontOffsetZ()));
                     }
                 }
 
@@ -157,14 +156,14 @@ public class TileEntityPiston extends TileEntity implements ITickable
 
             if (this.worldObj.getBlockState(this.pos).getBlock() == Blocks.piston_extension)
             {
-                this.worldObj.setBlockState(this.pos, this.pistonState, 3);
-                this.worldObj.notifyBlockOfStateChange(this.pos, this.pistonState.getBlock());
+                this.worldObj.setBlockState(this.pos, this.field_174932_a, 3);
+                this.worldObj.notifyBlockOfStateChange(this.pos, this.field_174932_a.getBlock());
             }
         }
     }
 
     /**
-     * Like the old updateEntity(), except more generic.
+     * Updates the JList with a new model.
      */
     public void update()
     {
@@ -172,14 +171,14 @@ public class TileEntityPiston extends TileEntity implements ITickable
 
         if (this.lastProgress >= 1.0F)
         {
-            this.launchWithSlimeBlock(1.0F, 0.25F);
+            this.func_145863_a(1.0F, 0.25F);
             this.worldObj.removeTileEntity(this.pos);
             this.invalidate();
 
             if (this.worldObj.getBlockState(this.pos).getBlock() == Blocks.piston_extension)
             {
-                this.worldObj.setBlockState(this.pos, this.pistonState, 3);
-                this.worldObj.notifyBlockOfStateChange(this.pos, this.pistonState.getBlock());
+                this.worldObj.setBlockState(this.pos, this.field_174932_a, 3);
+                this.worldObj.notifyBlockOfStateChange(this.pos, this.field_174932_a.getBlock());
             }
         }
         else
@@ -193,7 +192,7 @@ public class TileEntityPiston extends TileEntity implements ITickable
 
             if (this.extending)
             {
-                this.launchWithSlimeBlock(this.progress, this.progress - this.lastProgress + 0.0625F);
+                this.func_145863_a(this.progress, this.progress - this.lastProgress + 0.0625F);
             }
         }
     }
@@ -201,8 +200,8 @@ public class TileEntityPiston extends TileEntity implements ITickable
     public void readFromNBT(NBTTagCompound compound)
     {
         super.readFromNBT(compound);
-        this.pistonState = Block.getBlockById(compound.getInteger("blockId")).getStateFromMeta(compound.getInteger("blockData"));
-        this.pistonFacing = EnumFacing.getFront(compound.getInteger("facing"));
+        this.field_174932_a = Block.getBlockById(compound.getInteger("blockId")).getStateFromMeta(compound.getInteger("blockData"));
+        this.field_174931_f = EnumFacing.getFront(compound.getInteger("facing"));
         this.lastProgress = this.progress = compound.getFloat("progress");
         this.extending = compound.getBoolean("extending");
     }
@@ -210,10 +209,46 @@ public class TileEntityPiston extends TileEntity implements ITickable
     public void writeToNBT(NBTTagCompound compound)
     {
         super.writeToNBT(compound);
-        compound.setInteger("blockId", Block.getIdFromBlock(this.pistonState.getBlock()));
-        compound.setInteger("blockData", this.pistonState.getBlock().getMetaFromState(this.pistonState));
-        compound.setInteger("facing", this.pistonFacing.getIndex());
+        compound.setInteger("blockId", Block.getIdFromBlock(this.field_174932_a.getBlock()));
+        compound.setInteger("blockData", this.field_174932_a.getBlock().getMetaFromState(this.field_174932_a));
+        compound.setInteger("facing", this.field_174931_f.getIndex());
         compound.setFloat("progress", this.lastProgress);
         compound.setBoolean("extending", this.extending);
+    }
+
+    static final class SwitchAxis
+    {
+        static final int[] field_177248_a = new int[EnumFacing.Axis.values().length];
+        
+
+        static
+        {
+            try
+            {
+                field_177248_a[EnumFacing.Axis.X.ordinal()] = 1;
+            }
+            catch (NoSuchFieldError var3)
+            {
+                ;
+            }
+
+            try
+            {
+                field_177248_a[EnumFacing.Axis.Y.ordinal()] = 2;
+            }
+            catch (NoSuchFieldError var2)
+            {
+                ;
+            }
+
+            try
+            {
+                field_177248_a[EnumFacing.Axis.Z.ordinal()] = 3;
+            }
+            catch (NoSuchFieldError var1)
+            {
+                ;
+            }
+        }
     }
 }

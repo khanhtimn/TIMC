@@ -7,36 +7,42 @@ import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 
-public class ObjectIntIdentityMap<T> implements IObjectIntIterable<T>
+public class ObjectIntIdentityMap implements IObjectIntIterable
 {
-    private final IdentityHashMap<T, Integer> identityMap = new IdentityHashMap(512);
-    private final List<T> objectList = Lists.<T>newArrayList();
+    private final IdentityHashMap field_148749_a = new IdentityHashMap(512);
+    private final List field_148748_b = Lists.newArrayList();
+    
 
-    public void put(T key, int value)
+    public void put(Object key, int value)
     {
-        this.identityMap.put(key, Integer.valueOf(value));
+        this.field_148749_a.put(key, Integer.valueOf(value));
 
-        while (this.objectList.size() <= value)
+        while (this.field_148748_b.size() <= value)
         {
-            this.objectList.add(null);
+            this.field_148748_b.add((Object)null);
         }
 
-        this.objectList.set(value, key);
+        this.field_148748_b.set(value, key);
     }
 
-    public int get(T key)
+    public int get(Object key)
     {
-        Integer integer = (Integer)this.identityMap.get(key);
-        return integer == null ? -1 : integer.intValue();
+        Integer var2 = (Integer)this.field_148749_a.get(key);
+        return var2 == null ? -1 : var2.intValue();
     }
 
-    public final T getByValue(int value)
+    public final Object getByValue(int value)
     {
-        return (T)(value >= 0 && value < this.objectList.size() ? this.objectList.get(value) : null);
+        return value >= 0 && value < this.field_148748_b.size() ? this.field_148748_b.get(value) : null;
     }
 
-    public Iterator<T> iterator()
+    public Iterator iterator()
     {
-        return Iterators.filter(this.objectList.iterator(), Predicates.notNull());
+        return Iterators.filter(this.field_148748_b.iterator(), Predicates.notNull());
+    }
+
+    public List getObjectList()
+    {
+        return this.field_148748_b;
     }
 }

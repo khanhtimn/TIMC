@@ -11,46 +11,43 @@ import net.minecraft.world.WorldServer;
 
 public class CommandSaveAll extends CommandBase
 {
-    /**
-     * Gets the name of the command
-     */
+    
+
     public String getCommandName()
     {
         return "save-all";
     }
 
-    /**
-     * Gets the usage string for the command.
-     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.save.usage";
     }
 
-    /**
-     * Callback when the command is invoked
-     */
     public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
-        MinecraftServer minecraftserver = MinecraftServer.getServer();
+        MinecraftServer var3 = MinecraftServer.getServer();
         sender.addChatMessage(new ChatComponentTranslation("commands.save.start", new Object[0]));
 
-        if (minecraftserver.getConfigurationManager() != null)
+        if (var3.getConfigurationManager() != null)
         {
-            minecraftserver.getConfigurationManager().saveAllPlayerData();
+            var3.getConfigurationManager().saveAllPlayerData();
         }
 
         try
         {
-            for (int i = 0; i < minecraftserver.worldServers.length; ++i)
+            int var4;
+            WorldServer var5;
+            boolean var6;
+
+            for (var4 = 0; var4 < var3.worldServers.length; ++var4)
             {
-                if (minecraftserver.worldServers[i] != null)
+                if (var3.worldServers[var4] != null)
                 {
-                    WorldServer worldserver = minecraftserver.worldServers[i];
-                    boolean flag = worldserver.disableLevelSaving;
-                    worldserver.disableLevelSaving = false;
-                    worldserver.saveAllChunks(true, (IProgressUpdate)null);
-                    worldserver.disableLevelSaving = flag;
+                    var5 = var3.worldServers[var4];
+                    var6 = var5.disableLevelSaving;
+                    var5.disableLevelSaving = false;
+                    var5.saveAllChunks(true, (IProgressUpdate)null);
+                    var5.disableLevelSaving = var6;
                 }
             }
 
@@ -58,24 +55,24 @@ public class CommandSaveAll extends CommandBase
             {
                 sender.addChatMessage(new ChatComponentTranslation("commands.save.flushStart", new Object[0]));
 
-                for (int j = 0; j < minecraftserver.worldServers.length; ++j)
+                for (var4 = 0; var4 < var3.worldServers.length; ++var4)
                 {
-                    if (minecraftserver.worldServers[j] != null)
+                    if (var3.worldServers[var4] != null)
                     {
-                        WorldServer worldserver1 = minecraftserver.worldServers[j];
-                        boolean flag1 = worldserver1.disableLevelSaving;
-                        worldserver1.disableLevelSaving = false;
-                        worldserver1.saveChunkData();
-                        worldserver1.disableLevelSaving = flag1;
+                        var5 = var3.worldServers[var4];
+                        var6 = var5.disableLevelSaving;
+                        var5.disableLevelSaving = false;
+                        var5.saveChunkData();
+                        var5.disableLevelSaving = var6;
                     }
                 }
 
                 sender.addChatMessage(new ChatComponentTranslation("commands.save.flushEnd", new Object[0]));
             }
         }
-        catch (MinecraftException minecraftexception)
+        catch (MinecraftException var7)
         {
-            notifyOperators(sender, this, "commands.save.failed", new Object[] {minecraftexception.getMessage()});
+            notifyOperators(sender, this, "commands.save.failed", new Object[] {var7.getMessage()});
             return;
         }
 

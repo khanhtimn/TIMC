@@ -10,6 +10,8 @@ import net.minecraft.world.World;
 
 public class ItemFireball extends Item
 {
+    
+
     public ItemFireball()
     {
         this.setCreativeTab(CreativeTabs.tabMisc);
@@ -17,6 +19,9 @@ public class ItemFireball extends Item
 
     /**
      * Called when a Block is right-clicked with this Item
+     *  
+     * @param pos The block being right-clicked
+     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
@@ -28,7 +33,7 @@ public class ItemFireball extends Item
         {
             pos = pos.offset(side);
 
-            if (!playerIn.canPlayerEdit(pos, side, stack))
+            if (!playerIn.func_175151_a(pos, side, stack))
             {
                 return false;
             }

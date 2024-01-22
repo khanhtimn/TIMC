@@ -45,6 +45,7 @@ public class ModelRabbit extends ModelBase
     ModelRenderer rabbitNose;
     private float field_178701_m = 0.0F;
     private float field_178699_n = 0.0F;
+    
 
     public ModelRabbit()
     {
@@ -124,47 +125,47 @@ public class ModelRabbit extends ModelBase
     /**
      * Sets the models various rotation angles then renders the model.
      */
-    public void render(Entity entityIn, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float scale)
+    public void render(Entity p_78088_1_, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float p_78088_7_)
     {
-        this.setRotationAngles(p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, scale, entityIn);
+        this.setRotationAngles(p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, p_78088_7_, p_78088_1_);
 
         if (this.isChild)
         {
-            float f = 2.0F;
+            float var8 = 2.0F;
             GlStateManager.pushMatrix();
-            GlStateManager.translate(0.0F, 5.0F * scale, 2.0F * scale);
-            this.rabbitHead.render(scale);
-            this.rabbitLeftEar.render(scale);
-            this.rabbitRightEar.render(scale);
-            this.rabbitNose.render(scale);
+            GlStateManager.translate(0.0F, 5.0F * p_78088_7_, 2.0F * p_78088_7_);
+            this.rabbitHead.render(p_78088_7_);
+            this.rabbitLeftEar.render(p_78088_7_);
+            this.rabbitRightEar.render(p_78088_7_);
+            this.rabbitNose.render(p_78088_7_);
             GlStateManager.popMatrix();
             GlStateManager.pushMatrix();
-            GlStateManager.scale(1.0F / f, 1.0F / f, 1.0F / f);
-            GlStateManager.translate(0.0F, 24.0F * scale, 0.0F);
-            this.rabbitLeftFoot.render(scale);
-            this.rabbitRightFoot.render(scale);
-            this.rabbitLeftThigh.render(scale);
-            this.rabbitRightThigh.render(scale);
-            this.rabbitBody.render(scale);
-            this.rabbitLeftArm.render(scale);
-            this.rabbitRightArm.render(scale);
-            this.rabbitTail.render(scale);
+            GlStateManager.scale(1.0F / var8, 1.0F / var8, 1.0F / var8);
+            GlStateManager.translate(0.0F, 24.0F * p_78088_7_, 0.0F);
+            this.rabbitLeftFoot.render(p_78088_7_);
+            this.rabbitRightFoot.render(p_78088_7_);
+            this.rabbitLeftThigh.render(p_78088_7_);
+            this.rabbitRightThigh.render(p_78088_7_);
+            this.rabbitBody.render(p_78088_7_);
+            this.rabbitLeftArm.render(p_78088_7_);
+            this.rabbitRightArm.render(p_78088_7_);
+            this.rabbitTail.render(p_78088_7_);
             GlStateManager.popMatrix();
         }
         else
         {
-            this.rabbitLeftFoot.render(scale);
-            this.rabbitRightFoot.render(scale);
-            this.rabbitLeftThigh.render(scale);
-            this.rabbitRightThigh.render(scale);
-            this.rabbitBody.render(scale);
-            this.rabbitLeftArm.render(scale);
-            this.rabbitRightArm.render(scale);
-            this.rabbitHead.render(scale);
-            this.rabbitRightEar.render(scale);
-            this.rabbitLeftEar.render(scale);
-            this.rabbitTail.render(scale);
-            this.rabbitNose.render(scale);
+            this.rabbitLeftFoot.render(p_78088_7_);
+            this.rabbitRightFoot.render(p_78088_7_);
+            this.rabbitLeftThigh.render(p_78088_7_);
+            this.rabbitRightThigh.render(p_78088_7_);
+            this.rabbitBody.render(p_78088_7_);
+            this.rabbitLeftArm.render(p_78088_7_);
+            this.rabbitRightArm.render(p_78088_7_);
+            this.rabbitHead.render(p_78088_7_);
+            this.rabbitRightEar.render(p_78088_7_);
+            this.rabbitLeftEar.render(p_78088_7_);
+            this.rabbitTail.render(p_78088_7_);
+            this.rabbitNose.render(p_78088_7_);
         }
     }
 
@@ -173,15 +174,15 @@ public class ModelRabbit extends ModelBase
      * and legs, where par1 represents the time(so that arms and legs swing back and forth) and par2 represents how
      * "far" arms and legs can swing at most.
      */
-    public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn)
+    public void setRotationAngles(float p_78087_1_, float p_78087_2_, float p_78087_3_, float p_78087_4_, float p_78087_5_, float p_78087_6_, Entity p_78087_7_)
     {
-        float f = ageInTicks - (float)entityIn.ticksExisted;
-        EntityRabbit entityrabbit = (EntityRabbit)entityIn;
-        this.rabbitNose.rotateAngleX = this.rabbitHead.rotateAngleX = this.rabbitRightEar.rotateAngleX = this.rabbitLeftEar.rotateAngleX = headPitch * 0.017453292F;
-        this.rabbitNose.rotateAngleY = this.rabbitHead.rotateAngleY = netHeadYaw * 0.017453292F;
+        float var8 = p_78087_3_ - (float)p_78087_7_.ticksExisted;
+        EntityRabbit var9 = (EntityRabbit)p_78087_7_;
+        this.rabbitNose.rotateAngleX = this.rabbitHead.rotateAngleX = this.rabbitRightEar.rotateAngleX = this.rabbitLeftEar.rotateAngleX = p_78087_5_ * 0.017453292F;
+        this.rabbitNose.rotateAngleY = this.rabbitHead.rotateAngleY = p_78087_4_ * 0.017453292F;
         this.rabbitRightEar.rotateAngleY = this.rabbitNose.rotateAngleY - 0.2617994F;
         this.rabbitLeftEar.rotateAngleY = this.rabbitNose.rotateAngleY + 0.2617994F;
-        this.field_178701_m = MathHelper.sin(entityrabbit.func_175521_o(f) * (float)Math.PI);
+        this.field_178701_m = MathHelper.sin(var9.func_175521_o(var8) * (float)Math.PI);
         this.rabbitLeftThigh.rotateAngleX = this.rabbitRightThigh.rotateAngleX = (this.field_178701_m * 50.0F - 21.0F) * 0.017453292F;
         this.rabbitLeftFoot.rotateAngleX = this.rabbitRightFoot.rotateAngleX = this.field_178701_m * 50.0F * 0.017453292F;
         this.rabbitLeftArm.rotateAngleX = this.rabbitRightArm.rotateAngleX = (this.field_178701_m * -40.0F - 11.0F) * 0.017453292F;
@@ -191,7 +192,5 @@ public class ModelRabbit extends ModelBase
      * Used for easily adding entity-dependent animations. The second and third float params here are the same second
      * and third as in the setRotationAngles method.
      */
-    public void setLivingAnimations(EntityLivingBase entitylivingbaseIn, float p_78086_2_, float p_78086_3_, float partialTickTime)
-    {
-    }
+    public void setLivingAnimations(EntityLivingBase p_78086_1_, float p_78086_2_, float p_78086_3_, float p_78086_4_) {}
 }

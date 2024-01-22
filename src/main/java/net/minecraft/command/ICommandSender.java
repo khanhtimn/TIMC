@@ -9,52 +9,34 @@ import net.minecraft.world.World;
 public interface ICommandSender
 {
     /**
-     * Get the name of this object. For players this returns their username
+     * Gets the name of this command sender (usually username, but possibly "Rcon")
      */
     String getName();
 
-    /**
-     * Get the formatted ChatComponent that will be used for the sender's username in chat
-     */
     IChatComponent getDisplayName();
 
     /**
-     * Send a chat message to the CommandSender
+     * Notifies this sender of some sort of information.  This is for messages intended to display to the user.  Used
+     * for typical output (like "you asked for whether or not this game rule is set, so here's your answer"), warnings
+     * (like "I fetched this block for you by ID, but I'd like you to know that every time you do this, I die a little
+     * inside"), and errors (like "it's not called iron_pixacke, silly").
      */
-    void addChatMessage(IChatComponent component);
+    void addChatMessage(IChatComponent var1);
 
     /**
-     * Returns {@code true} if the CommandSender is allowed to execute the command, {@code false} if not
+     * Returns true if the command sender is allowed to use the given command.
      */
-    boolean canCommandSenderUseCommand(int permLevel, String commandName);
+    boolean canCommandSenderUseCommand(int var1, String var2);
 
-    /**
-     * Get the position in the world. <b>{@code null} is not allowed!</b> If you are not an entity in the world, return
-     * the coordinates 0, 0, 0
-     */
     BlockPos getPosition();
 
-    /**
-     * Get the position vector. <b>{@code null} is not allowed!</b> If you are not an entity in the world, return 0.0D,
-     * 0.0D, 0.0D
-     */
     Vec3 getPositionVector();
 
-    /**
-     * Get the world, if available. <b>{@code null} is not allowed!</b> If you are not an entity in the world, return
-     * the overworld
-     */
     World getEntityWorld();
 
-    /**
-     * Returns the entity associated with the command sender. MAY BE NULL!
-     */
     Entity getCommandSenderEntity();
 
-    /**
-     * Returns true if the command sender should be sent feedback about executed commands
-     */
     boolean sendCommandFeedback();
 
-    void setCommandStat(CommandResultStats.Type type, int amount);
+    void func_174794_a(CommandResultStats.Type var1, int var2);
 }

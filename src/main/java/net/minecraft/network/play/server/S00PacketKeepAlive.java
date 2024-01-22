@@ -1,21 +1,21 @@
 package net.minecraft.network.play.server;
 
 import java.io.IOException;
+import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 
-public class S00PacketKeepAlive implements Packet<INetHandlerPlayClient>
+public class S00PacketKeepAlive implements Packet
 {
-    private int id;
+    private int field_149136_a;
+    
 
-    public S00PacketKeepAlive()
-    {
-    }
+    public S00PacketKeepAlive() {}
 
-    public S00PacketKeepAlive(int idIn)
+    public S00PacketKeepAlive(int p_i45195_1_)
     {
-        this.id = idIn;
+        this.field_149136_a = p_i45195_1_;
     }
 
     /**
@@ -29,21 +29,29 @@ public class S00PacketKeepAlive implements Packet<INetHandlerPlayClient>
     /**
      * Reads the raw packet data from the data stream.
      */
-    public void readPacketData(PacketBuffer buf) throws IOException
+    public void readPacketData(PacketBuffer data) throws IOException
     {
-        this.id = buf.readVarIntFromBuffer();
+        this.field_149136_a = data.readVarIntFromBuffer();
     }
 
     /**
      * Writes the raw packet data to the data stream.
      */
-    public void writePacketData(PacketBuffer buf) throws IOException
+    public void writePacketData(PacketBuffer data) throws IOException
     {
-        buf.writeVarIntToBuffer(this.id);
+        data.writeVarIntToBuffer(this.field_149136_a);
     }
 
     public int func_149134_c()
     {
-        return this.id;
+        return this.field_149136_a;
+    }
+
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandler handler)
+    {
+        this.processPacket((INetHandlerPlayClient)handler);
     }
 }

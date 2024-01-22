@@ -2,7 +2,7 @@ package net.minecraft.world.storage;
 
 import net.minecraft.world.WorldSettings;
 
-public class SaveFormatComparator implements Comparable<SaveFormatComparator>
+public class SaveFormatComparator implements Comparable
 {
     /** the file name of this save */
     private final String fileName;
@@ -17,17 +17,18 @@ public class SaveFormatComparator implements Comparable<SaveFormatComparator>
     private final WorldSettings.GameType theEnumGameType;
     private final boolean hardcore;
     private final boolean cheatsEnabled;
+    
 
-    public SaveFormatComparator(String fileNameIn, String displayNameIn, long lastTimePlayedIn, long sizeOnDiskIn, WorldSettings.GameType theEnumGameTypeIn, boolean requiresConversionIn, boolean hardcoreIn, boolean cheatsEnabledIn)
+    public SaveFormatComparator(String p_i2161_1_, String p_i2161_2_, long p_i2161_3_, long p_i2161_5_, WorldSettings.GameType p_i2161_7_, boolean p_i2161_8_, boolean p_i2161_9_, boolean p_i2161_10_)
     {
-        this.fileName = fileNameIn;
-        this.displayName = displayNameIn;
-        this.lastTimePlayed = lastTimePlayedIn;
-        this.sizeOnDisk = sizeOnDiskIn;
-        this.theEnumGameType = theEnumGameTypeIn;
-        this.requiresConversion = requiresConversionIn;
-        this.hardcore = hardcoreIn;
-        this.cheatsEnabled = cheatsEnabledIn;
+        this.fileName = p_i2161_1_;
+        this.displayName = p_i2161_2_;
+        this.lastTimePlayed = p_i2161_3_;
+        this.sizeOnDisk = p_i2161_5_;
+        this.theEnumGameType = p_i2161_7_;
+        this.requiresConversion = p_i2161_8_;
+        this.hardcore = p_i2161_9_;
+        this.cheatsEnabled = p_i2161_10_;
     }
 
     /**
@@ -46,7 +47,7 @@ public class SaveFormatComparator implements Comparable<SaveFormatComparator>
         return this.displayName;
     }
 
-    public long getSizeOnDisk()
+    public long func_154336_c()
     {
         return this.sizeOnDisk;
     }
@@ -85,5 +86,10 @@ public class SaveFormatComparator implements Comparable<SaveFormatComparator>
     public boolean getCheatsEnabled()
     {
         return this.cheatsEnabled;
+    }
+
+    public int compareTo(Object p_compareTo_1_)
+    {
+        return this.compareTo((SaveFormatComparator)p_compareTo_1_);
     }
 }

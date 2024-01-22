@@ -2,13 +2,15 @@ package net.minecraft.server.management;
 
 import com.google.common.collect.Maps;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-public class LowerStringMap<V> implements Map<String, V>
+public class LowerStringMap implements Map
 {
-    private final Map<String, V> internalMap = Maps.<String, V>newLinkedHashMap();
+    private final Map internalMap = Maps.newLinkedHashMap();
+    
 
     public int size()
     {
@@ -30,26 +32,29 @@ public class LowerStringMap<V> implements Map<String, V>
         return this.internalMap.containsKey(p_containsValue_1_);
     }
 
-    public V get(Object p_get_1_)
+    public Object get(Object p_get_1_)
     {
         return this.internalMap.get(p_get_1_.toString().toLowerCase());
     }
 
-    public V put(String p_put_1_, V p_put_2_)
+    public Object put(String p_put_1_, Object p_put_2_)
     {
         return this.internalMap.put(p_put_1_.toLowerCase(), p_put_2_);
     }
 
-    public V remove(Object p_remove_1_)
+    public Object remove(Object p_remove_1_)
     {
         return this.internalMap.remove(p_remove_1_.toString().toLowerCase());
     }
 
-    public void putAll(Map <? extends String, ? extends V > p_putAll_1_)
+    public void putAll(Map p_putAll_1_)
     {
-        for (Entry <? extends String, ? extends V > entry : p_putAll_1_.entrySet())
+        Iterator var2 = p_putAll_1_.entrySet().iterator();
+
+        while (var2.hasNext())
         {
-            this.put((String)entry.getKey(), entry.getValue());
+            Entry var3 = (Entry)var2.next();
+            this.put((String)var3.getKey(), var3.getValue());
         }
     }
 
@@ -58,18 +63,23 @@ public class LowerStringMap<V> implements Map<String, V>
         this.internalMap.clear();
     }
 
-    public Set<String> keySet()
+    public Set keySet()
     {
         return this.internalMap.keySet();
     }
 
-    public Collection<V> values()
+    public Collection values()
     {
         return this.internalMap.values();
     }
 
-    public Set<Entry<String, V>> entrySet()
+    public Set entrySet()
     {
         return this.internalMap.entrySet();
+    }
+
+    public Object put(Object p_put_1_, Object p_put_2_)
+    {
+        return this.put((String)p_put_1_, p_put_2_);
     }
 }

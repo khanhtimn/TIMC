@@ -14,11 +14,9 @@ import org.apache.logging.log4j.Logger;
 
 public class CommandTitle extends CommandBase
 {
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger field_175774_a = LogManager.getLogger();
+    
 
-    /**
-     * Gets the name of the command
-     */
     public String getCommandName()
     {
         return "title";
@@ -32,17 +30,11 @@ public class CommandTitle extends CommandBase
         return 2;
     }
 
-    /**
-     * Gets the usage string for the command.
-     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.title.usage";
     }
 
-    /**
-     * Callback when the command is invoked
-     */
     public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 2)
@@ -64,12 +56,12 @@ public class CommandTitle extends CommandBase
                 }
             }
 
-            EntityPlayerMP entityplayermp = getPlayer(sender, args[0]);
-            S45PacketTitle.Type s45packettitle$type = S45PacketTitle.Type.byName(args[1]);
+            EntityPlayerMP var3 = getPlayer(sender, args[0]);
+            S45PacketTitle.Type var4 = S45PacketTitle.Type.func_179969_a(args[1]);
 
-            if (s45packettitle$type != S45PacketTitle.Type.CLEAR && s45packettitle$type != S45PacketTitle.Type.RESET)
+            if (var4 != S45PacketTitle.Type.CLEAR && var4 != S45PacketTitle.Type.RESET)
             {
-                if (s45packettitle$type == S45PacketTitle.Type.TIMES)
+                if (var4 == S45PacketTitle.Type.TIMES)
                 {
                     if (args.length != 5)
                     {
@@ -77,11 +69,11 @@ public class CommandTitle extends CommandBase
                     }
                     else
                     {
-                        int i = parseInt(args[2]);
-                        int j = parseInt(args[3]);
-                        int k = parseInt(args[4]);
-                        S45PacketTitle s45packettitle2 = new S45PacketTitle(i, j, k);
-                        entityplayermp.playerNetServerHandler.sendPacket(s45packettitle2);
+                        int var11 = parseInt(args[2]);
+                        int var12 = parseInt(args[3]);
+                        int var13 = parseInt(args[4]);
+                        S45PacketTitle var14 = new S45PacketTitle(var11, var12, var13);
+                        var3.playerNetServerHandler.sendPacket(var14);
                         notifyOperators(sender, this, "commands.title.success", new Object[0]);
                     }
                 }
@@ -91,21 +83,21 @@ public class CommandTitle extends CommandBase
                 }
                 else
                 {
-                    String s = buildString(args, 2);
-                    IChatComponent ichatcomponent;
+                    String var10 = func_180529_a(args, 2);
+                    IChatComponent var6;
 
                     try
                     {
-                        ichatcomponent = IChatComponent.Serializer.jsonToComponent(s);
+                        var6 = IChatComponent.Serializer.jsonToComponent(var10);
                     }
-                    catch (JsonParseException jsonparseexception)
+                    catch (JsonParseException var9)
                     {
-                        Throwable throwable = ExceptionUtils.getRootCause(jsonparseexception);
-                        throw new SyntaxErrorException("commands.tellraw.jsonException", new Object[] {throwable == null ? "" : throwable.getMessage()});
+                        Throwable var8 = ExceptionUtils.getRootCause(var9);
+                        throw new SyntaxErrorException("commands.tellraw.jsonException", new Object[] {var8 == null ? "" : var8.getMessage()});
                     }
 
-                    S45PacketTitle s45packettitle1 = new S45PacketTitle(s45packettitle$type, ChatComponentProcessor.processComponent(sender, ichatcomponent, entityplayermp));
-                    entityplayermp.playerNetServerHandler.sendPacket(s45packettitle1);
+                    S45PacketTitle var7 = new S45PacketTitle(var4, ChatComponentProcessor.func_179985_a(sender, var6, var3));
+                    var3.playerNetServerHandler.sendPacket(var7);
                     notifyOperators(sender, this, "commands.title.success", new Object[0]);
                 }
             }
@@ -115,16 +107,16 @@ public class CommandTitle extends CommandBase
             }
             else
             {
-                S45PacketTitle s45packettitle = new S45PacketTitle(s45packettitle$type, (IChatComponent)null);
-                entityplayermp.playerNetServerHandler.sendPacket(s45packettitle);
+                S45PacketTitle var5 = new S45PacketTitle(var4, (IChatComponent)null);
+                var3.playerNetServerHandler.sendPacket(var5);
                 notifyOperators(sender, this, "commands.title.success", new Object[0]);
             }
         }
     }
 
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
-        return args.length == 1 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : (args.length == 2 ? getListOfStringsMatchingLastWord(args, S45PacketTitle.Type.getNames()) : null);
+        return args.length == 1 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : (args.length == 2 ? getListOfStringsMatchingLastWord(args, S45PacketTitle.Type.func_179971_a()) : null);
     }
 
     /**

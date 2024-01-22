@@ -10,6 +10,7 @@ public class MouseHelper
 
     /** Mouse delta Y this frame */
     public int deltaY;
+    
 
     /**
      * Grabs the mouse cursor it doesn't move and isn't seen.

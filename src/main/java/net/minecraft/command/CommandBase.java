@@ -4,9 +4,11 @@ import com.google.common.base.Functions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Doubles;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import net.minecraft.block.Block;
@@ -22,6 +24,7 @@ import net.minecraft.util.ResourceLocation;
 public abstract class CommandBase implements ICommand
 {
     private static IAdminCommand theAdmin;
+    
 
     /**
      * Return the required permission level for this command.
@@ -31,9 +34,9 @@ public abstract class CommandBase implements ICommand
         return 4;
     }
 
-    public List<String> getCommandAliases()
+    public List getCommandAliases()
     {
-        return Collections.<String>emptyList();
+        return Collections.emptyList();
     }
 
     /**
@@ -44,7 +47,7 @@ public abstract class CommandBase implements ICommand
         return sender.canCommandSenderUseCommand(this.getRequiredPermissionLevel(), this.getCommandName());
     }
 
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         return null;
     }
@@ -68,19 +71,19 @@ public abstract class CommandBase implements ICommand
 
     public static int parseInt(String input, int min, int max) throws NumberInvalidException
     {
-        int i = parseInt(input);
+        int var3 = parseInt(input);
 
-        if (i < min)
+        if (var3 < min)
         {
-            throw new NumberInvalidException("commands.generic.num.tooSmall", new Object[] {Integer.valueOf(i), Integer.valueOf(min)});
+            throw new NumberInvalidException("commands.generic.num.tooSmall", new Object[] {Integer.valueOf(var3), Integer.valueOf(min)});
         }
-        else if (i > max)
+        else if (var3 > max)
         {
-            throw new NumberInvalidException("commands.generic.num.tooBig", new Object[] {Integer.valueOf(i), Integer.valueOf(max)});
+            throw new NumberInvalidException("commands.generic.num.tooBig", new Object[] {Integer.valueOf(var3), Integer.valueOf(max)});
         }
         else
         {
-            return i;
+            return var3;
         }
     }
 
@@ -98,41 +101,41 @@ public abstract class CommandBase implements ICommand
 
     public static long parseLong(String input, long min, long max) throws NumberInvalidException
     {
-        long i = parseLong(input);
+        long var5 = parseLong(input);
 
-        if (i < min)
+        if (var5 < min)
         {
-            throw new NumberInvalidException("commands.generic.num.tooSmall", new Object[] {Long.valueOf(i), Long.valueOf(min)});
+            throw new NumberInvalidException("commands.generic.num.tooSmall", new Object[] {Long.valueOf(var5), Long.valueOf(min)});
         }
-        else if (i > max)
+        else if (var5 > max)
         {
-            throw new NumberInvalidException("commands.generic.num.tooBig", new Object[] {Long.valueOf(i), Long.valueOf(max)});
+            throw new NumberInvalidException("commands.generic.num.tooBig", new Object[] {Long.valueOf(var5), Long.valueOf(max)});
         }
         else
         {
-            return i;
+            return var5;
         }
     }
 
-    public static BlockPos parseBlockPos(ICommandSender sender, String[] args, int startIndex, boolean centerBlock) throws NumberInvalidException
+    public static BlockPos func_175757_a(ICommandSender sender, String[] args, int p_175757_2_, boolean p_175757_3_) throws NumberInvalidException
     {
-        BlockPos blockpos = sender.getPosition();
-        return new BlockPos(parseDouble((double)blockpos.getX(), args[startIndex], -30000000, 30000000, centerBlock), parseDouble((double)blockpos.getY(), args[startIndex + 1], 0, 256, false), parseDouble((double)blockpos.getZ(), args[startIndex + 2], -30000000, 30000000, centerBlock));
+        BlockPos var4 = sender.getPosition();
+        return new BlockPos(func_175769_b((double)var4.getX(), args[p_175757_2_], -30000000, 30000000, p_175757_3_), func_175769_b((double)var4.getY(), args[p_175757_2_ + 1], 0, 256, false), func_175769_b((double)var4.getZ(), args[p_175757_2_ + 2], -30000000, 30000000, p_175757_3_));
     }
 
     public static double parseDouble(String input) throws NumberInvalidException
     {
         try
         {
-            double d0 = Double.parseDouble(input);
+            double var1 = Double.parseDouble(input);
 
-            if (!Doubles.isFinite(d0))
+            if (!Doubles.isFinite(var1))
             {
                 throw new NumberInvalidException("commands.generic.num.invalid", new Object[] {input});
             }
             else
             {
-                return d0;
+                return var1;
             }
         }
         catch (NumberFormatException var3)
@@ -148,19 +151,19 @@ public abstract class CommandBase implements ICommand
 
     public static double parseDouble(String input, double min, double max) throws NumberInvalidException
     {
-        double d0 = parseDouble(input);
+        double var5 = parseDouble(input);
 
-        if (d0 < min)
+        if (var5 < min)
         {
-            throw new NumberInvalidException("commands.generic.double.tooSmall", new Object[] {Double.valueOf(d0), Double.valueOf(min)});
+            throw new NumberInvalidException("commands.generic.double.tooSmall", new Object[] {Double.valueOf(var5), Double.valueOf(min)});
         }
-        else if (d0 > max)
+        else if (var5 > max)
         {
-            throw new NumberInvalidException("commands.generic.double.tooBig", new Object[] {Double.valueOf(d0), Double.valueOf(max)});
+            throw new NumberInvalidException("commands.generic.double.tooBig", new Object[] {Double.valueOf(var5), Double.valueOf(max)});
         }
         else
         {
-            return d0;
+            return var5;
         }
     }
 
@@ -200,13 +203,13 @@ public abstract class CommandBase implements ICommand
 
     public static EntityPlayerMP getPlayer(ICommandSender sender, String username) throws PlayerNotFoundException
     {
-        EntityPlayerMP entityplayermp = PlayerSelector.matchOnePlayer(sender, username);
+        EntityPlayerMP var2 = PlayerSelector.matchOnePlayer(sender, username);
 
-        if (entityplayermp == null)
+        if (var2 == null)
         {
             try
             {
-                entityplayermp = MinecraftServer.getServer().getConfigurationManager().getPlayerByUUID(UUID.fromString(username));
+                var2 = MinecraftServer.getServer().getConfigurationManager().func_177451_a(UUID.fromString(username));
             }
             catch (IllegalArgumentException var4)
             {
@@ -214,46 +217,46 @@ public abstract class CommandBase implements ICommand
             }
         }
 
-        if (entityplayermp == null)
+        if (var2 == null)
         {
-            entityplayermp = MinecraftServer.getServer().getConfigurationManager().getPlayerByUsername(username);
+            var2 = MinecraftServer.getServer().getConfigurationManager().getPlayerByUsername(username);
         }
 
-        if (entityplayermp == null)
+        if (var2 == null)
         {
             throw new PlayerNotFoundException();
         }
         else
         {
-            return entityplayermp;
+            return var2;
         }
     }
 
-    public static Entity getEntity(ICommandSender p_175768_0_, String p_175768_1_) throws EntityNotFoundException
+    public static Entity func_175768_b(ICommandSender p_175768_0_, String p_175768_1_) throws EntityNotFoundException
     {
-        return getEntity(p_175768_0_, p_175768_1_, Entity.class);
+        return func_175759_a(p_175768_0_, p_175768_1_, Entity.class);
     }
 
-    public static <T extends Entity> T getEntity(ICommandSender commandSender, String p_175759_1_, Class <? extends T > p_175759_2_) throws EntityNotFoundException
+    public static Entity func_175759_a(ICommandSender p_175759_0_, String p_175759_1_, Class p_175759_2_) throws EntityNotFoundException
     {
-        Entity entity = PlayerSelector.matchOneEntity(commandSender, p_175759_1_, p_175759_2_);
-        MinecraftServer minecraftserver = MinecraftServer.getServer();
+        Object var3 = PlayerSelector.func_179652_a(p_175759_0_, p_175759_1_, p_175759_2_);
+        MinecraftServer var4 = MinecraftServer.getServer();
 
-        if (entity == null)
+        if (var3 == null)
         {
-            entity = minecraftserver.getConfigurationManager().getPlayerByUsername(p_175759_1_);
+            var3 = var4.getConfigurationManager().getPlayerByUsername(p_175759_1_);
         }
 
-        if (entity == null)
+        if (var3 == null)
         {
             try
             {
-                UUID uuid = UUID.fromString(p_175759_1_);
-                entity = minecraftserver.getEntityFromUuid(uuid);
+                UUID var5 = UUID.fromString(p_175759_1_);
+                var3 = var4.getEntityFromUuid(var5);
 
-                if (entity == null)
+                if (var3 == null)
                 {
-                    entity = minecraftserver.getConfigurationManager().getPlayerByUUID(uuid);
+                    var3 = var4.getConfigurationManager().func_177451_a(var5);
                 }
             }
             catch (IllegalArgumentException var6)
@@ -262,9 +265,9 @@ public abstract class CommandBase implements ICommand
             }
         }
 
-        if (entity != null && p_175759_2_.isAssignableFrom(entity.getClass()))
+        if (var3 != null && p_175759_2_.isAssignableFrom(var3.getClass()))
         {
-            return (T)entity;
+            return (Entity)var3;
         }
         else
         {
@@ -272,9 +275,9 @@ public abstract class CommandBase implements ICommand
         }
     }
 
-    public static List<Entity> func_175763_c(ICommandSender p_175763_0_, String p_175763_1_) throws EntityNotFoundException
+    public static List func_175763_c(ICommandSender p_175763_0_, String p_175763_1_) throws EntityNotFoundException
     {
-        return (List<Entity>)(PlayerSelector.hasArguments(p_175763_1_) ? PlayerSelector.matchEntities(p_175763_0_, p_175763_1_, Entity.class) : Lists.newArrayList(new Entity[] {getEntity(p_175763_0_, p_175763_1_)}));
+        return (List)(PlayerSelector.hasArguments(p_175763_1_) ? PlayerSelector.func_179656_b(p_175763_0_, p_175763_1_, Entity.class) : Lists.newArrayList(new Entity[] {func_175768_b(p_175763_0_, p_175763_1_)}));
     }
 
     public static String getPlayerName(ICommandSender sender, String query) throws PlayerNotFoundException
@@ -283,11 +286,11 @@ public abstract class CommandBase implements ICommand
         {
             return getPlayer(sender, query).getName();
         }
-        catch (PlayerNotFoundException playernotfoundexception)
+        catch (PlayerNotFoundException var3)
         {
             if (PlayerSelector.hasArguments(query))
             {
-                throw playernotfoundexception;
+                throw var3;
             }
             else
             {
@@ -296,11 +299,7 @@ public abstract class CommandBase implements ICommand
         }
     }
 
-    /**
-     * Attempts to retrieve an entity's name, first assuming that the entity is a player, and then exhausting all other
-     * possibilities.
-     */
-    public static String getEntityName(ICommandSender p_175758_0_, String p_175758_1_) throws EntityNotFoundException
+    public static String func_175758_e(ICommandSender p_175758_0_, String p_175758_1_) throws EntityNotFoundException
     {
         try
         {
@@ -310,13 +309,13 @@ public abstract class CommandBase implements ICommand
         {
             try
             {
-                return getEntity(p_175758_0_, p_175758_1_).getUniqueID().toString();
+                return func_175768_b(p_175758_0_, p_175758_1_).getUniqueID().toString();
             }
-            catch (EntityNotFoundException entitynotfoundexception)
+            catch (EntityNotFoundException var4)
             {
                 if (PlayerSelector.hasArguments(p_175758_1_))
                 {
-                    throw entitynotfoundexception;
+                    throw var4;
                 }
                 else
                 {
@@ -326,167 +325,164 @@ public abstract class CommandBase implements ICommand
         }
     }
 
-    public static IChatComponent getChatComponentFromNthArg(ICommandSender sender, String[] args, int p_147178_2_) throws CommandException, PlayerNotFoundException
+    public static IChatComponent getChatComponentFromNthArg(ICommandSender sender, String[] args, int p_147178_2_) throws CommandException
     {
         return getChatComponentFromNthArg(sender, args, p_147178_2_, false);
     }
 
     public static IChatComponent getChatComponentFromNthArg(ICommandSender sender, String[] args, int index, boolean p_147176_3_) throws PlayerNotFoundException
     {
-        IChatComponent ichatcomponent = new ChatComponentText("");
+        ChatComponentText var4 = new ChatComponentText("");
 
-        for (int i = index; i < args.length; ++i)
+        for (int var5 = index; var5 < args.length; ++var5)
         {
-            if (i > index)
+            if (var5 > index)
             {
-                ichatcomponent.appendText(" ");
+                var4.appendText(" ");
             }
 
-            IChatComponent ichatcomponent1 = new ChatComponentText(args[i]);
+            Object var6 = new ChatComponentText(args[var5]);
 
             if (p_147176_3_)
             {
-                IChatComponent ichatcomponent2 = PlayerSelector.matchEntitiesToChatComponent(sender, args[i]);
+                IChatComponent var7 = PlayerSelector.func_150869_b(sender, args[var5]);
 
-                if (ichatcomponent2 == null)
+                if (var7 == null)
                 {
-                    if (PlayerSelector.hasArguments(args[i]))
+                    if (PlayerSelector.hasArguments(args[var5]))
                     {
                         throw new PlayerNotFoundException();
                     }
                 }
                 else
                 {
-                    ichatcomponent1 = ichatcomponent2;
+                    var6 = var7;
                 }
             }
 
-            ichatcomponent.appendSibling(ichatcomponent1);
+            var4.appendSibling((IChatComponent)var6);
         }
 
-        return ichatcomponent;
+        return var4;
     }
 
-    /**
-     * Builds a string starting at startPos
-     */
-    public static String buildString(String[] args, int startPos)
+    public static String func_180529_a(String[] p_180529_0_, int p_180529_1_)
     {
-        StringBuilder stringbuilder = new StringBuilder();
+        StringBuilder var2 = new StringBuilder();
 
-        for (int i = startPos; i < args.length; ++i)
+        for (int var3 = p_180529_1_; var3 < p_180529_0_.length; ++var3)
         {
-            if (i > startPos)
+            if (var3 > p_180529_1_)
             {
-                stringbuilder.append(" ");
+                var2.append(" ");
             }
 
-            String s = args[i];
-            stringbuilder.append(s);
+            String var4 = p_180529_0_[var3];
+            var2.append(var4);
         }
 
-        return stringbuilder.toString();
+        return var2.toString();
     }
 
-    public static CommandBase.CoordinateArg parseCoordinate(double base, String p_175770_2_, boolean centerBlock) throws NumberInvalidException
+    public static CommandBase.CoordinateArg func_175770_a(double p_175770_0_, String p_175770_2_, boolean p_175770_3_) throws NumberInvalidException
     {
-        return parseCoordinate(base, p_175770_2_, -30000000, 30000000, centerBlock);
+        return func_175767_a(p_175770_0_, p_175770_2_, -30000000, 30000000, p_175770_3_);
     }
 
-    public static CommandBase.CoordinateArg parseCoordinate(double p_175767_0_, String p_175767_2_, int min, int max, boolean centerBlock) throws NumberInvalidException
+    public static CommandBase.CoordinateArg func_175767_a(double p_175767_0_, String p_175767_2_, int p_175767_3_, int p_175767_4_, boolean p_175767_5_) throws NumberInvalidException
     {
-        boolean flag = p_175767_2_.startsWith("~");
+        boolean var6 = p_175767_2_.startsWith("~");
 
-        if (flag && Double.isNaN(p_175767_0_))
+        if (var6 && Double.isNaN(p_175767_0_))
         {
             throw new NumberInvalidException("commands.generic.num.invalid", new Object[] {Double.valueOf(p_175767_0_)});
         }
         else
         {
-            double d0 = 0.0D;
+            double var7 = 0.0D;
 
-            if (!flag || p_175767_2_.length() > 1)
+            if (!var6 || p_175767_2_.length() > 1)
             {
-                boolean flag1 = p_175767_2_.contains(".");
+                boolean var9 = p_175767_2_.contains(".");
 
-                if (flag)
+                if (var6)
                 {
                     p_175767_2_ = p_175767_2_.substring(1);
                 }
 
-                d0 += parseDouble(p_175767_2_);
+                var7 += parseDouble(p_175767_2_);
 
-                if (!flag1 && !flag && centerBlock)
+                if (!var9 && !var6 && p_175767_5_)
                 {
-                    d0 += 0.5D;
+                    var7 += 0.5D;
                 }
             }
 
-            if (min != 0 || max != 0)
+            if (p_175767_3_ != 0 || p_175767_4_ != 0)
             {
-                if (d0 < (double)min)
+                if (var7 < (double)p_175767_3_)
                 {
-                    throw new NumberInvalidException("commands.generic.double.tooSmall", new Object[] {Double.valueOf(d0), Integer.valueOf(min)});
+                    throw new NumberInvalidException("commands.generic.double.tooSmall", new Object[] {Double.valueOf(var7), Integer.valueOf(p_175767_3_)});
                 }
 
-                if (d0 > (double)max)
+                if (var7 > (double)p_175767_4_)
                 {
-                    throw new NumberInvalidException("commands.generic.double.tooBig", new Object[] {Double.valueOf(d0), Integer.valueOf(max)});
+                    throw new NumberInvalidException("commands.generic.double.tooBig", new Object[] {Double.valueOf(var7), Integer.valueOf(p_175767_4_)});
                 }
             }
 
-            return new CommandBase.CoordinateArg(d0 + (flag ? p_175767_0_ : 0.0D), d0, flag);
+            return new CommandBase.CoordinateArg(var7 + (var6 ? p_175767_0_ : 0.0D), var7, var6);
         }
     }
 
-    public static double parseDouble(double base, String input, boolean centerBlock) throws NumberInvalidException
+    public static double func_175761_b(double p_175761_0_, String p_175761_2_, boolean p_175761_3_) throws NumberInvalidException
     {
-        return parseDouble(base, input, -30000000, 30000000, centerBlock);
+        return func_175769_b(p_175761_0_, p_175761_2_, -30000000, 30000000, p_175761_3_);
     }
 
-    public static double parseDouble(double base, String input, int min, int max, boolean centerBlock) throws NumberInvalidException
+    public static double func_175769_b(double base, String input, int min, int max, boolean centerBlock) throws NumberInvalidException
     {
-        boolean flag = input.startsWith("~");
+        boolean var6 = input.startsWith("~");
 
-        if (flag && Double.isNaN(base))
+        if (var6 && Double.isNaN(base))
         {
             throw new NumberInvalidException("commands.generic.num.invalid", new Object[] {Double.valueOf(base)});
         }
         else
         {
-            double d0 = flag ? base : 0.0D;
+            double var7 = var6 ? base : 0.0D;
 
-            if (!flag || input.length() > 1)
+            if (!var6 || input.length() > 1)
             {
-                boolean flag1 = input.contains(".");
+                boolean var9 = input.contains(".");
 
-                if (flag)
+                if (var6)
                 {
                     input = input.substring(1);
                 }
 
-                d0 += parseDouble(input);
+                var7 += parseDouble(input);
 
-                if (!flag1 && !flag && centerBlock)
+                if (!var9 && !var6 && centerBlock)
                 {
-                    d0 += 0.5D;
+                    var7 += 0.5D;
                 }
             }
 
             if (min != 0 || max != 0)
             {
-                if (d0 < (double)min)
+                if (var7 < (double)min)
                 {
-                    throw new NumberInvalidException("commands.generic.double.tooSmall", new Object[] {Double.valueOf(d0), Integer.valueOf(min)});
+                    throw new NumberInvalidException("commands.generic.double.tooSmall", new Object[] {Double.valueOf(var7), Integer.valueOf(min)});
                 }
 
-                if (d0 > (double)max)
+                if (var7 > (double)max)
                 {
-                    throw new NumberInvalidException("commands.generic.double.tooBig", new Object[] {Double.valueOf(d0), Integer.valueOf(max)});
+                    throw new NumberInvalidException("commands.generic.double.tooBig", new Object[] {Double.valueOf(var7), Integer.valueOf(max)});
                 }
             }
 
-            return d0;
+            return var7;
         }
     }
 
@@ -497,16 +493,16 @@ public abstract class CommandBase implements ICommand
      */
     public static Item getItemByText(ICommandSender sender, String id) throws NumberInvalidException
     {
-        ResourceLocation resourcelocation = new ResourceLocation(id);
-        Item item = (Item)Item.itemRegistry.getObject(resourcelocation);
+        ResourceLocation var2 = new ResourceLocation(id);
+        Item var3 = (Item)Item.itemRegistry.getObject(var2);
 
-        if (item == null)
+        if (var3 == null)
         {
-            throw new NumberInvalidException("commands.give.item.notFound", new Object[] {resourcelocation});
+            throw new NumberInvalidException("commands.give.notFound", new Object[] {var2});
         }
         else
         {
-            return item;
+            return var3;
         }
     }
 
@@ -517,23 +513,23 @@ public abstract class CommandBase implements ICommand
      */
     public static Block getBlockByText(ICommandSender sender, String id) throws NumberInvalidException
     {
-        ResourceLocation resourcelocation = new ResourceLocation(id);
+        ResourceLocation var2 = new ResourceLocation(id);
 
-        if (!Block.blockRegistry.containsKey(resourcelocation))
+        if (!Block.blockRegistry.containsKey(var2))
         {
-            throw new NumberInvalidException("commands.give.block.notFound", new Object[] {resourcelocation});
+            throw new NumberInvalidException("commands.give.notFound", new Object[] {var2});
         }
         else
         {
-            Block block = (Block)Block.blockRegistry.getObject(resourcelocation);
+            Block var3 = (Block)Block.blockRegistry.getObject(var2);
 
-            if (block == null)
+            if (var3 == null)
             {
-                throw new NumberInvalidException("commands.give.block.notFound", new Object[] {resourcelocation});
+                throw new NumberInvalidException("commands.give.notFound", new Object[] {var2});
             }
             else
             {
-                return block;
+                return var3;
             }
         }
     }
@@ -544,52 +540,52 @@ public abstract class CommandBase implements ICommand
      */
     public static String joinNiceString(Object[] elements)
     {
-        StringBuilder stringbuilder = new StringBuilder();
+        StringBuilder var1 = new StringBuilder();
 
-        for (int i = 0; i < elements.length; ++i)
+        for (int var2 = 0; var2 < elements.length; ++var2)
         {
-            String s = elements[i].toString();
+            String var3 = elements[var2].toString();
 
-            if (i > 0)
+            if (var2 > 0)
             {
-                if (i == elements.length - 1)
+                if (var2 == elements.length - 1)
                 {
-                    stringbuilder.append(" and ");
+                    var1.append(" and ");
                 }
                 else
                 {
-                    stringbuilder.append(", ");
+                    var1.append(", ");
                 }
             }
 
-            stringbuilder.append(s);
+            var1.append(var3);
         }
 
-        return stringbuilder.toString();
+        return var1.toString();
     }
 
-    public static IChatComponent join(List<IChatComponent> components)
+    public static IChatComponent join(List components)
     {
-        IChatComponent ichatcomponent = new ChatComponentText("");
+        ChatComponentText var1 = new ChatComponentText("");
 
-        for (int i = 0; i < components.size(); ++i)
+        for (int var2 = 0; var2 < components.size(); ++var2)
         {
-            if (i > 0)
+            if (var2 > 0)
             {
-                if (i == components.size() - 1)
+                if (var2 == components.size() - 1)
                 {
-                    ichatcomponent.appendText(" and ");
+                    var1.appendText(" and ");
                 }
-                else if (i > 0)
+                else if (var2 > 0)
                 {
-                    ichatcomponent.appendText(", ");
+                    var1.appendText(", ");
                 }
             }
 
-            ichatcomponent.appendSibling((IChatComponent)components.get(i));
+            var1.appendSibling((IChatComponent)components.get(var2));
         }
 
-        return ichatcomponent;
+        return var1;
     }
 
     /**
@@ -597,12 +593,12 @@ public abstract class CommandBase implements ICommand
      * {"Steve"} --> "Steve",  3) {"Steve", "Phil"} --> "Steve and Phil",  4) {"Steve", "Phil", "Mark"} --> "Steve, Phil
      * and Mark"
      */
-    public static String joinNiceStringFromCollection(Collection<String> strings)
+    public static String joinNiceStringFromCollection(Collection strings)
     {
         return joinNiceString(strings.toArray(new String[strings.size()]));
     }
 
-    public static List<String> func_175771_a(String[] p_175771_0_, int p_175771_1_, BlockPos p_175771_2_)
+    public static List func_175771_a(String[] p_175771_0_, int p_175771_1_, BlockPos p_175771_2_)
     {
         if (p_175771_2_ == null)
         {
@@ -610,57 +606,27 @@ public abstract class CommandBase implements ICommand
         }
         else
         {
-            int i = p_175771_0_.length - 1;
-            String s;
+            String var3;
 
-            if (i == p_175771_1_)
+            if (p_175771_0_.length - 1 == p_175771_1_)
             {
-                s = Integer.toString(p_175771_2_.getX());
+                var3 = Integer.toString(p_175771_2_.getX());
             }
-            else if (i == p_175771_1_ + 1)
+            else if (p_175771_0_.length - 1 == p_175771_1_ + 1)
             {
-                s = Integer.toString(p_175771_2_.getY());
+                var3 = Integer.toString(p_175771_2_.getY());
             }
             else
             {
-                if (i != p_175771_1_ + 2)
+                if (p_175771_0_.length - 1 != p_175771_1_ + 2)
                 {
                     return null;
                 }
 
-                s = Integer.toString(p_175771_2_.getZ());
+                var3 = Integer.toString(p_175771_2_.getZ());
             }
 
-            return Lists.newArrayList(new String[] {s});
-        }
-    }
-
-    public static List<String> func_181043_b(String[] p_181043_0_, int p_181043_1_, BlockPos p_181043_2_)
-    {
-        if (p_181043_2_ == null)
-        {
-            return null;
-        }
-        else
-        {
-            int i = p_181043_0_.length - 1;
-            String s;
-
-            if (i == p_181043_1_)
-            {
-                s = Integer.toString(p_181043_2_.getX());
-            }
-            else
-            {
-                if (i != p_181043_1_ + 1)
-                {
-                    return null;
-                }
-
-                s = Integer.toString(p_181043_2_.getZ());
-            }
-
-            return Lists.newArrayList(new String[] {s});
+            return Lists.newArrayList(new String[] {var3});
         }
     }
 
@@ -672,39 +638,51 @@ public abstract class CommandBase implements ICommand
         return region.regionMatches(true, 0, original, 0, original.length());
     }
 
-    public static List<String> getListOfStringsMatchingLastWord(String[] args, String... possibilities)
+    /**
+     * Returns a List of strings (chosen from the given strings) which the last word in the given string array is a
+     * beginning-match for. (Tab completion).
+     */
+    public static List getListOfStringsMatchingLastWord(String[] args, String ... possibilities)
     {
-        return getListOfStringsMatchingLastWord(args, Arrays.asList(possibilities));
+        return func_175762_a(args, Arrays.asList(possibilities));
     }
 
-    public static List<String> getListOfStringsMatchingLastWord(String[] p_175762_0_, Collection<?> p_175762_1_)
+    public static List func_175762_a(String[] p_175762_0_, Collection p_175762_1_)
     {
-        String s = p_175762_0_[p_175762_0_.length - 1];
-        List<String> list = Lists.<String>newArrayList();
+        String var2 = p_175762_0_[p_175762_0_.length - 1];
+        ArrayList var3 = Lists.newArrayList();
 
         if (!p_175762_1_.isEmpty())
         {
-            for (String s1 : Iterables.transform(p_175762_1_, Functions.toStringFunction()))
+            Iterator var4 = Iterables.transform(p_175762_1_, Functions.toStringFunction()).iterator();
+
+            while (var4.hasNext())
             {
-                if (doesStringStartWith(s, s1))
+                String var5 = (String)var4.next();
+
+                if (doesStringStartWith(var2, var5))
                 {
-                    list.add(s1);
+                    var3.add(var5);
                 }
             }
 
-            if (list.isEmpty())
+            if (var3.isEmpty())
             {
-                for (Object object : p_175762_1_)
+                var4 = p_175762_1_.iterator();
+
+                while (var4.hasNext())
                 {
-                    if (object instanceof ResourceLocation && doesStringStartWith(s, ((ResourceLocation)object).getResourcePath()))
+                    Object var6 = var4.next();
+
+                    if (var6 instanceof ResourceLocation && doesStringStartWith(var2, ((ResourceLocation)var6).getResourcePath()))
                     {
-                        list.add(String.valueOf(object));
+                        var3.add(String.valueOf(var6));
                     }
                 }
             }
         }
 
-        return list;
+        return var3;
     }
 
     /**
@@ -715,12 +693,12 @@ public abstract class CommandBase implements ICommand
         return false;
     }
 
-    public static void notifyOperators(ICommandSender sender, ICommand command, String msgFormat, Object... msgParams)
+    public static void notifyOperators(ICommandSender sender, ICommand command, String msgFormat, Object ... msgParams)
     {
         notifyOperators(sender, command, 0, msgFormat, msgParams);
     }
 
-    public static void notifyOperators(ICommandSender sender, ICommand command, int p_152374_2_, String msgFormat, Object... msgParams)
+    public static void notifyOperators(ICommandSender sender, ICommand command, int p_152374_2_, String msgFormat, Object ... msgParams)
     {
         if (theAdmin != null)
         {
@@ -741,11 +719,17 @@ public abstract class CommandBase implements ICommand
         return this.getCommandName().compareTo(p_compareTo_1_.getCommandName());
     }
 
+    public int compareTo(Object p_compareTo_1_)
+    {
+        return this.compareTo((ICommand)p_compareTo_1_);
+    }
+
     public static class CoordinateArg
     {
         private final double field_179633_a;
         private final double field_179631_b;
         private final boolean field_179632_c;
+        
 
         protected CoordinateArg(double p_i46051_1_, double p_i46051_3_, boolean p_i46051_5_)
         {

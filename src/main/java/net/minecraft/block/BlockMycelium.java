@@ -1,7 +1,6 @@
 package net.minecraft.block;
 
 import java.util.Random;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -17,12 +16,13 @@ import net.minecraft.world.World;
 
 public class BlockMycelium extends Block
 {
-    public static final PropertyBool SNOWY = PropertyBool.create("snowy");
+    public static final PropertyBool SNOWY_PROP = PropertyBool.create("snowy");
+    
 
     protected BlockMycelium()
     {
-        super(Material.grass, MapColor.purpleColor);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(SNOWY, Boolean.valueOf(false)));
+        super(Material.grass);
+        this.setDefaultState(this.blockState.getBaseState().withProperty(SNOWY_PROP, Boolean.valueOf(false)));
         this.setTickRandomly(true);
         this.setCreativeTab(CreativeTabs.tabBlock);
     }
@@ -33,31 +33,31 @@ public class BlockMycelium extends Block
      */
     public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
     {
-        Block block = worldIn.getBlockState(pos.up()).getBlock();
-        return state.withProperty(SNOWY, Boolean.valueOf(block == Blocks.snow || block == Blocks.snow_layer));
+        Block var4 = worldIn.getBlockState(pos.offsetUp()).getBlock();
+        return state.withProperty(SNOWY_PROP, Boolean.valueOf(var4 == Blocks.snow || var4 == Blocks.snow_layer));
     }
 
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
         if (!worldIn.isRemote)
         {
-            if (worldIn.getLightFromNeighbors(pos.up()) < 4 && worldIn.getBlockState(pos.up()).getBlock().getLightOpacity() > 2)
+            if (worldIn.getLightFromNeighbors(pos.offsetUp()) < 4 && worldIn.getBlockState(pos.offsetUp()).getBlock().getLightOpacity() > 2)
             {
                 worldIn.setBlockState(pos, Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.DIRT));
             }
             else
             {
-                if (worldIn.getLightFromNeighbors(pos.up()) >= 9)
+                if (worldIn.getLightFromNeighbors(pos.offsetUp()) >= 9)
                 {
-                    for (int i = 0; i < 4; ++i)
+                    for (int var5 = 0; var5 < 4; ++var5)
                     {
-                        BlockPos blockpos = pos.add(rand.nextInt(3) - 1, rand.nextInt(5) - 3, rand.nextInt(3) - 1);
-                        IBlockState iblockstate = worldIn.getBlockState(blockpos);
-                        Block block = worldIn.getBlockState(blockpos.up()).getBlock();
+                        BlockPos var6 = pos.add(rand.nextInt(3) - 1, rand.nextInt(5) - 3, rand.nextInt(3) - 1);
+                        IBlockState var7 = worldIn.getBlockState(var6);
+                        Block var8 = worldIn.getBlockState(var6.offsetUp()).getBlock();
 
-                        if (iblockstate.getBlock() == Blocks.dirt && iblockstate.getValue(BlockDirt.VARIANT) == BlockDirt.DirtType.DIRT && worldIn.getLightFromNeighbors(blockpos.up()) >= 4 && block.getLightOpacity() <= 2)
+                        if (var7.getBlock() == Blocks.dirt && var7.getValue(BlockDirt.VARIANT) == BlockDirt.DirtType.DIRT && worldIn.getLightFromNeighbors(var6.offsetUp()) >= 4 && var8.getLightOpacity() <= 2)
                         {
-                            worldIn.setBlockState(blockpos, this.getDefaultState());
+                            worldIn.setBlockState(var6, this.getDefaultState());
                         }
                     }
                 }
@@ -77,6 +77,8 @@ public class BlockMycelium extends Block
 
     /**
      * Get the Item that this Block should drop when harvested.
+     *  
+     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -93,6 +95,6 @@ public class BlockMycelium extends Block
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {SNOWY});
+        return new BlockState(this, new IProperty[] {SNOWY_PROP});
     }
 }

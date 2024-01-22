@@ -10,7 +10,7 @@ public class EntityAITempt extends EntityAIBase
 {
     /** The entity using this AI that is tempted by the player. */
     private EntityCreature temptedEntity;
-    private double speed;
+    private double field_75282_b;
 
     /** X position of player tempting this mob */
     private double targetX;
@@ -20,12 +20,8 @@ public class EntityAITempt extends EntityAIBase
 
     /** Z position of player tempting this mob */
     private double targetZ;
-
-    /** Tempting player's pitch */
-    private double pitch;
-
-    /** Tempting player's yaw */
-    private double yaw;
+    private double field_75278_f;
+    private double field_75279_g;
 
     /** The player that is tempting the entity that is using this AI. */
     private EntityPlayer temptingPlayer;
@@ -38,23 +34,24 @@ public class EntityAITempt extends EntityAIBase
 
     /** True if this EntityAITempt task is running */
     private boolean isRunning;
-    private Item temptItem;
+    private Item field_151484_k;
 
     /**
      * Whether the entity using this AI will be scared by the tempter's sudden movement.
      */
     private boolean scaredByPlayerMovement;
-    private boolean avoidWater;
+    private boolean field_75286_m;
+    
 
-    public EntityAITempt(EntityCreature temptedEntityIn, double speedIn, Item temptItemIn, boolean scaredByPlayerMovementIn)
+    public EntityAITempt(EntityCreature p_i45316_1_, double p_i45316_2_, Item p_i45316_4_, boolean p_i45316_5_)
     {
-        this.temptedEntity = temptedEntityIn;
-        this.speed = speedIn;
-        this.temptItem = temptItemIn;
-        this.scaredByPlayerMovement = scaredByPlayerMovementIn;
+        this.temptedEntity = p_i45316_1_;
+        this.field_75282_b = p_i45316_2_;
+        this.field_151484_k = p_i45316_4_;
+        this.scaredByPlayerMovement = p_i45316_5_;
         this.setMutexBits(3);
 
-        if (!(temptedEntityIn.getNavigator() instanceof PathNavigateGround))
+        if (!(p_i45316_1_.getNavigator() instanceof PathNavigateGround))
         {
             throw new IllegalArgumentException("Unsupported mob type for TemptGoal");
         }
@@ -80,8 +77,8 @@ public class EntityAITempt extends EntityAIBase
             }
             else
             {
-                ItemStack itemstack = this.temptingPlayer.getCurrentEquippedItem();
-                return itemstack == null ? false : itemstack.getItem() == this.temptItem;
+                ItemStack var1 = this.temptingPlayer.getCurrentEquippedItem();
+                return var1 == null ? false : var1.getItem() == this.field_151484_k;
             }
         }
     }
@@ -100,7 +97,7 @@ public class EntityAITempt extends EntityAIBase
                     return false;
                 }
 
-                if (Math.abs((double)this.temptingPlayer.rotationPitch - this.pitch) > 5.0D || Math.abs((double)this.temptingPlayer.rotationYaw - this.yaw) > 5.0D)
+                if (Math.abs((double)this.temptingPlayer.rotationPitch - this.field_75278_f) > 5.0D || Math.abs((double)this.temptingPlayer.rotationYaw - this.field_75279_g) > 5.0D)
                 {
                     return false;
                 }
@@ -112,8 +109,8 @@ public class EntityAITempt extends EntityAIBase
                 this.targetZ = this.temptingPlayer.posZ;
             }
 
-            this.pitch = (double)this.temptingPlayer.rotationPitch;
-            this.yaw = (double)this.temptingPlayer.rotationYaw;
+            this.field_75278_f = (double)this.temptingPlayer.rotationPitch;
+            this.field_75279_g = (double)this.temptingPlayer.rotationYaw;
         }
 
         return this.shouldExecute();
@@ -128,8 +125,8 @@ public class EntityAITempt extends EntityAIBase
         this.targetY = this.temptingPlayer.posY;
         this.targetZ = this.temptingPlayer.posZ;
         this.isRunning = true;
-        this.avoidWater = ((PathNavigateGround)this.temptedEntity.getNavigator()).getAvoidsWater();
-        ((PathNavigateGround)this.temptedEntity.getNavigator()).setAvoidsWater(false);
+        this.field_75286_m = ((PathNavigateGround)this.temptedEntity.getNavigator()).func_179689_e();
+        ((PathNavigateGround)this.temptedEntity.getNavigator()).func_179690_a(false);
     }
 
     /**
@@ -141,7 +138,7 @@ public class EntityAITempt extends EntityAIBase
         this.temptedEntity.getNavigator().clearPathEntity();
         this.delayTemptCounter = 100;
         this.isRunning = false;
-        ((PathNavigateGround)this.temptedEntity.getNavigator()).setAvoidsWater(this.avoidWater);
+        ((PathNavigateGround)this.temptedEntity.getNavigator()).func_179690_a(this.field_75286_m);
     }
 
     /**
@@ -157,7 +154,7 @@ public class EntityAITempt extends EntityAIBase
         }
         else
         {
-            this.temptedEntity.getNavigator().tryMoveToEntityLiving(this.temptingPlayer, this.speed);
+            this.temptedEntity.getNavigator().tryMoveToEntityLiving(this.temptingPlayer, this.field_75282_b);
         }
     }
 

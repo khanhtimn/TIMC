@@ -5,18 +5,17 @@ import java.util.ArrayList;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.PacketBuffer;
 
-public class MerchantRecipeList extends ArrayList<MerchantRecipe>
+public class MerchantRecipeList extends ArrayList
 {
-    public MerchantRecipeList()
-    {
-    }
+    
 
-    public MerchantRecipeList(NBTTagCompound compound)
+    public MerchantRecipeList() {}
+
+    public MerchantRecipeList(NBTTagCompound p_i1944_1_)
     {
-        this.readRecipiesFromTags(compound);
+        this.readRecipiesFromTags(p_i1944_1_);
     }
 
     /**
@@ -26,18 +25,18 @@ public class MerchantRecipeList extends ArrayList<MerchantRecipe>
     {
         if (p_77203_3_ > 0 && p_77203_3_ < this.size())
         {
-            MerchantRecipe merchantrecipe1 = (MerchantRecipe)this.get(p_77203_3_);
-            return !this.func_181078_a(p_77203_1_, merchantrecipe1.getItemToBuy()) || (p_77203_2_ != null || merchantrecipe1.hasSecondItemToBuy()) && (!merchantrecipe1.hasSecondItemToBuy() || !this.func_181078_a(p_77203_2_, merchantrecipe1.getSecondItemToBuy())) || p_77203_1_.stackSize < merchantrecipe1.getItemToBuy().stackSize || merchantrecipe1.hasSecondItemToBuy() && p_77203_2_.stackSize < merchantrecipe1.getSecondItemToBuy().stackSize ? null : merchantrecipe1;
+            MerchantRecipe var6 = (MerchantRecipe)this.get(p_77203_3_);
+            return ItemStack.areItemsEqual(p_77203_1_, var6.getItemToBuy()) && (p_77203_2_ == null && !var6.hasSecondItemToBuy() || var6.hasSecondItemToBuy() && ItemStack.areItemsEqual(p_77203_2_, var6.getSecondItemToBuy())) && p_77203_1_.stackSize >= var6.getItemToBuy().stackSize && (!var6.hasSecondItemToBuy() || p_77203_2_.stackSize >= var6.getSecondItemToBuy().stackSize) ? var6 : null;
         }
         else
         {
-            for (int i = 0; i < this.size(); ++i)
+            for (int var4 = 0; var4 < this.size(); ++var4)
             {
-                MerchantRecipe merchantrecipe = (MerchantRecipe)this.get(i);
+                MerchantRecipe var5 = (MerchantRecipe)this.get(var4);
 
-                if (this.func_181078_a(p_77203_1_, merchantrecipe.getItemToBuy()) && p_77203_1_.stackSize >= merchantrecipe.getItemToBuy().stackSize && (!merchantrecipe.hasSecondItemToBuy() && p_77203_2_ == null || merchantrecipe.hasSecondItemToBuy() && this.func_181078_a(p_77203_2_, merchantrecipe.getSecondItemToBuy()) && p_77203_2_.stackSize >= merchantrecipe.getSecondItemToBuy().stackSize))
+                if (ItemStack.areItemsEqual(p_77203_1_, var5.getItemToBuy()) && p_77203_1_.stackSize >= var5.getItemToBuy().stackSize && (!var5.hasSecondItemToBuy() && p_77203_2_ == null || var5.hasSecondItemToBuy() && ItemStack.areItemsEqual(p_77203_2_, var5.getSecondItemToBuy()) && p_77203_2_.stackSize >= var5.getSecondItemToBuy().stackSize))
                 {
-                    return merchantrecipe;
+                    return var5;
                 }
             }
 
@@ -45,89 +44,84 @@ public class MerchantRecipeList extends ArrayList<MerchantRecipe>
         }
     }
 
-    private boolean func_181078_a(ItemStack p_181078_1_, ItemStack p_181078_2_)
+    public void func_151391_a(PacketBuffer p_151391_1_)
     {
-        return ItemStack.areItemsEqual(p_181078_1_, p_181078_2_) && (!p_181078_2_.hasTagCompound() || p_181078_1_.hasTagCompound() && NBTUtil.func_181123_a(p_181078_2_.getTagCompound(), p_181078_1_.getTagCompound(), false));
-    }
+        p_151391_1_.writeByte((byte)(this.size() & 255));
 
-    public void writeToBuf(PacketBuffer buffer)
-    {
-        buffer.writeByte((byte)(this.size() & 255));
-
-        for (int i = 0; i < this.size(); ++i)
+        for (int var2 = 0; var2 < this.size(); ++var2)
         {
-            MerchantRecipe merchantrecipe = (MerchantRecipe)this.get(i);
-            buffer.writeItemStackToBuffer(merchantrecipe.getItemToBuy());
-            buffer.writeItemStackToBuffer(merchantrecipe.getItemToSell());
-            ItemStack itemstack = merchantrecipe.getSecondItemToBuy();
-            buffer.writeBoolean(itemstack != null);
+            MerchantRecipe var3 = (MerchantRecipe)this.get(var2);
+            p_151391_1_.writeItemStackToBuffer(var3.getItemToBuy());
+            p_151391_1_.writeItemStackToBuffer(var3.getItemToSell());
+            ItemStack var4 = var3.getSecondItemToBuy();
+            p_151391_1_.writeBoolean(var4 != null);
 
-            if (itemstack != null)
+            if (var4 != null)
             {
-                buffer.writeItemStackToBuffer(itemstack);
+                p_151391_1_.writeItemStackToBuffer(var4);
             }
 
-            buffer.writeBoolean(merchantrecipe.isRecipeDisabled());
-            buffer.writeInt(merchantrecipe.getToolUses());
-            buffer.writeInt(merchantrecipe.getMaxTradeUses());
+            p_151391_1_.writeBoolean(var3.isRecipeDisabled());
+            p_151391_1_.writeInt(var3.func_180321_e());
+            p_151391_1_.writeInt(var3.func_180320_f());
         }
     }
 
-    public static MerchantRecipeList readFromBuf(PacketBuffer buffer) throws IOException
+    public static MerchantRecipeList func_151390_b(PacketBuffer p_151390_0_) throws IOException
     {
-        MerchantRecipeList merchantrecipelist = new MerchantRecipeList();
-        int i = buffer.readByte() & 255;
+        MerchantRecipeList var1 = new MerchantRecipeList();
+        int var2 = p_151390_0_.readByte() & 255;
 
-        for (int j = 0; j < i; ++j)
+        for (int var3 = 0; var3 < var2; ++var3)
         {
-            ItemStack itemstack = buffer.readItemStackFromBuffer();
-            ItemStack itemstack1 = buffer.readItemStackFromBuffer();
-            ItemStack itemstack2 = null;
+            ItemStack var4 = p_151390_0_.readItemStackFromBuffer();
+            ItemStack var5 = p_151390_0_.readItemStackFromBuffer();
+            ItemStack var6 = null;
 
-            if (buffer.readBoolean())
+            if (p_151390_0_.readBoolean())
             {
-                itemstack2 = buffer.readItemStackFromBuffer();
+                var6 = p_151390_0_.readItemStackFromBuffer();
             }
 
-            boolean flag = buffer.readBoolean();
-            int k = buffer.readInt();
-            int l = buffer.readInt();
-            MerchantRecipe merchantrecipe = new MerchantRecipe(itemstack, itemstack2, itemstack1, k, l);
+            boolean var7 = p_151390_0_.readBoolean();
+            int var8 = p_151390_0_.readInt();
+            int var9 = p_151390_0_.readInt();
+            MerchantRecipe var10 = new MerchantRecipe(var4, var6, var5, var8, var9);
 
-            if (flag)
+            if (var7)
             {
-                merchantrecipe.compensateToolUses();
+                var10.func_82785_h();
             }
 
-            merchantrecipelist.add(merchantrecipe);
+            var1.add(var10);
         }
 
-        return merchantrecipelist;
+        return var1;
     }
 
-    public void readRecipiesFromTags(NBTTagCompound compound)
+    public void readRecipiesFromTags(NBTTagCompound p_77201_1_)
     {
-        NBTTagList nbttaglist = compound.getTagList("Recipes", 10);
+        NBTTagList var2 = p_77201_1_.getTagList("Recipes", 10);
 
-        for (int i = 0; i < nbttaglist.tagCount(); ++i)
+        for (int var3 = 0; var3 < var2.tagCount(); ++var3)
         {
-            NBTTagCompound nbttagcompound = nbttaglist.getCompoundTagAt(i);
-            this.add(new MerchantRecipe(nbttagcompound));
+            NBTTagCompound var4 = var2.getCompoundTagAt(var3);
+            this.add(new MerchantRecipe(var4));
         }
     }
 
     public NBTTagCompound getRecipiesAsTags()
     {
-        NBTTagCompound nbttagcompound = new NBTTagCompound();
-        NBTTagList nbttaglist = new NBTTagList();
+        NBTTagCompound var1 = new NBTTagCompound();
+        NBTTagList var2 = new NBTTagList();
 
-        for (int i = 0; i < this.size(); ++i)
+        for (int var3 = 0; var3 < this.size(); ++var3)
         {
-            MerchantRecipe merchantrecipe = (MerchantRecipe)this.get(i);
-            nbttaglist.appendTag(merchantrecipe.writeToTags());
+            MerchantRecipe var4 = (MerchantRecipe)this.get(var3);
+            var2.appendTag(var4.writeToTags());
         }
 
-        nbttagcompound.setTag("Recipes", nbttaglist);
-        return nbttagcompound;
+        var1.setTag("Recipes", var2);
+        return var1;
     }
 }

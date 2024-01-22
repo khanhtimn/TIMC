@@ -15,7 +15,6 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityBrewingStand;
 import net.minecraft.util.AxisAlignedBB;
@@ -23,37 +22,27 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.EnumWorldBlockLayer;
-import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
 public class BlockBrewingStand extends BlockContainer
 {
-    public static final PropertyBool[] HAS_BOTTLE = new PropertyBool[] {PropertyBool.create("has_bottle_0"), PropertyBool.create("has_bottle_1"), PropertyBool.create("has_bottle_2")};
+    public static final PropertyBool[] BOTTLE_PROPS = new PropertyBool[] {PropertyBool.create("has_bottle_0"), PropertyBool.create("has_bottle_1"), PropertyBool.create("has_bottle_2")};
+    private final Random rand = new Random();
+    
 
     public BlockBrewingStand()
     {
         super(Material.iron);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(HAS_BOTTLE[0], Boolean.valueOf(false)).withProperty(HAS_BOTTLE[1], Boolean.valueOf(false)).withProperty(HAS_BOTTLE[2], Boolean.valueOf(false)));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(BOTTLE_PROPS[0], Boolean.valueOf(false)).withProperty(BOTTLE_PROPS[1], Boolean.valueOf(false)).withProperty(BOTTLE_PROPS[2], Boolean.valueOf(false)));
     }
 
-    /**
-     * Gets the localized name of this block. Used for the statistics page.
-     */
-    public String getLocalizedName()
-    {
-        return StatCollector.translateToLocal("item.brewingStand.name");
-    }
-
-    /**
-     * Used to determine ambient occlusion and culling when rebuilding chunks for render
-     */
     public boolean isOpaqueCube()
     {
         return false;
     }
 
     /**
-     * The type of render function called. 3 for standard block models, 2 for TESR's, 1 for liquids, -1 is no render
+     * The type of render function that is called for this block
      */
     public int getRenderType()
     {
@@ -75,8 +64,10 @@ public class BlockBrewingStand extends BlockContainer
 
     /**
      * Add all collision boxes of this Block to the list that intersect with the given mask.
+     *  
+     * @param collidingEntity the Entity colliding with this Block
      */
-    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity)
+    public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List list, Entity collidingEntity)
     {
         this.setBlockBounds(0.4375F, 0.0F, 0.4375F, 0.5625F, 0.875F, 0.5625F);
         super.addCollisionBoxesToList(worldIn, pos, state, mask, list, collidingEntity);
@@ -100,49 +91,45 @@ public class BlockBrewingStand extends BlockContainer
         }
         else
         {
-            TileEntity tileentity = worldIn.getTileEntity(pos);
+            TileEntity var9 = worldIn.getTileEntity(pos);
 
-            if (tileentity instanceof TileEntityBrewingStand)
+            if (var9 instanceof TileEntityBrewingStand)
             {
-                playerIn.displayGUIChest((TileEntityBrewingStand)tileentity);
-                playerIn.triggerAchievement(StatList.field_181729_M);
+                playerIn.displayGUIChest((TileEntityBrewingStand)var9);
             }
 
             return true;
         }
     }
 
-    /**
-     * Called by ItemBlocks after a block is set in the world, to allow post-place logic
-     */
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
     {
         if (stack.hasDisplayName())
         {
-            TileEntity tileentity = worldIn.getTileEntity(pos);
+            TileEntity var6 = worldIn.getTileEntity(pos);
 
-            if (tileentity instanceof TileEntityBrewingStand)
+            if (var6 instanceof TileEntityBrewingStand)
             {
-                ((TileEntityBrewingStand)tileentity).setName(stack.getDisplayName());
+                ((TileEntityBrewingStand)var6).func_145937_a(stack.getDisplayName());
             }
         }
     }
 
     public void randomDisplayTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
-        double d0 = (double)((float)pos.getX() + 0.4F + rand.nextFloat() * 0.2F);
-        double d1 = (double)((float)pos.getY() + 0.7F + rand.nextFloat() * 0.3F);
-        double d2 = (double)((float)pos.getZ() + 0.4F + rand.nextFloat() * 0.2F);
-        worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, d0, d1, d2, 0.0D, 0.0D, 0.0D, new int[0]);
+        double var5 = (double)((float)pos.getX() + 0.4F + rand.nextFloat() * 0.2F);
+        double var7 = (double)((float)pos.getY() + 0.7F + rand.nextFloat() * 0.3F);
+        double var9 = (double)((float)pos.getZ() + 0.4F + rand.nextFloat() * 0.2F);
+        worldIn.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, var5, var7, var9, 0.0D, 0.0D, 0.0D, new int[0]);
     }
 
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
     {
-        TileEntity tileentity = worldIn.getTileEntity(pos);
+        TileEntity var4 = worldIn.getTileEntity(pos);
 
-        if (tileentity instanceof TileEntityBrewingStand)
+        if (var4 instanceof TileEntityBrewingStand)
         {
-            InventoryHelper.dropInventoryItems(worldIn, pos, (TileEntityBrewingStand)tileentity);
+            InventoryHelper.dropInventoryItems(worldIn, pos, (TileEntityBrewingStand)var4);
         }
 
         super.breakBlock(worldIn, pos, state);
@@ -150,6 +137,8 @@ public class BlockBrewingStand extends BlockContainer
 
     /**
      * Get the Item that this Block should drop when harvested.
+     *  
+     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -168,7 +157,7 @@ public class BlockBrewingStand extends BlockContainer
 
     public int getComparatorInputOverride(World worldIn, BlockPos pos)
     {
-        return Container.calcRedstone(worldIn.getTileEntity(pos));
+        return Container.calcRedstoneFromInventory(worldIn.getTileEntity(pos));
     }
 
     public EnumWorldBlockLayer getBlockLayer()
@@ -181,14 +170,14 @@ public class BlockBrewingStand extends BlockContainer
      */
     public IBlockState getStateFromMeta(int meta)
     {
-        IBlockState iblockstate = this.getDefaultState();
+        IBlockState var2 = this.getDefaultState();
 
-        for (int i = 0; i < 3; ++i)
+        for (int var3 = 0; var3 < 3; ++var3)
         {
-            iblockstate = iblockstate.withProperty(HAS_BOTTLE[i], Boolean.valueOf((meta & 1 << i) > 0));
+            var2 = var2.withProperty(BOTTLE_PROPS[var3], Boolean.valueOf((meta & 1 << var3) > 0));
         }
 
-        return iblockstate;
+        return var2;
     }
 
     /**
@@ -196,21 +185,21 @@ public class BlockBrewingStand extends BlockContainer
      */
     public int getMetaFromState(IBlockState state)
     {
-        int i = 0;
+        int var2 = 0;
 
-        for (int j = 0; j < 3; ++j)
+        for (int var3 = 0; var3 < 3; ++var3)
         {
-            if (((Boolean)state.getValue(HAS_BOTTLE[j])).booleanValue())
+            if (((Boolean)state.getValue(BOTTLE_PROPS[var3])).booleanValue())
             {
-                i |= 1 << j;
+                var2 |= 1 << var3;
             }
         }
 
-        return i;
+        return var2;
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {HAS_BOTTLE[0], HAS_BOTTLE[1], HAS_BOTTLE[2]});
+        return new BlockState(this, new IProperty[] {BOTTLE_PROPS[0], BOTTLE_PROPS[1], BOTTLE_PROPS[2]});
     }
 }

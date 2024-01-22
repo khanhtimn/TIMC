@@ -9,13 +9,14 @@ import net.minecraft.util.IChatComponent;
 
 public class NetHandlerHandshakeMemory implements INetHandlerHandshakeServer
 {
-    private final MinecraftServer mcServer;
-    private final NetworkManager networkManager;
+    private final MinecraftServer field_147385_a;
+    private final NetworkManager field_147384_b;
+    
 
-    public NetHandlerHandshakeMemory(MinecraftServer mcServerIn, NetworkManager networkManagerIn)
+    public NetHandlerHandshakeMemory(MinecraftServer p_i45287_1_, NetworkManager p_i45287_2_)
     {
-        this.mcServer = mcServerIn;
-        this.networkManager = networkManagerIn;
+        this.field_147385_a = p_i45287_1_;
+        this.field_147384_b = p_i45287_2_;
     }
 
     /**
@@ -25,14 +26,12 @@ public class NetHandlerHandshakeMemory implements INetHandlerHandshakeServer
      */
     public void processHandshake(C00Handshake packetIn)
     {
-        this.networkManager.setConnectionState(packetIn.getRequestedState());
-        this.networkManager.setNetHandler(new NetHandlerLoginServer(this.mcServer, this.networkManager));
+        this.field_147384_b.setConnectionState(packetIn.getRequestedState());
+        this.field_147384_b.setNetHandler(new NetHandlerLoginServer(this.field_147385_a, this.field_147384_b));
     }
 
     /**
      * Invoked when disconnecting, the parameter is a ChatComponent describing the reason for termination
      */
-    public void onDisconnect(IChatComponent reason)
-    {
-    }
+    public void onDisconnect(IChatComponent reason) {}
 }

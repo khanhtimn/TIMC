@@ -6,10 +6,11 @@ public class LockCode
 {
     public static final LockCode EMPTY_CODE = new LockCode("");
     private final String lock;
+    
 
-    public LockCode(String code)
+    public LockCode(String p_i45903_1_)
     {
-        this.lock = code;
+        this.lock = p_i45903_1_;
     }
 
     public boolean isEmpty()
@@ -31,8 +32,8 @@ public class LockCode
     {
         if (nbt.hasKey("Lock", 8))
         {
-            String s = nbt.getString("Lock");
-            return new LockCode(s);
+            String var1 = nbt.getString("Lock");
+            return new LockCode(var1);
         }
         else
         {

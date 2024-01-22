@@ -7,9 +7,10 @@ public class TextureMetadataSection implements IMetadataSection
 {
     private final boolean textureBlur;
     private final boolean textureClamp;
-    private final List<Integer> listMipmaps;
+    private final List listMipmaps;
+    
 
-    public TextureMetadataSection(boolean p_i45102_1_, boolean p_i45102_2_, List<Integer> p_i45102_3_)
+    public TextureMetadataSection(boolean p_i45102_1_, boolean p_i45102_2_, List p_i45102_3_)
     {
         this.textureBlur = p_i45102_1_;
         this.textureClamp = p_i45102_2_;
@@ -26,8 +27,8 @@ public class TextureMetadataSection implements IMetadataSection
         return this.textureClamp;
     }
 
-    public List<Integer> getListMipmaps()
+    public List getListMipmaps()
     {
-        return Collections.<Integer>unmodifiableList(this.listMipmaps);
+        return Collections.unmodifiableList(this.listMipmaps);
     }
 }

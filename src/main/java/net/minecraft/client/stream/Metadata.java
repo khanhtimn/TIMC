@@ -8,14 +8,15 @@ import java.util.Map;
 public class Metadata
 {
     private static final Gson field_152811_a = new Gson();
-    private final String name;
-    private String description;
-    private Map<String, String> payload;
+    private final String field_152812_b;
+    private String field_152813_c;
+    private Map field_152814_d;
+    
 
     public Metadata(String p_i46345_1_, String p_i46345_2_)
     {
-        this.name = p_i46345_1_;
-        this.description = p_i46345_2_;
+        this.field_152812_b = p_i46345_1_;
+        this.field_152813_c = p_i46345_2_;
     }
 
     public Metadata(String p_i1030_1_)
@@ -25,22 +26,22 @@ public class Metadata
 
     public void func_152807_a(String p_152807_1_)
     {
-        this.description = p_152807_1_;
+        this.field_152813_c = p_152807_1_;
     }
 
     public String func_152809_a()
     {
-        return this.description == null ? this.name : this.description;
+        return this.field_152813_c == null ? this.field_152812_b : this.field_152813_c;
     }
 
     public void func_152808_a(String p_152808_1_, String p_152808_2_)
     {
-        if (this.payload == null)
+        if (this.field_152814_d == null)
         {
-            this.payload = Maps.<String, String>newHashMap();
+            this.field_152814_d = Maps.newHashMap();
         }
 
-        if (this.payload.size() > 50)
+        if (this.field_152814_d.size() > 50)
         {
             throw new IllegalArgumentException("Metadata payload is full, cannot add more to it!");
         }
@@ -62,22 +63,22 @@ public class Metadata
         }
         else
         {
-            this.payload.put(p_152808_1_, p_152808_2_);
+            this.field_152814_d.put(p_152808_1_, p_152808_2_);
         }
     }
 
     public String func_152806_b()
     {
-        return this.payload != null && !this.payload.isEmpty() ? field_152811_a.toJson((Object)this.payload) : null;
+        return this.field_152814_d != null && !this.field_152814_d.isEmpty() ? field_152811_a.toJson(this.field_152814_d) : null;
     }
 
     public String func_152810_c()
     {
-        return this.name;
+        return this.field_152812_b;
     }
 
     public String toString()
     {
-        return Objects.toStringHelper(this).add("name", this.name).add("description", this.description).add("data", this.func_152806_b()).toString();
+        return Objects.toStringHelper(this).add("name", this.field_152812_b).add("description", this.field_152813_c).add("data", this.func_152806_b()).toString();
     }
 }

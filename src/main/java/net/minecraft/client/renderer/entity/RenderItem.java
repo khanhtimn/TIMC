@@ -1,5 +1,6 @@
 package net.minecraft.client.renderer.entity;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import net.minecraft.block.Block;
@@ -26,7 +27,6 @@ import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.ItemModelMesher;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -35,7 +35,7 @@ import net.minecraft.client.renderer.block.model.ItemTransformVec3f;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.texture.TextureUtil;
-import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererChestHelper;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
@@ -53,62 +53,58 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemFishFood;
 import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
-import net.minecraft.src.Config;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3i;
-import net.optifine.CustomColors;
-import net.optifine.CustomItems;
-import net.optifine.reflect.Reflector;
-import net.optifine.reflect.ReflectorForge;
-import net.optifine.shaders.Shaders;
-import net.optifine.shaders.ShadersRender;
+import optifine.Config;
+import optifine.CustomColors;
+import optifine.CustomItems;
+import optifine.Reflector;
 
 public class RenderItem implements IResourceManagerReloadListener
 {
     private static final ResourceLocation RES_ITEM_GLINT = new ResourceLocation("textures/misc/enchanted_item_glint.png");
-
-    /** False when the renderer is rendering the item's effects into a GUI */
-    private boolean notRenderingEffectsInGUI = true;
+    private boolean field_175058_l = true;
 
     /** Defines the zLevel of rendering of item on GUI. */
     public float zLevel;
     private final ItemModelMesher itemModelMesher;
-    private final TextureManager textureManager;
+    private final TextureManager field_175057_n;
+    public static float field_175055_b = 0.0F;
+    public static float field_175056_c = 0.0F;
+    public static float field_175053_d = 0.0F;
+    public static float field_175054_e = 0.0F;
+    public static float field_175051_f = 0.0F;
+    public static float field_175052_g = 0.0F;
+    public static float field_175061_h = 0.0F;
+    public static float field_175062_i = 0.0F;
+    public static float field_175060_j = 0.0F;
+    
     private ModelResourceLocation modelLocation = null;
-    private boolean renderItemGui = false;
-    public ModelManager modelManager = null;
-    private boolean renderModelHasEmissive = false;
-    private boolean renderModelEmissive = false;
 
-    public RenderItem(TextureManager textureManager, ModelManager modelManager)
+    public RenderItem(TextureManager p_i46165_1_, ModelManager p_i46165_2_)
     {
-        this.textureManager = textureManager;
-        this.modelManager = modelManager;
+        this.field_175057_n = p_i46165_1_;
+        Config.setModelManager(p_i46165_2_);
 
         if (Reflector.ItemModelMesherForge_Constructor.exists())
         {
-            this.itemModelMesher = (ItemModelMesher)Reflector.newInstance(Reflector.ItemModelMesherForge_Constructor, new Object[] {modelManager});
+            this.itemModelMesher = (ItemModelMesher)Reflector.newInstance(Reflector.ItemModelMesherForge_Constructor, new Object[] {p_i46165_2_});
         }
         else
         {
-            this.itemModelMesher = new ItemModelMesher(modelManager);
+            this.itemModelMesher = new ItemModelMesher(p_i46165_2_);
         }
 
         this.registerItems();
     }
 
-    /**
-     * False when the renderer is rendering the item's effects into a GUI
-     *  
-     * @param isNot If the renderer is not rendering the effects in a GUI
-     */
-    public void isNotRenderingEffectsInGUI(boolean isNot)
+    public void func_175039_a(boolean p_175039_1_)
     {
-        this.notRenderingEffectsInGUI = isNot;
+        this.field_175058_l = p_175039_1_;
     }
 
     public ItemModelMesher getItemModelMesher()
@@ -116,252 +112,210 @@ public class RenderItem implements IResourceManagerReloadListener
         return this.itemModelMesher;
     }
 
-    protected void registerItem(Item itm, int subType, String identifier)
+    protected void registerItem(Item p_175048_1_, int p_175048_2_, String p_175048_3_)
     {
-        this.itemModelMesher.register(itm, subType, new ModelResourceLocation(identifier, "inventory"));
+        this.itemModelMesher.register(p_175048_1_, p_175048_2_, new ModelResourceLocation(p_175048_3_, "inventory"));
     }
 
-    protected void registerBlock(Block blk, int subType, String identifier)
+    protected void registerBlock(Block p_175029_1_, int p_175029_2_, String p_175029_3_)
     {
-        this.registerItem(Item.getItemFromBlock(blk), subType, identifier);
+        this.registerItem(Item.getItemFromBlock(p_175029_1_), p_175029_2_, p_175029_3_);
     }
 
-    private void registerBlock(Block blk, String identifier)
+    private void registerBlock(Block p_175031_1_, String p_175031_2_)
     {
-        this.registerBlock(blk, 0, identifier);
+        this.registerBlock(p_175031_1_, 0, p_175031_2_);
     }
 
-    private void registerItem(Item itm, String identifier)
+    private void registerItem(Item p_175047_1_, String p_175047_2_)
     {
-        this.registerItem(itm, 0, identifier);
+        this.registerItem(p_175047_1_, 0, p_175047_2_);
     }
 
-    private void renderModel(IBakedModel model, ItemStack stack)
+    private void func_175036_a(IBakedModel p_175036_1_, ItemStack p_175036_2_)
     {
-        this.renderModel(model, -1, stack);
+        this.func_175045_a(p_175036_1_, -1, p_175036_2_);
     }
 
-    public void renderModel(IBakedModel model, int color)
+    public void func_175035_a(IBakedModel p_175035_1_, int p_175035_2_)
     {
-        this.renderModel(model, color, (ItemStack)null);
+        this.func_175045_a(p_175035_1_, p_175035_2_, (ItemStack)null);
     }
 
-    private void renderModel(IBakedModel model, int color, ItemStack stack)
+    private void func_175045_a(IBakedModel p_175045_1_, int p_175045_2_, ItemStack p_175045_3_)
     {
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        boolean flag = Minecraft.getMinecraft().getTextureMapBlocks().isTextureBound();
-        boolean flag1 = Config.isMultiTexture() && flag;
+        Tessellator var4 = Tessellator.getInstance();
+        WorldRenderer var5 = var4.getWorldRenderer();
+        boolean renderTextureMap = Minecraft.getMinecraft().getTextureMapBlocks().isTextureBound();
+        boolean multiTexture = Config.isMultiTexture() && renderTextureMap;
 
-        if (flag1)
+        if (multiTexture)
         {
-            worldrenderer.setBlockLayer(EnumWorldBlockLayer.SOLID);
+            var5.setBlockLayer(EnumWorldBlockLayer.SOLID);
         }
 
-        worldrenderer.begin(7, DefaultVertexFormats.ITEM);
+        var5.startDrawingQuads();
+        var5.setVertexFormat(DefaultVertexFormats.field_176599_b);
+        EnumFacing[] var6 = EnumFacing.VALUES;
+        int var7 = var6.length;
 
-        for (EnumFacing enumfacing : EnumFacing.VALUES)
+        for (int var8 = 0; var8 < var7; ++var8)
         {
-            this.renderQuads(worldrenderer, model.getFaceQuads(enumfacing), color, stack);
+            EnumFacing var9 = var6[var8];
+            this.func_175032_a(var5, p_175045_1_.func_177551_a(var9), p_175045_2_, p_175045_3_);
         }
 
-        this.renderQuads(worldrenderer, model.getGeneralQuads(), color, stack);
-        tessellator.draw();
+        this.func_175032_a(var5, p_175045_1_.func_177550_a(), p_175045_2_, p_175045_3_);
+        var4.draw();
 
-        if (flag1)
+        if (multiTexture)
         {
-            worldrenderer.setBlockLayer((EnumWorldBlockLayer)null);
+            var5.setBlockLayer((EnumWorldBlockLayer)null);
             GlStateManager.bindCurrentTexture();
         }
     }
 
-    public void renderItem(ItemStack stack, IBakedModel model)
+    public void func_180454_a(ItemStack p_180454_1_, IBakedModel p_180454_2_)
     {
-        if (stack != null)
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(0.5F, 0.5F, 0.5F);
+
+        if (p_180454_2_.isBuiltInRenderer())
         {
-            GlStateManager.pushMatrix();
-            GlStateManager.scale(0.5F, 0.5F, 0.5F);
-
-            if (model.isBuiltInRenderer())
-            {
-                GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
-                GlStateManager.translate(-0.5F, -0.5F, -0.5F);
-                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                GlStateManager.enableRescaleNormal();
-                TileEntityItemStackRenderer.instance.renderByItem(stack);
-            }
-            else
-            {
-                GlStateManager.translate(-0.5F, -0.5F, -0.5F);
-
-                if (Config.isCustomItems())
-                {
-                    model = CustomItems.getCustomItemModel(stack, model, this.modelLocation, false);
-                }
-
-                this.renderModelHasEmissive = false;
-                this.renderModel(model, stack);
-
-                if (this.renderModelHasEmissive)
-                {
-                    float f = OpenGlHelper.lastBrightnessX;
-                    float f1 = OpenGlHelper.lastBrightnessY;
-                    OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, f1);
-                    this.renderModelEmissive = true;
-                    this.renderModel(model, stack);
-                    this.renderModelEmissive = false;
-                    OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, f, f1);
-                }
-
-                if (stack.hasEffect() && (!Config.isCustomItems() || !CustomItems.renderCustomEffect(this, stack, model)))
-                {
-                    this.renderEffect(model);
-                }
-            }
-
-            GlStateManager.popMatrix();
+            GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+            GlStateManager.translate(-0.5F, -0.5F, -0.5F);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.enableRescaleNormal();
+            TileEntityRendererChestHelper.instance.renderByItem(p_180454_1_);
         }
+        else
+        {
+            if (Config.isCustomItems())
+            {
+                p_180454_2_ = CustomItems.getCustomItemModel(p_180454_1_, p_180454_2_, this.modelLocation);
+            }
+
+            GlStateManager.translate(-0.5F, -0.5F, -0.5F);
+            this.func_175036_a(p_180454_2_, p_180454_1_);
+
+            if (p_180454_1_.hasEffect() && (!Config.isCustomItems() || !CustomItems.renderCustomEffect(this, p_180454_1_, p_180454_2_)))
+            {
+                this.renderEffect(p_180454_2_);
+            }
+        }
+
+        GlStateManager.popMatrix();
     }
 
-    private void renderEffect(IBakedModel model)
+    private void renderEffect(IBakedModel p_180451_1_)
     {
         if (!Config.isCustomItems() || CustomItems.isUseGlint())
         {
-            if (!Config.isShaders() || !Shaders.isShadowPass)
-            {
-                GlStateManager.depthMask(false);
-                GlStateManager.depthFunc(514);
-                GlStateManager.disableLighting();
-                GlStateManager.blendFunc(768, 1);
-                this.textureManager.bindTexture(RES_ITEM_GLINT);
-
-                if (Config.isShaders() && !this.renderItemGui)
-                {
-                    ShadersRender.renderEnchantedGlintBegin();
-                }
-
-                GlStateManager.matrixMode(5890);
-                GlStateManager.pushMatrix();
-                GlStateManager.scale(8.0F, 8.0F, 8.0F);
-                float f = (float)(Minecraft.getSystemTime() % 3000L) / 3000.0F / 8.0F;
-                GlStateManager.translate(f, 0.0F, 0.0F);
-                GlStateManager.rotate(-50.0F, 0.0F, 0.0F, 1.0F);
-                this.renderModel(model, -8372020);
-                GlStateManager.popMatrix();
-                GlStateManager.pushMatrix();
-                GlStateManager.scale(8.0F, 8.0F, 8.0F);
-                float f1 = (float)(Minecraft.getSystemTime() % 4873L) / 4873.0F / 8.0F;
-                GlStateManager.translate(-f1, 0.0F, 0.0F);
-                GlStateManager.rotate(10.0F, 0.0F, 0.0F, 1.0F);
-                this.renderModel(model, -8372020);
-                GlStateManager.popMatrix();
-                GlStateManager.matrixMode(5888);
-                GlStateManager.blendFunc(770, 771);
-                GlStateManager.enableLighting();
-                GlStateManager.depthFunc(515);
-                GlStateManager.depthMask(true);
-                this.textureManager.bindTexture(TextureMap.locationBlocksTexture);
-
-                if (Config.isShaders() && !this.renderItemGui)
-                {
-                    ShadersRender.renderEnchantedGlintEnd();
-                }
-            }
+            GlStateManager.depthMask(false);
+            GlStateManager.depthFunc(514);
+            GlStateManager.disableLighting();
+            GlStateManager.blendFunc(768, 1);
+            this.field_175057_n.bindTexture(RES_ITEM_GLINT);
+            GlStateManager.matrixMode(5890);
+            GlStateManager.pushMatrix();
+            GlStateManager.scale(8.0F, 8.0F, 8.0F);
+            float var2 = (float)(Minecraft.getSystemTime() % 3000L) / 3000.0F / 8.0F;
+            GlStateManager.translate(var2, 0.0F, 0.0F);
+            GlStateManager.rotate(-50.0F, 0.0F, 0.0F, 1.0F);
+            this.func_175035_a(p_180451_1_, -8372020);
+            GlStateManager.popMatrix();
+            GlStateManager.pushMatrix();
+            GlStateManager.scale(8.0F, 8.0F, 8.0F);
+            float var3 = (float)(Minecraft.getSystemTime() % 4873L) / 4873.0F / 8.0F;
+            GlStateManager.translate(-var3, 0.0F, 0.0F);
+            GlStateManager.rotate(10.0F, 0.0F, 0.0F, 1.0F);
+            this.func_175035_a(p_180451_1_, -8372020);
+            GlStateManager.popMatrix();
+            GlStateManager.matrixMode(5888);
+            GlStateManager.blendFunc(770, 771);
+            GlStateManager.enableLighting();
+            GlStateManager.depthFunc(515);
+            GlStateManager.depthMask(true);
+            this.field_175057_n.bindTexture(TextureMap.locationBlocksTexture);
         }
     }
 
-    private void putQuadNormal(WorldRenderer renderer, BakedQuad quad)
+    private void func_175038_a(WorldRenderer p_175038_1_, BakedQuad p_175038_2_)
     {
-        Vec3i vec3i = quad.getFace().getDirectionVec();
-        renderer.putNormal((float)vec3i.getX(), (float)vec3i.getY(), (float)vec3i.getZ());
+        Vec3i var3 = p_175038_2_.getFace().getDirectionVec();
+        p_175038_1_.func_178975_e((float)var3.getX(), (float)var3.getY(), (float)var3.getZ());
     }
 
-    private void renderQuad(WorldRenderer renderer, BakedQuad quad, int color)
+    private void func_175033_a(WorldRenderer p_175033_1_, BakedQuad p_175033_2_, int p_175033_3_)
     {
-        if (this.renderModelEmissive)
+        if (p_175033_1_.isMultiTexture())
         {
-            if (quad.getQuadEmissive() == null)
-            {
-                return;
-            }
-
-            quad = quad.getQuadEmissive();
-        }
-        else if (quad.getQuadEmissive() != null)
-        {
-            this.renderModelHasEmissive = true;
-        }
-
-        if (renderer.isMultiTexture())
-        {
-            renderer.addVertexData(quad.getVertexDataSingle());
+            p_175033_1_.func_178981_a(p_175033_2_.getVertexDataSingle());
+            p_175033_1_.putSprite(p_175033_2_.getSprite());
         }
         else
         {
-            renderer.addVertexData(quad.getVertexData());
+            p_175033_1_.func_178981_a(p_175033_2_.func_178209_a());
         }
 
-        renderer.putSprite(quad.getSprite());
-
-        if (Reflector.IColoredBakedQuad.exists() && Reflector.IColoredBakedQuad.isInstance(quad))
+        if (Reflector.IColoredBakedQuad.exists() && Reflector.IColoredBakedQuad.isInstance(p_175033_2_))
         {
-            forgeHooksClient_putQuadColor(renderer, quad, color);
+            forgeHooksClient_putQuadColor(p_175033_1_, p_175033_2_, p_175033_3_);
         }
         else
         {
-            renderer.putColor4(color);
+            p_175033_1_.func_178968_d(p_175033_3_);
         }
 
-        this.putQuadNormal(renderer, quad);
+        this.func_175038_a(p_175033_1_, p_175033_2_);
     }
 
-    private void renderQuads(WorldRenderer renderer, List<BakedQuad> quads, int color, ItemStack stack)
+    private void func_175032_a(WorldRenderer p_175032_1_, List p_175032_2_, int p_175032_3_, ItemStack p_175032_4_)
     {
-        boolean flag = color == -1 && stack != null;
-        int i = 0;
+        boolean var5 = p_175032_3_ == -1 && p_175032_4_ != null;
+        BakedQuad var7;
+        int var8;
 
-        for (int j = quads.size(); i < j; ++i)
+        for (Iterator var6 = p_175032_2_.iterator(); var6.hasNext(); this.func_175033_a(p_175032_1_, var7, var8))
         {
-            BakedQuad bakedquad = (BakedQuad)quads.get(i);
-            int k = color;
+            var7 = (BakedQuad)var6.next();
+            var8 = p_175032_3_;
 
-            if (flag && bakedquad.hasTintIndex())
+            if (var5 && var7.func_178212_b())
             {
-                k = stack.getItem().getColorFromItemStack(stack, bakedquad.getTintIndex());
+                var8 = p_175032_4_.getItem().getColorFromItemStack(p_175032_4_, var7.func_178211_c());
 
                 if (Config.isCustomColors())
                 {
-                    k = CustomColors.getColorFromItemStack(stack, bakedquad.getTintIndex(), k);
+                    var8 = CustomColors.getColorFromItemStack(p_175032_4_, var7.func_178211_c(), var8);
                 }
 
                 if (EntityRenderer.anaglyphEnable)
                 {
-                    k = TextureUtil.anaglyphColor(k);
+                    var8 = TextureUtil.func_177054_c(var8);
                 }
 
-                k = k | -16777216;
+                var8 |= -16777216;
             }
-
-            this.renderQuad(renderer, bakedquad, k);
         }
     }
 
-    public boolean shouldRenderItemIn3D(ItemStack stack)
+    public boolean func_175050_a(ItemStack p_175050_1_)
     {
-        IBakedModel ibakedmodel = this.itemModelMesher.getItemModel(stack);
-        return ibakedmodel == null ? false : ibakedmodel.isGui3d();
+        IBakedModel var2 = this.itemModelMesher.getItemModel(p_175050_1_);
+        return var2 == null ? false : var2.isAmbientOcclusionEnabled();
     }
 
-    private void preTransform(ItemStack stack)
+    private void func_175046_c(ItemStack p_175046_1_)
     {
-        IBakedModel ibakedmodel = this.itemModelMesher.getItemModel(stack);
-        Item item = stack.getItem();
+        IBakedModel var2 = this.itemModelMesher.getItemModel(p_175046_1_);
+        Item var3 = p_175046_1_.getItem();
 
-        if (item != null)
+        if (var3 != null)
         {
-            boolean flag = ibakedmodel.isGui3d();
+            boolean var4 = var2.isAmbientOcclusionEnabled();
 
-            if (!flag)
+            if (!var4)
             {
                 GlStateManager.scale(2.0F, 2.0F, 2.0F);
             }
@@ -370,70 +324,82 @@ public class RenderItem implements IResourceManagerReloadListener
         }
     }
 
-    public void renderItem(ItemStack stack, ItemCameraTransforms.TransformType cameraTransformType)
+    public void func_175043_b(ItemStack p_175043_1_)
     {
-        if (stack != null)
-        {
-            IBakedModel ibakedmodel = this.itemModelMesher.getItemModel(stack);
-            this.renderItemModelTransform(stack, ibakedmodel, cameraTransformType);
-        }
+        IBakedModel var2 = this.itemModelMesher.getItemModel(p_175043_1_);
+        this.func_175040_a(p_175043_1_, var2, ItemCameraTransforms.TransformType.NONE);
     }
 
-    public void renderItemModelForEntity(ItemStack stack, EntityLivingBase entityToRenderFor, ItemCameraTransforms.TransformType cameraTransformType)
+    public void func_175049_a(ItemStack p_175049_1_, EntityLivingBase p_175049_2_, ItemCameraTransforms.TransformType p_175049_3_)
     {
-        if (stack != null && entityToRenderFor != null)
+        IBakedModel var4 = this.itemModelMesher.getItemModel(p_175049_1_);
+
+        if (p_175049_2_ instanceof EntityPlayer)
         {
-            IBakedModel ibakedmodel = this.itemModelMesher.getItemModel(stack);
+            EntityPlayer var5 = (EntityPlayer)p_175049_2_;
+            Item var6 = p_175049_1_.getItem();
+            ModelResourceLocation var7 = null;
 
-            if (entityToRenderFor instanceof EntityPlayer)
+            if (var6 == Items.fishing_rod && var5.fishEntity != null)
             {
-                EntityPlayer entityplayer = (EntityPlayer)entityToRenderFor;
-                Item item = stack.getItem();
-                ModelResourceLocation modelresourcelocation = null;
+                var7 = new ModelResourceLocation("fishing_rod_cast", "inventory");
+            }
+            else if (var6 == Items.bow && var5.getItemInUse() != null)
+            {
+                int var8 = p_175049_1_.getMaxItemUseDuration() - var5.getItemInUseCount();
 
-                if (item == Items.fishing_rod && entityplayer.fishEntity != null)
+                if (var8 >= 18)
                 {
-                    modelresourcelocation = new ModelResourceLocation("fishing_rod_cast", "inventory");
+                    var7 = new ModelResourceLocation("bow_pulling_2", "inventory");
                 }
-                else if (item == Items.bow && entityplayer.getItemInUse() != null)
+                else if (var8 > 13)
                 {
-                    int i = stack.getMaxItemUseDuration() - entityplayer.getItemInUseCount();
-
-                    if (i >= 18)
-                    {
-                        modelresourcelocation = new ModelResourceLocation("bow_pulling_2", "inventory");
-                    }
-                    else if (i > 13)
-                    {
-                        modelresourcelocation = new ModelResourceLocation("bow_pulling_1", "inventory");
-                    }
-                    else if (i > 0)
-                    {
-                        modelresourcelocation = new ModelResourceLocation("bow_pulling_0", "inventory");
-                    }
+                    var7 = new ModelResourceLocation("bow_pulling_1", "inventory");
                 }
-                else if (Reflector.ForgeItem_getModel.exists())
+                else if (var8 > 0)
                 {
-                    modelresourcelocation = (ModelResourceLocation)Reflector.call(item, Reflector.ForgeItem_getModel, new Object[] {stack, entityplayer, Integer.valueOf(entityplayer.getItemInUseCount())});
-                }
-
-                if (modelresourcelocation != null)
-                {
-                    ibakedmodel = this.itemModelMesher.getModelManager().getModel(modelresourcelocation);
-                    this.modelLocation = modelresourcelocation;
+                    var7 = new ModelResourceLocation("bow_pulling_0", "inventory");
                 }
             }
+            else if (Reflector.ForgeItem_getModel.exists())
+            {
+                var7 = (ModelResourceLocation)Reflector.call(var6, Reflector.ForgeItem_getModel, new Object[] {p_175049_1_, var5, Integer.valueOf(var5.getItemInUseCount())});
+            }
 
-            this.renderItemModelTransform(stack, ibakedmodel, cameraTransformType);
-            this.modelLocation = null;
+            this.modelLocation = var7;
+
+            if (var7 != null)
+            {
+                var4 = this.itemModelMesher.getModelManager().getModel(var7);
+            }
+        }
+
+        this.func_175040_a(p_175049_1_, var4, p_175049_3_);
+        this.modelLocation = null;
+    }
+
+    protected void func_175034_a(ItemTransformVec3f p_175034_1_)
+    {
+        applyVanillaTransform(p_175034_1_);
+    }
+
+    public static void applyVanillaTransform(ItemTransformVec3f p_175034_1_)
+    {
+        if (p_175034_1_ != ItemTransformVec3f.field_178366_a)
+        {
+            GlStateManager.translate(p_175034_1_.field_178365_c.x + field_175055_b, p_175034_1_.field_178365_c.y + field_175056_c, p_175034_1_.field_178365_c.z + field_175053_d);
+            GlStateManager.rotate(p_175034_1_.field_178364_b.y + field_175051_f, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(p_175034_1_.field_178364_b.x + field_175054_e, 1.0F, 0.0F, 0.0F);
+            GlStateManager.rotate(p_175034_1_.field_178364_b.z + field_175052_g, 0.0F, 0.0F, 1.0F);
+            GlStateManager.scale(p_175034_1_.field_178363_d.x + field_175061_h, p_175034_1_.field_178363_d.y + field_175062_i, p_175034_1_.field_178363_d.z + field_175060_j);
         }
     }
 
-    protected void renderItemModelTransform(ItemStack stack, IBakedModel model, ItemCameraTransforms.TransformType cameraTransformType)
+    protected void func_175040_a(ItemStack p_175040_1_, IBakedModel p_175040_2_, ItemCameraTransforms.TransformType p_175040_3_)
     {
-        this.textureManager.bindTexture(TextureMap.locationBlocksTexture);
-        this.textureManager.getTexture(TextureMap.locationBlocksTexture).setBlurMipmap(false, false);
-        this.preTransform(stack);
+        this.field_175057_n.bindTexture(TextureMap.locationBlocksTexture);
+        this.field_175057_n.getTexture(TextureMap.locationBlocksTexture).func_174936_b(false, false);
+        this.func_175046_c(p_175040_1_);
         GlStateManager.enableRescaleNormal();
         GlStateManager.alphaFunc(516, 0.1F);
         GlStateManager.enableBlend();
@@ -442,80 +408,81 @@ public class RenderItem implements IResourceManagerReloadListener
 
         if (Reflector.ForgeHooksClient_handleCameraTransforms.exists())
         {
-            model = (IBakedModel)Reflector.call(Reflector.ForgeHooksClient_handleCameraTransforms, new Object[] {model, cameraTransformType});
+            p_175040_2_ = (IBakedModel)Reflector.call(Reflector.ForgeHooksClient_handleCameraTransforms, new Object[] {p_175040_2_, p_175040_3_});
         }
         else
         {
-            ItemCameraTransforms itemcameratransforms = model.getItemCameraTransforms();
-            itemcameratransforms.applyTransform(cameraTransformType);
-
-            if (this.isThereOneNegativeScale(itemcameratransforms.getTransform(cameraTransformType)))
+            switch (RenderItem.SwitchTransformType.field_178640_a[p_175040_3_.ordinal()])
             {
-                GlStateManager.cullFace(1028);
+                case 1:
+                default:
+                    break;
+
+                case 2:
+                    this.func_175034_a(p_175040_2_.getItemCameraTransforms().field_178355_b);
+                    break;
+
+                case 3:
+                    this.func_175034_a(p_175040_2_.getItemCameraTransforms().field_178356_c);
+                    break;
+
+                case 4:
+                    this.func_175034_a(p_175040_2_.getItemCameraTransforms().field_178353_d);
+                    break;
+
+                case 5:
+                    this.func_175034_a(p_175040_2_.getItemCameraTransforms().field_178354_e);
             }
         }
 
-        this.renderItem(stack, model);
-        GlStateManager.cullFace(1029);
+        this.func_180454_a(p_175040_1_, p_175040_2_);
         GlStateManager.popMatrix();
         GlStateManager.disableRescaleNormal();
         GlStateManager.disableBlend();
-        this.textureManager.bindTexture(TextureMap.locationBlocksTexture);
-        this.textureManager.getTexture(TextureMap.locationBlocksTexture).restoreLastBlurMipmap();
+        this.field_175057_n.bindTexture(TextureMap.locationBlocksTexture);
+        this.field_175057_n.getTexture(TextureMap.locationBlocksTexture).func_174935_a();
     }
 
-    /**
-     * Return true if only one scale is negative
-     *  
-     * @param itemTranformVec The ItemTransformVec3f instance
-     */
-    private boolean isThereOneNegativeScale(ItemTransformVec3f itemTranformVec)
+    public void func_175042_a(ItemStack p_175042_1_, int p_175042_2_, int p_175042_3_)
     {
-        return itemTranformVec.scale.x < 0.0F ^ itemTranformVec.scale.y < 0.0F ^ itemTranformVec.scale.z < 0.0F;
-    }
-
-    public void renderItemIntoGUI(ItemStack stack, int x, int y)
-    {
-        this.renderItemGui = true;
-        IBakedModel ibakedmodel = this.itemModelMesher.getItemModel(stack);
+        IBakedModel var4 = this.itemModelMesher.getItemModel(p_175042_1_);
         GlStateManager.pushMatrix();
-        this.textureManager.bindTexture(TextureMap.locationBlocksTexture);
-        this.textureManager.getTexture(TextureMap.locationBlocksTexture).setBlurMipmap(false, false);
+        this.field_175057_n.bindTexture(TextureMap.locationBlocksTexture);
+        this.field_175057_n.getTexture(TextureMap.locationBlocksTexture).func_174936_b(false, false);
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableAlpha();
         GlStateManager.alphaFunc(516, 0.1F);
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(770, 771);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        this.setupGuiTransform(x, y, ibakedmodel.isGui3d());
+        this.func_180452_a(p_175042_2_, p_175042_3_, var4.isAmbientOcclusionEnabled());
 
         if (Reflector.ForgeHooksClient_handleCameraTransforms.exists())
         {
-            ibakedmodel = (IBakedModel)Reflector.call(Reflector.ForgeHooksClient_handleCameraTransforms, new Object[] {ibakedmodel, ItemCameraTransforms.TransformType.GUI});
+            var4 = (IBakedModel)Reflector.call(Reflector.ForgeHooksClient_handleCameraTransforms, new Object[] {var4, ItemCameraTransforms.TransformType.GUI});
         }
         else
         {
-            ibakedmodel.getItemCameraTransforms().applyTransform(ItemCameraTransforms.TransformType.GUI);
+            this.func_175034_a(var4.getItemCameraTransforms().field_178354_e);
         }
 
-        this.renderItem(stack, ibakedmodel);
+        this.func_180454_a(p_175042_1_, var4);
         GlStateManager.disableAlpha();
         GlStateManager.disableRescaleNormal();
         GlStateManager.disableLighting();
         GlStateManager.popMatrix();
-        this.textureManager.bindTexture(TextureMap.locationBlocksTexture);
-        this.textureManager.getTexture(TextureMap.locationBlocksTexture).restoreLastBlurMipmap();
-        this.renderItemGui = false;
+        this.field_175057_n.bindTexture(TextureMap.locationBlocksTexture);
+        this.field_175057_n.getTexture(TextureMap.locationBlocksTexture).func_174935_a();
     }
 
-    private void setupGuiTransform(int xPosition, int yPosition, boolean isGui3d)
+    private void func_180452_a(int p_180452_1_, int p_180452_2_, boolean p_180452_3_)
     {
-        GlStateManager.translate((float)xPosition, (float)yPosition, 100.0F + this.zLevel);
+        GlStateManager.translate((float)p_180452_1_, (float)p_180452_2_, 100.0F + this.zLevel);
         GlStateManager.translate(8.0F, 8.0F, 0.0F);
         GlStateManager.scale(1.0F, 1.0F, -1.0F);
         GlStateManager.scale(0.5F, 0.5F, 0.5F);
 
-        if (isGui3d)
+        if (p_180452_3_)
         {
             GlStateManager.scale(40.0F, 40.0F, 40.0F);
             GlStateManager.rotate(210.0F, 1.0F, 0.0F, 0.0F);
@@ -530,95 +497,101 @@ public class RenderItem implements IResourceManagerReloadListener
         }
     }
 
-    public void renderItemAndEffectIntoGUI(final ItemStack stack, int xPosition, int yPosition)
+    public void func_180450_b(final ItemStack p_180450_1_, int p_180450_2_, int p_180450_3_)
     {
-        if (stack != null && stack.getItem() != null)
+        if (p_180450_1_ != null)
         {
             this.zLevel += 50.0F;
 
             try
             {
-                this.renderItemIntoGUI(stack, xPosition, yPosition);
+                this.func_175042_a(p_180450_1_, p_180450_2_, p_180450_3_);
             }
-            catch (Throwable throwable)
+            catch (Throwable var7)
             {
-                CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Rendering item");
-                CrashReportCategory crashreportcategory = crashreport.makeCategory("Item being rendered");
-                crashreportcategory.addCrashSectionCallable("Item Type", new Callable<String>()
+                CrashReport var5 = CrashReport.makeCrashReport(var7, "Rendering item");
+                CrashReportCategory var6 = var5.makeCategory("Item being rendered");
+                var6.addCrashSectionCallable("Item Type", new Callable()
                 {
-                    public String call() throws Exception
+                    
+                    public String call()
                     {
-                        return String.valueOf((Object)stack.getItem());
+                        return String.valueOf(p_180450_1_.getItem());
                     }
                 });
-                crashreportcategory.addCrashSectionCallable("Item Aux", new Callable<String>()
+                var6.addCrashSectionCallable("Item Aux", new Callable()
                 {
-                    public String call() throws Exception
+                    
+                    public String call()
                     {
-                        return String.valueOf(stack.getMetadata());
+                        return String.valueOf(p_180450_1_.getMetadata());
                     }
                 });
-                crashreportcategory.addCrashSectionCallable("Item NBT", new Callable<String>()
+                var6.addCrashSectionCallable("Item NBT", new Callable()
                 {
-                    public String call() throws Exception
+                    
+                    public String call()
                     {
-                        return String.valueOf((Object)stack.getTagCompound());
+                        return String.valueOf(p_180450_1_.getTagCompound());
                     }
                 });
-                crashreportcategory.addCrashSectionCallable("Item Foil", new Callable<String>()
+                var6.addCrashSectionCallable("Item Foil", new Callable()
                 {
-                    public String call() throws Exception
+                    public String call()
                     {
-                        return String.valueOf(stack.hasEffect());
+                        return String.valueOf(p_180450_1_.hasEffect());
                     }
                 });
-                throw new ReportedException(crashreport);
+                throw new ReportedException(var5);
             }
 
             this.zLevel -= 50.0F;
         }
     }
 
-    public void renderItemOverlays(FontRenderer fr, ItemStack stack, int xPosition, int yPosition)
+    public void func_175030_a(FontRenderer p_175030_1_, ItemStack p_175030_2_, int p_175030_3_, int p_175030_4_)
     {
-        this.renderItemOverlayIntoGUI(fr, stack, xPosition, yPosition, (String)null);
+        this.func_180453_a(p_175030_1_, p_175030_2_, p_175030_3_, p_175030_4_, (String)null);
     }
 
-    /**
-     * Renders the stack size and/or damage bar for the given ItemStack.
-     */
-    public void renderItemOverlayIntoGUI(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, String text)
+    public void func_180453_a(FontRenderer p_180453_1_, ItemStack p_180453_2_, int p_180453_3_, int p_180453_4_, String p_180453_5_)
     {
-        if (stack != null)
+        if (p_180453_2_ != null)
         {
-            if (stack.stackSize != 1 || text != null)
+            if (p_180453_2_.stackSize != 1 || p_180453_5_ != null)
             {
-                String s = text == null ? String.valueOf(stack.stackSize) : text;
+                String itemDamaged = p_180453_5_ == null ? String.valueOf(p_180453_2_.stackSize) : p_180453_5_;
 
-                if (text == null && stack.stackSize < 1)
+                if (p_180453_5_ == null && p_180453_2_.stackSize < 1)
                 {
-                    s = EnumChatFormatting.RED + String.valueOf(stack.stackSize);
+                    itemDamaged = EnumChatFormatting.RED + String.valueOf(p_180453_2_.stackSize);
                 }
 
                 GlStateManager.disableLighting();
                 GlStateManager.disableDepth();
                 GlStateManager.disableBlend();
-                fr.drawStringWithShadow(s, (float)(xPosition + 19 - 2 - fr.getStringWidth(s)), (float)(yPosition + 6 + 3), 16777215);
+                p_180453_1_.func_175063_a(itemDamaged, (float)(p_180453_3_ + 19 - 2 - p_180453_1_.getStringWidth(itemDamaged)), (float)(p_180453_4_ + 6 + 3), 16777215);
                 GlStateManager.enableLighting();
                 GlStateManager.enableDepth();
-                GlStateManager.enableBlend();
             }
 
-            if (ReflectorForge.isItemDamaged(stack))
+            boolean itemDamaged1 = p_180453_2_.isItemDamaged();
+
+            if (Reflector.ForgeItem_showDurabilityBar.exists())
             {
-                int j1 = (int)Math.round(13.0D - (double)stack.getItemDamage() * 13.0D / (double)stack.getMaxDamage());
-                int i = (int)Math.round(255.0D - (double)stack.getItemDamage() * 255.0D / (double)stack.getMaxDamage());
+                itemDamaged1 = Reflector.callBoolean(p_180453_2_.getItem(), Reflector.ForgeItem_showDurabilityBar, new Object[] {p_180453_2_});
+            }
+
+            if (itemDamaged1)
+            {
+                int var12 = (int)Math.round(13.0D - (double)p_180453_2_.getItemDamage() * 13.0D / (double)p_180453_2_.getMaxDamage());
+                int var7 = (int)Math.round(255.0D - (double)p_180453_2_.getItemDamage() * 255.0D / (double)p_180453_2_.getMaxDamage());
 
                 if (Reflector.ForgeItem_getDurabilityForDisplay.exists())
                 {
-                    double d0 = Reflector.callDouble(stack.getItem(), Reflector.ForgeItem_getDurabilityForDisplay, new Object[] {stack});
-                    j1 = (int)Math.round(13.0D - d0 * 13.0D);
-                    i = (int)Math.round(255.0D - d0 * 255.0D);
+                    double var8 = Reflector.callDouble(p_180453_2_.getItem(), Reflector.ForgeItem_getDurabilityForDisplay, new Object[] {p_180453_2_});
+                    var12 = (int)Math.round(13.0D - var8 * 13.0D);
+                    var7 = (int)Math.round(255.0D - var8 * 255.0D);
                 }
 
                 GlStateManager.disableLighting();
@@ -626,28 +599,19 @@ public class RenderItem implements IResourceManagerReloadListener
                 GlStateManager.disableTexture2D();
                 GlStateManager.disableAlpha();
                 GlStateManager.disableBlend();
-                Tessellator tessellator = Tessellator.getInstance();
-                WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-                this.draw(worldrenderer, xPosition + 2, yPosition + 13, 13, 2, 0, 0, 0, 255);
-                this.draw(worldrenderer, xPosition + 2, yPosition + 13, 12, 1, (255 - i) / 4, 64, 0, 255);
-                int j = 255 - i;
-                int k = i;
-                int l = 0;
+                Tessellator var81 = Tessellator.getInstance();
+                WorldRenderer var9 = var81.getWorldRenderer();
+                int var10 = 255 - var7 << 16 | var7 << 8;
+                int var11 = (255 - var7) / 4 << 16 | 16128;
+                this.func_175044_a(var9, p_180453_3_ + 2, p_180453_4_ + 13, 13, 2, 0);
+                this.func_175044_a(var9, p_180453_3_ + 2, p_180453_4_ + 13, 12, 1, var11);
+                this.func_175044_a(var9, p_180453_3_ + 2, p_180453_4_ + 13, var12, 1, var10);
 
-                if (Config.isCustomColors())
+                if (!Reflector.ForgeHooksClient.exists())
                 {
-                    int i1 = CustomColors.getDurabilityColor(i);
-
-                    if (i1 >= 0)
-                    {
-                        j = i1 >> 16 & 255;
-                        k = i1 >> 8 & 255;
-                        l = i1 >> 0 & 255;
-                    }
+                    GlStateManager.enableBlend();
                 }
 
-                this.draw(worldrenderer, xPosition + 2, yPosition + 13, j1, 1, j, k, l, 255);
-                GlStateManager.enableBlend();
                 GlStateManager.enableAlpha();
                 GlStateManager.enableTexture2D();
                 GlStateManager.enableLighting();
@@ -656,26 +620,14 @@ public class RenderItem implements IResourceManagerReloadListener
         }
     }
 
-    /**
-     * Draw with the WorldRenderer
-     *  
-     * @param renderer The WorldRenderer's instance
-     * @param x X position where the render begin
-     * @param y Y position where the render begin
-     * @param width The width of the render
-     * @param height The height of the render
-     * @param red Red component of the color
-     * @param green Green component of the color
-     * @param blue Blue component of the color
-     * @param alpha Alpha component of the color
-     */
-    private void draw(WorldRenderer renderer, int x, int y, int width, int height, int red, int green, int blue, int alpha)
+    private void func_175044_a(WorldRenderer p_175044_1_, int p_175044_2_, int p_175044_3_, int p_175044_4_, int p_175044_5_, int p_175044_6_)
     {
-        renderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        renderer.pos((double)(x + 0), (double)(y + 0), 0.0D).color(red, green, blue, alpha).endVertex();
-        renderer.pos((double)(x + 0), (double)(y + height), 0.0D).color(red, green, blue, alpha).endVertex();
-        renderer.pos((double)(x + width), (double)(y + height), 0.0D).color(red, green, blue, alpha).endVertex();
-        renderer.pos((double)(x + width), (double)(y + 0), 0.0D).color(red, green, blue, alpha).endVertex();
+        p_175044_1_.startDrawingQuads();
+        p_175044_1_.func_178991_c(p_175044_6_);
+        p_175044_1_.addVertex((double)(p_175044_2_ + 0), (double)(p_175044_3_ + 0), 0.0D);
+        p_175044_1_.addVertex((double)(p_175044_2_ + 0), (double)(p_175044_3_ + p_175044_5_), 0.0D);
+        p_175044_1_.addVertex((double)(p_175044_2_ + p_175044_4_), (double)(p_175044_3_ + p_175044_5_), 0.0D);
+        p_175044_1_.addVertex((double)(p_175044_2_ + p_175044_4_), (double)(p_175044_3_ + 0), 0.0D);
         Tessellator.getInstance().draw();
     }
 
@@ -684,181 +636,181 @@ public class RenderItem implements IResourceManagerReloadListener
         this.registerBlock(Blocks.anvil, "anvil_intact");
         this.registerBlock(Blocks.anvil, 1, "anvil_slightly_damaged");
         this.registerBlock(Blocks.anvil, 2, "anvil_very_damaged");
-        this.registerBlock(Blocks.carpet, EnumDyeColor.BLACK.getMetadata(), "black_carpet");
-        this.registerBlock(Blocks.carpet, EnumDyeColor.BLUE.getMetadata(), "blue_carpet");
-        this.registerBlock(Blocks.carpet, EnumDyeColor.BROWN.getMetadata(), "brown_carpet");
-        this.registerBlock(Blocks.carpet, EnumDyeColor.CYAN.getMetadata(), "cyan_carpet");
-        this.registerBlock(Blocks.carpet, EnumDyeColor.GRAY.getMetadata(), "gray_carpet");
-        this.registerBlock(Blocks.carpet, EnumDyeColor.GREEN.getMetadata(), "green_carpet");
-        this.registerBlock(Blocks.carpet, EnumDyeColor.LIGHT_BLUE.getMetadata(), "light_blue_carpet");
-        this.registerBlock(Blocks.carpet, EnumDyeColor.LIME.getMetadata(), "lime_carpet");
-        this.registerBlock(Blocks.carpet, EnumDyeColor.MAGENTA.getMetadata(), "magenta_carpet");
-        this.registerBlock(Blocks.carpet, EnumDyeColor.ORANGE.getMetadata(), "orange_carpet");
-        this.registerBlock(Blocks.carpet, EnumDyeColor.PINK.getMetadata(), "pink_carpet");
-        this.registerBlock(Blocks.carpet, EnumDyeColor.PURPLE.getMetadata(), "purple_carpet");
-        this.registerBlock(Blocks.carpet, EnumDyeColor.RED.getMetadata(), "red_carpet");
-        this.registerBlock(Blocks.carpet, EnumDyeColor.SILVER.getMetadata(), "silver_carpet");
-        this.registerBlock(Blocks.carpet, EnumDyeColor.WHITE.getMetadata(), "white_carpet");
-        this.registerBlock(Blocks.carpet, EnumDyeColor.YELLOW.getMetadata(), "yellow_carpet");
-        this.registerBlock(Blocks.cobblestone_wall, BlockWall.EnumType.MOSSY.getMetadata(), "mossy_cobblestone_wall");
-        this.registerBlock(Blocks.cobblestone_wall, BlockWall.EnumType.NORMAL.getMetadata(), "cobblestone_wall");
+        this.registerBlock(Blocks.carpet, EnumDyeColor.BLACK.func_176765_a(), "black_carpet");
+        this.registerBlock(Blocks.carpet, EnumDyeColor.BLUE.func_176765_a(), "blue_carpet");
+        this.registerBlock(Blocks.carpet, EnumDyeColor.BROWN.func_176765_a(), "brown_carpet");
+        this.registerBlock(Blocks.carpet, EnumDyeColor.CYAN.func_176765_a(), "cyan_carpet");
+        this.registerBlock(Blocks.carpet, EnumDyeColor.GRAY.func_176765_a(), "gray_carpet");
+        this.registerBlock(Blocks.carpet, EnumDyeColor.GREEN.func_176765_a(), "green_carpet");
+        this.registerBlock(Blocks.carpet, EnumDyeColor.LIGHT_BLUE.func_176765_a(), "light_blue_carpet");
+        this.registerBlock(Blocks.carpet, EnumDyeColor.LIME.func_176765_a(), "lime_carpet");
+        this.registerBlock(Blocks.carpet, EnumDyeColor.MAGENTA.func_176765_a(), "magenta_carpet");
+        this.registerBlock(Blocks.carpet, EnumDyeColor.ORANGE.func_176765_a(), "orange_carpet");
+        this.registerBlock(Blocks.carpet, EnumDyeColor.PINK.func_176765_a(), "pink_carpet");
+        this.registerBlock(Blocks.carpet, EnumDyeColor.PURPLE.func_176765_a(), "purple_carpet");
+        this.registerBlock(Blocks.carpet, EnumDyeColor.RED.func_176765_a(), "red_carpet");
+        this.registerBlock(Blocks.carpet, EnumDyeColor.SILVER.func_176765_a(), "silver_carpet");
+        this.registerBlock(Blocks.carpet, EnumDyeColor.WHITE.func_176765_a(), "white_carpet");
+        this.registerBlock(Blocks.carpet, EnumDyeColor.YELLOW.func_176765_a(), "yellow_carpet");
+        this.registerBlock(Blocks.cobblestone_wall, BlockWall.EnumType.MOSSY.func_176657_a(), "mossy_cobblestone_wall");
+        this.registerBlock(Blocks.cobblestone_wall, BlockWall.EnumType.NORMAL.func_176657_a(), "cobblestone_wall");
         this.registerBlock(Blocks.dirt, BlockDirt.DirtType.COARSE_DIRT.getMetadata(), "coarse_dirt");
         this.registerBlock(Blocks.dirt, BlockDirt.DirtType.DIRT.getMetadata(), "dirt");
         this.registerBlock(Blocks.dirt, BlockDirt.DirtType.PODZOL.getMetadata(), "podzol");
-        this.registerBlock(Blocks.double_plant, BlockDoublePlant.EnumPlantType.FERN.getMeta(), "double_fern");
-        this.registerBlock(Blocks.double_plant, BlockDoublePlant.EnumPlantType.GRASS.getMeta(), "double_grass");
-        this.registerBlock(Blocks.double_plant, BlockDoublePlant.EnumPlantType.PAEONIA.getMeta(), "paeonia");
-        this.registerBlock(Blocks.double_plant, BlockDoublePlant.EnumPlantType.ROSE.getMeta(), "double_rose");
-        this.registerBlock(Blocks.double_plant, BlockDoublePlant.EnumPlantType.SUNFLOWER.getMeta(), "sunflower");
-        this.registerBlock(Blocks.double_plant, BlockDoublePlant.EnumPlantType.SYRINGA.getMeta(), "syringa");
-        this.registerBlock(Blocks.leaves, BlockPlanks.EnumType.BIRCH.getMetadata(), "birch_leaves");
-        this.registerBlock(Blocks.leaves, BlockPlanks.EnumType.JUNGLE.getMetadata(), "jungle_leaves");
-        this.registerBlock(Blocks.leaves, BlockPlanks.EnumType.OAK.getMetadata(), "oak_leaves");
-        this.registerBlock(Blocks.leaves, BlockPlanks.EnumType.SPRUCE.getMetadata(), "spruce_leaves");
-        this.registerBlock(Blocks.leaves2, BlockPlanks.EnumType.ACACIA.getMetadata() - 4, "acacia_leaves");
-        this.registerBlock(Blocks.leaves2, BlockPlanks.EnumType.DARK_OAK.getMetadata() - 4, "dark_oak_leaves");
-        this.registerBlock(Blocks.log, BlockPlanks.EnumType.BIRCH.getMetadata(), "birch_log");
-        this.registerBlock(Blocks.log, BlockPlanks.EnumType.JUNGLE.getMetadata(), "jungle_log");
-        this.registerBlock(Blocks.log, BlockPlanks.EnumType.OAK.getMetadata(), "oak_log");
-        this.registerBlock(Blocks.log, BlockPlanks.EnumType.SPRUCE.getMetadata(), "spruce_log");
-        this.registerBlock(Blocks.log2, BlockPlanks.EnumType.ACACIA.getMetadata() - 4, "acacia_log");
-        this.registerBlock(Blocks.log2, BlockPlanks.EnumType.DARK_OAK.getMetadata() - 4, "dark_oak_log");
-        this.registerBlock(Blocks.monster_egg, BlockSilverfish.EnumType.CHISELED_STONEBRICK.getMetadata(), "chiseled_brick_monster_egg");
-        this.registerBlock(Blocks.monster_egg, BlockSilverfish.EnumType.COBBLESTONE.getMetadata(), "cobblestone_monster_egg");
-        this.registerBlock(Blocks.monster_egg, BlockSilverfish.EnumType.CRACKED_STONEBRICK.getMetadata(), "cracked_brick_monster_egg");
-        this.registerBlock(Blocks.monster_egg, BlockSilverfish.EnumType.MOSSY_STONEBRICK.getMetadata(), "mossy_brick_monster_egg");
-        this.registerBlock(Blocks.monster_egg, BlockSilverfish.EnumType.STONE.getMetadata(), "stone_monster_egg");
-        this.registerBlock(Blocks.monster_egg, BlockSilverfish.EnumType.STONEBRICK.getMetadata(), "stone_brick_monster_egg");
-        this.registerBlock(Blocks.planks, BlockPlanks.EnumType.ACACIA.getMetadata(), "acacia_planks");
-        this.registerBlock(Blocks.planks, BlockPlanks.EnumType.BIRCH.getMetadata(), "birch_planks");
-        this.registerBlock(Blocks.planks, BlockPlanks.EnumType.DARK_OAK.getMetadata(), "dark_oak_planks");
-        this.registerBlock(Blocks.planks, BlockPlanks.EnumType.JUNGLE.getMetadata(), "jungle_planks");
-        this.registerBlock(Blocks.planks, BlockPlanks.EnumType.OAK.getMetadata(), "oak_planks");
-        this.registerBlock(Blocks.planks, BlockPlanks.EnumType.SPRUCE.getMetadata(), "spruce_planks");
+        this.registerBlock(Blocks.double_plant, BlockDoublePlant.EnumPlantType.FERN.func_176936_a(), "double_fern");
+        this.registerBlock(Blocks.double_plant, BlockDoublePlant.EnumPlantType.GRASS.func_176936_a(), "double_grass");
+        this.registerBlock(Blocks.double_plant, BlockDoublePlant.EnumPlantType.PAEONIA.func_176936_a(), "paeonia");
+        this.registerBlock(Blocks.double_plant, BlockDoublePlant.EnumPlantType.ROSE.func_176936_a(), "double_rose");
+        this.registerBlock(Blocks.double_plant, BlockDoublePlant.EnumPlantType.SUNFLOWER.func_176936_a(), "sunflower");
+        this.registerBlock(Blocks.double_plant, BlockDoublePlant.EnumPlantType.SYRINGA.func_176936_a(), "syringa");
+        this.registerBlock(Blocks.leaves, BlockPlanks.EnumType.BIRCH.func_176839_a(), "birch_leaves");
+        this.registerBlock(Blocks.leaves, BlockPlanks.EnumType.JUNGLE.func_176839_a(), "jungle_leaves");
+        this.registerBlock(Blocks.leaves, BlockPlanks.EnumType.OAK.func_176839_a(), "oak_leaves");
+        this.registerBlock(Blocks.leaves, BlockPlanks.EnumType.SPRUCE.func_176839_a(), "spruce_leaves");
+        this.registerBlock(Blocks.leaves2, BlockPlanks.EnumType.ACACIA.func_176839_a() - 4, "acacia_leaves");
+        this.registerBlock(Blocks.leaves2, BlockPlanks.EnumType.DARK_OAK.func_176839_a() - 4, "dark_oak_leaves");
+        this.registerBlock(Blocks.log, BlockPlanks.EnumType.BIRCH.func_176839_a(), "birch_log");
+        this.registerBlock(Blocks.log, BlockPlanks.EnumType.JUNGLE.func_176839_a(), "jungle_log");
+        this.registerBlock(Blocks.log, BlockPlanks.EnumType.OAK.func_176839_a(), "oak_log");
+        this.registerBlock(Blocks.log, BlockPlanks.EnumType.SPRUCE.func_176839_a(), "spruce_log");
+        this.registerBlock(Blocks.log2, BlockPlanks.EnumType.ACACIA.func_176839_a() - 4, "acacia_log");
+        this.registerBlock(Blocks.log2, BlockPlanks.EnumType.DARK_OAK.func_176839_a() - 4, "dark_oak_log");
+        this.registerBlock(Blocks.monster_egg, BlockSilverfish.EnumType.CHISELED_STONEBRICK.func_176881_a(), "chiseled_brick_monster_egg");
+        this.registerBlock(Blocks.monster_egg, BlockSilverfish.EnumType.COBBLESTONE.func_176881_a(), "cobblestone_monster_egg");
+        this.registerBlock(Blocks.monster_egg, BlockSilverfish.EnumType.CRACKED_STONEBRICK.func_176881_a(), "cracked_brick_monster_egg");
+        this.registerBlock(Blocks.monster_egg, BlockSilverfish.EnumType.MOSSY_STONEBRICK.func_176881_a(), "mossy_brick_monster_egg");
+        this.registerBlock(Blocks.monster_egg, BlockSilverfish.EnumType.STONE.func_176881_a(), "stone_monster_egg");
+        this.registerBlock(Blocks.monster_egg, BlockSilverfish.EnumType.STONEBRICK.func_176881_a(), "stone_brick_monster_egg");
+        this.registerBlock(Blocks.planks, BlockPlanks.EnumType.ACACIA.func_176839_a(), "acacia_planks");
+        this.registerBlock(Blocks.planks, BlockPlanks.EnumType.BIRCH.func_176839_a(), "birch_planks");
+        this.registerBlock(Blocks.planks, BlockPlanks.EnumType.DARK_OAK.func_176839_a(), "dark_oak_planks");
+        this.registerBlock(Blocks.planks, BlockPlanks.EnumType.JUNGLE.func_176839_a(), "jungle_planks");
+        this.registerBlock(Blocks.planks, BlockPlanks.EnumType.OAK.func_176839_a(), "oak_planks");
+        this.registerBlock(Blocks.planks, BlockPlanks.EnumType.SPRUCE.func_176839_a(), "spruce_planks");
         this.registerBlock(Blocks.prismarine, BlockPrismarine.EnumType.BRICKS.getMetadata(), "prismarine_bricks");
         this.registerBlock(Blocks.prismarine, BlockPrismarine.EnumType.DARK.getMetadata(), "dark_prismarine");
         this.registerBlock(Blocks.prismarine, BlockPrismarine.EnumType.ROUGH.getMetadata(), "prismarine");
-        this.registerBlock(Blocks.quartz_block, BlockQuartz.EnumType.CHISELED.getMetadata(), "chiseled_quartz_block");
-        this.registerBlock(Blocks.quartz_block, BlockQuartz.EnumType.DEFAULT.getMetadata(), "quartz_block");
-        this.registerBlock(Blocks.quartz_block, BlockQuartz.EnumType.LINES_Y.getMetadata(), "quartz_column");
-        this.registerBlock(Blocks.red_flower, BlockFlower.EnumFlowerType.ALLIUM.getMeta(), "allium");
-        this.registerBlock(Blocks.red_flower, BlockFlower.EnumFlowerType.BLUE_ORCHID.getMeta(), "blue_orchid");
-        this.registerBlock(Blocks.red_flower, BlockFlower.EnumFlowerType.HOUSTONIA.getMeta(), "houstonia");
-        this.registerBlock(Blocks.red_flower, BlockFlower.EnumFlowerType.ORANGE_TULIP.getMeta(), "orange_tulip");
-        this.registerBlock(Blocks.red_flower, BlockFlower.EnumFlowerType.OXEYE_DAISY.getMeta(), "oxeye_daisy");
-        this.registerBlock(Blocks.red_flower, BlockFlower.EnumFlowerType.PINK_TULIP.getMeta(), "pink_tulip");
-        this.registerBlock(Blocks.red_flower, BlockFlower.EnumFlowerType.POPPY.getMeta(), "poppy");
-        this.registerBlock(Blocks.red_flower, BlockFlower.EnumFlowerType.RED_TULIP.getMeta(), "red_tulip");
-        this.registerBlock(Blocks.red_flower, BlockFlower.EnumFlowerType.WHITE_TULIP.getMeta(), "white_tulip");
-        this.registerBlock(Blocks.sand, BlockSand.EnumType.RED_SAND.getMetadata(), "red_sand");
-        this.registerBlock(Blocks.sand, BlockSand.EnumType.SAND.getMetadata(), "sand");
-        this.registerBlock(Blocks.sandstone, BlockSandStone.EnumType.CHISELED.getMetadata(), "chiseled_sandstone");
-        this.registerBlock(Blocks.sandstone, BlockSandStone.EnumType.DEFAULT.getMetadata(), "sandstone");
-        this.registerBlock(Blocks.sandstone, BlockSandStone.EnumType.SMOOTH.getMetadata(), "smooth_sandstone");
-        this.registerBlock(Blocks.red_sandstone, BlockRedSandstone.EnumType.CHISELED.getMetadata(), "chiseled_red_sandstone");
-        this.registerBlock(Blocks.red_sandstone, BlockRedSandstone.EnumType.DEFAULT.getMetadata(), "red_sandstone");
-        this.registerBlock(Blocks.red_sandstone, BlockRedSandstone.EnumType.SMOOTH.getMetadata(), "smooth_red_sandstone");
-        this.registerBlock(Blocks.sapling, BlockPlanks.EnumType.ACACIA.getMetadata(), "acacia_sapling");
-        this.registerBlock(Blocks.sapling, BlockPlanks.EnumType.BIRCH.getMetadata(), "birch_sapling");
-        this.registerBlock(Blocks.sapling, BlockPlanks.EnumType.DARK_OAK.getMetadata(), "dark_oak_sapling");
-        this.registerBlock(Blocks.sapling, BlockPlanks.EnumType.JUNGLE.getMetadata(), "jungle_sapling");
-        this.registerBlock(Blocks.sapling, BlockPlanks.EnumType.OAK.getMetadata(), "oak_sapling");
-        this.registerBlock(Blocks.sapling, BlockPlanks.EnumType.SPRUCE.getMetadata(), "spruce_sapling");
+        this.registerBlock(Blocks.quartz_block, BlockQuartz.EnumType.CHISELED.getMetaFromState(), "chiseled_quartz_block");
+        this.registerBlock(Blocks.quartz_block, BlockQuartz.EnumType.DEFAULT.getMetaFromState(), "quartz_block");
+        this.registerBlock(Blocks.quartz_block, BlockQuartz.EnumType.LINES_Y.getMetaFromState(), "quartz_column");
+        this.registerBlock(Blocks.red_flower, BlockFlower.EnumFlowerType.ALLIUM.func_176968_b(), "allium");
+        this.registerBlock(Blocks.red_flower, BlockFlower.EnumFlowerType.BLUE_ORCHID.func_176968_b(), "blue_orchid");
+        this.registerBlock(Blocks.red_flower, BlockFlower.EnumFlowerType.HOUSTONIA.func_176968_b(), "houstonia");
+        this.registerBlock(Blocks.red_flower, BlockFlower.EnumFlowerType.ORANGE_TULIP.func_176968_b(), "orange_tulip");
+        this.registerBlock(Blocks.red_flower, BlockFlower.EnumFlowerType.OXEYE_DAISY.func_176968_b(), "oxeye_daisy");
+        this.registerBlock(Blocks.red_flower, BlockFlower.EnumFlowerType.PINK_TULIP.func_176968_b(), "pink_tulip");
+        this.registerBlock(Blocks.red_flower, BlockFlower.EnumFlowerType.POPPY.func_176968_b(), "poppy");
+        this.registerBlock(Blocks.red_flower, BlockFlower.EnumFlowerType.RED_TULIP.func_176968_b(), "red_tulip");
+        this.registerBlock(Blocks.red_flower, BlockFlower.EnumFlowerType.WHITE_TULIP.func_176968_b(), "white_tulip");
+        this.registerBlock(Blocks.sand, BlockSand.EnumType.RED_SAND.func_176688_a(), "red_sand");
+        this.registerBlock(Blocks.sand, BlockSand.EnumType.SAND.func_176688_a(), "sand");
+        this.registerBlock(Blocks.sandstone, BlockSandStone.EnumType.CHISELED.func_176675_a(), "chiseled_sandstone");
+        this.registerBlock(Blocks.sandstone, BlockSandStone.EnumType.DEFAULT.func_176675_a(), "sandstone");
+        this.registerBlock(Blocks.sandstone, BlockSandStone.EnumType.SMOOTH.func_176675_a(), "smooth_sandstone");
+        this.registerBlock(Blocks.red_sandstone, BlockRedSandstone.EnumType.CHISELED.getMetaFromState(), "chiseled_red_sandstone");
+        this.registerBlock(Blocks.red_sandstone, BlockRedSandstone.EnumType.DEFAULT.getMetaFromState(), "red_sandstone");
+        this.registerBlock(Blocks.red_sandstone, BlockRedSandstone.EnumType.SMOOTH.getMetaFromState(), "smooth_red_sandstone");
+        this.registerBlock(Blocks.sapling, BlockPlanks.EnumType.ACACIA.func_176839_a(), "acacia_sapling");
+        this.registerBlock(Blocks.sapling, BlockPlanks.EnumType.BIRCH.func_176839_a(), "birch_sapling");
+        this.registerBlock(Blocks.sapling, BlockPlanks.EnumType.DARK_OAK.func_176839_a(), "dark_oak_sapling");
+        this.registerBlock(Blocks.sapling, BlockPlanks.EnumType.JUNGLE.func_176839_a(), "jungle_sapling");
+        this.registerBlock(Blocks.sapling, BlockPlanks.EnumType.OAK.func_176839_a(), "oak_sapling");
+        this.registerBlock(Blocks.sapling, BlockPlanks.EnumType.SPRUCE.func_176839_a(), "spruce_sapling");
         this.registerBlock(Blocks.sponge, 0, "sponge");
         this.registerBlock(Blocks.sponge, 1, "sponge_wet");
-        this.registerBlock(Blocks.stained_glass, EnumDyeColor.BLACK.getMetadata(), "black_stained_glass");
-        this.registerBlock(Blocks.stained_glass, EnumDyeColor.BLUE.getMetadata(), "blue_stained_glass");
-        this.registerBlock(Blocks.stained_glass, EnumDyeColor.BROWN.getMetadata(), "brown_stained_glass");
-        this.registerBlock(Blocks.stained_glass, EnumDyeColor.CYAN.getMetadata(), "cyan_stained_glass");
-        this.registerBlock(Blocks.stained_glass, EnumDyeColor.GRAY.getMetadata(), "gray_stained_glass");
-        this.registerBlock(Blocks.stained_glass, EnumDyeColor.GREEN.getMetadata(), "green_stained_glass");
-        this.registerBlock(Blocks.stained_glass, EnumDyeColor.LIGHT_BLUE.getMetadata(), "light_blue_stained_glass");
-        this.registerBlock(Blocks.stained_glass, EnumDyeColor.LIME.getMetadata(), "lime_stained_glass");
-        this.registerBlock(Blocks.stained_glass, EnumDyeColor.MAGENTA.getMetadata(), "magenta_stained_glass");
-        this.registerBlock(Blocks.stained_glass, EnumDyeColor.ORANGE.getMetadata(), "orange_stained_glass");
-        this.registerBlock(Blocks.stained_glass, EnumDyeColor.PINK.getMetadata(), "pink_stained_glass");
-        this.registerBlock(Blocks.stained_glass, EnumDyeColor.PURPLE.getMetadata(), "purple_stained_glass");
-        this.registerBlock(Blocks.stained_glass, EnumDyeColor.RED.getMetadata(), "red_stained_glass");
-        this.registerBlock(Blocks.stained_glass, EnumDyeColor.SILVER.getMetadata(), "silver_stained_glass");
-        this.registerBlock(Blocks.stained_glass, EnumDyeColor.WHITE.getMetadata(), "white_stained_glass");
-        this.registerBlock(Blocks.stained_glass, EnumDyeColor.YELLOW.getMetadata(), "yellow_stained_glass");
-        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.BLACK.getMetadata(), "black_stained_glass_pane");
-        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.BLUE.getMetadata(), "blue_stained_glass_pane");
-        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.BROWN.getMetadata(), "brown_stained_glass_pane");
-        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.CYAN.getMetadata(), "cyan_stained_glass_pane");
-        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.GRAY.getMetadata(), "gray_stained_glass_pane");
-        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.GREEN.getMetadata(), "green_stained_glass_pane");
-        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.LIGHT_BLUE.getMetadata(), "light_blue_stained_glass_pane");
-        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.LIME.getMetadata(), "lime_stained_glass_pane");
-        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.MAGENTA.getMetadata(), "magenta_stained_glass_pane");
-        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.ORANGE.getMetadata(), "orange_stained_glass_pane");
-        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.PINK.getMetadata(), "pink_stained_glass_pane");
-        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.PURPLE.getMetadata(), "purple_stained_glass_pane");
-        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.RED.getMetadata(), "red_stained_glass_pane");
-        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.SILVER.getMetadata(), "silver_stained_glass_pane");
-        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.WHITE.getMetadata(), "white_stained_glass_pane");
-        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.YELLOW.getMetadata(), "yellow_stained_glass_pane");
-        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.BLACK.getMetadata(), "black_stained_hardened_clay");
-        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.BLUE.getMetadata(), "blue_stained_hardened_clay");
-        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.BROWN.getMetadata(), "brown_stained_hardened_clay");
-        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.CYAN.getMetadata(), "cyan_stained_hardened_clay");
-        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.GRAY.getMetadata(), "gray_stained_hardened_clay");
-        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.GREEN.getMetadata(), "green_stained_hardened_clay");
-        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.LIGHT_BLUE.getMetadata(), "light_blue_stained_hardened_clay");
-        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.LIME.getMetadata(), "lime_stained_hardened_clay");
-        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.MAGENTA.getMetadata(), "magenta_stained_hardened_clay");
-        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.ORANGE.getMetadata(), "orange_stained_hardened_clay");
-        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.PINK.getMetadata(), "pink_stained_hardened_clay");
-        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.PURPLE.getMetadata(), "purple_stained_hardened_clay");
-        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.RED.getMetadata(), "red_stained_hardened_clay");
-        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.SILVER.getMetadata(), "silver_stained_hardened_clay");
-        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.WHITE.getMetadata(), "white_stained_hardened_clay");
-        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.YELLOW.getMetadata(), "yellow_stained_hardened_clay");
-        this.registerBlock(Blocks.stone, BlockStone.EnumType.ANDESITE.getMetadata(), "andesite");
-        this.registerBlock(Blocks.stone, BlockStone.EnumType.ANDESITE_SMOOTH.getMetadata(), "andesite_smooth");
-        this.registerBlock(Blocks.stone, BlockStone.EnumType.DIORITE.getMetadata(), "diorite");
-        this.registerBlock(Blocks.stone, BlockStone.EnumType.DIORITE_SMOOTH.getMetadata(), "diorite_smooth");
-        this.registerBlock(Blocks.stone, BlockStone.EnumType.GRANITE.getMetadata(), "granite");
-        this.registerBlock(Blocks.stone, BlockStone.EnumType.GRANITE_SMOOTH.getMetadata(), "granite_smooth");
-        this.registerBlock(Blocks.stone, BlockStone.EnumType.STONE.getMetadata(), "stone");
-        this.registerBlock(Blocks.stonebrick, BlockStoneBrick.EnumType.CRACKED.getMetadata(), "cracked_stonebrick");
-        this.registerBlock(Blocks.stonebrick, BlockStoneBrick.EnumType.DEFAULT.getMetadata(), "stonebrick");
-        this.registerBlock(Blocks.stonebrick, BlockStoneBrick.EnumType.CHISELED.getMetadata(), "chiseled_stonebrick");
-        this.registerBlock(Blocks.stonebrick, BlockStoneBrick.EnumType.MOSSY.getMetadata(), "mossy_stonebrick");
-        this.registerBlock(Blocks.stone_slab, BlockStoneSlab.EnumType.BRICK.getMetadata(), "brick_slab");
-        this.registerBlock(Blocks.stone_slab, BlockStoneSlab.EnumType.COBBLESTONE.getMetadata(), "cobblestone_slab");
-        this.registerBlock(Blocks.stone_slab, BlockStoneSlab.EnumType.WOOD.getMetadata(), "old_wood_slab");
-        this.registerBlock(Blocks.stone_slab, BlockStoneSlab.EnumType.NETHERBRICK.getMetadata(), "nether_brick_slab");
-        this.registerBlock(Blocks.stone_slab, BlockStoneSlab.EnumType.QUARTZ.getMetadata(), "quartz_slab");
-        this.registerBlock(Blocks.stone_slab, BlockStoneSlab.EnumType.SAND.getMetadata(), "sandstone_slab");
-        this.registerBlock(Blocks.stone_slab, BlockStoneSlab.EnumType.SMOOTHBRICK.getMetadata(), "stone_brick_slab");
-        this.registerBlock(Blocks.stone_slab, BlockStoneSlab.EnumType.STONE.getMetadata(), "stone_slab");
-        this.registerBlock(Blocks.stone_slab2, BlockStoneSlabNew.EnumType.RED_SANDSTONE.getMetadata(), "red_sandstone_slab");
-        this.registerBlock(Blocks.tallgrass, BlockTallGrass.EnumType.DEAD_BUSH.getMeta(), "dead_bush");
-        this.registerBlock(Blocks.tallgrass, BlockTallGrass.EnumType.FERN.getMeta(), "fern");
-        this.registerBlock(Blocks.tallgrass, BlockTallGrass.EnumType.GRASS.getMeta(), "tall_grass");
-        this.registerBlock(Blocks.wooden_slab, BlockPlanks.EnumType.ACACIA.getMetadata(), "acacia_slab");
-        this.registerBlock(Blocks.wooden_slab, BlockPlanks.EnumType.BIRCH.getMetadata(), "birch_slab");
-        this.registerBlock(Blocks.wooden_slab, BlockPlanks.EnumType.DARK_OAK.getMetadata(), "dark_oak_slab");
-        this.registerBlock(Blocks.wooden_slab, BlockPlanks.EnumType.JUNGLE.getMetadata(), "jungle_slab");
-        this.registerBlock(Blocks.wooden_slab, BlockPlanks.EnumType.OAK.getMetadata(), "oak_slab");
-        this.registerBlock(Blocks.wooden_slab, BlockPlanks.EnumType.SPRUCE.getMetadata(), "spruce_slab");
-        this.registerBlock(Blocks.wool, EnumDyeColor.BLACK.getMetadata(), "black_wool");
-        this.registerBlock(Blocks.wool, EnumDyeColor.BLUE.getMetadata(), "blue_wool");
-        this.registerBlock(Blocks.wool, EnumDyeColor.BROWN.getMetadata(), "brown_wool");
-        this.registerBlock(Blocks.wool, EnumDyeColor.CYAN.getMetadata(), "cyan_wool");
-        this.registerBlock(Blocks.wool, EnumDyeColor.GRAY.getMetadata(), "gray_wool");
-        this.registerBlock(Blocks.wool, EnumDyeColor.GREEN.getMetadata(), "green_wool");
-        this.registerBlock(Blocks.wool, EnumDyeColor.LIGHT_BLUE.getMetadata(), "light_blue_wool");
-        this.registerBlock(Blocks.wool, EnumDyeColor.LIME.getMetadata(), "lime_wool");
-        this.registerBlock(Blocks.wool, EnumDyeColor.MAGENTA.getMetadata(), "magenta_wool");
-        this.registerBlock(Blocks.wool, EnumDyeColor.ORANGE.getMetadata(), "orange_wool");
-        this.registerBlock(Blocks.wool, EnumDyeColor.PINK.getMetadata(), "pink_wool");
-        this.registerBlock(Blocks.wool, EnumDyeColor.PURPLE.getMetadata(), "purple_wool");
-        this.registerBlock(Blocks.wool, EnumDyeColor.RED.getMetadata(), "red_wool");
-        this.registerBlock(Blocks.wool, EnumDyeColor.SILVER.getMetadata(), "silver_wool");
-        this.registerBlock(Blocks.wool, EnumDyeColor.WHITE.getMetadata(), "white_wool");
-        this.registerBlock(Blocks.wool, EnumDyeColor.YELLOW.getMetadata(), "yellow_wool");
+        this.registerBlock(Blocks.stained_glass, EnumDyeColor.BLACK.func_176765_a(), "black_stained_glass");
+        this.registerBlock(Blocks.stained_glass, EnumDyeColor.BLUE.func_176765_a(), "blue_stained_glass");
+        this.registerBlock(Blocks.stained_glass, EnumDyeColor.BROWN.func_176765_a(), "brown_stained_glass");
+        this.registerBlock(Blocks.stained_glass, EnumDyeColor.CYAN.func_176765_a(), "cyan_stained_glass");
+        this.registerBlock(Blocks.stained_glass, EnumDyeColor.GRAY.func_176765_a(), "gray_stained_glass");
+        this.registerBlock(Blocks.stained_glass, EnumDyeColor.GREEN.func_176765_a(), "green_stained_glass");
+        this.registerBlock(Blocks.stained_glass, EnumDyeColor.LIGHT_BLUE.func_176765_a(), "light_blue_stained_glass");
+        this.registerBlock(Blocks.stained_glass, EnumDyeColor.LIME.func_176765_a(), "lime_stained_glass");
+        this.registerBlock(Blocks.stained_glass, EnumDyeColor.MAGENTA.func_176765_a(), "magenta_stained_glass");
+        this.registerBlock(Blocks.stained_glass, EnumDyeColor.ORANGE.func_176765_a(), "orange_stained_glass");
+        this.registerBlock(Blocks.stained_glass, EnumDyeColor.PINK.func_176765_a(), "pink_stained_glass");
+        this.registerBlock(Blocks.stained_glass, EnumDyeColor.PURPLE.func_176765_a(), "purple_stained_glass");
+        this.registerBlock(Blocks.stained_glass, EnumDyeColor.RED.func_176765_a(), "red_stained_glass");
+        this.registerBlock(Blocks.stained_glass, EnumDyeColor.SILVER.func_176765_a(), "silver_stained_glass");
+        this.registerBlock(Blocks.stained_glass, EnumDyeColor.WHITE.func_176765_a(), "white_stained_glass");
+        this.registerBlock(Blocks.stained_glass, EnumDyeColor.YELLOW.func_176765_a(), "yellow_stained_glass");
+        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.BLACK.func_176765_a(), "black_stained_glass_pane");
+        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.BLUE.func_176765_a(), "blue_stained_glass_pane");
+        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.BROWN.func_176765_a(), "brown_stained_glass_pane");
+        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.CYAN.func_176765_a(), "cyan_stained_glass_pane");
+        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.GRAY.func_176765_a(), "gray_stained_glass_pane");
+        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.GREEN.func_176765_a(), "green_stained_glass_pane");
+        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.LIGHT_BLUE.func_176765_a(), "light_blue_stained_glass_pane");
+        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.LIME.func_176765_a(), "lime_stained_glass_pane");
+        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.MAGENTA.func_176765_a(), "magenta_stained_glass_pane");
+        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.ORANGE.func_176765_a(), "orange_stained_glass_pane");
+        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.PINK.func_176765_a(), "pink_stained_glass_pane");
+        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.PURPLE.func_176765_a(), "purple_stained_glass_pane");
+        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.RED.func_176765_a(), "red_stained_glass_pane");
+        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.SILVER.func_176765_a(), "silver_stained_glass_pane");
+        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.WHITE.func_176765_a(), "white_stained_glass_pane");
+        this.registerBlock(Blocks.stained_glass_pane, EnumDyeColor.YELLOW.func_176765_a(), "yellow_stained_glass_pane");
+        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.BLACK.func_176765_a(), "black_stained_hardened_clay");
+        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.BLUE.func_176765_a(), "blue_stained_hardened_clay");
+        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.BROWN.func_176765_a(), "brown_stained_hardened_clay");
+        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.CYAN.func_176765_a(), "cyan_stained_hardened_clay");
+        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.GRAY.func_176765_a(), "gray_stained_hardened_clay");
+        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.GREEN.func_176765_a(), "green_stained_hardened_clay");
+        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.LIGHT_BLUE.func_176765_a(), "light_blue_stained_hardened_clay");
+        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.LIME.func_176765_a(), "lime_stained_hardened_clay");
+        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.MAGENTA.func_176765_a(), "magenta_stained_hardened_clay");
+        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.ORANGE.func_176765_a(), "orange_stained_hardened_clay");
+        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.PINK.func_176765_a(), "pink_stained_hardened_clay");
+        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.PURPLE.func_176765_a(), "purple_stained_hardened_clay");
+        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.RED.func_176765_a(), "red_stained_hardened_clay");
+        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.SILVER.func_176765_a(), "silver_stained_hardened_clay");
+        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.WHITE.func_176765_a(), "white_stained_hardened_clay");
+        this.registerBlock(Blocks.stained_hardened_clay, EnumDyeColor.YELLOW.func_176765_a(), "yellow_stained_hardened_clay");
+        this.registerBlock(Blocks.stone, BlockStone.EnumType.ANDESITE.getMetaFromState(), "andesite");
+        this.registerBlock(Blocks.stone, BlockStone.EnumType.ANDESITE_SMOOTH.getMetaFromState(), "andesite_smooth");
+        this.registerBlock(Blocks.stone, BlockStone.EnumType.DIORITE.getMetaFromState(), "diorite");
+        this.registerBlock(Blocks.stone, BlockStone.EnumType.DIORITE_SMOOTH.getMetaFromState(), "diorite_smooth");
+        this.registerBlock(Blocks.stone, BlockStone.EnumType.GRANITE.getMetaFromState(), "granite");
+        this.registerBlock(Blocks.stone, BlockStone.EnumType.GRANITE_SMOOTH.getMetaFromState(), "granite_smooth");
+        this.registerBlock(Blocks.stone, BlockStone.EnumType.STONE.getMetaFromState(), "stone");
+        this.registerBlock(Blocks.stonebrick, BlockStoneBrick.EnumType.CRACKED.getMetaFromState(), "cracked_stonebrick");
+        this.registerBlock(Blocks.stonebrick, BlockStoneBrick.EnumType.DEFAULT.getMetaFromState(), "stonebrick");
+        this.registerBlock(Blocks.stonebrick, BlockStoneBrick.EnumType.CHISELED.getMetaFromState(), "chiseled_stonebrick");
+        this.registerBlock(Blocks.stonebrick, BlockStoneBrick.EnumType.MOSSY.getMetaFromState(), "mossy_stonebrick");
+        this.registerBlock(Blocks.stone_slab, BlockStoneSlab.EnumType.BRICK.func_176624_a(), "brick_slab");
+        this.registerBlock(Blocks.stone_slab, BlockStoneSlab.EnumType.COBBLESTONE.func_176624_a(), "cobblestone_slab");
+        this.registerBlock(Blocks.stone_slab, BlockStoneSlab.EnumType.WOOD.func_176624_a(), "old_wood_slab");
+        this.registerBlock(Blocks.stone_slab, BlockStoneSlab.EnumType.NETHERBRICK.func_176624_a(), "nether_brick_slab");
+        this.registerBlock(Blocks.stone_slab, BlockStoneSlab.EnumType.QUARTZ.func_176624_a(), "quartz_slab");
+        this.registerBlock(Blocks.stone_slab, BlockStoneSlab.EnumType.SAND.func_176624_a(), "sandstone_slab");
+        this.registerBlock(Blocks.stone_slab, BlockStoneSlab.EnumType.SMOOTHBRICK.func_176624_a(), "stone_brick_slab");
+        this.registerBlock(Blocks.stone_slab, BlockStoneSlab.EnumType.STONE.func_176624_a(), "stone_slab");
+        this.registerBlock(Blocks.stone_slab2, BlockStoneSlabNew.EnumType.RED_SANDSTONE.func_176915_a(), "red_sandstone_slab");
+        this.registerBlock(Blocks.tallgrass, BlockTallGrass.EnumType.DEAD_BUSH.func_177044_a(), "dead_bush");
+        this.registerBlock(Blocks.tallgrass, BlockTallGrass.EnumType.FERN.func_177044_a(), "fern");
+        this.registerBlock(Blocks.tallgrass, BlockTallGrass.EnumType.GRASS.func_177044_a(), "tall_grass");
+        this.registerBlock(Blocks.wooden_slab, BlockPlanks.EnumType.ACACIA.func_176839_a(), "acacia_slab");
+        this.registerBlock(Blocks.wooden_slab, BlockPlanks.EnumType.BIRCH.func_176839_a(), "birch_slab");
+        this.registerBlock(Blocks.wooden_slab, BlockPlanks.EnumType.DARK_OAK.func_176839_a(), "dark_oak_slab");
+        this.registerBlock(Blocks.wooden_slab, BlockPlanks.EnumType.JUNGLE.func_176839_a(), "jungle_slab");
+        this.registerBlock(Blocks.wooden_slab, BlockPlanks.EnumType.OAK.func_176839_a(), "oak_slab");
+        this.registerBlock(Blocks.wooden_slab, BlockPlanks.EnumType.SPRUCE.func_176839_a(), "spruce_slab");
+        this.registerBlock(Blocks.wool, EnumDyeColor.BLACK.func_176765_a(), "black_wool");
+        this.registerBlock(Blocks.wool, EnumDyeColor.BLUE.func_176765_a(), "blue_wool");
+        this.registerBlock(Blocks.wool, EnumDyeColor.BROWN.func_176765_a(), "brown_wool");
+        this.registerBlock(Blocks.wool, EnumDyeColor.CYAN.func_176765_a(), "cyan_wool");
+        this.registerBlock(Blocks.wool, EnumDyeColor.GRAY.func_176765_a(), "gray_wool");
+        this.registerBlock(Blocks.wool, EnumDyeColor.GREEN.func_176765_a(), "green_wool");
+        this.registerBlock(Blocks.wool, EnumDyeColor.LIGHT_BLUE.func_176765_a(), "light_blue_wool");
+        this.registerBlock(Blocks.wool, EnumDyeColor.LIME.func_176765_a(), "lime_wool");
+        this.registerBlock(Blocks.wool, EnumDyeColor.MAGENTA.func_176765_a(), "magenta_wool");
+        this.registerBlock(Blocks.wool, EnumDyeColor.ORANGE.func_176765_a(), "orange_wool");
+        this.registerBlock(Blocks.wool, EnumDyeColor.PINK.func_176765_a(), "pink_wool");
+        this.registerBlock(Blocks.wool, EnumDyeColor.PURPLE.func_176765_a(), "purple_wool");
+        this.registerBlock(Blocks.wool, EnumDyeColor.RED.func_176765_a(), "red_wool");
+        this.registerBlock(Blocks.wool, EnumDyeColor.SILVER.func_176765_a(), "silver_wool");
+        this.registerBlock(Blocks.wool, EnumDyeColor.WHITE.func_176765_a(), "white_wool");
+        this.registerBlock(Blocks.wool, EnumDyeColor.YELLOW.func_176765_a(), "yellow_wool");
         this.registerBlock(Blocks.acacia_stairs, "acacia_stairs");
         this.registerBlock(Blocks.activator_rail, "activator_rail");
         this.registerBlock(Blocks.beacon, "beacon");
@@ -969,7 +921,7 @@ public class RenderItem implements IResourceManagerReloadListener
         this.registerBlock(Blocks.web, "web");
         this.registerBlock(Blocks.wooden_button, "wooden_button");
         this.registerBlock(Blocks.wooden_pressure_plate, "wooden_pressure_plate");
-        this.registerBlock(Blocks.yellow_flower, BlockFlower.EnumFlowerType.DANDELION.getMeta(), "dandelion");
+        this.registerBlock(Blocks.yellow_flower, BlockFlower.EnumFlowerType.DANDELION.func_176968_b(), "dandelion");
         this.registerBlock(Blocks.chest, "chest");
         this.registerBlock(Blocks.trapped_chest, "trapped_chest");
         this.registerBlock(Blocks.ender_chest, "ender_chest");
@@ -1077,28 +1029,28 @@ public class RenderItem implements IResourceManagerReloadListener
         this.registerItem(Items.fishing_rod, 1, "fishing_rod_cast");
         this.registerItem(Items.clock, "clock");
         this.registerItem(Items.glowstone_dust, "glowstone_dust");
-        this.registerItem(Items.fish, ItemFishFood.FishType.COD.getMetadata(), "cod");
-        this.registerItem(Items.fish, ItemFishFood.FishType.SALMON.getMetadata(), "salmon");
-        this.registerItem(Items.fish, ItemFishFood.FishType.CLOWNFISH.getMetadata(), "clownfish");
-        this.registerItem(Items.fish, ItemFishFood.FishType.PUFFERFISH.getMetadata(), "pufferfish");
-        this.registerItem(Items.cooked_fish, ItemFishFood.FishType.COD.getMetadata(), "cooked_cod");
-        this.registerItem(Items.cooked_fish, ItemFishFood.FishType.SALMON.getMetadata(), "cooked_salmon");
-        this.registerItem(Items.dye, EnumDyeColor.BLACK.getDyeDamage(), "dye_black");
-        this.registerItem(Items.dye, EnumDyeColor.RED.getDyeDamage(), "dye_red");
-        this.registerItem(Items.dye, EnumDyeColor.GREEN.getDyeDamage(), "dye_green");
-        this.registerItem(Items.dye, EnumDyeColor.BROWN.getDyeDamage(), "dye_brown");
-        this.registerItem(Items.dye, EnumDyeColor.BLUE.getDyeDamage(), "dye_blue");
-        this.registerItem(Items.dye, EnumDyeColor.PURPLE.getDyeDamage(), "dye_purple");
-        this.registerItem(Items.dye, EnumDyeColor.CYAN.getDyeDamage(), "dye_cyan");
-        this.registerItem(Items.dye, EnumDyeColor.SILVER.getDyeDamage(), "dye_silver");
-        this.registerItem(Items.dye, EnumDyeColor.GRAY.getDyeDamage(), "dye_gray");
-        this.registerItem(Items.dye, EnumDyeColor.PINK.getDyeDamage(), "dye_pink");
-        this.registerItem(Items.dye, EnumDyeColor.LIME.getDyeDamage(), "dye_lime");
-        this.registerItem(Items.dye, EnumDyeColor.YELLOW.getDyeDamage(), "dye_yellow");
-        this.registerItem(Items.dye, EnumDyeColor.LIGHT_BLUE.getDyeDamage(), "dye_light_blue");
-        this.registerItem(Items.dye, EnumDyeColor.MAGENTA.getDyeDamage(), "dye_magenta");
-        this.registerItem(Items.dye, EnumDyeColor.ORANGE.getDyeDamage(), "dye_orange");
-        this.registerItem(Items.dye, EnumDyeColor.WHITE.getDyeDamage(), "dye_white");
+        this.registerItem(Items.fish, ItemFishFood.FishType.COD.getItemDamage(), "cod");
+        this.registerItem(Items.fish, ItemFishFood.FishType.SALMON.getItemDamage(), "salmon");
+        this.registerItem(Items.fish, ItemFishFood.FishType.CLOWNFISH.getItemDamage(), "clownfish");
+        this.registerItem(Items.fish, ItemFishFood.FishType.PUFFERFISH.getItemDamage(), "pufferfish");
+        this.registerItem(Items.cooked_fish, ItemFishFood.FishType.COD.getItemDamage(), "cooked_cod");
+        this.registerItem(Items.cooked_fish, ItemFishFood.FishType.SALMON.getItemDamage(), "cooked_salmon");
+        this.registerItem(Items.dye, EnumDyeColor.BLACK.getDyeColorDamage(), "dye_black");
+        this.registerItem(Items.dye, EnumDyeColor.RED.getDyeColorDamage(), "dye_red");
+        this.registerItem(Items.dye, EnumDyeColor.GREEN.getDyeColorDamage(), "dye_green");
+        this.registerItem(Items.dye, EnumDyeColor.BROWN.getDyeColorDamage(), "dye_brown");
+        this.registerItem(Items.dye, EnumDyeColor.BLUE.getDyeColorDamage(), "dye_blue");
+        this.registerItem(Items.dye, EnumDyeColor.PURPLE.getDyeColorDamage(), "dye_purple");
+        this.registerItem(Items.dye, EnumDyeColor.CYAN.getDyeColorDamage(), "dye_cyan");
+        this.registerItem(Items.dye, EnumDyeColor.SILVER.getDyeColorDamage(), "dye_silver");
+        this.registerItem(Items.dye, EnumDyeColor.GRAY.getDyeColorDamage(), "dye_gray");
+        this.registerItem(Items.dye, EnumDyeColor.PINK.getDyeColorDamage(), "dye_pink");
+        this.registerItem(Items.dye, EnumDyeColor.LIME.getDyeColorDamage(), "dye_lime");
+        this.registerItem(Items.dye, EnumDyeColor.YELLOW.getDyeColorDamage(), "dye_yellow");
+        this.registerItem(Items.dye, EnumDyeColor.LIGHT_BLUE.getDyeColorDamage(), "dye_light_blue");
+        this.registerItem(Items.dye, EnumDyeColor.MAGENTA.getDyeColorDamage(), "dye_magenta");
+        this.registerItem(Items.dye, EnumDyeColor.ORANGE.getDyeColorDamage(), "dye_orange");
+        this.registerItem(Items.dye, EnumDyeColor.WHITE.getDyeColorDamage(), "dye_white");
         this.registerItem(Items.bone, "bone");
         this.registerItem(Items.sugar, "sugar");
         this.registerItem(Items.cake, "cake");
@@ -1128,9 +1080,10 @@ public class RenderItem implements IResourceManagerReloadListener
         this.registerItem(Items.nether_wart, "nether_wart");
         this.itemModelMesher.register(Items.potionitem, new ItemMeshDefinition()
         {
-            public ModelResourceLocation getModelLocation(ItemStack stack)
+            
+            public ModelResourceLocation getModelLocation(ItemStack p_178113_1_)
             {
-                return ItemPotion.isSplash(stack.getMetadata()) ? new ModelResourceLocation("bottle_splash", "inventory") : new ModelResourceLocation("bottle_drinkable", "inventory");
+                return ItemPotion.isSplash(p_178113_1_.getMetadata()) ? new ModelResourceLocation("bottle_splash", "inventory") : new ModelResourceLocation("bottle_drinkable", "inventory");
             }
         });
         this.registerItem(Items.glass_bottle, "glass_bottle");
@@ -1144,7 +1097,8 @@ public class RenderItem implements IResourceManagerReloadListener
         this.registerItem(Items.speckled_melon, "speckled_melon");
         this.itemModelMesher.register(Items.spawn_egg, new ItemMeshDefinition()
         {
-            public ModelResourceLocation getModelLocation(ItemStack stack)
+            
+            public ModelResourceLocation getModelLocation(ItemStack p_178113_1_)
             {
                 return new ModelResourceLocation("spawn_egg", "inventory");
             }
@@ -1183,7 +1137,8 @@ public class RenderItem implements IResourceManagerReloadListener
         this.registerItem(Items.name_tag, "name_tag");
         this.itemModelMesher.register(Items.banner, new ItemMeshDefinition()
         {
-            public ModelResourceLocation getModelLocation(ItemStack stack)
+            
+            public ModelResourceLocation getModelLocation(ItemStack p_178113_1_)
             {
                 return new ModelResourceLocation("banner", "inventory");
             }
@@ -1204,14 +1159,16 @@ public class RenderItem implements IResourceManagerReloadListener
         this.registerItem(Items.prismarine_crystals, "prismarine_crystals");
         this.itemModelMesher.register(Items.enchanted_book, new ItemMeshDefinition()
         {
-            public ModelResourceLocation getModelLocation(ItemStack stack)
+            
+            public ModelResourceLocation getModelLocation(ItemStack p_178113_1_)
             {
                 return new ModelResourceLocation("enchanted_book", "inventory");
             }
         });
         this.itemModelMesher.register(Items.filled_map, new ItemMeshDefinition()
         {
-            public ModelResourceLocation getModelLocation(ItemStack stack)
+            
+            public ModelResourceLocation getModelLocation(ItemStack p_178113_1_)
             {
                 return new ModelResourceLocation("filled_map", "inventory");
             }
@@ -1222,8 +1179,8 @@ public class RenderItem implements IResourceManagerReloadListener
         this.registerBlock(Blocks.barrier, "barrier");
         this.registerBlock(Blocks.mob_spawner, "mob_spawner");
         this.registerItem(Items.written_book, "written_book");
-        this.registerBlock(Blocks.brown_mushroom_block, BlockHugeMushroom.EnumType.ALL_INSIDE.getMetadata(), "brown_mushroom_block");
-        this.registerBlock(Blocks.red_mushroom_block, BlockHugeMushroom.EnumType.ALL_INSIDE.getMetadata(), "red_mushroom_block");
+        this.registerBlock(Blocks.brown_mushroom_block, BlockHugeMushroom.EnumType.ALL_INSIDE.func_176896_a(), "brown_mushroom_block");
+        this.registerBlock(Blocks.red_mushroom_block, BlockHugeMushroom.EnumType.ALL_INSIDE.func_176896_a(), "red_mushroom_block");
         this.registerBlock(Blocks.dragon_egg, "dragon_egg");
 
         if (Reflector.ModelLoader_onRegisterItems.exists())
@@ -1237,27 +1194,81 @@ public class RenderItem implements IResourceManagerReloadListener
         this.itemModelMesher.rebuildCache();
     }
 
-    public static void forgeHooksClient_putQuadColor(WorldRenderer p_forgeHooksClient_putQuadColor_0_, BakedQuad p_forgeHooksClient_putQuadColor_1_, int p_forgeHooksClient_putQuadColor_2_)
+    public static void forgeHooksClient_putQuadColor(WorldRenderer renderer, BakedQuad quad, int color)
     {
-        float f = (float)(p_forgeHooksClient_putQuadColor_2_ & 255);
-        float f1 = (float)(p_forgeHooksClient_putQuadColor_2_ >>> 8 & 255);
-        float f2 = (float)(p_forgeHooksClient_putQuadColor_2_ >>> 16 & 255);
-        float f3 = (float)(p_forgeHooksClient_putQuadColor_2_ >>> 24 & 255);
-        int[] aint = p_forgeHooksClient_putQuadColor_1_.getVertexData();
-        int i = aint.length / 4;
+        float cr = (float)(color & 255);
+        float cg = (float)(color >>> 8 & 255);
+        float cb = (float)(color >>> 16 & 255);
+        float ca = (float)(color >>> 24 & 255);
+        int[] vd = quad.func_178209_a();
+        int step = vd.length / 4;
 
-        for (int j = 0; j < 4; ++j)
+        for (int i = 0; i < 4; ++i)
         {
-            int k = aint[3 + i * j];
-            float f4 = (float)(k & 255);
-            float f5 = (float)(k >>> 8 & 255);
-            float f6 = (float)(k >>> 16 & 255);
-            float f7 = (float)(k >>> 24 & 255);
-            int l = Math.min(255, (int)(f * f4 / 255.0F));
-            int i1 = Math.min(255, (int)(f1 * f5 / 255.0F));
-            int j1 = Math.min(255, (int)(f2 * f6 / 255.0F));
-            int k1 = Math.min(255, (int)(f3 * f7 / 255.0F));
-            p_forgeHooksClient_putQuadColor_0_.putColorRGBA(p_forgeHooksClient_putQuadColor_0_.getColorIndex(4 - j), l, i1, j1, k1);
+            int vc = vd[3 + step * i];
+            float vcr = (float)(vc & 255);
+            float vcg = (float)(vc >>> 8 & 255);
+            float vcb = (float)(vc >>> 16 & 255);
+            float vca = (float)(vc >>> 24 & 255);
+            int ncr = Math.min(255, (int)(cr * vcr / 255.0F));
+            int ncg = Math.min(255, (int)(cg * vcg / 255.0F));
+            int ncb = Math.min(255, (int)(cb * vcb / 255.0F));
+            int nca = Math.min(255, (int)(ca * vca / 255.0F));
+            renderer.func_178972_a(renderer.getGLCallListForPass(4 - i), ncr, ncg, ncb, nca);
+        }
+    }
+
+    static final class SwitchTransformType
+    {
+        static final int[] field_178640_a = new int[ItemCameraTransforms.TransformType.values().length];
+        
+
+        static
+        {
+            try
+            {
+                field_178640_a[ItemCameraTransforms.TransformType.NONE.ordinal()] = 1;
+            }
+            catch (NoSuchFieldError var5)
+            {
+                ;
+            }
+
+            try
+            {
+                field_178640_a[ItemCameraTransforms.TransformType.THIRD_PERSON.ordinal()] = 2;
+            }
+            catch (NoSuchFieldError var4)
+            {
+                ;
+            }
+
+            try
+            {
+                field_178640_a[ItemCameraTransforms.TransformType.FIRST_PERSON.ordinal()] = 3;
+            }
+            catch (NoSuchFieldError var3)
+            {
+                ;
+            }
+
+            try
+            {
+                field_178640_a[ItemCameraTransforms.TransformType.HEAD.ordinal()] = 4;
+            }
+            catch (NoSuchFieldError var2)
+            {
+                ;
+            }
+
+            try
+            {
+                field_178640_a[ItemCameraTransforms.TransformType.GUI.ordinal()] = 5;
+            }
+            catch (NoSuchFieldError var1)
+            {
+                ;
+            }
         }
     }
 }

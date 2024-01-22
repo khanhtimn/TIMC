@@ -1,26 +1,21 @@
 package net.minecraft.client.renderer;
 
 import net.minecraft.client.renderer.vertex.VertexBuffer;
-import net.minecraft.src.Config;
 
 public class VertexBufferUploader extends WorldVertexBufferUploader
 {
-    private VertexBuffer vertexBuffer = null;
+    private VertexBuffer field_178179_a = null;
+    
 
-    public void draw(WorldRenderer p_181679_1_)
+    public int draw(WorldRenderer p_178177_1_, int p_178177_2_)
     {
-        if (p_181679_1_.getDrawMode() == 7 && Config.isQuadsToTriangles())
-        {
-            p_181679_1_.quadsToTriangles();
-            this.vertexBuffer.setDrawMode(p_181679_1_.getDrawMode());
-        }
-
-        this.vertexBuffer.bufferData(p_181679_1_.getByteBuffer());
-        p_181679_1_.reset();
+        p_178177_1_.reset();
+        this.field_178179_a.func_177360_a(p_178177_1_.func_178966_f(), p_178177_1_.func_178976_e());
+        return p_178177_2_;
     }
 
-    public void setVertexBuffer(VertexBuffer vertexBufferIn)
+    public void func_178178_a(VertexBuffer p_178178_1_)
     {
-        this.vertexBuffer = vertexBufferIn;
+        this.field_178179_a = p_178178_1_;
     }
 }

@@ -14,42 +14,43 @@ import net.minecraft.world.World;
 
 public class ItemSword extends Item
 {
-    private float attackDamage;
-    private final Item.ToolMaterial material;
+    public float field_150934_a;
+    private final Item.ToolMaterial repairMaterial;
+    
 
-    public ItemSword(Item.ToolMaterial material)
+    public ItemSword(Item.ToolMaterial p_i45356_1_)
     {
-        this.material = material;
+        this.repairMaterial = p_i45356_1_;
         this.maxStackSize = 1;
-        this.setMaxDamage(material.getMaxUses());
+        this.setMaxDamage(p_i45356_1_.getMaxUses());
         this.setCreativeTab(CreativeTabs.tabCombat);
-        this.attackDamage = 4.0F + material.getDamageVsEntity();
+        this.field_150934_a = 4.0F + p_i45356_1_.getDamageVsEntity();
     }
 
-    /**
-     * Returns the amount of damage this item will deal. One heart of damage is equal to 2 damage points.
-     */
-    public float getDamageVsEntity()
+    public float func_150931_i()
     {
-        return this.material.getDamageVsEntity();
+        return this.repairMaterial.getDamageVsEntity();
     }
 
-    public float getStrVsBlock(ItemStack stack, Block state)
+    public float getStrVsBlock(ItemStack stack, Block p_150893_2_)
     {
-        if (state == Blocks.web)
+        if (p_150893_2_ == Blocks.web)
         {
             return 15.0F;
         }
         else
         {
-            Material material = state.getMaterial();
-            return material != Material.plants && material != Material.vine && material != Material.coral && material != Material.leaves && material != Material.gourd ? 1.0F : 1.5F;
+            Material var3 = p_150893_2_.getMaterial();
+            return var3 != Material.plants && var3 != Material.vine && var3 != Material.coral && var3 != Material.leaves && var3 != Material.gourd ? 1.0F : 1.5F;
         }
     }
 
     /**
      * Current implementations of this method in child classes do not use the entry argument beside ev. They just raise
      * the damage on the stack.
+     *  
+     * @param target The Entity being hit
+     * @param attacker the attacking entity
      */
     public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker)
     {
@@ -116,7 +117,7 @@ public class ItemSword extends Item
      */
     public int getItemEnchantability()
     {
-        return this.material.getEnchantability();
+        return this.repairMaterial.getEnchantability();
     }
 
     /**
@@ -124,21 +125,27 @@ public class ItemSword extends Item
      */
     public String getToolMaterialName()
     {
-        return this.material.toString();
+        return this.repairMaterial.toString();
     }
 
     /**
      * Return whether this item is repairable in an anvil.
+     *  
+     * @param toRepair The ItemStack to be repaired
+     * @param repair The ItemStack that should repair this Item (leather for leather armor, etc.)
      */
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair)
     {
-        return this.material.getRepairItem() == repair.getItem() ? true : super.getIsRepairable(toRepair, repair);
+        return this.repairMaterial.getBaseItemForRepair() == repair.getItem() ? true : super.getIsRepairable(toRepair, repair);
     }
 
-    public Multimap<String, AttributeModifier> getItemAttributeModifiers()
+    /**
+     * Gets a map of item attribute modifiers, used by ItemSword to increase hit damage.
+     */
+    public Multimap getItemAttributeModifiers()
     {
-        Multimap<String, AttributeModifier> multimap = super.getItemAttributeModifiers();
-        multimap.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(), new AttributeModifier(itemModifierUUID, "Weapon modifier", (double)this.attackDamage, 0));
-        return multimap;
+        Multimap var1 = super.getItemAttributeModifiers();
+        var1.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(), new AttributeModifier(itemModifierUUID, "Weapon modifier", (double)this.field_150934_a, 0));
+        return var1;
     }
 }

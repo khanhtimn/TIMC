@@ -9,10 +9,9 @@ public class NBTTagByteArray extends NBTBase
 {
     /** The byte array stored in the tag. */
     private byte[] data;
+    
 
-    NBTTagByteArray()
-    {
-    }
+    NBTTagByteArray() {}
 
     public NBTTagByteArray(byte[] data)
     {
@@ -30,10 +29,9 @@ public class NBTTagByteArray extends NBTBase
 
     void read(DataInput input, int depth, NBTSizeTracker sizeTracker) throws IOException
     {
-        sizeTracker.read(192L);
-        int i = input.readInt();
-        sizeTracker.read((long)(8 * i));
-        this.data = new byte[i];
+        int var4 = input.readInt();
+        sizeTracker.read((long)(8 * var4));
+        this.data = new byte[var4];
         input.readFully(this.data);
     }
 
@@ -55,9 +53,9 @@ public class NBTTagByteArray extends NBTBase
      */
     public NBTBase copy()
     {
-        byte[] abyte = new byte[this.data.length];
-        System.arraycopy(this.data, 0, abyte, 0, this.data.length);
-        return new NBTTagByteArray(abyte);
+        byte[] var1 = new byte[this.data.length];
+        System.arraycopy(this.data, 0, var1, 0, this.data.length);
+        return new NBTTagByteArray(var1);
     }
 
     public boolean equals(Object p_equals_1_)

@@ -10,25 +10,32 @@ import net.minecraft.world.World;
 
 public class WorldGenVines extends WorldGenerator
 {
-    public boolean generate(World worldIn, Random rand, BlockPos position)
+    
+
+    public boolean generate(World worldIn, Random p_180709_2_, BlockPos p_180709_3_)
     {
-        for (; position.getY() < 128; position = position.up())
+        for (; p_180709_3_.getY() < 128; p_180709_3_ = p_180709_3_.offsetUp())
         {
-            if (worldIn.isAirBlock(position))
+            if (worldIn.isAirBlock(p_180709_3_))
             {
-                for (EnumFacing enumfacing : EnumFacing.Plane.HORIZONTAL.facings())
+                EnumFacing[] var4 = EnumFacing.Plane.HORIZONTAL.facings();
+                int var5 = var4.length;
+
+                for (int var6 = 0; var6 < var5; ++var6)
                 {
-                    if (Blocks.vine.canPlaceBlockOnSide(worldIn, position, enumfacing))
+                    EnumFacing var7 = var4[var6];
+
+                    if (Blocks.vine.canPlaceBlockOnSide(worldIn, p_180709_3_, var7))
                     {
-                        IBlockState iblockstate = Blocks.vine.getDefaultState().withProperty(BlockVine.NORTH, Boolean.valueOf(enumfacing == EnumFacing.NORTH)).withProperty(BlockVine.EAST, Boolean.valueOf(enumfacing == EnumFacing.EAST)).withProperty(BlockVine.SOUTH, Boolean.valueOf(enumfacing == EnumFacing.SOUTH)).withProperty(BlockVine.WEST, Boolean.valueOf(enumfacing == EnumFacing.WEST));
-                        worldIn.setBlockState(position, iblockstate, 2);
+                        IBlockState var8 = Blocks.vine.getDefaultState().withProperty(BlockVine.field_176273_b, Boolean.valueOf(var7 == EnumFacing.NORTH)).withProperty(BlockVine.field_176278_M, Boolean.valueOf(var7 == EnumFacing.EAST)).withProperty(BlockVine.field_176279_N, Boolean.valueOf(var7 == EnumFacing.SOUTH)).withProperty(BlockVine.field_176280_O, Boolean.valueOf(var7 == EnumFacing.WEST));
+                        worldIn.setBlockState(p_180709_3_, var8, 2);
                         break;
                     }
                 }
             }
             else
             {
-                position = position.add(rand.nextInt(4) - rand.nextInt(4), 0, rand.nextInt(4) - rand.nextInt(4));
+                p_180709_3_ = p_180709_3_.add(p_180709_2_.nextInt(4) - p_180709_2_.nextInt(4), 0, p_180709_2_.nextInt(4) - p_180709_2_.nextInt(4));
             }
         }
 

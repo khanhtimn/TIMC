@@ -2,10 +2,10 @@ package net.minecraft.entity;
 
 import com.google.common.collect.Sets;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import net.minecraft.block.Block;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.ai.attributes.ServersideAttributeMap;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.item.EntityBoat;
@@ -103,23 +103,28 @@ public class EntityTrackerEntry
     private int ticksSinceLastForcedTeleport;
     private Entity field_85178_v;
     private boolean ridingEntity;
-    private boolean onGround;
+    private boolean field_180234_y;
     public boolean playerEntitiesUpdated;
-    public Set<EntityPlayerMP> trackingPlayers = Sets.<EntityPlayerMP>newHashSet();
 
-    public EntityTrackerEntry(Entity trackedEntityIn, int trackingDistanceThresholdIn, int updateFrequencyIn, boolean sendVelocityUpdatesIn)
+    /**
+     * Holds references to all the players that are currently receiving position updates for this entity.
+     */
+    public Set trackingPlayers = Sets.newHashSet();
+    
+
+    public EntityTrackerEntry(Entity p_i1525_1_, int p_i1525_2_, int p_i1525_3_, boolean p_i1525_4_)
     {
-        this.trackedEntity = trackedEntityIn;
-        this.trackingDistanceThreshold = trackingDistanceThresholdIn;
-        this.updateFrequency = updateFrequencyIn;
-        this.sendVelocityUpdates = sendVelocityUpdatesIn;
-        this.encodedPosX = MathHelper.floor_double(trackedEntityIn.posX * 32.0D);
-        this.encodedPosY = MathHelper.floor_double(trackedEntityIn.posY * 32.0D);
-        this.encodedPosZ = MathHelper.floor_double(trackedEntityIn.posZ * 32.0D);
-        this.encodedRotationYaw = MathHelper.floor_float(trackedEntityIn.rotationYaw * 256.0F / 360.0F);
-        this.encodedRotationPitch = MathHelper.floor_float(trackedEntityIn.rotationPitch * 256.0F / 360.0F);
-        this.lastHeadMotion = MathHelper.floor_float(trackedEntityIn.getRotationYawHead() * 256.0F / 360.0F);
-        this.onGround = trackedEntityIn.onGround;
+        this.trackedEntity = p_i1525_1_;
+        this.trackingDistanceThreshold = p_i1525_2_;
+        this.updateFrequency = p_i1525_3_;
+        this.sendVelocityUpdates = p_i1525_4_;
+        this.encodedPosX = MathHelper.floor_double(p_i1525_1_.posX * 32.0D);
+        this.encodedPosY = MathHelper.floor_double(p_i1525_1_.posY * 32.0D);
+        this.encodedPosZ = MathHelper.floor_double(p_i1525_1_.posZ * 32.0D);
+        this.encodedRotationYaw = MathHelper.floor_float(p_i1525_1_.rotationYaw * 256.0F / 360.0F);
+        this.encodedRotationPitch = MathHelper.floor_float(p_i1525_1_.rotationPitch * 256.0F / 360.0F);
+        this.lastHeadMotion = MathHelper.floor_float(p_i1525_1_.getRotationYawHead() * 256.0F / 360.0F);
+        this.field_180234_y = p_i1525_1_.onGround;
     }
 
     public boolean equals(Object p_equals_1_)
@@ -132,7 +137,7 @@ public class EntityTrackerEntry
         return this.trackedEntity.getEntityId();
     }
 
-    public void updatePlayerList(List<EntityPlayer> players)
+    public void updatePlayerList(List p_73122_1_)
     {
         this.playerEntitiesUpdated = false;
 
@@ -143,33 +148,35 @@ public class EntityTrackerEntry
             this.lastTrackedEntityPosZ = this.trackedEntity.posZ;
             this.firstUpdateDone = true;
             this.playerEntitiesUpdated = true;
-            this.updatePlayerEntities(players);
+            this.updatePlayerEntities(p_73122_1_);
         }
 
         if (this.field_85178_v != this.trackedEntity.ridingEntity || this.trackedEntity.ridingEntity != null && this.updateCounter % 60 == 0)
         {
             this.field_85178_v = this.trackedEntity.ridingEntity;
-            this.sendPacketToTrackedPlayers(new S1BPacketEntityAttach(0, this.trackedEntity, this.trackedEntity.ridingEntity));
+            this.func_151259_a(new S1BPacketEntityAttach(0, this.trackedEntity, this.trackedEntity.ridingEntity));
         }
 
         if (this.trackedEntity instanceof EntityItemFrame && this.updateCounter % 10 == 0)
         {
-            EntityItemFrame entityitemframe = (EntityItemFrame)this.trackedEntity;
-            ItemStack itemstack = entityitemframe.getDisplayedItem();
+            EntityItemFrame var2 = (EntityItemFrame)this.trackedEntity;
+            ItemStack var3 = var2.getDisplayedItem();
 
-            if (itemstack != null && itemstack.getItem() instanceof ItemMap)
+            if (var3 != null && var3.getItem() instanceof ItemMap)
             {
-                MapData mapdata = Items.filled_map.getMapData(itemstack, this.trackedEntity.worldObj);
+                MapData var4 = Items.filled_map.getMapData(var3, this.trackedEntity.worldObj);
+                Iterator var5 = p_73122_1_.iterator();
 
-                for (EntityPlayer entityplayer : players)
+                while (var5.hasNext())
                 {
-                    EntityPlayerMP entityplayermp = (EntityPlayerMP)entityplayer;
-                    mapdata.updateVisiblePlayers(entityplayermp, itemstack);
-                    Packet packet = Items.filled_map.createMapDataPacket(itemstack, this.trackedEntity.worldObj, entityplayermp);
+                    EntityPlayer var6 = (EntityPlayer)var5.next();
+                    EntityPlayerMP var7 = (EntityPlayerMP)var6;
+                    var4.updateVisiblePlayers(var7, var3);
+                    Packet var8 = Items.filled_map.createMapDataPacket(var3, this.trackedEntity.worldObj, var7);
 
-                    if (packet != null)
+                    if (var8 != null)
                     {
-                        entityplayermp.playerNetServerHandler.sendPacket(packet);
+                        var7.playerNetServerHandler.sendPacket(var8);
                     }
                 }
             }
@@ -179,99 +186,99 @@ public class EntityTrackerEntry
 
         if (this.updateCounter % this.updateFrequency == 0 || this.trackedEntity.isAirBorne || this.trackedEntity.getDataWatcher().hasObjectChanged())
         {
+            int var23;
+            int var24;
+
             if (this.trackedEntity.ridingEntity == null)
             {
                 ++this.ticksSinceLastForcedTeleport;
-                int k = MathHelper.floor_double(this.trackedEntity.posX * 32.0D);
-                int j1 = MathHelper.floor_double(this.trackedEntity.posY * 32.0D);
-                int k1 = MathHelper.floor_double(this.trackedEntity.posZ * 32.0D);
-                int l1 = MathHelper.floor_float(this.trackedEntity.rotationYaw * 256.0F / 360.0F);
-                int i2 = MathHelper.floor_float(this.trackedEntity.rotationPitch * 256.0F / 360.0F);
-                int j2 = k - this.encodedPosX;
-                int k2 = j1 - this.encodedPosY;
-                int i = k1 - this.encodedPosZ;
-                Packet packet1 = null;
-                boolean flag = Math.abs(j2) >= 4 || Math.abs(k2) >= 4 || Math.abs(i) >= 4 || this.updateCounter % 60 == 0;
-                boolean flag1 = Math.abs(l1 - this.encodedRotationYaw) >= 4 || Math.abs(i2 - this.encodedRotationPitch) >= 4;
+                var23 = MathHelper.floor_double(this.trackedEntity.posX * 32.0D);
+                var24 = MathHelper.floor_double(this.trackedEntity.posY * 32.0D);
+                int var25 = MathHelper.floor_double(this.trackedEntity.posZ * 32.0D);
+                int var27 = MathHelper.floor_float(this.trackedEntity.rotationYaw * 256.0F / 360.0F);
+                int var28 = MathHelper.floor_float(this.trackedEntity.rotationPitch * 256.0F / 360.0F);
+                int var29 = var23 - this.encodedPosX;
+                int var30 = var24 - this.encodedPosY;
+                int var9 = var25 - this.encodedPosZ;
+                Object var10 = null;
+                boolean var11 = Math.abs(var29) >= 4 || Math.abs(var30) >= 4 || Math.abs(var9) >= 4 || this.updateCounter % 60 == 0;
+                boolean var12 = Math.abs(var27 - this.encodedRotationYaw) >= 4 || Math.abs(var28 - this.encodedRotationPitch) >= 4;
 
                 if (this.updateCounter > 0 || this.trackedEntity instanceof EntityArrow)
                 {
-                    if (j2 >= -128 && j2 < 128 && k2 >= -128 && k2 < 128 && i >= -128 && i < 128 && this.ticksSinceLastForcedTeleport <= 400 && !this.ridingEntity && this.onGround == this.trackedEntity.onGround)
+                    if (var29 >= -128 && var29 < 128 && var30 >= -128 && var30 < 128 && var9 >= -128 && var9 < 128 && this.ticksSinceLastForcedTeleport <= 400 && !this.ridingEntity && this.field_180234_y == this.trackedEntity.onGround)
                     {
-                        if ((!flag || !flag1) && !(this.trackedEntity instanceof EntityArrow))
+                        if (var11 && var12)
                         {
-                            if (flag)
-                            {
-                                packet1 = new S14PacketEntity.S15PacketEntityRelMove(this.trackedEntity.getEntityId(), (byte)j2, (byte)k2, (byte)i, this.trackedEntity.onGround);
-                            }
-                            else if (flag1)
-                            {
-                                packet1 = new S14PacketEntity.S16PacketEntityLook(this.trackedEntity.getEntityId(), (byte)l1, (byte)i2, this.trackedEntity.onGround);
-                            }
+                            var10 = new S14PacketEntity.S17PacketEntityLookMove(this.trackedEntity.getEntityId(), (byte)var29, (byte)var30, (byte)var9, (byte)var27, (byte)var28, this.trackedEntity.onGround);
                         }
-                        else
+                        else if (var11)
                         {
-                            packet1 = new S14PacketEntity.S17PacketEntityLookMove(this.trackedEntity.getEntityId(), (byte)j2, (byte)k2, (byte)i, (byte)l1, (byte)i2, this.trackedEntity.onGround);
+                            var10 = new S14PacketEntity.S15PacketEntityRelMove(this.trackedEntity.getEntityId(), (byte)var29, (byte)var30, (byte)var9, this.trackedEntity.onGround);
+                        }
+                        else if (var12)
+                        {
+                            var10 = new S14PacketEntity.S16PacketEntityLook(this.trackedEntity.getEntityId(), (byte)var27, (byte)var28, this.trackedEntity.onGround);
                         }
                     }
                     else
                     {
-                        this.onGround = this.trackedEntity.onGround;
+                        this.field_180234_y = this.trackedEntity.onGround;
                         this.ticksSinceLastForcedTeleport = 0;
-                        packet1 = new S18PacketEntityTeleport(this.trackedEntity.getEntityId(), k, j1, k1, (byte)l1, (byte)i2, this.trackedEntity.onGround);
+                        var10 = new S18PacketEntityTeleport(this.trackedEntity.getEntityId(), var23, var24, var25, (byte)var27, (byte)var28, this.trackedEntity.onGround);
                     }
                 }
 
                 if (this.sendVelocityUpdates)
                 {
-                    double d0 = this.trackedEntity.motionX - this.lastTrackedEntityMotionX;
-                    double d1 = this.trackedEntity.motionY - this.lastTrackedEntityMotionY;
-                    double d2 = this.trackedEntity.motionZ - this.motionZ;
-                    double d3 = 0.02D;
-                    double d4 = d0 * d0 + d1 * d1 + d2 * d2;
+                    double var13 = this.trackedEntity.motionX - this.lastTrackedEntityMotionX;
+                    double var15 = this.trackedEntity.motionY - this.lastTrackedEntityMotionY;
+                    double var17 = this.trackedEntity.motionZ - this.motionZ;
+                    double var19 = 0.02D;
+                    double var21 = var13 * var13 + var15 * var15 + var17 * var17;
 
-                    if (d4 > d3 * d3 || d4 > 0.0D && this.trackedEntity.motionX == 0.0D && this.trackedEntity.motionY == 0.0D && this.trackedEntity.motionZ == 0.0D)
+                    if (var21 > var19 * var19 || var21 > 0.0D && this.trackedEntity.motionX == 0.0D && this.trackedEntity.motionY == 0.0D && this.trackedEntity.motionZ == 0.0D)
                     {
                         this.lastTrackedEntityMotionX = this.trackedEntity.motionX;
                         this.lastTrackedEntityMotionY = this.trackedEntity.motionY;
                         this.motionZ = this.trackedEntity.motionZ;
-                        this.sendPacketToTrackedPlayers(new S12PacketEntityVelocity(this.trackedEntity.getEntityId(), this.lastTrackedEntityMotionX, this.lastTrackedEntityMotionY, this.motionZ));
+                        this.func_151259_a(new S12PacketEntityVelocity(this.trackedEntity.getEntityId(), this.lastTrackedEntityMotionX, this.lastTrackedEntityMotionY, this.motionZ));
                     }
                 }
 
-                if (packet1 != null)
+                if (var10 != null)
                 {
-                    this.sendPacketToTrackedPlayers(packet1);
+                    this.func_151259_a((Packet)var10);
                 }
 
                 this.sendMetadataToAllAssociatedPlayers();
 
-                if (flag)
+                if (var11)
                 {
-                    this.encodedPosX = k;
-                    this.encodedPosY = j1;
-                    this.encodedPosZ = k1;
+                    this.encodedPosX = var23;
+                    this.encodedPosY = var24;
+                    this.encodedPosZ = var25;
                 }
 
-                if (flag1)
+                if (var12)
                 {
-                    this.encodedRotationYaw = l1;
-                    this.encodedRotationPitch = i2;
+                    this.encodedRotationYaw = var27;
+                    this.encodedRotationPitch = var28;
                 }
 
                 this.ridingEntity = false;
             }
             else
             {
-                int j = MathHelper.floor_float(this.trackedEntity.rotationYaw * 256.0F / 360.0F);
-                int i1 = MathHelper.floor_float(this.trackedEntity.rotationPitch * 256.0F / 360.0F);
-                boolean flag2 = Math.abs(j - this.encodedRotationYaw) >= 4 || Math.abs(i1 - this.encodedRotationPitch) >= 4;
+                var23 = MathHelper.floor_float(this.trackedEntity.rotationYaw * 256.0F / 360.0F);
+                var24 = MathHelper.floor_float(this.trackedEntity.rotationPitch * 256.0F / 360.0F);
+                boolean var26 = Math.abs(var23 - this.encodedRotationYaw) >= 4 || Math.abs(var24 - this.encodedRotationPitch) >= 4;
 
-                if (flag2)
+                if (var26)
                 {
-                    this.sendPacketToTrackedPlayers(new S14PacketEntity.S16PacketEntityLook(this.trackedEntity.getEntityId(), (byte)j, (byte)i1, this.trackedEntity.onGround));
-                    this.encodedRotationYaw = j;
-                    this.encodedRotationPitch = i1;
+                    this.func_151259_a(new S14PacketEntity.S16PacketEntityLook(this.trackedEntity.getEntityId(), (byte)var23, (byte)var24, this.trackedEntity.onGround));
+                    this.encodedRotationYaw = var23;
+                    this.encodedRotationPitch = var24;
                 }
 
                 this.encodedPosX = MathHelper.floor_double(this.trackedEntity.posX * 32.0D);
@@ -281,12 +288,12 @@ public class EntityTrackerEntry
                 this.ridingEntity = true;
             }
 
-            int l = MathHelper.floor_float(this.trackedEntity.getRotationYawHead() * 256.0F / 360.0F);
+            var23 = MathHelper.floor_float(this.trackedEntity.getRotationYawHead() * 256.0F / 360.0F);
 
-            if (Math.abs(l - this.lastHeadMotion) >= 4)
+            if (Math.abs(var23 - this.lastHeadMotion) >= 4)
             {
-                this.sendPacketToTrackedPlayers(new S19PacketEntityHeadLook(this.trackedEntity, (byte)l));
-                this.lastHeadMotion = l;
+                this.func_151259_a(new S19PacketEntityHeadLook(this.trackedEntity, (byte)var23));
+                this.lastHeadMotion = var23;
             }
 
             this.trackedEntity.isAirBorne = false;
@@ -307,97 +314,100 @@ public class EntityTrackerEntry
      */
     private void sendMetadataToAllAssociatedPlayers()
     {
-        DataWatcher datawatcher = this.trackedEntity.getDataWatcher();
+        DataWatcher var1 = this.trackedEntity.getDataWatcher();
 
-        if (datawatcher.hasObjectChanged())
+        if (var1.hasObjectChanged())
         {
-            this.func_151261_b(new S1CPacketEntityMetadata(this.trackedEntity.getEntityId(), datawatcher, false));
+            this.func_151261_b(new S1CPacketEntityMetadata(this.trackedEntity.getEntityId(), var1, false));
         }
 
         if (this.trackedEntity instanceof EntityLivingBase)
         {
-            ServersideAttributeMap serversideattributemap = (ServersideAttributeMap)((EntityLivingBase)this.trackedEntity).getAttributeMap();
-            Set<IAttributeInstance> set = serversideattributemap.getAttributeInstanceSet();
+            ServersideAttributeMap var2 = (ServersideAttributeMap)((EntityLivingBase)this.trackedEntity).getAttributeMap();
+            Set var3 = var2.getAttributeInstanceSet();
 
-            if (!set.isEmpty())
+            if (!var3.isEmpty())
             {
-                this.func_151261_b(new S20PacketEntityProperties(this.trackedEntity.getEntityId(), set));
+                this.func_151261_b(new S20PacketEntityProperties(this.trackedEntity.getEntityId(), var3));
             }
 
-            set.clear();
+            var3.clear();
         }
     }
 
-    /**
-     * Send the given packet to all players tracking this entity.
-     */
-    public void sendPacketToTrackedPlayers(Packet packetIn)
+    public void func_151259_a(Packet p_151259_1_)
     {
-        for (EntityPlayerMP entityplayermp : this.trackingPlayers)
+        Iterator var2 = this.trackingPlayers.iterator();
+
+        while (var2.hasNext())
         {
-            entityplayermp.playerNetServerHandler.sendPacket(packetIn);
+            EntityPlayerMP var3 = (EntityPlayerMP)var2.next();
+            var3.playerNetServerHandler.sendPacket(p_151259_1_);
         }
     }
 
-    public void func_151261_b(Packet packetIn)
+    public void func_151261_b(Packet p_151261_1_)
     {
-        this.sendPacketToTrackedPlayers(packetIn);
+        this.func_151259_a(p_151261_1_);
 
         if (this.trackedEntity instanceof EntityPlayerMP)
         {
-            ((EntityPlayerMP)this.trackedEntity).playerNetServerHandler.sendPacket(packetIn);
+            ((EntityPlayerMP)this.trackedEntity).playerNetServerHandler.sendPacket(p_151261_1_);
         }
     }
 
     public void sendDestroyEntityPacketToTrackedPlayers()
     {
-        for (EntityPlayerMP entityplayermp : this.trackingPlayers)
+        Iterator var1 = this.trackingPlayers.iterator();
+
+        while (var1.hasNext())
         {
-            entityplayermp.removeEntity(this.trackedEntity);
+            EntityPlayerMP var2 = (EntityPlayerMP)var1.next();
+            var2.func_152339_d(this.trackedEntity);
         }
     }
 
-    public void removeFromTrackedPlayers(EntityPlayerMP playerMP)
+    public void removeFromTrackedPlayers(EntityPlayerMP p_73118_1_)
     {
-        if (this.trackingPlayers.contains(playerMP))
+        if (this.trackingPlayers.contains(p_73118_1_))
         {
-            playerMP.removeEntity(this.trackedEntity);
-            this.trackingPlayers.remove(playerMP);
+            p_73118_1_.func_152339_d(this.trackedEntity);
+            this.trackingPlayers.remove(p_73118_1_);
         }
     }
 
-    public void updatePlayerEntity(EntityPlayerMP playerMP)
+    public void updatePlayerEntity(EntityPlayerMP p_73117_1_)
     {
-        if (playerMP != this.trackedEntity)
+        if (p_73117_1_ != this.trackedEntity)
         {
-            if (this.func_180233_c(playerMP))
+            if (this.func_180233_c(p_73117_1_))
             {
-                if (!this.trackingPlayers.contains(playerMP) && (this.isPlayerWatchingThisChunk(playerMP) || this.trackedEntity.forceSpawn))
+                if (!this.trackingPlayers.contains(p_73117_1_) && (this.isPlayerWatchingThisChunk(p_73117_1_) || this.trackedEntity.forceSpawn))
                 {
-                    this.trackingPlayers.add(playerMP);
-                    Packet packet = this.createSpawnPacket();
-                    playerMP.playerNetServerHandler.sendPacket(packet);
+                    this.trackingPlayers.add(p_73117_1_);
+                    Packet var2 = this.func_151260_c();
+                    p_73117_1_.playerNetServerHandler.sendPacket(var2);
 
                     if (!this.trackedEntity.getDataWatcher().getIsBlank())
                     {
-                        playerMP.playerNetServerHandler.sendPacket(new S1CPacketEntityMetadata(this.trackedEntity.getEntityId(), this.trackedEntity.getDataWatcher(), true));
+                        p_73117_1_.playerNetServerHandler.sendPacket(new S1CPacketEntityMetadata(this.trackedEntity.getEntityId(), this.trackedEntity.getDataWatcher(), true));
                     }
 
-                    NBTTagCompound nbttagcompound = this.trackedEntity.getNBTTagCompound();
+                    NBTTagCompound var3 = this.trackedEntity.func_174819_aU();
 
-                    if (nbttagcompound != null)
+                    if (var3 != null)
                     {
-                        playerMP.playerNetServerHandler.sendPacket(new S49PacketUpdateEntityNBT(this.trackedEntity.getEntityId(), nbttagcompound));
+                        p_73117_1_.playerNetServerHandler.sendPacket(new S49PacketUpdateEntityNBT(this.trackedEntity.getEntityId(), var3));
                     }
 
                     if (this.trackedEntity instanceof EntityLivingBase)
                     {
-                        ServersideAttributeMap serversideattributemap = (ServersideAttributeMap)((EntityLivingBase)this.trackedEntity).getAttributeMap();
-                        Collection<IAttributeInstance> collection = serversideattributemap.getWatchedAttributes();
+                        ServersideAttributeMap var4 = (ServersideAttributeMap)((EntityLivingBase)this.trackedEntity).getAttributeMap();
+                        Collection var5 = var4.getWatchedAttributes();
 
-                        if (!collection.isEmpty())
+                        if (!var5.isEmpty())
                         {
-                            playerMP.playerNetServerHandler.sendPacket(new S20PacketEntityProperties(this.trackedEntity.getEntityId(), collection));
+                            p_73117_1_.playerNetServerHandler.sendPacket(new S20PacketEntityProperties(this.trackedEntity.getEntityId(), var5));
                         }
                     }
 
@@ -405,87 +415,86 @@ public class EntityTrackerEntry
                     this.lastTrackedEntityMotionY = this.trackedEntity.motionY;
                     this.motionZ = this.trackedEntity.motionZ;
 
-                    if (this.sendVelocityUpdates && !(packet instanceof S0FPacketSpawnMob))
+                    if (this.sendVelocityUpdates && !(var2 instanceof S0FPacketSpawnMob))
                     {
-                        playerMP.playerNetServerHandler.sendPacket(new S12PacketEntityVelocity(this.trackedEntity.getEntityId(), this.trackedEntity.motionX, this.trackedEntity.motionY, this.trackedEntity.motionZ));
+                        p_73117_1_.playerNetServerHandler.sendPacket(new S12PacketEntityVelocity(this.trackedEntity.getEntityId(), this.trackedEntity.motionX, this.trackedEntity.motionY, this.trackedEntity.motionZ));
                     }
 
                     if (this.trackedEntity.ridingEntity != null)
                     {
-                        playerMP.playerNetServerHandler.sendPacket(new S1BPacketEntityAttach(0, this.trackedEntity, this.trackedEntity.ridingEntity));
+                        p_73117_1_.playerNetServerHandler.sendPacket(new S1BPacketEntityAttach(0, this.trackedEntity, this.trackedEntity.ridingEntity));
                     }
 
                     if (this.trackedEntity instanceof EntityLiving && ((EntityLiving)this.trackedEntity).getLeashedToEntity() != null)
                     {
-                        playerMP.playerNetServerHandler.sendPacket(new S1BPacketEntityAttach(1, this.trackedEntity, ((EntityLiving)this.trackedEntity).getLeashedToEntity()));
+                        p_73117_1_.playerNetServerHandler.sendPacket(new S1BPacketEntityAttach(1, this.trackedEntity, ((EntityLiving)this.trackedEntity).getLeashedToEntity()));
                     }
 
                     if (this.trackedEntity instanceof EntityLivingBase)
                     {
-                        for (int i = 0; i < 5; ++i)
+                        for (int var7 = 0; var7 < 5; ++var7)
                         {
-                            ItemStack itemstack = ((EntityLivingBase)this.trackedEntity).getEquipmentInSlot(i);
+                            ItemStack var10 = ((EntityLivingBase)this.trackedEntity).getEquipmentInSlot(var7);
 
-                            if (itemstack != null)
+                            if (var10 != null)
                             {
-                                playerMP.playerNetServerHandler.sendPacket(new S04PacketEntityEquipment(this.trackedEntity.getEntityId(), i, itemstack));
+                                p_73117_1_.playerNetServerHandler.sendPacket(new S04PacketEntityEquipment(this.trackedEntity.getEntityId(), var7, var10));
                             }
                         }
                     }
 
                     if (this.trackedEntity instanceof EntityPlayer)
                     {
-                        EntityPlayer entityplayer = (EntityPlayer)this.trackedEntity;
+                        EntityPlayer var8 = (EntityPlayer)this.trackedEntity;
 
-                        if (entityplayer.isPlayerSleeping())
+                        if (var8.isPlayerSleeping())
                         {
-                            playerMP.playerNetServerHandler.sendPacket(new S0APacketUseBed(entityplayer, new BlockPos(this.trackedEntity)));
+                            p_73117_1_.playerNetServerHandler.sendPacket(new S0APacketUseBed(var8, new BlockPos(this.trackedEntity)));
                         }
                     }
 
                     if (this.trackedEntity instanceof EntityLivingBase)
                     {
-                        EntityLivingBase entitylivingbase = (EntityLivingBase)this.trackedEntity;
+                        EntityLivingBase var9 = (EntityLivingBase)this.trackedEntity;
+                        Iterator var11 = var9.getActivePotionEffects().iterator();
 
-                        for (PotionEffect potioneffect : entitylivingbase.getActivePotionEffects())
+                        while (var11.hasNext())
                         {
-                            playerMP.playerNetServerHandler.sendPacket(new S1DPacketEntityEffect(this.trackedEntity.getEntityId(), potioneffect));
+                            PotionEffect var6 = (PotionEffect)var11.next();
+                            p_73117_1_.playerNetServerHandler.sendPacket(new S1DPacketEntityEffect(this.trackedEntity.getEntityId(), var6));
                         }
                     }
                 }
             }
-            else if (this.trackingPlayers.contains(playerMP))
+            else if (this.trackingPlayers.contains(p_73117_1_))
             {
-                this.trackingPlayers.remove(playerMP);
-                playerMP.removeEntity(this.trackedEntity);
+                this.trackingPlayers.remove(p_73117_1_);
+                p_73117_1_.func_152339_d(this.trackedEntity);
             }
         }
     }
 
-    public boolean func_180233_c(EntityPlayerMP playerMP)
+    public boolean func_180233_c(EntityPlayerMP p_180233_1_)
     {
-        double d0 = playerMP.posX - (double)(this.encodedPosX / 32);
-        double d1 = playerMP.posZ - (double)(this.encodedPosZ / 32);
-        return d0 >= (double)(-this.trackingDistanceThreshold) && d0 <= (double)this.trackingDistanceThreshold && d1 >= (double)(-this.trackingDistanceThreshold) && d1 <= (double)this.trackingDistanceThreshold && this.trackedEntity.isSpectatedByPlayer(playerMP);
+        double var2 = p_180233_1_.posX - (double)(this.encodedPosX / 32);
+        double var4 = p_180233_1_.posZ - (double)(this.encodedPosZ / 32);
+        return var2 >= (double)(-this.trackingDistanceThreshold) && var2 <= (double)this.trackingDistanceThreshold && var4 >= (double)(-this.trackingDistanceThreshold) && var4 <= (double)this.trackingDistanceThreshold && this.trackedEntity.func_174827_a(p_180233_1_);
     }
 
-    private boolean isPlayerWatchingThisChunk(EntityPlayerMP playerMP)
+    private boolean isPlayerWatchingThisChunk(EntityPlayerMP p_73121_1_)
     {
-        return playerMP.getServerForPlayer().getPlayerManager().isPlayerWatchingChunk(playerMP, this.trackedEntity.chunkCoordX, this.trackedEntity.chunkCoordZ);
+        return p_73121_1_.getServerForPlayer().getPlayerManager().isPlayerWatchingChunk(p_73121_1_, this.trackedEntity.chunkCoordX, this.trackedEntity.chunkCoordZ);
     }
 
-    public void updatePlayerEntities(List<EntityPlayer> players)
+    public void updatePlayerEntities(List p_73125_1_)
     {
-        for (int i = 0; i < players.size(); ++i)
+        for (int var2 = 0; var2 < p_73125_1_.size(); ++var2)
         {
-            this.updatePlayerEntity((EntityPlayerMP)players.get(i));
+            this.updatePlayerEntity((EntityPlayerMP)p_73125_1_.get(var2));
         }
     }
 
-    /**
-     * Creates a spawn packet for the entity managed by this entry.
-     */
-    private Packet createSpawnPacket()
+    private Packet func_151260_c()
     {
         if (this.trackedEntity.isDead)
         {
@@ -502,8 +511,8 @@ public class EntityTrackerEntry
         }
         else if (this.trackedEntity instanceof EntityMinecart)
         {
-            EntityMinecart entityminecart = (EntityMinecart)this.trackedEntity;
-            return new S0EPacketSpawnObject(this.trackedEntity, 10, entityminecart.getMinecartType().getNetworkID());
+            EntityMinecart var9 = (EntityMinecart)this.trackedEntity;
+            return new S0EPacketSpawnObject(this.trackedEntity, 10, var9.func_180456_s().func_180039_a());
         }
         else if (this.trackedEntity instanceof EntityBoat)
         {
@@ -516,13 +525,13 @@ public class EntityTrackerEntry
         }
         else if (this.trackedEntity instanceof EntityFishHook)
         {
-            Entity entity1 = ((EntityFishHook)this.trackedEntity).angler;
-            return new S0EPacketSpawnObject(this.trackedEntity, 90, entity1 != null ? entity1.getEntityId() : this.trackedEntity.getEntityId());
+            EntityPlayer var8 = ((EntityFishHook)this.trackedEntity).angler;
+            return new S0EPacketSpawnObject(this.trackedEntity, 90, var8 != null ? var8.getEntityId() : this.trackedEntity.getEntityId());
         }
         else if (this.trackedEntity instanceof EntityArrow)
         {
-            Entity entity = ((EntityArrow)this.trackedEntity).shootingEntity;
-            return new S0EPacketSpawnObject(this.trackedEntity, 60, entity != null ? entity.getEntityId() : this.trackedEntity.getEntityId());
+            Entity var7 = ((EntityArrow)this.trackedEntity).shootingEntity;
+            return new S0EPacketSpawnObject(this.trackedEntity, 60, var7 != null ? var7.getEntityId() : this.trackedEntity.getEntityId());
         }
         else if (this.trackedEntity instanceof EntitySnowball)
         {
@@ -548,99 +557,109 @@ public class EntityTrackerEntry
         {
             return new S0EPacketSpawnObject(this.trackedEntity, 76);
         }
-        else if (this.trackedEntity instanceof EntityFireball)
+        else
         {
-            EntityFireball entityfireball = (EntityFireball)this.trackedEntity;
-            S0EPacketSpawnObject s0epacketspawnobject2 = null;
-            int i = 63;
+            S0EPacketSpawnObject var2;
 
-            if (this.trackedEntity instanceof EntitySmallFireball)
+            if (this.trackedEntity instanceof EntityFireball)
             {
-                i = 64;
-            }
-            else if (this.trackedEntity instanceof EntityWitherSkull)
-            {
-                i = 66;
-            }
+                EntityFireball var6 = (EntityFireball)this.trackedEntity;
+                var2 = null;
+                byte var10 = 63;
 
-            if (entityfireball.shootingEntity != null)
+                if (this.trackedEntity instanceof EntitySmallFireball)
+                {
+                    var10 = 64;
+                }
+                else if (this.trackedEntity instanceof EntityWitherSkull)
+                {
+                    var10 = 66;
+                }
+
+                if (var6.shootingEntity != null)
+                {
+                    var2 = new S0EPacketSpawnObject(this.trackedEntity, var10, ((EntityFireball)this.trackedEntity).shootingEntity.getEntityId());
+                }
+                else
+                {
+                    var2 = new S0EPacketSpawnObject(this.trackedEntity, var10, 0);
+                }
+
+                var2.func_149003_d((int)(var6.accelerationX * 8000.0D));
+                var2.func_149000_e((int)(var6.accelerationY * 8000.0D));
+                var2.func_149007_f((int)(var6.accelerationZ * 8000.0D));
+                return var2;
+            }
+            else if (this.trackedEntity instanceof EntityEgg)
             {
-                s0epacketspawnobject2 = new S0EPacketSpawnObject(this.trackedEntity, i, ((EntityFireball)this.trackedEntity).shootingEntity.getEntityId());
+                return new S0EPacketSpawnObject(this.trackedEntity, 62);
+            }
+            else if (this.trackedEntity instanceof EntityTNTPrimed)
+            {
+                return new S0EPacketSpawnObject(this.trackedEntity, 50);
+            }
+            else if (this.trackedEntity instanceof EntityEnderCrystal)
+            {
+                return new S0EPacketSpawnObject(this.trackedEntity, 51);
+            }
+            else if (this.trackedEntity instanceof EntityFallingBlock)
+            {
+                EntityFallingBlock var5 = (EntityFallingBlock)this.trackedEntity;
+                return new S0EPacketSpawnObject(this.trackedEntity, 70, Block.getStateId(var5.getBlock()));
+            }
+            else if (this.trackedEntity instanceof EntityArmorStand)
+            {
+                return new S0EPacketSpawnObject(this.trackedEntity, 78);
+            }
+            else if (this.trackedEntity instanceof EntityPainting)
+            {
+                return new S10PacketSpawnPainting((EntityPainting)this.trackedEntity);
             }
             else
             {
-                s0epacketspawnobject2 = new S0EPacketSpawnObject(this.trackedEntity, i, 0);
-            }
+                BlockPos var3;
 
-            s0epacketspawnobject2.setSpeedX((int)(entityfireball.accelerationX * 8000.0D));
-            s0epacketspawnobject2.setSpeedY((int)(entityfireball.accelerationY * 8000.0D));
-            s0epacketspawnobject2.setSpeedZ((int)(entityfireball.accelerationZ * 8000.0D));
-            return s0epacketspawnobject2;
-        }
-        else if (this.trackedEntity instanceof EntityEgg)
-        {
-            return new S0EPacketSpawnObject(this.trackedEntity, 62);
-        }
-        else if (this.trackedEntity instanceof EntityTNTPrimed)
-        {
-            return new S0EPacketSpawnObject(this.trackedEntity, 50);
-        }
-        else if (this.trackedEntity instanceof EntityEnderCrystal)
-        {
-            return new S0EPacketSpawnObject(this.trackedEntity, 51);
-        }
-        else if (this.trackedEntity instanceof EntityFallingBlock)
-        {
-            EntityFallingBlock entityfallingblock = (EntityFallingBlock)this.trackedEntity;
-            return new S0EPacketSpawnObject(this.trackedEntity, 70, Block.getStateId(entityfallingblock.getBlock()));
-        }
-        else if (this.trackedEntity instanceof EntityArmorStand)
-        {
-            return new S0EPacketSpawnObject(this.trackedEntity, 78);
-        }
-        else if (this.trackedEntity instanceof EntityPainting)
-        {
-            return new S10PacketSpawnPainting((EntityPainting)this.trackedEntity);
-        }
-        else if (this.trackedEntity instanceof EntityItemFrame)
-        {
-            EntityItemFrame entityitemframe = (EntityItemFrame)this.trackedEntity;
-            S0EPacketSpawnObject s0epacketspawnobject1 = new S0EPacketSpawnObject(this.trackedEntity, 71, entityitemframe.facingDirection.getHorizontalIndex());
-            BlockPos blockpos1 = entityitemframe.getHangingPosition();
-            s0epacketspawnobject1.setX(MathHelper.floor_float((float)(blockpos1.getX() * 32)));
-            s0epacketspawnobject1.setY(MathHelper.floor_float((float)(blockpos1.getY() * 32)));
-            s0epacketspawnobject1.setZ(MathHelper.floor_float((float)(blockpos1.getZ() * 32)));
-            return s0epacketspawnobject1;
-        }
-        else if (this.trackedEntity instanceof EntityLeashKnot)
-        {
-            EntityLeashKnot entityleashknot = (EntityLeashKnot)this.trackedEntity;
-            S0EPacketSpawnObject s0epacketspawnobject = new S0EPacketSpawnObject(this.trackedEntity, 77);
-            BlockPos blockpos = entityleashknot.getHangingPosition();
-            s0epacketspawnobject.setX(MathHelper.floor_float((float)(blockpos.getX() * 32)));
-            s0epacketspawnobject.setY(MathHelper.floor_float((float)(blockpos.getY() * 32)));
-            s0epacketspawnobject.setZ(MathHelper.floor_float((float)(blockpos.getZ() * 32)));
-            return s0epacketspawnobject;
-        }
-        else if (this.trackedEntity instanceof EntityXPOrb)
-        {
-            return new S11PacketSpawnExperienceOrb((EntityXPOrb)this.trackedEntity);
-        }
-        else
-        {
-            throw new IllegalArgumentException("Don\'t know how to add " + this.trackedEntity.getClass() + "!");
+                if (this.trackedEntity instanceof EntityItemFrame)
+                {
+                    EntityItemFrame var4 = (EntityItemFrame)this.trackedEntity;
+                    var2 = new S0EPacketSpawnObject(this.trackedEntity, 71, var4.field_174860_b.getHorizontalIndex());
+                    var3 = var4.func_174857_n();
+                    var2.func_148996_a(MathHelper.floor_float((float)(var3.getX() * 32)));
+                    var2.func_148995_b(MathHelper.floor_float((float)(var3.getY() * 32)));
+                    var2.func_149005_c(MathHelper.floor_float((float)(var3.getZ() * 32)));
+                    return var2;
+                }
+                else if (this.trackedEntity instanceof EntityLeashKnot)
+                {
+                    EntityLeashKnot var1 = (EntityLeashKnot)this.trackedEntity;
+                    var2 = new S0EPacketSpawnObject(this.trackedEntity, 77);
+                    var3 = var1.func_174857_n();
+                    var2.func_148996_a(MathHelper.floor_float((float)(var3.getX() * 32)));
+                    var2.func_148995_b(MathHelper.floor_float((float)(var3.getY() * 32)));
+                    var2.func_149005_c(MathHelper.floor_float((float)(var3.getZ() * 32)));
+                    return var2;
+                }
+                else if (this.trackedEntity instanceof EntityXPOrb)
+                {
+                    return new S11PacketSpawnExperienceOrb((EntityXPOrb)this.trackedEntity);
+                }
+                else
+                {
+                    throw new IllegalArgumentException("Don\'t know how to add " + this.trackedEntity.getClass() + "!");
+                }
+            }
         }
     }
 
     /**
      * Remove a tracked player from our list and tell the tracked player to destroy us from their world.
      */
-    public void removeTrackedPlayerSymmetric(EntityPlayerMP playerMP)
+    public void removeTrackedPlayerSymmetric(EntityPlayerMP p_73123_1_)
     {
-        if (this.trackingPlayers.contains(playerMP))
+        if (this.trackingPlayers.contains(p_73123_1_))
         {
-            this.trackingPlayers.remove(playerMP);
-            playerMP.removeEntity(this.trackedEntity);
+            this.trackingPlayers.remove(p_73123_1_);
+            p_73123_1_.func_152339_d(this.trackedEntity);
         }
     }
 }

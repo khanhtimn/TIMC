@@ -9,6 +9,7 @@ public abstract class WorldSavedData
 
     /** Whether this MapDataBase needs saving to disk. */
     private boolean dirty;
+    
 
     public WorldSavedData(String name)
     {
@@ -18,12 +19,12 @@ public abstract class WorldSavedData
     /**
      * reads in data from the NBTTagCompound into this MapDataBase
      */
-    public abstract void readFromNBT(NBTTagCompound nbt);
+    public abstract void readFromNBT(NBTTagCompound var1);
 
     /**
      * write data to NBTTagCompound from this MapDataBase, similar to Entities and TileEntities
      */
-    public abstract void writeToNBT(NBTTagCompound nbt);
+    public abstract void writeToNBT(NBTTagCompound var1);
 
     /**
      * Marks this MapDataBase dirty, to be saved to disk when the level next saves.

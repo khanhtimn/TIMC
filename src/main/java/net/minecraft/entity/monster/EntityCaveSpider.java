@@ -12,6 +12,8 @@ import net.minecraft.world.World;
 
 public class EntityCaveSpider extends EntitySpider
 {
+    
+
     public EntityCaveSpider(World worldIn)
     {
         super(worldIn);
@@ -24,26 +26,26 @@ public class EntityCaveSpider extends EntitySpider
         this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(12.0D);
     }
 
-    public boolean attackEntityAsMob(Entity entityIn)
+    public boolean attackEntityAsMob(Entity p_70652_1_)
     {
-        if (super.attackEntityAsMob(entityIn))
+        if (super.attackEntityAsMob(p_70652_1_))
         {
-            if (entityIn instanceof EntityLivingBase)
+            if (p_70652_1_ instanceof EntityLivingBase)
             {
-                int i = 0;
+                byte var2 = 0;
 
                 if (this.worldObj.getDifficulty() == EnumDifficulty.NORMAL)
                 {
-                    i = 7;
+                    var2 = 7;
                 }
                 else if (this.worldObj.getDifficulty() == EnumDifficulty.HARD)
                 {
-                    i = 15;
+                    var2 = 15;
                 }
 
-                if (i > 0)
+                if (var2 > 0)
                 {
-                    ((EntityLivingBase)entityIn).addPotionEffect(new PotionEffect(Potion.poison.id, i * 20, 0));
+                    ((EntityLivingBase)p_70652_1_).addPotionEffect(new PotionEffect(Potion.poison.id, var2 * 20, 0));
                 }
             }
 
@@ -55,13 +57,9 @@ public class EntityCaveSpider extends EntitySpider
         }
     }
 
-    /**
-     * Called only once on an entity when first time spawned, via egg, mob spawner, natural spawning etc, but not called
-     * when entity is reloaded from nbt. Mainly used for initializing attributes and inventory
-     */
-    public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, IEntityLivingData livingdata)
+    public IEntityLivingData func_180482_a(DifficultyInstance p_180482_1_, IEntityLivingData p_180482_2_)
     {
-        return livingdata;
+        return p_180482_2_;
     }
 
     public float getEyeHeight()

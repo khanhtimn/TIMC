@@ -8,6 +8,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentTranslation;
@@ -16,14 +17,13 @@ import net.minecraft.util.IChatComponent;
 
 public class CommandMessage extends CommandBase
 {
-    public List<String> getCommandAliases()
+    
+
+    public List getCommandAliases()
     {
-        return Arrays.<String>asList(new String[] {"w", "msg"});
+        return Arrays.asList(new String[] {"w", "msg"});
     }
 
-    /**
-     * Gets the name of the command
-     */
     public String getCommandName()
     {
         return "tell";
@@ -37,17 +37,11 @@ public class CommandMessage extends CommandBase
         return 0;
     }
 
-    /**
-     * Gets the usage string for the command.
-     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.message.usage";
     }
 
-    /**
-     * Callback when the command is invoked
-     */
     public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length < 2)
@@ -56,26 +50,26 @@ public class CommandMessage extends CommandBase
         }
         else
         {
-            EntityPlayer entityplayer = getPlayer(sender, args[0]);
+            EntityPlayerMP var3 = getPlayer(sender, args[0]);
 
-            if (entityplayer == sender)
+            if (var3 == sender)
             {
                 throw new PlayerNotFoundException("commands.message.sameTarget", new Object[0]);
             }
             else
             {
-                IChatComponent ichatcomponent = getChatComponentFromNthArg(sender, args, 1, !(sender instanceof EntityPlayer));
-                ChatComponentTranslation chatcomponenttranslation = new ChatComponentTranslation("commands.message.display.incoming", new Object[] {sender.getDisplayName(), ichatcomponent.createCopy()});
-                ChatComponentTranslation chatcomponenttranslation1 = new ChatComponentTranslation("commands.message.display.outgoing", new Object[] {entityplayer.getDisplayName(), ichatcomponent.createCopy()});
-                chatcomponenttranslation.getChatStyle().setColor(EnumChatFormatting.GRAY).setItalic(Boolean.valueOf(true));
-                chatcomponenttranslation1.getChatStyle().setColor(EnumChatFormatting.GRAY).setItalic(Boolean.valueOf(true));
-                entityplayer.addChatMessage(chatcomponenttranslation);
-                sender.addChatMessage(chatcomponenttranslation1);
+                IChatComponent var4 = getChatComponentFromNthArg(sender, args, 1, !(sender instanceof EntityPlayer));
+                ChatComponentTranslation var5 = new ChatComponentTranslation("commands.message.display.incoming", new Object[] {sender.getDisplayName(), var4.createCopy()});
+                ChatComponentTranslation var6 = new ChatComponentTranslation("commands.message.display.outgoing", new Object[] {var3.getDisplayName(), var4.createCopy()});
+                var5.getChatStyle().setColor(EnumChatFormatting.GRAY).setItalic(Boolean.valueOf(true));
+                var6.getChatStyle().setColor(EnumChatFormatting.GRAY).setItalic(Boolean.valueOf(true));
+                var3.addChatMessage(var5);
+                sender.addChatMessage(var6);
             }
         }
     }
 
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         return getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames());
     }

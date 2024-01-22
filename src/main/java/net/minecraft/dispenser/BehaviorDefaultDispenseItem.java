@@ -8,15 +8,17 @@ import net.minecraft.world.World;
 
 public class BehaviorDefaultDispenseItem implements IBehaviorDispenseItem
 {
+    
+
     /**
      * Dispenses the specified ItemStack from a dispenser.
      */
     public final ItemStack dispense(IBlockSource source, ItemStack stack)
     {
-        ItemStack itemstack = this.dispenseStack(source, stack);
+        ItemStack var3 = this.dispenseStack(source, stack);
         this.playDispenseSound(source);
         this.spawnDispenseParticles(source, BlockDispenser.getFacing(source.getBlockMetadata()));
-        return itemstack;
+        return var3;
     }
 
     /**
@@ -24,37 +26,37 @@ public class BehaviorDefaultDispenseItem implements IBehaviorDispenseItem
      */
     protected ItemStack dispenseStack(IBlockSource source, ItemStack stack)
     {
-        EnumFacing enumfacing = BlockDispenser.getFacing(source.getBlockMetadata());
-        IPosition iposition = BlockDispenser.getDispensePosition(source);
-        ItemStack itemstack = stack.splitStack(1);
-        doDispense(source.getWorld(), itemstack, 6, enumfacing, iposition);
+        EnumFacing var3 = BlockDispenser.getFacing(source.getBlockMetadata());
+        IPosition var4 = BlockDispenser.getDispensePosition(source);
+        ItemStack var5 = stack.splitStack(1);
+        doDispense(source.getWorld(), var5, 6, var3, var4);
         return stack;
     }
 
-    public static void doDispense(World worldIn, ItemStack stack, int speed, EnumFacing facing, IPosition position)
+    public static void doDispense(World worldIn, ItemStack stack, int speed, EnumFacing p_82486_3_, IPosition position)
     {
-        double d0 = position.getX();
-        double d1 = position.getY();
-        double d2 = position.getZ();
+        double var5 = position.getX();
+        double var7 = position.getY();
+        double var9 = position.getZ();
 
-        if (facing.getAxis() == EnumFacing.Axis.Y)
+        if (p_82486_3_.getAxis() == EnumFacing.Axis.Y)
         {
-            d1 = d1 - 0.125D;
+            var7 -= 0.125D;
         }
         else
         {
-            d1 = d1 - 0.15625D;
+            var7 -= 0.15625D;
         }
 
-        EntityItem entityitem = new EntityItem(worldIn, d0, d1, d2, stack);
-        double d3 = worldIn.rand.nextDouble() * 0.1D + 0.2D;
-        entityitem.motionX = (double)facing.getFrontOffsetX() * d3;
-        entityitem.motionY = 0.20000000298023224D;
-        entityitem.motionZ = (double)facing.getFrontOffsetZ() * d3;
-        entityitem.motionX += worldIn.rand.nextGaussian() * 0.007499999832361937D * (double)speed;
-        entityitem.motionY += worldIn.rand.nextGaussian() * 0.007499999832361937D * (double)speed;
-        entityitem.motionZ += worldIn.rand.nextGaussian() * 0.007499999832361937D * (double)speed;
-        worldIn.spawnEntityInWorld(entityitem);
+        EntityItem var11 = new EntityItem(worldIn, var5, var7, var9, stack);
+        double var12 = worldIn.rand.nextDouble() * 0.1D + 0.2D;
+        var11.motionX = (double)p_82486_3_.getFrontOffsetX() * var12;
+        var11.motionY = 0.20000000298023224D;
+        var11.motionZ = (double)p_82486_3_.getFrontOffsetZ() * var12;
+        var11.motionX += worldIn.rand.nextGaussian() * 0.007499999832361937D * (double)speed;
+        var11.motionY += worldIn.rand.nextGaussian() * 0.007499999832361937D * (double)speed;
+        var11.motionZ += worldIn.rand.nextGaussian() * 0.007499999832361937D * (double)speed;
+        worldIn.spawnEntityInWorld(var11);
     }
 
     /**

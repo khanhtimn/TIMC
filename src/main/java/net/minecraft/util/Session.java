@@ -12,13 +12,14 @@ public class Session
     private final String playerID;
     private final String token;
     private final Session.Type sessionType;
+    
 
-    public Session(String usernameIn, String playerIDIn, String tokenIn, String sessionTypeIn)
+    public Session(String p_i1098_1_, String p_i1098_2_, String p_i1098_3_, String p_i1098_4_)
     {
-        this.username = usernameIn;
-        this.playerID = playerIDIn;
-        this.token = tokenIn;
-        this.sessionType = Session.Type.setSessionType(sessionTypeIn);
+        this.username = p_i1098_1_;
+        this.playerID = p_i1098_2_;
+        this.token = p_i1098_3_;
+        this.sessionType = Session.Type.setSessionType(p_i1098_4_);
     }
 
     public String getSessionID()
@@ -45,8 +46,8 @@ public class Session
     {
         try
         {
-            UUID uuid = UUIDTypeAdapter.fromString(this.getPlayerID());
-            return new GameProfile(uuid, this.getUsername());
+            UUID var1 = UUIDTypeAdapter.fromString(this.getPlayerID());
+            return new GameProfile(var1, this.getUsername());
         }
         catch (IllegalArgumentException var2)
         {
@@ -64,26 +65,32 @@ public class Session
 
     public static enum Type
     {
-        LEGACY("legacy"),
-        MOJANG("mojang");
-
-        private static final Map<String, Session.Type> SESSION_TYPES = Maps.<String, Session.Type>newHashMap();
+        LEGACY("LEGACY", 0, "legacy"),
+        MOJANG("MOJANG", 1, "mojang");
+        private static final Map field_152425_c = Maps.newHashMap();
         private final String sessionType;
 
-        private Type(String sessionTypeIn)
+        private static final Session.Type[] $VALUES = new Session.Type[]{LEGACY, MOJANG};
+        
+
+        private Type(String p_i1096_1_, int p_i1096_2_, String p_i1096_3_)
         {
-            this.sessionType = sessionTypeIn;
+            this.sessionType = p_i1096_3_;
         }
 
-        public static Session.Type setSessionType(String sessionTypeIn)
+        public static Session.Type setSessionType(String p_152421_0_)
         {
-            return (Session.Type)SESSION_TYPES.get(sessionTypeIn.toLowerCase());
+            return (Session.Type)field_152425_c.get(p_152421_0_.toLowerCase());
         }
 
         static {
-            for (Session.Type session$type : values())
+            Session.Type[] var0 = values();
+            int var1 = var0.length;
+
+            for (int var2 = 0; var2 < var1; ++var2)
             {
-                SESSION_TYPES.put(session$type.sessionType, session$type);
+                Session.Type var3 = var0[var2];
+                field_152425_c.put(var3.sessionType, var3);
             }
         }
     }

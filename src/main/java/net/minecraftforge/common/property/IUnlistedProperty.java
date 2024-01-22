@@ -1,12 +1,15 @@
+/*
+ * Decompiled with CFR 0.150.
+ */
 package net.minecraftforge.common.property;
 
-public interface IUnlistedProperty<V>
-{
-    String getName();
+public interface IUnlistedProperty<V> {
+    public String getName();
 
-    boolean isValid(V var1);
+    public boolean isValid(V var1);
 
-    Class<V> getType();
+    public Class<V> getType();
 
-    String valueToString(V var1);
+    public String valueToString(V var1);
 }
+

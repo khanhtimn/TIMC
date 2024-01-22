@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.data.IMetadataSection;
 import net.minecraft.client.resources.data.IMetadataSerializer;
@@ -23,15 +22,16 @@ public abstract class AbstractResourcePack implements IResourcePack
 {
     private static final Logger resourceLog = LogManager.getLogger();
     public final File resourcePackFile;
+    
 
-    public AbstractResourcePack(File resourcePackFileIn)
+    public AbstractResourcePack(File p_i1287_1_)
     {
-        this.resourcePackFile = resourcePackFileIn;
+        this.resourcePackFile = p_i1287_1_;
     }
 
-    private static String locationToName(ResourceLocation location)
+    private static String locationToName(ResourceLocation p_110592_0_)
     {
-        return String.format("%s/%s/%s", new Object[] {"assets", location.getResourceDomain(), location.getResourcePath()});
+        return String.format("%s/%s/%s", new Object[] {"assets", p_110592_0_.getResourceDomain(), p_110592_0_.getResourcePath()});
     }
 
     protected static String getRelativeName(File p_110595_0_, File p_110595_1_)
@@ -39,55 +39,55 @@ public abstract class AbstractResourcePack implements IResourcePack
         return p_110595_0_.toURI().relativize(p_110595_1_.toURI()).getPath();
     }
 
-    public InputStream getInputStream(ResourceLocation location) throws IOException
+    public InputStream getInputStream(ResourceLocation p_110590_1_) throws IOException
     {
-        return this.getInputStreamByName(locationToName(location));
+        return this.getInputStreamByName(locationToName(p_110590_1_));
     }
 
-    public boolean resourceExists(ResourceLocation location)
+    public boolean resourceExists(ResourceLocation p_110589_1_)
     {
-        return this.hasResourceName(locationToName(location));
+        return this.hasResourceName(locationToName(p_110589_1_));
     }
 
-    protected abstract InputStream getInputStreamByName(String name) throws IOException;
+    protected abstract InputStream getInputStreamByName(String var1) throws IOException;
 
-    protected abstract boolean hasResourceName(String name);
+    protected abstract boolean hasResourceName(String var1);
 
-    protected void logNameNotLowercase(String name)
+    protected void logNameNotLowercase(String p_110594_1_)
     {
-        resourceLog.warn("ResourcePack: ignored non-lowercase namespace: {} in {}", new Object[] {name, this.resourcePackFile});
+        resourceLog.warn("ResourcePack: ignored non-lowercase namespace: {} in {}", new Object[] {p_110594_1_, this.resourcePackFile});
     }
 
-    public <T extends IMetadataSection> T getPackMetadata(IMetadataSerializer metadataSerializer, String metadataSectionName) throws IOException
+    public IMetadataSection getPackMetadata(IMetadataSerializer p_135058_1_, String p_135058_2_) throws IOException
     {
-        return readMetadata(metadataSerializer, this.getInputStreamByName("pack.mcmeta"), metadataSectionName);
+        return readMetadata(p_135058_1_, this.getInputStreamByName("pack.mcmeta"), p_135058_2_);
     }
 
-    static <T extends IMetadataSection> T readMetadata(IMetadataSerializer p_110596_0_, InputStream p_110596_1_, String p_110596_2_)
+    static IMetadataSection readMetadata(IMetadataSerializer p_110596_0_, InputStream p_110596_1_, String p_110596_2_)
     {
-        JsonObject jsonobject = null;
-        BufferedReader bufferedreader = null;
+        JsonObject var3 = null;
+        BufferedReader var4 = null;
 
         try
         {
-            bufferedreader = new BufferedReader(new InputStreamReader(p_110596_1_, Charsets.UTF_8));
-            jsonobject = (new JsonParser()).parse((Reader)bufferedreader).getAsJsonObject();
+            var4 = new BufferedReader(new InputStreamReader(p_110596_1_, Charsets.UTF_8));
+            var3 = (new JsonParser()).parse(var4).getAsJsonObject();
         }
-        catch (RuntimeException runtimeexception)
+        catch (RuntimeException var9)
         {
-            throw new JsonParseException(runtimeexception);
+            throw new JsonParseException(var9);
         }
         finally
         {
-            IOUtils.closeQuietly((Reader)bufferedreader);
+            IOUtils.closeQuietly(var4);
         }
 
-        return p_110596_0_.parseMetadataSection(p_110596_2_, jsonobject);
+        return p_110596_0_.parseMetadataSection(p_110596_2_, var3);
     }
 
     public BufferedImage getPackImage() throws IOException
     {
-        return TextureUtil.readBufferedImage(this.getInputStreamByName("pack.png"));
+        return TextureUtil.func_177053_a(this.getInputStreamByName("pack.png"));
     }
 
     public String getPackName()

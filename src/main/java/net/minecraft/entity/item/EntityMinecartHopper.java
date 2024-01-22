@@ -2,6 +2,7 @@ package net.minecraft.entity.item;
 
 import java.util.List;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
@@ -13,7 +14,6 @@ import net.minecraft.tileentity.IHopper;
 import net.minecraft.tileentity.TileEntityHopper;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntitySelectors;
 import net.minecraft.world.World;
 
 public class EntityMinecartHopper extends EntityMinecartContainer implements IHopper
@@ -21,24 +21,27 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements IHo
     /** Whether this hopper minecart is being blocked by an activator rail. */
     private boolean isBlocked = true;
     private int transferTicker = -1;
-    private BlockPos field_174900_c = BlockPos.ORIGIN;
+    private BlockPos field_174900_c;
+    
 
     public EntityMinecartHopper(World worldIn)
     {
         super(worldIn);
+        this.field_174900_c = BlockPos.ORIGIN;
     }
 
-    public EntityMinecartHopper(World worldIn, double x, double y, double z)
+    public EntityMinecartHopper(World worldIn, double p_i1721_2_, double p_i1721_4_, double p_i1721_6_)
     {
-        super(worldIn, x, y, z);
+        super(worldIn, p_i1721_2_, p_i1721_4_, p_i1721_6_);
+        this.field_174900_c = BlockPos.ORIGIN;
     }
 
-    public EntityMinecart.EnumMinecartType getMinecartType()
+    public EntityMinecart.EnumMinecartType func_180456_s()
     {
         return EntityMinecart.EnumMinecartType.HOPPER;
     }
 
-    public IBlockState getDefaultDisplayTile()
+    public IBlockState func_180457_u()
     {
         return Blocks.hopper.getDefaultState();
     }
@@ -72,13 +75,13 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements IHo
     /**
      * Called every tick the minecart is on an activator rail. Args: x, y, z, is the rail receiving power
      */
-    public void onActivatorRailPass(int x, int y, int z, boolean receivingPower)
+    public void onActivatorRailPass(int p_96095_1_, int p_96095_2_, int p_96095_3_, boolean p_96095_4_)
     {
-        boolean flag = !receivingPower;
+        boolean var5 = !p_96095_4_;
 
-        if (flag != this.getBlocked())
+        if (var5 != this.getBlocked())
         {
-            this.setBlocked(flag);
+            this.setBlocked(var5);
         }
     }
 
@@ -119,7 +122,7 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements IHo
      */
     public double getYPos()
     {
-        return this.posY + 0.5D;
+        return this.posY;
     }
 
     /**
@@ -139,9 +142,9 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements IHo
 
         if (!this.worldObj.isRemote && this.isEntityAlive() && this.getBlocked())
         {
-            BlockPos blockpos = new BlockPos(this);
+            BlockPos var1 = new BlockPos(this);
 
-            if (blockpos.equals(this.field_174900_c))
+            if (var1.equals(this.field_174900_c))
             {
                 --this.transferTicker;
             }
@@ -165,31 +168,27 @@ public class EntityMinecartHopper extends EntityMinecartContainer implements IHo
 
     public boolean func_96112_aD()
     {
-        if (TileEntityHopper.captureDroppedItems(this))
+        if (TileEntityHopper.func_145891_a(this))
         {
             return true;
         }
         else
         {
-            List<EntityItem> list = this.worldObj.<EntityItem>getEntitiesWithinAABB(EntityItem.class, this.getEntityBoundingBox().expand(0.25D, 0.0D, 0.25D), EntitySelectors.selectAnything);
+            List var1 = this.worldObj.func_175647_a(EntityItem.class, this.getEntityBoundingBox().expand(0.25D, 0.0D, 0.25D), IEntitySelector.selectAnything);
 
-            if (list.size() > 0)
+            if (var1.size() > 0)
             {
-                TileEntityHopper.putDropInInventoryAllSlots(this, (EntityItem)list.get(0));
+                TileEntityHopper.func_145898_a(this, (EntityItem)var1.get(0));
             }
 
             return false;
         }
     }
 
-    public void killMinecart(DamageSource source)
+    public void killMinecart(DamageSource p_94095_1_)
     {
-        super.killMinecart(source);
-
-        if (this.worldObj.getGameRules().getBoolean("doEntityDrops"))
-        {
-            this.dropItemWithOffset(Item.getItemFromBlock(Blocks.hopper), 1, 0.0F);
-        }
+        super.killMinecart(p_94095_1_);
+        this.dropItemWithOffset(Item.getItemFromBlock(Blocks.hopper), 1, 0.0F);
     }
 
     /**

@@ -10,31 +10,32 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class UserList<K, V extends UserListEntry<K>>
+public class UserList
 {
     protected static final Logger logger = LogManager.getLogger();
     protected final Gson gson;
     private final File saveFile;
-    private final Map<String, V> values = Maps.<String, V>newHashMap();
+    private final Map values = Maps.newHashMap();
     private boolean lanServer = true;
     private static final ParameterizedType saveFileFormat = new ParameterizedType()
     {
+        
         public Type[] getActualTypeArguments()
         {
             return new Type[] {UserListEntry.class};
@@ -48,13 +49,14 @@ public class UserList<K, V extends UserListEntry<K>>
             return null;
         }
     };
+    
 
     public UserList(File saveFile)
     {
         this.saveFile = saveFile;
-        GsonBuilder gsonbuilder = (new GsonBuilder()).setPrettyPrinting();
-        gsonbuilder.registerTypeHierarchyAdapter(UserListEntry.class, new UserList.Serializer());
-        this.gson = gsonbuilder.create();
+        GsonBuilder var2 = (new GsonBuilder()).setPrettyPrinting();
+        var2.registerTypeHierarchyAdapter(UserListEntry.class, new UserList.Serializer(null));
+        this.gson = var2.create();
     }
 
     public boolean isLanServer()
@@ -70,7 +72,7 @@ public class UserList<K, V extends UserListEntry<K>>
     /**
      * Adds an entry to the list
      */
-    public void addEntry(V entry)
+    public void addEntry(UserListEntry entry)
     {
         this.values.put(this.getObjectKey(entry.getValue()), entry);
 
@@ -78,29 +80,29 @@ public class UserList<K, V extends UserListEntry<K>>
         {
             this.writeChanges();
         }
-        catch (IOException ioexception)
+        catch (IOException var3)
         {
-            logger.warn((String)"Could not save the list after adding a user.", (Throwable)ioexception);
+            logger.warn("Could not save the list after adding a user.", var3);
         }
     }
 
-    public V getEntry(K obj)
+    public UserListEntry getEntry(Object obj)
     {
         this.removeExpired();
-        return (V)((UserListEntry)this.values.get(this.getObjectKey(obj)));
+        return (UserListEntry)this.values.get(this.getObjectKey(obj));
     }
 
-    public void removeEntry(K entry)
+    public void removeEntry(Object p_152684_1_)
     {
-        this.values.remove(this.getObjectKey(entry));
+        this.values.remove(this.getObjectKey(p_152684_1_));
 
         try
         {
             this.writeChanges();
         }
-        catch (IOException ioexception)
+        catch (IOException var3)
         {
-            logger.warn((String)"Could not save the list after removing a user.", (Throwable)ioexception);
+            logger.warn("Could not save the list after removing a user.", var3);
         }
     }
 
@@ -112,89 +114,111 @@ public class UserList<K, V extends UserListEntry<K>>
     /**
      * Gets the key value for the given object
      */
-    protected String getObjectKey(K obj)
+    protected String getObjectKey(Object obj)
     {
         return obj.toString();
     }
 
-    protected boolean hasEntry(K entry)
+    protected boolean hasEntry(Object entry)
     {
         return this.values.containsKey(this.getObjectKey(entry));
     }
 
     /**
-     * Removes expired bans from the list. See {@link BanEntry#hasBanExpired}
+     * Removes expired bans from the list. Never actually does anything since UserListEntry#hasBanExpired always returns
+     * false. Appears to be an effort by Mojang to add temp ban functionality. (1.7.10)
      */
     private void removeExpired()
     {
-        List<K> list = Lists.<K>newArrayList();
+        ArrayList var1 = Lists.newArrayList();
+        Iterator var2 = this.values.values().iterator();
 
-        for (V v : this.values.values())
+        while (var2.hasNext())
         {
-            if (v.hasBanExpired())
+            UserListEntry var3 = (UserListEntry)var2.next();
+
+            if (var3.hasBanExpired())
             {
-                list.add(v.getValue());
+                var1.add(var3.getValue());
             }
         }
 
-        for (K k : list)
+        var2 = var1.iterator();
+
+        while (var2.hasNext())
         {
-            this.values.remove(k);
+            Object var4 = var2.next();
+            this.values.remove(var4);
         }
     }
 
-    protected UserListEntry<K> createEntry(JsonObject entryData)
+    protected UserListEntry createEntry(JsonObject entryData)
     {
         return new UserListEntry((Object)null, entryData);
     }
 
-    protected Map<String, V> getValues()
+    protected Map getValues()
     {
         return this.values;
     }
 
     public void writeChanges() throws IOException
     {
-        Collection<V> collection = this.values.values();
-        String s = this.gson.toJson((Object)collection);
-        BufferedWriter bufferedwriter = null;
+        Collection var1 = this.values.values();
+        String var2 = this.gson.toJson(var1);
+        BufferedWriter var3 = null;
 
         try
         {
-            bufferedwriter = Files.newWriter(this.saveFile, Charsets.UTF_8);
-            bufferedwriter.write(s);
+            var3 = Files.newWriter(this.saveFile, Charsets.UTF_8);
+            var3.write(var2);
         }
         finally
         {
-            IOUtils.closeQuietly((Writer)bufferedwriter);
+            IOUtils.closeQuietly(var3);
         }
     }
 
-    class Serializer implements JsonDeserializer<UserListEntry<K>>, JsonSerializer<UserListEntry<K>>
+    class Serializer implements JsonDeserializer, JsonSerializer
     {
-        private Serializer()
+        
+
+        private Serializer() {}
+
+        public JsonElement serializeEntry(UserListEntry p_152751_1_, Type p_152751_2_, JsonSerializationContext p_152751_3_)
         {
+            JsonObject var4 = new JsonObject();
+            p_152751_1_.onSerialization(var4);
+            return var4;
         }
 
-        public JsonElement serialize(UserListEntry<K> p_serialize_1_, Type p_serialize_2_, JsonSerializationContext p_serialize_3_)
+        public UserListEntry deserializeEntry(JsonElement p_152750_1_, Type p_152750_2_, JsonDeserializationContext p_152750_3_)
         {
-            JsonObject jsonobject = new JsonObject();
-            p_serialize_1_.onSerialization(jsonobject);
-            return jsonobject;
-        }
-
-        public UserListEntry<K> deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_) throws JsonParseException
-        {
-            if (p_deserialize_1_.isJsonObject())
+            if (p_152750_1_.isJsonObject())
             {
-                JsonObject jsonobject = p_deserialize_1_.getAsJsonObject();
-                UserListEntry<K> userlistentry = UserList.this.createEntry(jsonobject);
-                return userlistentry;
+                JsonObject var4 = p_152750_1_.getAsJsonObject();
+                UserListEntry var5 = UserList.this.createEntry(var4);
+                return var5;
             }
             else
             {
                 return null;
             }
+        }
+
+        public JsonElement serialize(Object p_serialize_1_, Type p_serialize_2_, JsonSerializationContext p_serialize_3_)
+        {
+            return this.serializeEntry((UserListEntry)p_serialize_1_, p_serialize_2_, p_serialize_3_);
+        }
+
+        public Object deserialize(JsonElement p_deserialize_1_, Type p_deserialize_2_, JsonDeserializationContext p_deserialize_3_)
+        {
+            return this.deserializeEntry(p_deserialize_1_, p_deserialize_2_, p_deserialize_3_);
+        }
+
+        Serializer(Object p_i1141_2_)
+        {
+            this();
         }
     }
 }

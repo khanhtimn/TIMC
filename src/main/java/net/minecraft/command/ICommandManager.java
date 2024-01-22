@@ -6,20 +6,17 @@ import net.minecraft.util.BlockPos;
 
 public interface ICommandManager
 {
+    int executeCommand(ICommandSender var1, String var2);
+
+    List getTabCompletionOptions(ICommandSender var1, String var2, BlockPos var3);
+
     /**
-     * Attempt to execute a command. This method should return the number of times that the command was executed. If the
-     * command does not exist or if the player does not have permission, 0 will be returned. A number greater than 1 can
-     * be returned if a player selector is used.
-     *  
-     * @param sender The person who executed the command. This could be an EntityPlayer, RCon Source, Command Block,
-     * etc.
-     * @param rawCommand The raw arguments that were passed. This includes the command name.
+     * returns all commands that the commandSender can use
      */
-    int executeCommand(ICommandSender sender, String rawCommand);
+    List getPossibleCommands(ICommandSender var1);
 
-    List<String> getTabCompletionOptions(ICommandSender sender, String input, BlockPos pos);
-
-    List<ICommand> getPossibleCommands(ICommandSender sender);
-
-    Map<String, ICommand> getCommands();
+    /**
+     * returns a map of string to commads. All commands are returned, not just ones which someone has permission to use.
+     */
+    Map getCommands();
 }

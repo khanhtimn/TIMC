@@ -1,5 +1,6 @@
 package net.minecraft.entity.ai;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import net.minecraft.entity.EntityAgeable;
@@ -25,12 +26,13 @@ public class EntityAIMate extends EntityAIBase
 
     /** The speed the creature moves at during mating behavior. */
     double moveSpeed;
+    
 
-    public EntityAIMate(EntityAnimal animal, double speedIn)
+    public EntityAIMate(EntityAnimal p_i1619_1_, double p_i1619_2_)
     {
-        this.theAnimal = animal;
-        this.theWorld = animal.worldObj;
-        this.moveSpeed = speedIn;
+        this.theAnimal = p_i1619_1_;
+        this.theWorld = p_i1619_1_.worldObj;
+        this.moveSpeed = p_i1619_2_;
         this.setMutexBits(3);
     }
 
@@ -88,21 +90,24 @@ public class EntityAIMate extends EntityAIBase
      */
     private EntityAnimal getNearbyMate()
     {
-        float f = 8.0F;
-        List<EntityAnimal> list = this.theWorld.<EntityAnimal>getEntitiesWithinAABB(this.theAnimal.getClass(), this.theAnimal.getEntityBoundingBox().expand((double)f, (double)f, (double)f));
-        double d0 = Double.MAX_VALUE;
-        EntityAnimal entityanimal = null;
+        float var1 = 8.0F;
+        List var2 = this.theWorld.getEntitiesWithinAABB(this.theAnimal.getClass(), this.theAnimal.getEntityBoundingBox().expand((double)var1, (double)var1, (double)var1));
+        double var3 = Double.MAX_VALUE;
+        EntityAnimal var5 = null;
+        Iterator var6 = var2.iterator();
 
-        for (EntityAnimal entityanimal1 : list)
+        while (var6.hasNext())
         {
-            if (this.theAnimal.canMateWith(entityanimal1) && this.theAnimal.getDistanceSqToEntity(entityanimal1) < d0)
+            EntityAnimal var7 = (EntityAnimal)var6.next();
+
+            if (this.theAnimal.canMateWith(var7) && this.theAnimal.getDistanceSqToEntity(var7) < var3)
             {
-                entityanimal = entityanimal1;
-                d0 = this.theAnimal.getDistanceSqToEntity(entityanimal1);
+                var5 = var7;
+                var3 = this.theAnimal.getDistanceSqToEntity(var7);
             }
         }
 
-        return entityanimal;
+        return var5;
     }
 
     /**
@@ -110,24 +115,24 @@ public class EntityAIMate extends EntityAIBase
      */
     private void spawnBaby()
     {
-        EntityAgeable entityageable = this.theAnimal.createChild(this.targetMate);
+        EntityAgeable var1 = this.theAnimal.createChild(this.targetMate);
 
-        if (entityageable != null)
+        if (var1 != null)
         {
-            EntityPlayer entityplayer = this.theAnimal.getPlayerInLove();
+            EntityPlayer var2 = this.theAnimal.func_146083_cb();
 
-            if (entityplayer == null && this.targetMate.getPlayerInLove() != null)
+            if (var2 == null && this.targetMate.func_146083_cb() != null)
             {
-                entityplayer = this.targetMate.getPlayerInLove();
+                var2 = this.targetMate.func_146083_cb();
             }
 
-            if (entityplayer != null)
+            if (var2 != null)
             {
-                entityplayer.triggerAchievement(StatList.animalsBredStat);
+                var2.triggerAchievement(StatList.animalsBredStat);
 
                 if (this.theAnimal instanceof EntityCow)
                 {
-                    entityplayer.triggerAchievement(AchievementList.breedCow);
+                    var2.triggerAchievement(AchievementList.breedCow);
                 }
             }
 
@@ -135,25 +140,22 @@ public class EntityAIMate extends EntityAIBase
             this.targetMate.setGrowingAge(6000);
             this.theAnimal.resetInLove();
             this.targetMate.resetInLove();
-            entityageable.setGrowingAge(-24000);
-            entityageable.setLocationAndAngles(this.theAnimal.posX, this.theAnimal.posY, this.theAnimal.posZ, 0.0F, 0.0F);
-            this.theWorld.spawnEntityInWorld(entityageable);
-            Random random = this.theAnimal.getRNG();
+            var1.setGrowingAge(-24000);
+            var1.setLocationAndAngles(this.theAnimal.posX, this.theAnimal.posY, this.theAnimal.posZ, 0.0F, 0.0F);
+            this.theWorld.spawnEntityInWorld(var1);
+            Random var3 = this.theAnimal.getRNG();
 
-            for (int i = 0; i < 7; ++i)
+            for (int var4 = 0; var4 < 7; ++var4)
             {
-                double d0 = random.nextGaussian() * 0.02D;
-                double d1 = random.nextGaussian() * 0.02D;
-                double d2 = random.nextGaussian() * 0.02D;
-                double d3 = random.nextDouble() * (double)this.theAnimal.width * 2.0D - (double)this.theAnimal.width;
-                double d4 = 0.5D + random.nextDouble() * (double)this.theAnimal.height;
-                double d5 = random.nextDouble() * (double)this.theAnimal.width * 2.0D - (double)this.theAnimal.width;
-                this.theWorld.spawnParticle(EnumParticleTypes.HEART, this.theAnimal.posX + d3, this.theAnimal.posY + d4, this.theAnimal.posZ + d5, d0, d1, d2, new int[0]);
+                double var5 = var3.nextGaussian() * 0.02D;
+                double var7 = var3.nextGaussian() * 0.02D;
+                double var9 = var3.nextGaussian() * 0.02D;
+                this.theWorld.spawnParticle(EnumParticleTypes.HEART, this.theAnimal.posX + (double)(var3.nextFloat() * this.theAnimal.width * 2.0F) - (double)this.theAnimal.width, this.theAnimal.posY + 0.5D + (double)(var3.nextFloat() * this.theAnimal.height), this.theAnimal.posZ + (double)(var3.nextFloat() * this.theAnimal.width * 2.0F) - (double)this.theAnimal.width, var5, var7, var9, new int[0]);
             }
 
-            if (this.theWorld.getGameRules().getBoolean("doMobLoot"))
+            if (this.theWorld.getGameRules().getGameRuleBooleanValue("doMobLoot"))
             {
-                this.theWorld.spawnEntityInWorld(new EntityXPOrb(this.theWorld, this.theAnimal.posX, this.theAnimal.posY, this.theAnimal.posZ, random.nextInt(7) + 1));
+                this.theWorld.spawnEntityInWorld(new EntityXPOrb(this.theWorld, this.theAnimal.posX, this.theAnimal.posY, this.theAnimal.posZ, var3.nextInt(7) + 1));
             }
         }
     }

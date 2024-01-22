@@ -10,6 +10,8 @@ import net.minecraft.item.Item;
 
 public class BlockObsidian extends Block
 {
+    
+
     public BlockObsidian()
     {
         super(Material.rock);
@@ -18,6 +20,8 @@ public class BlockObsidian extends Block
 
     /**
      * Get the Item that this Block should drop when harvested.
+     *  
+     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -29,6 +33,6 @@ public class BlockObsidian extends Block
      */
     public MapColor getMapColor(IBlockState state)
     {
-        return MapColor.blackColor;
+        return MapColor.obsidianColor;
     }
 }

@@ -10,11 +10,14 @@ import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Table;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.block.Block;
@@ -25,62 +28,81 @@ import net.minecraft.util.MapPopulator;
 public class BlockState
 {
     private static final Joiner COMMA_JOINER = Joiner.on(", ");
-    private static final Function<IProperty, String> GET_NAME_FUNC = new Function<IProperty, String>()
+
+    /** Function that converts a Property into it's name. */
+    private static final Function GET_NAME_FUNC = new Function()
     {
-        public String apply(IProperty p_apply_1_)
+        
+        public String apply(IProperty property)
         {
-            return p_apply_1_ == null ? "<NULL>" : p_apply_1_.getName();
+            return property == null ? "<NULL>" : property.getName();
+        }
+        public Object apply(Object p_apply_1_)
+        {
+            return this.apply((IProperty)p_apply_1_);
         }
     };
     private final Block block;
-    private final ImmutableList<IProperty> properties;
-    private final ImmutableList<IBlockState> validStates;
+    private final ImmutableList properties;
+    private final ImmutableList validStates;
+    
 
-    public BlockState(Block blockIn, IProperty... properties)
+    public BlockState(Block blockIn, IProperty ... properties)
     {
         this.block = blockIn;
-        Arrays.sort(properties, new Comparator<IProperty>()
+        Arrays.sort(properties, new Comparator()
         {
-            public int compare(IProperty p_compare_1_, IProperty p_compare_2_)
+            
+            public int compare(IProperty left, IProperty right)
             {
-                return p_compare_1_.getName().compareTo(p_compare_2_.getName());
+                return left.getName().compareTo(right.getName());
+            }
+            public int compare(Object p_compare_1_, Object p_compare_2_)
+            {
+                return this.compare((IProperty)p_compare_1_, (IProperty)p_compare_2_);
             }
         });
         this.properties = ImmutableList.copyOf(properties);
-        Map<Map<IProperty, Comparable>, BlockState.StateImplementation> map = Maps.<Map<IProperty, Comparable>, BlockState.StateImplementation>newLinkedHashMap();
-        List<BlockState.StateImplementation> list = Lists.<BlockState.StateImplementation>newArrayList();
+        LinkedHashMap var3 = Maps.newLinkedHashMap();
+        ArrayList var4 = Lists.newArrayList();
+        Iterable var5 = Cartesian.cartesianProduct(this.getAllowedValues());
+        Iterator var6 = var5.iterator();
 
-        for (List<Comparable> list1 : Cartesian.cartesianProduct(this.getAllowedValues()))
+        while (var6.hasNext())
         {
-            Map<IProperty, Comparable> map1 = MapPopulator.<IProperty, Comparable>createMap(this.properties, list1);
-            BlockState.StateImplementation blockstate$stateimplementation = new BlockState.StateImplementation(blockIn, ImmutableMap.copyOf(map1));
-            map.put(map1, blockstate$stateimplementation);
-            list.add(blockstate$stateimplementation);
+            List var7 = (List)var6.next();
+            Map var8 = MapPopulator.createMap(this.properties, var7);
+            BlockState.StateImplemenation var9 = new BlockState.StateImplemenation(blockIn, ImmutableMap.copyOf(var8), null);
+            var3.put(var8, var9);
+            var4.add(var9);
         }
 
-        for (BlockState.StateImplementation blockstate$stateimplementation1 : list)
+        var6 = var4.iterator();
+
+        while (var6.hasNext())
         {
-            blockstate$stateimplementation1.buildPropertyValueTable(map);
+            BlockState.StateImplemenation var10 = (BlockState.StateImplemenation)var6.next();
+            var10.buildPropertyValueTable(var3);
         }
 
-        this.validStates = ImmutableList.<IBlockState>copyOf(list);
+        this.validStates = ImmutableList.copyOf(var4);
     }
 
-    public ImmutableList<IBlockState> getValidStates()
+    public ImmutableList getValidStates()
     {
         return this.validStates;
     }
 
-    private List<Iterable<Comparable>> getAllowedValues()
+    private List getAllowedValues()
     {
-        List<Iterable<Comparable>> list = Lists.<Iterable<Comparable>>newArrayList();
+        ArrayList var1 = Lists.newArrayList();
 
-        for (int i = 0; i < this.properties.size(); ++i)
+        for (int var2 = 0; var2 < this.properties.size(); ++var2)
         {
-            list.add(((IProperty)this.properties.get(i)).getAllowedValues());
+            var1.add(((IProperty)this.properties.get(var2)).getAllowedValues());
         }
 
-        return list;
+        return var1;
     }
 
     public IBlockState getBaseState()
@@ -93,7 +115,7 @@ public class BlockState
         return this.block;
     }
 
-    public Collection<IProperty> getProperties()
+    public Collection getProperties()
     {
         return this.properties;
     }
@@ -103,24 +125,25 @@ public class BlockState
         return Objects.toStringHelper(this).add("block", Block.blockRegistry.getNameForObject(this.block)).add("properties", Iterables.transform(this.properties, GET_NAME_FUNC)).toString();
     }
 
-    static class StateImplementation extends BlockStateBase
+    static class StateImplemenation extends BlockStateBase
     {
         private final Block block;
-        private final ImmutableMap<IProperty, Comparable> properties;
-        private ImmutableTable<IProperty, Comparable, IBlockState> propertyValueTable;
+        private final ImmutableMap properties;
+        private ImmutableTable propertyValueTable;
+        
 
-        private StateImplementation(Block blockIn, ImmutableMap<IProperty, Comparable> propertiesIn)
+        private StateImplemenation(Block p_i45660_1_, ImmutableMap p_i45660_2_)
         {
-            this.block = blockIn;
-            this.properties = propertiesIn;
+            this.block = p_i45660_1_;
+            this.properties = p_i45660_2_;
         }
 
-        public Collection<IProperty> getPropertyNames()
+        public Collection getPropertyNames()
         {
-            return Collections.<IProperty>unmodifiableCollection(this.properties.keySet());
+            return Collections.unmodifiableCollection(this.properties.keySet());
         }
 
-        public <T extends Comparable<T>> T getValue(IProperty<T> property)
+        public Comparable getValue(IProperty property)
         {
             if (!this.properties.containsKey(property))
             {
@@ -128,11 +151,11 @@ public class BlockState
             }
             else
             {
-                return (T)((Comparable)property.getValueClass().cast(this.properties.get(property)));
+                return (Comparable)property.getValueClass().cast(this.properties.get(property));
             }
         }
 
-        public <T extends Comparable<T>, V extends T> IBlockState withProperty(IProperty<T> property, V value)
+        public IBlockState withProperty(IProperty property, Comparable value)
         {
             if (!this.properties.containsKey(property))
             {
@@ -148,7 +171,7 @@ public class BlockState
             }
         }
 
-        public ImmutableMap<IProperty, Comparable> getProperties()
+        public ImmutableMap getProperties()
         {
             return this.properties;
         }
@@ -168,7 +191,7 @@ public class BlockState
             return this.properties.hashCode();
         }
 
-        public void buildPropertyValueTable(Map<Map<IProperty, Comparable>, BlockState.StateImplementation> map)
+        public void buildPropertyValueTable(Map map)
         {
             if (this.propertyValueTable != null)
             {
@@ -176,28 +199,39 @@ public class BlockState
             }
             else
             {
-                Table<IProperty, Comparable, IBlockState> table = HashBasedTable.<IProperty, Comparable, IBlockState>create();
+                HashBasedTable var2 = HashBasedTable.create();
+                Iterator var3 = this.properties.keySet().iterator();
 
-                for (IProperty <? extends Comparable > iproperty : this.properties.keySet())
+                while (var3.hasNext())
                 {
-                    for (Comparable comparable : iproperty.getAllowedValues())
+                    IProperty var4 = (IProperty)var3.next();
+                    Iterator var5 = var4.getAllowedValues().iterator();
+
+                    while (var5.hasNext())
                     {
-                        if (comparable != this.properties.get(iproperty))
+                        Comparable var6 = (Comparable)var5.next();
+
+                        if (var6 != this.properties.get(var4))
                         {
-                            table.put(iproperty, comparable, map.get(this.getPropertiesWithValue(iproperty, comparable)));
+                            var2.put(var4, var6, map.get(this.setPropertyValue(var4, var6)));
                         }
                     }
                 }
 
-                this.propertyValueTable = ImmutableTable.<IProperty, Comparable, IBlockState>copyOf(table);
+                this.propertyValueTable = ImmutableTable.copyOf(var2);
             }
         }
 
-        private Map<IProperty, Comparable> getPropertiesWithValue(IProperty property, Comparable value)
+        private Map setPropertyValue(IProperty property, Comparable value)
         {
-            Map<IProperty, Comparable> map = Maps.<IProperty, Comparable>newHashMap(this.properties);
-            map.put(property, value);
-            return map;
+            HashMap var3 = Maps.newHashMap(this.properties);
+            var3.put(property, value);
+            return var3;
+        }
+
+        StateImplemenation(Block p_i45661_1_, ImmutableMap p_i45661_2_, Object p_i45661_3_)
+        {
+            this(p_i45661_1_, p_i45661_2_);
         }
     }
 }

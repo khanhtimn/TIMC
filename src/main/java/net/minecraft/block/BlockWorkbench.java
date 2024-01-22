@@ -1,5 +1,7 @@
 package net.minecraft.block;
 
+import java.util.ArrayList;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -8,7 +10,6 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerWorkbench;
-import net.minecraft.stats.StatList;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumFacing;
@@ -18,6 +19,8 @@ import net.minecraft.world.World;
 
 public class BlockWorkbench extends Block
 {
+    
+
     protected BlockWorkbench()
     {
         super(Material.wood);
@@ -33,7 +36,6 @@ public class BlockWorkbench extends Block
         else
         {
             playerIn.displayGui(new BlockWorkbench.InterfaceCraftingTable(worldIn, pos));
-            playerIn.triggerAchievement(StatList.field_181742_Z);
             return true;
         }
     }
@@ -42,11 +44,12 @@ public class BlockWorkbench extends Block
     {
         private final World world;
         private final BlockPos position;
+        
 
-        public InterfaceCraftingTable(World worldIn, BlockPos pos)
+        public InterfaceCraftingTable(World worldIn, BlockPos p_i45730_2_)
         {
             this.world = worldIn;
-            this.position = pos;
+            this.position = p_i45730_2_;
         }
 
         public String getName()
@@ -74,4 +77,9 @@ public class BlockWorkbench extends Block
             return "minecraft:crafting_table";
         }
     }
+    
+    public static ArrayList<String> theArray(){
+    	return new ArrayList<String>();
+    }
+    
 }

@@ -10,45 +10,46 @@ public class NettyEncryptionTranslator
     private final Cipher cipher;
     private byte[] field_150505_b = new byte[0];
     private byte[] field_150506_c = new byte[0];
+    
 
     protected NettyEncryptionTranslator(Cipher cipherIn)
     {
         this.cipher = cipherIn;
     }
 
-    private byte[] func_150502_a(ByteBuf buf)
+    private byte[] func_150502_a(ByteBuf p_150502_1_)
     {
-        int i = buf.readableBytes();
+        int var2 = p_150502_1_.readableBytes();
 
-        if (this.field_150505_b.length < i)
+        if (this.field_150505_b.length < var2)
         {
-            this.field_150505_b = new byte[i];
+            this.field_150505_b = new byte[var2];
         }
 
-        buf.readBytes((byte[])this.field_150505_b, 0, i);
+        p_150502_1_.readBytes(this.field_150505_b, 0, var2);
         return this.field_150505_b;
     }
 
     protected ByteBuf decipher(ChannelHandlerContext ctx, ByteBuf buffer) throws ShortBufferException
     {
-        int i = buffer.readableBytes();
-        byte[] abyte = this.func_150502_a(buffer);
-        ByteBuf bytebuf = ctx.alloc().heapBuffer(this.cipher.getOutputSize(i));
-        bytebuf.writerIndex(this.cipher.update(abyte, 0, i, bytebuf.array(), bytebuf.arrayOffset()));
-        return bytebuf;
+        int var3 = buffer.readableBytes();
+        byte[] var4 = this.func_150502_a(buffer);
+        ByteBuf var5 = ctx.alloc().heapBuffer(this.cipher.getOutputSize(var3));
+        var5.writerIndex(this.cipher.update(var4, 0, var3, var5.array(), var5.arrayOffset()));
+        return var5;
     }
 
-    protected void cipher(ByteBuf in, ByteBuf out) throws ShortBufferException
+    protected void cipher(ByteBuf p_150504_1_, ByteBuf p_150504_2_) throws ShortBufferException
     {
-        int i = in.readableBytes();
-        byte[] abyte = this.func_150502_a(in);
-        int j = this.cipher.getOutputSize(i);
+        int var3 = p_150504_1_.readableBytes();
+        byte[] var4 = this.func_150502_a(p_150504_1_);
+        int var5 = this.cipher.getOutputSize(var3);
 
-        if (this.field_150506_c.length < j)
+        if (this.field_150506_c.length < var5)
         {
-            this.field_150506_c = new byte[j];
+            this.field_150506_c = new byte[var5];
         }
 
-        out.writeBytes((byte[])this.field_150506_c, 0, this.cipher.update(abyte, 0, i, this.field_150506_c));
+        p_150504_2_.writeBytes(this.field_150506_c, 0, this.cipher.update(var4, 0, var3, this.field_150506_c));
     }
 }

@@ -1,5 +1,6 @@
 package net.minecraft.entity.ai;
 
+import java.util.Iterator;
 import java.util.List;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityVillager;
@@ -9,13 +10,14 @@ public class EntityAIPlay extends EntityAIBase
 {
     private EntityVillager villagerObj;
     private EntityLivingBase targetVillager;
-    private double speed;
+    private double field_75261_c;
     private int playTime;
+    
 
-    public EntityAIPlay(EntityVillager villagerObjIn, double speedIn)
+    public EntityAIPlay(EntityVillager p_i1646_1_, double p_i1646_2_)
     {
-        this.villagerObj = villagerObjIn;
-        this.speed = speedIn;
+        this.villagerObj = p_i1646_1_;
+        this.field_75261_c = p_i1646_2_;
         this.setMutexBits(1);
     }
 
@@ -34,28 +36,31 @@ public class EntityAIPlay extends EntityAIBase
         }
         else
         {
-            List<EntityVillager> list = this.villagerObj.worldObj.<EntityVillager>getEntitiesWithinAABB(EntityVillager.class, this.villagerObj.getEntityBoundingBox().expand(6.0D, 3.0D, 6.0D));
-            double d0 = Double.MAX_VALUE;
+            List var1 = this.villagerObj.worldObj.getEntitiesWithinAABB(EntityVillager.class, this.villagerObj.getEntityBoundingBox().expand(6.0D, 3.0D, 6.0D));
+            double var2 = Double.MAX_VALUE;
+            Iterator var4 = var1.iterator();
 
-            for (EntityVillager entityvillager : list)
+            while (var4.hasNext())
             {
-                if (entityvillager != this.villagerObj && !entityvillager.isPlaying() && entityvillager.getGrowingAge() < 0)
-                {
-                    double d1 = entityvillager.getDistanceSqToEntity(this.villagerObj);
+                EntityVillager var5 = (EntityVillager)var4.next();
 
-                    if (d1 <= d0)
+                if (var5 != this.villagerObj && !var5.isPlaying() && var5.getGrowingAge() < 0)
+                {
+                    double var6 = var5.getDistanceSqToEntity(this.villagerObj);
+
+                    if (var6 <= var2)
                     {
-                        d0 = d1;
-                        this.targetVillager = entityvillager;
+                        var2 = var6;
+                        this.targetVillager = var5;
                     }
                 }
             }
 
             if (this.targetVillager == null)
             {
-                Vec3 vec3 = RandomPositionGenerator.findRandomTarget(this.villagerObj, 16, 3);
+                Vec3 var8 = RandomPositionGenerator.findRandomTarget(this.villagerObj, 16, 3);
 
-                if (vec3 == null)
+                if (var8 == null)
                 {
                     return false;
                 }
@@ -106,19 +111,19 @@ public class EntityAIPlay extends EntityAIBase
         {
             if (this.villagerObj.getDistanceSqToEntity(this.targetVillager) > 4.0D)
             {
-                this.villagerObj.getNavigator().tryMoveToEntityLiving(this.targetVillager, this.speed);
+                this.villagerObj.getNavigator().tryMoveToEntityLiving(this.targetVillager, this.field_75261_c);
             }
         }
         else if (this.villagerObj.getNavigator().noPath())
         {
-            Vec3 vec3 = RandomPositionGenerator.findRandomTarget(this.villagerObj, 16, 3);
+            Vec3 var1 = RandomPositionGenerator.findRandomTarget(this.villagerObj, 16, 3);
 
-            if (vec3 == null)
+            if (var1 == null)
             {
                 return;
             }
 
-            this.villagerObj.getNavigator().tryMoveToXYZ(vec3.xCoord, vec3.yCoord, vec3.zCoord, this.speed);
+            this.villagerObj.getNavigator().tryMoveToXYZ(var1.xCoord, var1.yCoord, var1.zCoord, this.field_75261_c);
         }
     }
 }

@@ -8,10 +8,9 @@ public class NBTTagByte extends NBTBase.NBTPrimitive
 {
     /** The byte value for the tag. */
     private byte data;
+    
 
-    NBTTagByte()
-    {
-    }
+    NBTTagByte() {}
 
     public NBTTagByte(byte data)
     {
@@ -28,7 +27,7 @@ public class NBTTagByte extends NBTBase.NBTPrimitive
 
     void read(DataInput input, int depth, NBTSizeTracker sizeTracker) throws IOException
     {
-        sizeTracker.read(72L);
+        sizeTracker.read(8L);
         this.data = input.readByte();
     }
 
@@ -57,8 +56,8 @@ public class NBTTagByte extends NBTBase.NBTPrimitive
     {
         if (super.equals(p_equals_1_))
         {
-            NBTTagByte nbttagbyte = (NBTTagByte)p_equals_1_;
-            return this.data == nbttagbyte.data;
+            NBTTagByte var2 = (NBTTagByte)p_equals_1_;
+            return this.data == var2.data;
         }
         else
         {

@@ -15,48 +15,38 @@ import net.minecraft.world.WorldSettings;
 
 public class NetworkPlayerInfo
 {
-    /**
-     * The GameProfile for the player represented by this NetworkPlayerInfo instance
-     */
-    private final GameProfile gameProfile;
+    private final GameProfile field_178867_a;
     private WorldSettings.GameType gameType;
 
     /** Player response time to server in milliseconds */
     private int responseTime;
-    private boolean playerTexturesLoaded = false;
-    private ResourceLocation locationSkin;
-    private ResourceLocation locationCape;
-    private String skinType;
-
-    /**
-     * When this is non-null, it is displayed instead of the player's real name
-     */
-    private IChatComponent displayName;
+    private boolean field_178864_d = false;
+    private ResourceLocation field_178865_e;
+    private ResourceLocation field_178862_f;
+    private String field_178863_g;
+    private IChatComponent field_178872_h;
     private int field_178873_i = 0;
     private int field_178870_j = 0;
     private long field_178871_k = 0L;
     private long field_178868_l = 0L;
     private long field_178869_m = 0L;
+    
 
     public NetworkPlayerInfo(GameProfile p_i46294_1_)
     {
-        this.gameProfile = p_i46294_1_;
+        this.field_178867_a = p_i46294_1_;
     }
 
     public NetworkPlayerInfo(S38PacketPlayerListItem.AddPlayerData p_i46295_1_)
     {
-        this.gameProfile = p_i46295_1_.getProfile();
-        this.gameType = p_i46295_1_.getGameMode();
-        this.responseTime = p_i46295_1_.getPing();
-        this.displayName = p_i46295_1_.getDisplayName();
+        this.field_178867_a = p_i46295_1_.func_179962_a();
+        this.gameType = p_i46295_1_.func_179960_c();
+        this.responseTime = p_i46295_1_.func_179963_b();
     }
 
-    /**
-     * Returns the GameProfile for the player represented by this NetworkPlayerInfo instance
-     */
-    public GameProfile getGameProfile()
+    public GameProfile func_178845_a()
     {
-        return this.gameProfile;
+        return this.field_178867_a;
     }
 
     public WorldSettings.GameType getGameType()
@@ -69,77 +59,78 @@ public class NetworkPlayerInfo
         return this.responseTime;
     }
 
-    protected void setGameType(WorldSettings.GameType p_178839_1_)
+    protected void func_178839_a(WorldSettings.GameType p_178839_1_)
     {
         this.gameType = p_178839_1_;
     }
 
-    protected void setResponseTime(int p_178838_1_)
+    protected void func_178838_a(int p_178838_1_)
     {
         this.responseTime = p_178838_1_;
     }
 
-    public boolean hasLocationSkin()
+    public boolean func_178856_e()
     {
-        return this.locationSkin != null;
+        return this.field_178865_e != null;
     }
 
-    public String getSkinType()
+    public String func_178851_f()
     {
-        return this.skinType == null ? DefaultPlayerSkin.getSkinType(this.gameProfile.getId()) : this.skinType;
+        return this.field_178863_g == null ? DefaultPlayerSkin.func_177332_b(this.field_178867_a.getId()) : this.field_178863_g;
     }
 
-    public ResourceLocation getLocationSkin()
+    public ResourceLocation func_178837_g()
     {
-        if (this.locationSkin == null)
+        if (this.field_178865_e == null)
         {
-            this.loadPlayerTextures();
+            this.func_178841_j();
         }
 
-        return (ResourceLocation)Objects.firstNonNull(this.locationSkin, DefaultPlayerSkin.getDefaultSkin(this.gameProfile.getId()));
+        return (ResourceLocation)Objects.firstNonNull(this.field_178865_e, DefaultPlayerSkin.func_177334_a(this.field_178867_a.getId()));
     }
 
-    public ResourceLocation getLocationCape()
+    public ResourceLocation func_178861_h()
     {
-        if (this.locationCape == null)
+        if (this.field_178862_f == null)
         {
-            this.loadPlayerTextures();
+            this.func_178841_j();
         }
 
-        return this.locationCape;
+        return this.field_178862_f;
     }
 
-    public ScorePlayerTeam getPlayerTeam()
+    public ScorePlayerTeam func_178850_i()
     {
-        return Minecraft.getMinecraft().theWorld.getScoreboard().getPlayersTeam(this.getGameProfile().getName());
+        return Minecraft.getMinecraft().theWorld.getScoreboard().getPlayersTeam(this.func_178845_a().getName());
     }
 
-    protected void loadPlayerTextures()
+    protected void func_178841_j()
     {
         synchronized (this)
         {
-            if (!this.playerTexturesLoaded)
+            if (!this.field_178864_d)
             {
-                this.playerTexturesLoaded = true;
-                Minecraft.getMinecraft().getSkinManager().loadProfileTextures(this.gameProfile, new SkinManager.SkinAvailableCallback()
+                this.field_178864_d = true;
+                Minecraft.getMinecraft().getSkinManager().func_152790_a(this.field_178867_a, new SkinManager.SkinAvailableCallback()
                 {
-                    public void skinAvailable(Type p_180521_1_, ResourceLocation location, MinecraftProfileTexture profileTexture)
+                    
+                    public void func_180521_a(Type p_180521_1_, ResourceLocation p_180521_2_, MinecraftProfileTexture p_180521_3_)
                     {
-                        switch (p_180521_1_)
+                        switch (NetworkPlayerInfo.SwitchType.field_178875_a[p_180521_1_.ordinal()])
                         {
-                            case SKIN:
-                                NetworkPlayerInfo.this.locationSkin = location;
-                                NetworkPlayerInfo.this.skinType = profileTexture.getMetadata("model");
+                            case 1:
+                                NetworkPlayerInfo.this.field_178865_e = p_180521_2_;
+                                NetworkPlayerInfo.this.field_178863_g = p_180521_3_.getMetadata("model");
 
-                                if (NetworkPlayerInfo.this.skinType == null)
+                                if (NetworkPlayerInfo.this.field_178863_g == null)
                                 {
-                                    NetworkPlayerInfo.this.skinType = "default";
+                                    NetworkPlayerInfo.this.field_178863_g = "default";
                                 }
 
                                 break;
 
-                            case CAPE:
-                                NetworkPlayerInfo.this.locationCape = location;
+                            case 2:
+                                NetworkPlayerInfo.this.field_178862_f = p_180521_2_;
                         }
                     }
                 }, true);
@@ -147,14 +138,14 @@ public class NetworkPlayerInfo
         }
     }
 
-    public void setDisplayName(IChatComponent displayNameIn)
+    public void func_178859_a(IChatComponent p_178859_1_)
     {
-        this.displayName = displayNameIn;
+        this.field_178872_h = p_178859_1_;
     }
 
-    public IChatComponent getDisplayName()
+    public IChatComponent func_178854_k()
     {
-        return this.displayName;
+        return this.field_178872_h;
     }
 
     public int func_178835_l()
@@ -205,5 +196,32 @@ public class NetworkPlayerInfo
     public void func_178843_c(long p_178843_1_)
     {
         this.field_178869_m = p_178843_1_;
+    }
+
+    static final class SwitchType
+    {
+        static final int[] field_178875_a = new int[Type.values().length];
+        
+
+        static
+        {
+            try
+            {
+                field_178875_a[Type.SKIN.ordinal()] = 1;
+            }
+            catch (NoSuchFieldError var2)
+            {
+                ;
+            }
+
+            try
+            {
+                field_178875_a[Type.CAPE.ordinal()] = 2;
+            }
+            catch (NoSuchFieldError var1)
+            {
+                ;
+            }
+        }
     }
 }

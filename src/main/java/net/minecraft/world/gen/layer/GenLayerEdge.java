@@ -3,6 +3,7 @@ package net.minecraft.world.gen.layer;
 public class GenLayerEdge extends GenLayer
 {
     private final GenLayerEdge.Mode field_151627_c;
+    
 
     public GenLayerEdge(long p_i45474_1_, GenLayer p_i45474_3_, GenLayerEdge.Mode p_i45474_4_)
     {
@@ -17,123 +18,164 @@ public class GenLayerEdge extends GenLayer
      */
     public int[] getInts(int areaX, int areaY, int areaWidth, int areaHeight)
     {
-        switch (this.field_151627_c)
+        switch (GenLayerEdge.SwitchMode.field_151642_a[this.field_151627_c.ordinal()])
         {
-            case COOL_WARM:
+            case 1:
             default:
                 return this.getIntsCoolWarm(areaX, areaY, areaWidth, areaHeight);
 
-            case HEAT_ICE:
+            case 2:
                 return this.getIntsHeatIce(areaX, areaY, areaWidth, areaHeight);
 
-            case SPECIAL:
+            case 3:
                 return this.getIntsSpecial(areaX, areaY, areaWidth, areaHeight);
         }
     }
 
     private int[] getIntsCoolWarm(int p_151626_1_, int p_151626_2_, int p_151626_3_, int p_151626_4_)
     {
-        int i = p_151626_1_ - 1;
-        int j = p_151626_2_ - 1;
-        int k = 1 + p_151626_3_ + 1;
-        int l = 1 + p_151626_4_ + 1;
-        int[] aint = this.parent.getInts(i, j, k, l);
-        int[] aint1 = IntCache.getIntCache(p_151626_3_ * p_151626_4_);
+        int var5 = p_151626_1_ - 1;
+        int var6 = p_151626_2_ - 1;
+        int var7 = 1 + p_151626_3_ + 1;
+        int var8 = 1 + p_151626_4_ + 1;
+        int[] var9 = this.parent.getInts(var5, var6, var7, var8);
+        int[] var10 = IntCache.getIntCache(p_151626_3_ * p_151626_4_);
 
-        for (int i1 = 0; i1 < p_151626_4_; ++i1)
+        for (int var11 = 0; var11 < p_151626_4_; ++var11)
         {
-            for (int j1 = 0; j1 < p_151626_3_; ++j1)
+            for (int var12 = 0; var12 < p_151626_3_; ++var12)
             {
-                this.initChunkSeed((long)(j1 + p_151626_1_), (long)(i1 + p_151626_2_));
-                int k1 = aint[j1 + 1 + (i1 + 1) * k];
+                this.initChunkSeed((long)(var12 + p_151626_1_), (long)(var11 + p_151626_2_));
+                int var13 = var9[var12 + 1 + (var11 + 1) * var7];
 
-                if (k1 == 1)
+                if (var13 == 1)
                 {
-                    int l1 = aint[j1 + 1 + (i1 + 1 - 1) * k];
-                    int i2 = aint[j1 + 1 + 1 + (i1 + 1) * k];
-                    int j2 = aint[j1 + 1 - 1 + (i1 + 1) * k];
-                    int k2 = aint[j1 + 1 + (i1 + 1 + 1) * k];
-                    boolean flag = l1 == 3 || i2 == 3 || j2 == 3 || k2 == 3;
-                    boolean flag1 = l1 == 4 || i2 == 4 || j2 == 4 || k2 == 4;
+                    int var14 = var9[var12 + 1 + (var11 + 1 - 1) * var7];
+                    int var15 = var9[var12 + 1 + 1 + (var11 + 1) * var7];
+                    int var16 = var9[var12 + 1 - 1 + (var11 + 1) * var7];
+                    int var17 = var9[var12 + 1 + (var11 + 1 + 1) * var7];
+                    boolean var18 = var14 == 3 || var15 == 3 || var16 == 3 || var17 == 3;
+                    boolean var19 = var14 == 4 || var15 == 4 || var16 == 4 || var17 == 4;
 
-                    if (flag || flag1)
+                    if (var18 || var19)
                     {
-                        k1 = 2;
+                        var13 = 2;
                     }
                 }
 
-                aint1[j1 + i1 * p_151626_3_] = k1;
+                var10[var12 + var11 * p_151626_3_] = var13;
             }
         }
 
-        return aint1;
+        return var10;
     }
 
     private int[] getIntsHeatIce(int p_151624_1_, int p_151624_2_, int p_151624_3_, int p_151624_4_)
     {
-        int i = p_151624_1_ - 1;
-        int j = p_151624_2_ - 1;
-        int k = 1 + p_151624_3_ + 1;
-        int l = 1 + p_151624_4_ + 1;
-        int[] aint = this.parent.getInts(i, j, k, l);
-        int[] aint1 = IntCache.getIntCache(p_151624_3_ * p_151624_4_);
+        int var5 = p_151624_1_ - 1;
+        int var6 = p_151624_2_ - 1;
+        int var7 = 1 + p_151624_3_ + 1;
+        int var8 = 1 + p_151624_4_ + 1;
+        int[] var9 = this.parent.getInts(var5, var6, var7, var8);
+        int[] var10 = IntCache.getIntCache(p_151624_3_ * p_151624_4_);
 
-        for (int i1 = 0; i1 < p_151624_4_; ++i1)
+        for (int var11 = 0; var11 < p_151624_4_; ++var11)
         {
-            for (int j1 = 0; j1 < p_151624_3_; ++j1)
+            for (int var12 = 0; var12 < p_151624_3_; ++var12)
             {
-                int k1 = aint[j1 + 1 + (i1 + 1) * k];
+                int var13 = var9[var12 + 1 + (var11 + 1) * var7];
 
-                if (k1 == 4)
+                if (var13 == 4)
                 {
-                    int l1 = aint[j1 + 1 + (i1 + 1 - 1) * k];
-                    int i2 = aint[j1 + 1 + 1 + (i1 + 1) * k];
-                    int j2 = aint[j1 + 1 - 1 + (i1 + 1) * k];
-                    int k2 = aint[j1 + 1 + (i1 + 1 + 1) * k];
-                    boolean flag = l1 == 2 || i2 == 2 || j2 == 2 || k2 == 2;
-                    boolean flag1 = l1 == 1 || i2 == 1 || j2 == 1 || k2 == 1;
+                    int var14 = var9[var12 + 1 + (var11 + 1 - 1) * var7];
+                    int var15 = var9[var12 + 1 + 1 + (var11 + 1) * var7];
+                    int var16 = var9[var12 + 1 - 1 + (var11 + 1) * var7];
+                    int var17 = var9[var12 + 1 + (var11 + 1 + 1) * var7];
+                    boolean var18 = var14 == 2 || var15 == 2 || var16 == 2 || var17 == 2;
+                    boolean var19 = var14 == 1 || var15 == 1 || var16 == 1 || var17 == 1;
 
-                    if (flag1 || flag)
+                    if (var19 || var18)
                     {
-                        k1 = 3;
+                        var13 = 3;
                     }
                 }
 
-                aint1[j1 + i1 * p_151624_3_] = k1;
+                var10[var12 + var11 * p_151624_3_] = var13;
             }
         }
 
-        return aint1;
+        return var10;
     }
 
     private int[] getIntsSpecial(int p_151625_1_, int p_151625_2_, int p_151625_3_, int p_151625_4_)
     {
-        int[] aint = this.parent.getInts(p_151625_1_, p_151625_2_, p_151625_3_, p_151625_4_);
-        int[] aint1 = IntCache.getIntCache(p_151625_3_ * p_151625_4_);
+        int[] var5 = this.parent.getInts(p_151625_1_, p_151625_2_, p_151625_3_, p_151625_4_);
+        int[] var6 = IntCache.getIntCache(p_151625_3_ * p_151625_4_);
 
-        for (int i = 0; i < p_151625_4_; ++i)
+        for (int var7 = 0; var7 < p_151625_4_; ++var7)
         {
-            for (int j = 0; j < p_151625_3_; ++j)
+            for (int var8 = 0; var8 < p_151625_3_; ++var8)
             {
-                this.initChunkSeed((long)(j + p_151625_1_), (long)(i + p_151625_2_));
-                int k = aint[j + i * p_151625_3_];
+                this.initChunkSeed((long)(var8 + p_151625_1_), (long)(var7 + p_151625_2_));
+                int var9 = var5[var8 + var7 * p_151625_3_];
 
-                if (k != 0 && this.nextInt(13) == 0)
+                if (var9 != 0 && this.nextInt(13) == 0)
                 {
-                    k |= 1 + this.nextInt(15) << 8 & 3840;
+                    var9 |= 1 + this.nextInt(15) << 8 & 3840;
                 }
 
-                aint1[j + i * p_151625_3_] = k;
+                var6[var8 + var7 * p_151625_3_] = var9;
             }
         }
 
-        return aint1;
+        return var6;
     }
 
     public static enum Mode
     {
-        COOL_WARM,
-        HEAT_ICE,
-        SPECIAL;
+        COOL_WARM("COOL_WARM", 0),
+        HEAT_ICE("HEAT_ICE", 1),
+        SPECIAL("SPECIAL", 2);
+
+        private static final GenLayerEdge.Mode[] $VALUES = new GenLayerEdge.Mode[]{COOL_WARM, HEAT_ICE, SPECIAL};
+        
+
+        private Mode(String p_i45473_1_, int p_i45473_2_) {}
+    }
+
+    static final class SwitchMode
+    {
+        static final int[] field_151642_a = new int[GenLayerEdge.Mode.values().length];
+        
+
+        static
+        {
+            try
+            {
+                field_151642_a[GenLayerEdge.Mode.COOL_WARM.ordinal()] = 1;
+            }
+            catch (NoSuchFieldError var3)
+            {
+                ;
+            }
+
+            try
+            {
+                field_151642_a[GenLayerEdge.Mode.HEAT_ICE.ordinal()] = 2;
+            }
+            catch (NoSuchFieldError var2)
+            {
+                ;
+            }
+
+            try
+            {
+                field_151642_a[GenLayerEdge.Mode.SPECIAL.ordinal()] = 3;
+            }
+            catch (NoSuchFieldError var1)
+            {
+                ;
+            }
+        }
     }
 }

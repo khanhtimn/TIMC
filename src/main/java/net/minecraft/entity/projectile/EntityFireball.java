@@ -18,10 +18,10 @@ import net.minecraft.world.World;
 
 public abstract class EntityFireball extends Entity
 {
-    private int xTile = -1;
-    private int yTile = -1;
-    private int zTile = -1;
-    private Block inTile;
+    private int field_145795_e = -1;
+    private int field_145793_f = -1;
+    private int field_145794_g = -1;
+    private Block field_145796_h;
     private boolean inGround;
     public EntityLivingBase shootingEntity;
     private int ticksAlive;
@@ -29,6 +29,7 @@ public abstract class EntityFireball extends Entity
     public double accelerationX;
     public double accelerationY;
     public double accelerationZ;
+    
 
     public EntityFireball(World worldIn)
     {
@@ -36,9 +37,7 @@ public abstract class EntityFireball extends Entity
         this.setSize(1.0F, 1.0F);
     }
 
-    protected void entityInit()
-    {
-    }
+    protected void entityInit() {}
 
     /**
      * Checks if the entity is in range to render by using the past in distance and comparing it to its average edge
@@ -46,44 +45,38 @@ public abstract class EntityFireball extends Entity
      */
     public boolean isInRangeToRenderDist(double distance)
     {
-        double d0 = this.getEntityBoundingBox().getAverageEdgeLength() * 4.0D;
-
-        if (Double.isNaN(d0))
-        {
-            d0 = 4.0D;
-        }
-
-        d0 = d0 * 64.0D;
-        return distance < d0 * d0;
+        double var3 = this.getEntityBoundingBox().getAverageEdgeLength() * 4.0D;
+        var3 *= 64.0D;
+        return distance < var3 * var3;
     }
 
-    public EntityFireball(World worldIn, double x, double y, double z, double accelX, double accelY, double accelZ)
+    public EntityFireball(World worldIn, double p_i1760_2_, double p_i1760_4_, double p_i1760_6_, double p_i1760_8_, double p_i1760_10_, double p_i1760_12_)
     {
         super(worldIn);
         this.setSize(1.0F, 1.0F);
-        this.setLocationAndAngles(x, y, z, this.rotationYaw, this.rotationPitch);
-        this.setPosition(x, y, z);
-        double d0 = (double)MathHelper.sqrt_double(accelX * accelX + accelY * accelY + accelZ * accelZ);
-        this.accelerationX = accelX / d0 * 0.1D;
-        this.accelerationY = accelY / d0 * 0.1D;
-        this.accelerationZ = accelZ / d0 * 0.1D;
+        this.setLocationAndAngles(p_i1760_2_, p_i1760_4_, p_i1760_6_, this.rotationYaw, this.rotationPitch);
+        this.setPosition(p_i1760_2_, p_i1760_4_, p_i1760_6_);
+        double var14 = (double)MathHelper.sqrt_double(p_i1760_8_ * p_i1760_8_ + p_i1760_10_ * p_i1760_10_ + p_i1760_12_ * p_i1760_12_);
+        this.accelerationX = p_i1760_8_ / var14 * 0.1D;
+        this.accelerationY = p_i1760_10_ / var14 * 0.1D;
+        this.accelerationZ = p_i1760_12_ / var14 * 0.1D;
     }
 
-    public EntityFireball(World worldIn, EntityLivingBase shooter, double accelX, double accelY, double accelZ)
+    public EntityFireball(World worldIn, EntityLivingBase p_i1761_2_, double p_i1761_3_, double p_i1761_5_, double p_i1761_7_)
     {
         super(worldIn);
-        this.shootingEntity = shooter;
+        this.shootingEntity = p_i1761_2_;
         this.setSize(1.0F, 1.0F);
-        this.setLocationAndAngles(shooter.posX, shooter.posY, shooter.posZ, shooter.rotationYaw, shooter.rotationPitch);
+        this.setLocationAndAngles(p_i1761_2_.posX, p_i1761_2_.posY, p_i1761_2_.posZ, p_i1761_2_.rotationYaw, p_i1761_2_.rotationPitch);
         this.setPosition(this.posX, this.posY, this.posZ);
         this.motionX = this.motionY = this.motionZ = 0.0D;
-        accelX = accelX + this.rand.nextGaussian() * 0.4D;
-        accelY = accelY + this.rand.nextGaussian() * 0.4D;
-        accelZ = accelZ + this.rand.nextGaussian() * 0.4D;
-        double d0 = (double)MathHelper.sqrt_double(accelX * accelX + accelY * accelY + accelZ * accelZ);
-        this.accelerationX = accelX / d0 * 0.1D;
-        this.accelerationY = accelY / d0 * 0.1D;
-        this.accelerationZ = accelZ / d0 * 0.1D;
+        p_i1761_3_ += this.rand.nextGaussian() * 0.4D;
+        p_i1761_5_ += this.rand.nextGaussian() * 0.4D;
+        p_i1761_7_ += this.rand.nextGaussian() * 0.4D;
+        double var9 = (double)MathHelper.sqrt_double(p_i1761_3_ * p_i1761_3_ + p_i1761_5_ * p_i1761_5_ + p_i1761_7_ * p_i1761_7_);
+        this.accelerationX = p_i1761_3_ / var9 * 0.1D;
+        this.accelerationY = p_i1761_5_ / var9 * 0.1D;
+        this.accelerationZ = p_i1761_7_ / var9 * 0.1D;
     }
 
     /**
@@ -91,14 +84,18 @@ public abstract class EntityFireball extends Entity
      */
     public void onUpdate()
     {
-        if (this.worldObj.isRemote || (this.shootingEntity == null || !this.shootingEntity.isDead) && this.worldObj.isBlockLoaded(new BlockPos(this)))
+        if (!this.worldObj.isRemote && (this.shootingEntity != null && this.shootingEntity.isDead || !this.worldObj.isBlockLoaded(new BlockPos(this))))
+        {
+            this.setDead();
+        }
+        else
         {
             super.onUpdate();
             this.setFire(1);
 
             if (this.inGround)
             {
-                if (this.worldObj.getBlockState(new BlockPos(this.xTile, this.yTile, this.zTile)).getBlock() == this.inTile)
+                if (this.worldObj.getBlockState(new BlockPos(this.field_145795_e, this.field_145793_f, this.field_145794_g)).getBlock() == this.field_145796_h)
                 {
                     ++this.ticksAlive;
 
@@ -122,61 +119,61 @@ public abstract class EntityFireball extends Entity
                 ++this.ticksInAir;
             }
 
-            Vec3 vec3 = new Vec3(this.posX, this.posY, this.posZ);
-            Vec3 vec31 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
-            MovingObjectPosition movingobjectposition = this.worldObj.rayTraceBlocks(vec3, vec31);
-            vec3 = new Vec3(this.posX, this.posY, this.posZ);
-            vec31 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+            Vec3 var1 = new Vec3(this.posX, this.posY, this.posZ);
+            Vec3 var2 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+            MovingObjectPosition var3 = this.worldObj.rayTraceBlocks(var1, var2);
+            var1 = new Vec3(this.posX, this.posY, this.posZ);
+            var2 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
 
-            if (movingobjectposition != null)
+            if (var3 != null)
             {
-                vec31 = new Vec3(movingobjectposition.hitVec.xCoord, movingobjectposition.hitVec.yCoord, movingobjectposition.hitVec.zCoord);
+                var2 = new Vec3(var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord);
             }
 
-            Entity entity = null;
-            List<Entity> list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
-            double d0 = 0.0D;
+            Entity var4 = null;
+            List var5 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
+            double var6 = 0.0D;
 
-            for (int i = 0; i < list.size(); ++i)
+            for (int var8 = 0; var8 < var5.size(); ++var8)
             {
-                Entity entity1 = (Entity)list.get(i);
+                Entity var9 = (Entity)var5.get(var8);
 
-                if (entity1.canBeCollidedWith() && (!entity1.isEntityEqual(this.shootingEntity) || this.ticksInAir >= 25))
+                if (var9.canBeCollidedWith() && (!var9.isEntityEqual(this.shootingEntity) || this.ticksInAir >= 25))
                 {
-                    float f = 0.3F;
-                    AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expand((double)f, (double)f, (double)f);
-                    MovingObjectPosition movingobjectposition1 = axisalignedbb.calculateIntercept(vec3, vec31);
+                    float var10 = 0.3F;
+                    AxisAlignedBB var11 = var9.getEntityBoundingBox().expand((double)var10, (double)var10, (double)var10);
+                    MovingObjectPosition var12 = var11.calculateIntercept(var1, var2);
 
-                    if (movingobjectposition1 != null)
+                    if (var12 != null)
                     {
-                        double d1 = vec3.squareDistanceTo(movingobjectposition1.hitVec);
+                        double var13 = var1.distanceTo(var12.hitVec);
 
-                        if (d1 < d0 || d0 == 0.0D)
+                        if (var13 < var6 || var6 == 0.0D)
                         {
-                            entity = entity1;
-                            d0 = d1;
+                            var4 = var9;
+                            var6 = var13;
                         }
                     }
                 }
             }
 
-            if (entity != null)
+            if (var4 != null)
             {
-                movingobjectposition = new MovingObjectPosition(entity);
+                var3 = new MovingObjectPosition(var4);
             }
 
-            if (movingobjectposition != null)
+            if (var3 != null)
             {
-                this.onImpact(movingobjectposition);
+                this.onImpact(var3);
             }
 
             this.posX += this.motionX;
             this.posY += this.motionY;
             this.posZ += this.motionZ;
-            float f1 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
-            this.rotationYaw = (float)(MathHelper.atan2(this.motionZ, this.motionX) * 180.0D / Math.PI) + 90.0F;
+            float var15 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
+            this.rotationYaw = (float)(Math.atan2(this.motionZ, this.motionX) * 180.0D / Math.PI) + 90.0F;
 
-            for (this.rotationPitch = (float)(MathHelper.atan2((double)f1, this.motionY) * 180.0D / Math.PI) - 90.0F; this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F)
+            for (this.rotationPitch = (float)(Math.atan2((double)var15, this.motionY) * 180.0D / Math.PI) - 90.0F; this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F)
             {
                 ;
             }
@@ -198,31 +195,27 @@ public abstract class EntityFireball extends Entity
 
             this.rotationPitch = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * 0.2F;
             this.rotationYaw = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * 0.2F;
-            float f2 = this.getMotionFactor();
+            float var16 = this.getMotionFactor();
 
             if (this.isInWater())
             {
-                for (int j = 0; j < 4; ++j)
+                for (int var17 = 0; var17 < 4; ++var17)
                 {
-                    float f3 = 0.25F;
-                    this.worldObj.spawnParticle(EnumParticleTypes.WATER_BUBBLE, this.posX - this.motionX * (double)f3, this.posY - this.motionY * (double)f3, this.posZ - this.motionZ * (double)f3, this.motionX, this.motionY, this.motionZ, new int[0]);
+                    float var18 = 0.25F;
+                    this.worldObj.spawnParticle(EnumParticleTypes.WATER_BUBBLE, this.posX - this.motionX * (double)var18, this.posY - this.motionY * (double)var18, this.posZ - this.motionZ * (double)var18, this.motionX, this.motionY, this.motionZ, new int[0]);
                 }
 
-                f2 = 0.8F;
+                var16 = 0.8F;
             }
 
             this.motionX += this.accelerationX;
             this.motionY += this.accelerationY;
             this.motionZ += this.accelerationZ;
-            this.motionX *= (double)f2;
-            this.motionY *= (double)f2;
-            this.motionZ *= (double)f2;
+            this.motionX *= (double)var16;
+            this.motionY *= (double)var16;
+            this.motionZ *= (double)var16;
             this.worldObj.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, this.posX, this.posY + 0.5D, this.posZ, 0.0D, 0.0D, 0.0D, new int[0]);
             this.setPosition(this.posX, this.posY, this.posZ);
-        }
-        else
-        {
-            this.setDead();
         }
     }
 
@@ -237,18 +230,18 @@ public abstract class EntityFireball extends Entity
     /**
      * Called when this EntityFireball hits a block or entity.
      */
-    protected abstract void onImpact(MovingObjectPosition movingObject);
+    protected abstract void onImpact(MovingObjectPosition var1);
 
     /**
      * (abstract) Protected helper method to write subclass entity data to NBT.
      */
     public void writeEntityToNBT(NBTTagCompound tagCompound)
     {
-        tagCompound.setShort("xTile", (short)this.xTile);
-        tagCompound.setShort("yTile", (short)this.yTile);
-        tagCompound.setShort("zTile", (short)this.zTile);
-        ResourceLocation resourcelocation = (ResourceLocation)Block.blockRegistry.getNameForObject(this.inTile);
-        tagCompound.setString("inTile", resourcelocation == null ? "" : resourcelocation.toString());
+        tagCompound.setShort("xTile", (short)this.field_145795_e);
+        tagCompound.setShort("yTile", (short)this.field_145793_f);
+        tagCompound.setShort("zTile", (short)this.field_145794_g);
+        ResourceLocation var2 = (ResourceLocation)Block.blockRegistry.getNameForObject(this.field_145796_h);
+        tagCompound.setString("inTile", var2 == null ? "" : var2.toString());
         tagCompound.setByte("inGround", (byte)(this.inGround ? 1 : 0));
         tagCompound.setTag("direction", this.newDoubleNBTList(new double[] {this.motionX, this.motionY, this.motionZ}));
     }
@@ -258,27 +251,27 @@ public abstract class EntityFireball extends Entity
      */
     public void readEntityFromNBT(NBTTagCompound tagCompund)
     {
-        this.xTile = tagCompund.getShort("xTile");
-        this.yTile = tagCompund.getShort("yTile");
-        this.zTile = tagCompund.getShort("zTile");
+        this.field_145795_e = tagCompund.getShort("xTile");
+        this.field_145793_f = tagCompund.getShort("yTile");
+        this.field_145794_g = tagCompund.getShort("zTile");
 
         if (tagCompund.hasKey("inTile", 8))
         {
-            this.inTile = Block.getBlockFromName(tagCompund.getString("inTile"));
+            this.field_145796_h = Block.getBlockFromName(tagCompund.getString("inTile"));
         }
         else
         {
-            this.inTile = Block.getBlockById(tagCompund.getByte("inTile") & 255);
+            this.field_145796_h = Block.getBlockById(tagCompund.getByte("inTile") & 255);
         }
 
         this.inGround = tagCompund.getByte("inGround") == 1;
 
         if (tagCompund.hasKey("direction", 9))
         {
-            NBTTagList nbttaglist = tagCompund.getTagList("direction", 6);
-            this.motionX = nbttaglist.getDoubleAt(0);
-            this.motionY = nbttaglist.getDoubleAt(1);
-            this.motionZ = nbttaglist.getDoubleAt(2);
+            NBTTagList var2 = tagCompund.getTagList("direction", 6);
+            this.motionX = var2.getDouble(0);
+            this.motionY = var2.getDouble(1);
+            this.motionZ = var2.getDouble(2);
         }
         else
         {
@@ -304,7 +297,7 @@ public abstract class EntityFireball extends Entity
      */
     public boolean attackEntityFrom(DamageSource source, float amount)
     {
-        if (this.isEntityInvulnerable(source))
+        if (this.func_180431_b(source))
         {
             return false;
         }
@@ -314,13 +307,13 @@ public abstract class EntityFireball extends Entity
 
             if (source.getEntity() != null)
             {
-                Vec3 vec3 = source.getEntity().getLookVec();
+                Vec3 var3 = source.getEntity().getLookVec();
 
-                if (vec3 != null)
+                if (var3 != null)
                 {
-                    this.motionX = vec3.xCoord;
-                    this.motionY = vec3.yCoord;
-                    this.motionZ = vec3.zCoord;
+                    this.motionX = var3.xCoord;
+                    this.motionY = var3.yCoord;
+                    this.motionZ = var3.zCoord;
                     this.accelerationX = this.motionX * 0.1D;
                     this.accelerationY = this.motionY * 0.1D;
                     this.accelerationZ = this.motionZ * 0.1D;
@@ -343,12 +336,12 @@ public abstract class EntityFireball extends Entity
     /**
      * Gets how bright this entity is.
      */
-    public float getBrightness(float partialTicks)
+    public float getBrightness(float p_70013_1_)
     {
         return 1.0F;
     }
 
-    public int getBrightnessForRender(float partialTicks)
+    public int getBrightnessForRender(float p_70070_1_)
     {
         return 15728880;
     }

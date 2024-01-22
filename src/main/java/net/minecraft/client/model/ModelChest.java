@@ -10,6 +10,7 @@ public class ModelChest extends ModelBase
 
     /** The chest's knob in the chest model. */
     public ModelRenderer chestKnob;
+    
 
     public ModelChest()
     {

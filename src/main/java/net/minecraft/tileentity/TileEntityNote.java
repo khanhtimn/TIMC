@@ -14,6 +14,7 @@ public class TileEntityNote extends TileEntity
 
     /** stores the latest redstone state */
     public boolean previousRedstoneState;
+    
 
     public void writeToNBT(NBTTagCompound compound)
     {
@@ -37,34 +38,34 @@ public class TileEntityNote extends TileEntity
         this.markDirty();
     }
 
-    public void triggerNote(World worldIn, BlockPos p_175108_2_)
+    public void func_175108_a(World worldIn, BlockPos p_175108_2_)
     {
-        if (worldIn.getBlockState(p_175108_2_.up()).getBlock().getMaterial() == Material.air)
+        if (worldIn.getBlockState(p_175108_2_.offsetUp()).getBlock().getMaterial() == Material.air)
         {
-            Material material = worldIn.getBlockState(p_175108_2_.down()).getBlock().getMaterial();
-            int i = 0;
+            Material var3 = worldIn.getBlockState(p_175108_2_.offsetDown()).getBlock().getMaterial();
+            byte var4 = 0;
 
-            if (material == Material.rock)
+            if (var3 == Material.rock)
             {
-                i = 1;
+                var4 = 1;
             }
 
-            if (material == Material.sand)
+            if (var3 == Material.sand)
             {
-                i = 2;
+                var4 = 2;
             }
 
-            if (material == Material.glass)
+            if (var3 == Material.glass)
             {
-                i = 3;
+                var4 = 3;
             }
 
-            if (material == Material.wood)
+            if (var3 == Material.wood)
             {
-                i = 4;
+                var4 = 4;
             }
 
-            worldIn.addBlockEvent(p_175108_2_, Blocks.noteblock, i, this.note);
+            worldIn.addBlockEvent(p_175108_2_, Blocks.noteblock, var4, this.note);
         }
     }
 }

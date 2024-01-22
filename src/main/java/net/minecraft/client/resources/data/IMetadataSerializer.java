@@ -2,7 +2,6 @@ package net.minecraft.client.resources.data;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumTypeAdapterFactory;
@@ -12,13 +11,14 @@ import net.minecraft.util.RegistrySimple;
 
 public class IMetadataSerializer
 {
-    private final IRegistry < String, IMetadataSerializer.Registration <? extends IMetadataSection >> metadataSectionSerializerRegistry = new RegistrySimple();
+    private final IRegistry metadataSectionSerializerRegistry = new RegistrySimple();
     private final GsonBuilder gsonBuilder = new GsonBuilder();
 
     /**
      * Cached Gson instance. Set to null when more sections are registered, and then re-created from the builder.
      */
     private Gson gson;
+    
 
     public IMetadataSerializer()
     {
@@ -27,38 +27,38 @@ public class IMetadataSerializer
         this.gsonBuilder.registerTypeAdapterFactory(new EnumTypeAdapterFactory());
     }
 
-    public <T extends IMetadataSection> void registerMetadataSectionType(IMetadataSectionSerializer<T> metadataSectionSerializer, Class<T> clazz)
+    public void registerMetadataSectionType(IMetadataSectionSerializer p_110504_1_, Class p_110504_2_)
     {
-        this.metadataSectionSerializerRegistry.putObject(metadataSectionSerializer.getSectionName(), new IMetadataSerializer.Registration(metadataSectionSerializer, clazz));
-        this.gsonBuilder.registerTypeAdapter(clazz, metadataSectionSerializer);
+        this.metadataSectionSerializerRegistry.putObject(p_110504_1_.getSectionName(), new IMetadataSerializer.Registration(p_110504_1_, p_110504_2_, null));
+        this.gsonBuilder.registerTypeAdapter(p_110504_2_, p_110504_1_);
         this.gson = null;
     }
 
-    public <T extends IMetadataSection> T parseMetadataSection(String sectionName, JsonObject json)
+    public IMetadataSection parseMetadataSection(String p_110503_1_, JsonObject p_110503_2_)
     {
-        if (sectionName == null)
+        if (p_110503_1_ == null)
         {
             throw new IllegalArgumentException("Metadata section name cannot be null");
         }
-        else if (!json.has(sectionName))
+        else if (!p_110503_2_.has(p_110503_1_))
         {
-            return (T)null;
+            return null;
         }
-        else if (!json.get(sectionName).isJsonObject())
+        else if (!p_110503_2_.get(p_110503_1_).isJsonObject())
         {
-            throw new IllegalArgumentException("Invalid metadata for \'" + sectionName + "\' - expected object, found " + json.get(sectionName));
+            throw new IllegalArgumentException("Invalid metadata for \'" + p_110503_1_ + "\' - expected object, found " + p_110503_2_.get(p_110503_1_));
         }
         else
         {
-            IMetadataSerializer.Registration<?> registration = (IMetadataSerializer.Registration)this.metadataSectionSerializerRegistry.getObject(sectionName);
+            IMetadataSerializer.Registration var3 = (IMetadataSerializer.Registration)this.metadataSectionSerializerRegistry.getObject(p_110503_1_);
 
-            if (registration == null)
+            if (var3 == null)
             {
-                throw new IllegalArgumentException("Don\'t know how to handle metadata section \'" + sectionName + "\'");
+                throw new IllegalArgumentException("Don\'t know how to handle metadata section \'" + p_110503_1_ + "\'");
             }
             else
             {
-                return (T)((IMetadataSection)this.getGson().fromJson((JsonElement)json.getAsJsonObject(sectionName), registration.clazz));
+                return (IMetadataSection)this.getGson().fromJson(p_110503_2_.getAsJsonObject(p_110503_1_), var3.field_110500_b);
             }
         }
     }
@@ -76,15 +76,21 @@ public class IMetadataSerializer
         return this.gson;
     }
 
-    class Registration<T extends IMetadataSection>
+    class Registration
     {
-        final IMetadataSectionSerializer<T> section;
-        final Class<T> clazz;
+        final IMetadataSectionSerializer field_110502_a;
+        final Class field_110500_b;
+        
 
-        private Registration(IMetadataSectionSerializer<T> metadataSectionSerializer, Class<T> clazzToRegister)
+        private Registration(IMetadataSectionSerializer p_i1305_2_, Class p_i1305_3_)
         {
-            this.section = metadataSectionSerializer;
-            this.clazz = clazzToRegister;
+            this.field_110502_a = p_i1305_2_;
+            this.field_110500_b = p_i1305_3_;
+        }
+
+        Registration(IMetadataSectionSerializer p_i1306_2_, Class p_i1306_3_, Object p_i1306_4_)
+        {
+            this(p_i1306_2_, p_i1306_3_);
         }
     }
 }

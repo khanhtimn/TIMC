@@ -1,170 +1,231 @@
-//public enum TIMC implements Utils {
-//    INSTANCE;
-//    public static final String NAME = "TIMC";
-//    public static final String VERSION = "1.0";
-//    public static final Logger LOGGER = LogManager.getLogger(NAME);
-//    public static final File DIRECTORY = new File(Minecraft.getMinecraft().mcDataDir, "TIMC");
-//
-//
-//    private final EventProtocol<Event> eventProtocol = new EventProtocol<>();
-////    private final NotificationManager notificationManager = new NotificationManager();
-//    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-////    private final SideGui sideGui = new SideGui();
-////    private ModuleCollection moduleCollection;
-////    private ConfigManager configManager;
-////    private GuiAltManager altManager;
-//    private CommandHandler commandHandler;
-////    private DiscordRP discordRP;
-////    public final AltPanels altPanels = new AltPanels();
-////    public KingGenApi kingGenApi;
-////
-//
-//    public void init() {
-////        this.moduleCollection = new ModuleCollection();
-////        this.configManager = new ConfigManager();
-////        this.altManager = new GuiAltManager();
-//        try {
-//            ViaMCP.create();
-//            ViaMCP.INSTANCE.initAsyncSlider(); // For top left aligned slider
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public String getVersion() {
-//        return VERSION;
-//    }
-//
-//    public final Color getClientColor() {
-//        return new Color(236, 133, 209);
-//    }
-//
-//    public final Color getAlternateClientColor() {
-//        return new Color(28, 167, 222);
-//    }
-//
-////    public SideGui getSideGui() {
-////        return sideGui;
-////    }
-////
-////    public NotificationManager getNotificationManager() {
-////        return notificationManager;
-////    }
-//
-//    public CommandHandler getCommandHandler() { return commandHandler; }
-//
-////    public GuiAltManager getAltManager() { return altManager; }
-////
-////    public ModuleCollection getModuleCollection() {
-////        return moduleCollection;
-////    }
-////
-////    public ConfigManager getConfigManager() {
-////        return configManager;
-////    }
-//
-//    public ExecutorService getExecutorService() { return executorService; }
-//
-////    public void setModuleCollection(ModuleCollection moduleCollection) { this.moduleCollection = moduleCollection; }
-////
-////    public void setConfigManager(ConfigManager configManager) { this.configManager = configManager; }
-////
-////    public void setAltManager(GuiAltManager altManager) { this.altManager = altManager; }
-////
-////    public void setCommandHandler(CommandHandler commandHandler) { this.commandHandler = commandHandler; }
-////
-////    public void setDiscordRP(DiscordRP discordRP) { this.discordRP = discordRP; }
-////
-////
-////    public boolean isToggled(Class<? extends Module> c) {
-////        Module m = TIMC.moduleCollection.get(c);
-////        return m != null && m.isToggled();
-////    }
-////
-////    public Dragging createDrag(Module module, String name, float x, float y) {
-////        DragManager.draggables.put(name, new Dragging(module, name, x, y));
-////        return DragManager.draggables.get(name);
-////    }
-//    public EventProtocol<Event> getEventProtocol() {
-//        return eventProtocol;
-//    }
-//
-//    public static void dispatchEvent(Event event) {
-//        TIMC.INSTANCE.getEventProtocol().dispatch(event);
-//    }
-//
-//}
 package com.teamti.timc.main;
 
-import com.teamti.timc.config.ConfigManager;
-import com.teamti.timc.config.DragManager;
-import com.teamti.timc.event.EventProtocol;
-import com.teamti.timc.module.Module;
-import com.teamti.timc.module.ModuleCollection;
-import com.teamti.timc.utils.Utils;
-import com.teamti.timc.utils.drag.Dragging;
-import lombok.Getter;
-import lombok.Setter;
-import net.minecraft.command.CommandHandler;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.teamti.timc.alts.AltFile;
+import com.teamti.timc.alts.AltManager;
+import com.teamti.timc.alts.GuiAltManager;
+import com.teamti.timc.clickgui.TIMCGui;
+import com.teamti.timc.discord.DiscordMain;
+import com.teamti.timc.hud.TIMCHud;
+import com.teamti.timc.modules.*;
+import com.teamti.timc.modules.crasher.*;
+import com.teamti.timc.modules.crasher.ac.AnimationCrasher2;
+import com.teamti.timc.modules.crasher.acc.AutoCompleteCrasher3;
+import com.teamti.timc.modules.crasher.cpc.CustomPayloadBypass1;
+import com.teamti.timc.modules.crasher.lbc.LabySpammerCrasher;
+import com.teamti.timc.modules.crasher.netty.NettyCrasher1;
+import com.teamti.timc.modules.crasher.wec.WorldEditCrasher1;
+import com.teamti.timc.tabgui.TabGUI;
+import com.teamti.timc.util.ChestUtil;
+import com.teamti.timc.util.FileManager;
+import com.teamti.timc.util.InventoryUtil;
+import com.teamti.timc.util.SettingsFile;
+import com.teamti.timc.util.chunkanimator.ChunkAnimator;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.util.ChatComponentText;
+import viamcp.ViaMCP;
 
-import java.awt.*;
 import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.ArrayList;
 
-@Getter
-@Setter
-public class TIMC implements Utils {
 
-    public static final TIMC INSTANCE = new TIMC();
+public class TIMC {
 
-    public static final String NAME = "TIMC";
-    public static final String VERSION = "2.0";
-//    public static final ReleaseType RELEASE = ReleaseType.DEV;
-    public static final Logger LOGGER = LogManager.getLogger(NAME);
-    public static final File DIRECTORY = new File(mc.mcDataDir, NAME);
+	//f9e8984f2c8d1d18360df902525c93180b9b7726
+	public static ArrayList<Module> mods = new ArrayList<Module>();
+	private static ScaledResolution s = new ScaledResolution(Minecraft.getMinecraft(), Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight);
+	public static TabGUI tabgui = new TabGUI();
+	public static double fontScaleOffset = 1;//round((double)1600/1080, 1) * s.getScaleFactor();//2.75;
+	private static TIMCHud hud;
+	public static Object theClient;
+	public static TCore core;
+    private static AltManager altManager;
+	private static File directory;
+    private static FileManager fileManager;
+    public static GuiAltManager altmanagergui;
+    public static ArrayList<String> clickguiarray = new ArrayList<String>();
+    public static SettingsFile settingsFile = new SettingsFile();
+    public static TIMCGui jgui;
+   // public static Menu menu;
+    public static ChestUtil chestUtil = new ChestUtil();
+	public static InventoryUtil inventoryUtil = new InventoryUtil();
+	public static double round (double value, int precision) {
+	    int scale = (int) Math.pow(10, precision);
+	    return (double) Math.round(value * scale) / scale;
+	}
 
-    private final EventProtocol eventProtocol = new EventProtocol();
-//    private final CloudDataManager cloudDataManager = new CloudDataManager();
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-//    private final SideGUI sideGui = new SideGUI();
-//    private final SearchBar searchBar = new SearchBar();
-    private ModuleCollection moduleCollection;
-//    private ScriptManager scriptManager;
-//    private IntentAccount intentAccount;
-    private ConfigManager configManager;
-//    private GuiAltManager altManager;
-    private CommandHandler commandHandler;
-//    private PingerUtils pingerUtils;
-//    private DiscordRPC discordRPC;
-//    public KingGenApi kingGenApi;
-//    private DiscordAccount discordAccount;
+	public static void register() {
 
-    public static boolean updateGuiScale;
-    public static int prevGuiScale;
+		DiscordMain.getInstance().init();
 
-    public String getVersion() {
-        return VERSION;
+		try
+		{
+			ViaMCP.getInstance().start();
+
+			// Only use one of the following
+			ViaMCP.getInstance().initAsyncSlider(); // For top left aligned slider
+
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+		new ChunkAnimator();
+		ChunkAnimator.INSTANCE.onStart();
+
+		register(new Notifications());
+		register(new Compass());
+		register(new com.teamti.timc.modules.TabGUI());
+		register(new KeyStrokes());
+		register(new MiniMap());
+		register(new ActiveMods());
+		register(new MenuGUI());
+		register(new ItemPhysics());
+		register(new ChunkAnimation());
+		register(new SmoothHotbar());
+		register(new BrigdeAssist());
+		register(new AutoTool());
+		register(new TimeChanger());
+		register(new Crosshair());
+
+		register(new ChestStealer());
+		register(new InvCleaner());
+		register(new AutoClicker());
+		register(new InvMove());
+		register(new ESP());
+		register(new ChestESP());
+		register(new Xray());
+		register(new ThirdPerson());
+		register(new ArmorHUD());
+		register(new Projectiles());
+		register(new BowAimbot());
+		register(new NoRotate());
+		register(new OldBlockHit());
+		register(new LeftHand());
+		register(new LeftBow());
+		register(new OldSneak());
+		register(new AntiBlind());
+		register(new AutoArmor());
+
+
+		register(new FlyCrasher());
+		register(new AnimationCrasher2());
+		register(new CustomPayloadBypass1());
+		register(new NettyCrasher1());
+		register(new WorldEditCrasher1());
+		register(new ExploitFixerCrasher());
+		register(new BungeeCrasher());
+		register(new MassChunkLoadCrasher());
+		register(new NcpCrasher());
+		register(new AutoCompleteCrasher3());
+		register(new LabySpammerCrasher());
+
+
+		TIMC.fileManager = new FileManager();
+		jgui = new TIMCGui();
+		altManager = new AltManager();
+		altmanagergui = new GuiAltManager();
+		hud = new TIMCHud();
+		core = new TCore();
+		
+		settingsFile.loadFiles();
+		
+		TIMC.altManager.setupAlts();
+		
+		
+		AltFile.load();
+	}
+	
+	public static void register(Module module) {
+		mods.add(module);
+	}
+
+	public static ArrayList<Module> getModules() {
+		return mods;
+	}
+	
+	public static TIMCHud getInGameGUI() {
+		return hud;
+	}
+	
+	public static void onKeyPressed(int keyCode) {
+		for(Module module : mods) {
+			if(module.getKeyCode() == keyCode) {
+				module.toggle();
+			}
+		}
+		if(keyCode == 200){
+			tabgui.keyUp();
+		}
+		if(keyCode == 208){
+			tabgui.keyDown();
+		}
+		if(keyCode == 203){
+			tabgui.keyLeft();
+		}
+		if(keyCode == 205){
+			tabgui.keyRight();
+		}
+	}
+	
+	public static void onUpdate() {
+		for(Module module : mods) {
+			module.onUpdate();
+		}
+	}
+	
+	public static void onRender() {
+		for(Module module : mods) {
+			module.onRender();
+		}
+	}
+	
+	public static AltManager getAltManager() {
+        return TIMC.altManager;
+    }
+	public static FileManager getFileManager() {
+        return TIMC.fileManager;
     }
 
-    public final Color getClientColor() {
-        return new Color(236, 133, 209);
-    }
+	public static void addChatMessage(String s) {
+		core.player().addChatMessage(new ChatComponentText("[TIMC] \247r" + s));
+	}
+	public static void addSilentChatMessage(String s) {
+		core.player().addChatMessage(new ChatComponentText(s));
+	}
 
-    public final Color getAlternateClientColor() {
-        return new Color(28, 167, 222);
+	public static void sendChatMessage(String s) {
+		core.player().sendChatMessage(s);
+	}
+	public static File getDirectory() {
+        return TIMC.directory;
     }
-
-    public boolean isEnabled(Class<? extends Module> c) {
-        Module m = INSTANCE.moduleCollection.get(c);
-        return m != null && m.isEnabled();
+	public static boolean onSendChatMessage(String s) {// EntityPlayerSP
+		
+		return true;
+	}
+	
+	public static Module getModule(final String modName) {
+        for (final Module module : getModules()) {
+            if (module.getName().equalsIgnoreCase(modName) || module.getName().equalsIgnoreCase(modName)) {
+                return module;
+            }
+        }
+        return null;
     }
-
-    public Dragging createDrag(Module module, String name, float x, float y) {
-        DragManager.draggables.put(name, new Dragging(module, name, x, y));
-        return DragManager.draggables.get(name);
+	
+	public static ArrayList<Module> getModulesInCategory(TabGUI.Cat cat)
+    {
+      ArrayList<Module> modsInCat = new ArrayList();
+      for (Module mod : getModules()) {
+    	  if(mod.jelloCat != null){
+    		  if(mod.jelloCat.equals(cat)){
+    			  modsInCat.add(mod);
+    		  }
+    	  }
+      }
+      return modsInCat;
     }
-
+	
 }

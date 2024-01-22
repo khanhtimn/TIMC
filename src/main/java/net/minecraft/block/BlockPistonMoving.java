@@ -22,13 +22,14 @@ import net.minecraft.world.World;
 
 public class BlockPistonMoving extends BlockContainer
 {
-    public static final PropertyDirection FACING = BlockPistonExtension.FACING;
-    public static final PropertyEnum<BlockPistonExtension.EnumPistonType> TYPE = BlockPistonExtension.TYPE;
+    public static final PropertyDirection field_176426_a = BlockPistonExtension.field_176326_a;
+    public static final PropertyEnum field_176425_b = BlockPistonExtension.field_176325_b;
+    
 
     public BlockPistonMoving()
     {
         super(Material.piston);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH).withProperty(TYPE, BlockPistonExtension.EnumPistonType.DEFAULT));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(field_176426_a, EnumFacing.NORTH).withProperty(field_176425_b, BlockPistonExtension.EnumPistonType.DEFAULT));
         this.setHardness(-1.0F);
     }
 
@@ -40,18 +41,18 @@ public class BlockPistonMoving extends BlockContainer
         return null;
     }
 
-    public static TileEntity newTileEntity(IBlockState state, EnumFacing facing, boolean extending, boolean renderHead)
+    public static TileEntity func_176423_a(IBlockState p_176423_0_, EnumFacing p_176423_1_, boolean p_176423_2_, boolean p_176423_3_)
     {
-        return new TileEntityPiston(state, facing, extending, renderHead);
+        return new TileEntityPiston(p_176423_0_, p_176423_1_, p_176423_2_, p_176423_3_);
     }
 
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
     {
-        TileEntity tileentity = worldIn.getTileEntity(pos);
+        TileEntity var4 = worldIn.getTileEntity(pos);
 
-        if (tileentity instanceof TileEntityPiston)
+        if (var4 instanceof TileEntityPiston)
         {
-            ((TileEntityPiston)tileentity).clearPistonTileEntity();
+            ((TileEntityPiston)var4).clearPistonTileEntity();
         }
         else
         {
@@ -77,18 +78,15 @@ public class BlockPistonMoving extends BlockContainer
      */
     public void onBlockDestroyedByPlayer(World worldIn, BlockPos pos, IBlockState state)
     {
-        BlockPos blockpos = pos.offset(((EnumFacing)state.getValue(FACING)).getOpposite());
-        IBlockState iblockstate = worldIn.getBlockState(blockpos);
+        BlockPos var4 = pos.offset(((EnumFacing)state.getValue(field_176426_a)).getOpposite());
+        IBlockState var5 = worldIn.getBlockState(var4);
 
-        if (iblockstate.getBlock() instanceof BlockPistonBase && ((Boolean)iblockstate.getValue(BlockPistonBase.EXTENDED)).booleanValue())
+        if (var5.getBlock() instanceof BlockPistonBase && ((Boolean)var5.getValue(BlockPistonBase.EXTENDED)).booleanValue())
         {
-            worldIn.setBlockToAir(blockpos);
+            worldIn.setBlockToAir(var4);
         }
     }
 
-    /**
-     * Used to determine ambient occlusion and culling when rebuilding chunks for render
-     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -114,6 +112,8 @@ public class BlockPistonMoving extends BlockContainer
 
     /**
      * Get the Item that this Block should drop when harvested.
+     *  
+     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
@@ -122,32 +122,35 @@ public class BlockPistonMoving extends BlockContainer
 
     /**
      * Spawns this Block's drops into the World as EntityItems.
+     *  
+     * @param chance The chance that each Item is actually spawned (1.0 = always, 0.0 = never)
+     * @param fortune The player's fortune level
      */
     public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
     {
         if (!worldIn.isRemote)
         {
-            TileEntityPiston tileentitypiston = this.getTileEntity(worldIn, pos);
+            TileEntityPiston var6 = this.func_176422_e(worldIn, pos);
 
-            if (tileentitypiston != null)
+            if (var6 != null)
             {
-                IBlockState iblockstate = tileentitypiston.getPistonState();
-                iblockstate.getBlock().dropBlockAsItem(worldIn, pos, iblockstate, 0);
+                IBlockState var7 = var6.func_174927_b();
+                var7.getBlock().dropBlockAsItem(worldIn, pos, var7, 0);
             }
         }
     }
 
     /**
      * Ray traces through the blocks collision from start vector to end vector returning a ray trace hit.
+     *  
+     * @param start The start vector
+     * @param end The end vector
      */
     public MovingObjectPosition collisionRayTrace(World worldIn, BlockPos pos, Vec3 start, Vec3 end)
     {
         return null;
     }
 
-    /**
-     * Called when a neighboring block changes.
-     */
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
     {
         if (!worldIn.isRemote)
@@ -158,110 +161,110 @@ public class BlockPistonMoving extends BlockContainer
 
     public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state)
     {
-        TileEntityPiston tileentitypiston = this.getTileEntity(worldIn, pos);
+        TileEntityPiston var4 = this.func_176422_e(worldIn, pos);
 
-        if (tileentitypiston == null)
+        if (var4 == null)
         {
             return null;
         }
         else
         {
-            float f = tileentitypiston.getProgress(0.0F);
+            float var5 = var4.func_145860_a(0.0F);
 
-            if (tileentitypiston.isExtending())
+            if (var4.isExtending())
             {
-                f = 1.0F - f;
+                var5 = 1.0F - var5;
             }
 
-            return this.getBoundingBox(worldIn, pos, tileentitypiston.getPistonState(), f, tileentitypiston.getFacing());
+            return this.func_176424_a(worldIn, pos, var4.func_174927_b(), var5, var4.func_174930_e());
         }
     }
 
-    public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
+    public void setBlockBoundsBasedOnState(IBlockAccess access, BlockPos pos)
     {
-        TileEntityPiston tileentitypiston = this.getTileEntity(worldIn, pos);
+        TileEntityPiston var3 = this.func_176422_e(access, pos);
 
-        if (tileentitypiston != null)
+        if (var3 != null)
         {
-            IBlockState iblockstate = tileentitypiston.getPistonState();
-            Block block = iblockstate.getBlock();
+            IBlockState var4 = var3.func_174927_b();
+            Block var5 = var4.getBlock();
 
-            if (block == this || block.getMaterial() == Material.air)
+            if (var5 == this || var5.getMaterial() == Material.air)
             {
                 return;
             }
 
-            float f = tileentitypiston.getProgress(0.0F);
+            float var6 = var3.func_145860_a(0.0F);
 
-            if (tileentitypiston.isExtending())
+            if (var3.isExtending())
             {
-                f = 1.0F - f;
+                var6 = 1.0F - var6;
             }
 
-            block.setBlockBoundsBasedOnState(worldIn, pos);
+            var5.setBlockBoundsBasedOnState(access, pos);
 
-            if (block == Blocks.piston || block == Blocks.sticky_piston)
+            if (var5 == Blocks.piston || var5 == Blocks.sticky_piston)
             {
-                f = 0.0F;
+                var6 = 0.0F;
             }
 
-            EnumFacing enumfacing = tileentitypiston.getFacing();
-            this.minX = block.getBlockBoundsMinX() - (double)((float)enumfacing.getFrontOffsetX() * f);
-            this.minY = block.getBlockBoundsMinY() - (double)((float)enumfacing.getFrontOffsetY() * f);
-            this.minZ = block.getBlockBoundsMinZ() - (double)((float)enumfacing.getFrontOffsetZ() * f);
-            this.maxX = block.getBlockBoundsMaxX() - (double)((float)enumfacing.getFrontOffsetX() * f);
-            this.maxY = block.getBlockBoundsMaxY() - (double)((float)enumfacing.getFrontOffsetY() * f);
-            this.maxZ = block.getBlockBoundsMaxZ() - (double)((float)enumfacing.getFrontOffsetZ() * f);
+            EnumFacing var7 = var3.func_174930_e();
+            this.minX = var5.getBlockBoundsMinX() - (double)((float)var7.getFrontOffsetX() * var6);
+            this.minY = var5.getBlockBoundsMinY() - (double)((float)var7.getFrontOffsetY() * var6);
+            this.minZ = var5.getBlockBoundsMinZ() - (double)((float)var7.getFrontOffsetZ() * var6);
+            this.maxX = var5.getBlockBoundsMaxX() - (double)((float)var7.getFrontOffsetX() * var6);
+            this.maxY = var5.getBlockBoundsMaxY() - (double)((float)var7.getFrontOffsetY() * var6);
+            this.maxZ = var5.getBlockBoundsMaxZ() - (double)((float)var7.getFrontOffsetZ() * var6);
         }
     }
 
-    public AxisAlignedBB getBoundingBox(World worldIn, BlockPos pos, IBlockState extendingBlock, float progress, EnumFacing direction)
+    public AxisAlignedBB func_176424_a(World worldIn, BlockPos p_176424_2_, IBlockState p_176424_3_, float p_176424_4_, EnumFacing p_176424_5_)
     {
-        if (extendingBlock.getBlock() != this && extendingBlock.getBlock().getMaterial() != Material.air)
+        if (p_176424_3_.getBlock() != this && p_176424_3_.getBlock().getMaterial() != Material.air)
         {
-            AxisAlignedBB axisalignedbb = extendingBlock.getBlock().getCollisionBoundingBox(worldIn, pos, extendingBlock);
+            AxisAlignedBB var6 = p_176424_3_.getBlock().getCollisionBoundingBox(worldIn, p_176424_2_, p_176424_3_);
 
-            if (axisalignedbb == null)
+            if (var6 == null)
             {
                 return null;
             }
             else
             {
-                double d0 = axisalignedbb.minX;
-                double d1 = axisalignedbb.minY;
-                double d2 = axisalignedbb.minZ;
-                double d3 = axisalignedbb.maxX;
-                double d4 = axisalignedbb.maxY;
-                double d5 = axisalignedbb.maxZ;
+                double var7 = var6.minX;
+                double var9 = var6.minY;
+                double var11 = var6.minZ;
+                double var13 = var6.maxX;
+                double var15 = var6.maxY;
+                double var17 = var6.maxZ;
 
-                if (direction.getFrontOffsetX() < 0)
+                if (p_176424_5_.getFrontOffsetX() < 0)
                 {
-                    d0 -= (double)((float)direction.getFrontOffsetX() * progress);
+                    var7 -= (double)((float)p_176424_5_.getFrontOffsetX() * p_176424_4_);
                 }
                 else
                 {
-                    d3 -= (double)((float)direction.getFrontOffsetX() * progress);
+                    var13 -= (double)((float)p_176424_5_.getFrontOffsetX() * p_176424_4_);
                 }
 
-                if (direction.getFrontOffsetY() < 0)
+                if (p_176424_5_.getFrontOffsetY() < 0)
                 {
-                    d1 -= (double)((float)direction.getFrontOffsetY() * progress);
+                    var9 -= (double)((float)p_176424_5_.getFrontOffsetY() * p_176424_4_);
                 }
                 else
                 {
-                    d4 -= (double)((float)direction.getFrontOffsetY() * progress);
+                    var15 -= (double)((float)p_176424_5_.getFrontOffsetY() * p_176424_4_);
                 }
 
-                if (direction.getFrontOffsetZ() < 0)
+                if (p_176424_5_.getFrontOffsetZ() < 0)
                 {
-                    d2 -= (double)((float)direction.getFrontOffsetZ() * progress);
+                    var11 -= (double)((float)p_176424_5_.getFrontOffsetZ() * p_176424_4_);
                 }
                 else
                 {
-                    d5 -= (double)((float)direction.getFrontOffsetZ() * progress);
+                    var17 -= (double)((float)p_176424_5_.getFrontOffsetZ() * p_176424_4_);
                 }
 
-                return new AxisAlignedBB(d0, d1, d2, d3, d4, d5);
+                return new AxisAlignedBB(var7, var9, var11, var13, var15, var17);
             }
         }
         else
@@ -270,10 +273,10 @@ public class BlockPistonMoving extends BlockContainer
         }
     }
 
-    private TileEntityPiston getTileEntity(IBlockAccess worldIn, BlockPos pos)
+    private TileEntityPiston func_176422_e(IBlockAccess p_176422_1_, BlockPos p_176422_2_)
     {
-        TileEntity tileentity = worldIn.getTileEntity(pos);
-        return tileentity instanceof TileEntityPiston ? (TileEntityPiston)tileentity : null;
+        TileEntity var3 = p_176422_1_.getTileEntity(p_176422_2_);
+        return var3 instanceof TileEntityPiston ? (TileEntityPiston)var3 : null;
     }
 
     public Item getItem(World worldIn, BlockPos pos)
@@ -286,7 +289,7 @@ public class BlockPistonMoving extends BlockContainer
      */
     public IBlockState getStateFromMeta(int meta)
     {
-        return this.getDefaultState().withProperty(FACING, BlockPistonExtension.getFacing(meta)).withProperty(TYPE, (meta & 8) > 0 ? BlockPistonExtension.EnumPistonType.STICKY : BlockPistonExtension.EnumPistonType.DEFAULT);
+        return this.getDefaultState().withProperty(field_176426_a, BlockPistonExtension.func_176322_b(meta)).withProperty(field_176425_b, (meta & 8) > 0 ? BlockPistonExtension.EnumPistonType.STICKY : BlockPistonExtension.EnumPistonType.DEFAULT);
     }
 
     /**
@@ -294,19 +297,19 @@ public class BlockPistonMoving extends BlockContainer
      */
     public int getMetaFromState(IBlockState state)
     {
-        int i = 0;
-        i = i | ((EnumFacing)state.getValue(FACING)).getIndex();
+        byte var2 = 0;
+        int var3 = var2 | ((EnumFacing)state.getValue(field_176426_a)).getIndex();
 
-        if (state.getValue(TYPE) == BlockPistonExtension.EnumPistonType.STICKY)
+        if (state.getValue(field_176425_b) == BlockPistonExtension.EnumPistonType.STICKY)
         {
-            i |= 8;
+            var3 |= 8;
         }
 
-        return i;
+        return var3;
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {FACING, TYPE});
+        return new BlockState(this, new IProperty[] {field_176426_a, field_176425_b});
     }
 }

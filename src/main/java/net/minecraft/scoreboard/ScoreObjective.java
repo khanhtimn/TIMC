@@ -7,16 +7,17 @@ public class ScoreObjective
 
     /** The ScoreObjectiveCriteria for this objetive */
     private final IScoreObjectiveCriteria objectiveCriteria;
-    private IScoreObjectiveCriteria.EnumRenderType renderType;
+    private IScoreObjectiveCriteria.EnumRenderType field_178768_d;
     private String displayName;
+    
 
-    public ScoreObjective(Scoreboard theScoreboardIn, String nameIn, IScoreObjectiveCriteria objectiveCriteriaIn)
+    public ScoreObjective(Scoreboard p_i2307_1_, String p_i2307_2_, IScoreObjectiveCriteria p_i2307_3_)
     {
-        this.theScoreboard = theScoreboardIn;
-        this.name = nameIn;
-        this.objectiveCriteria = objectiveCriteriaIn;
-        this.displayName = nameIn;
-        this.renderType = objectiveCriteriaIn.getRenderType();
+        this.theScoreboard = p_i2307_1_;
+        this.name = p_i2307_2_;
+        this.objectiveCriteria = p_i2307_3_;
+        this.displayName = p_i2307_2_;
+        this.field_178768_d = p_i2307_3_.func_178790_c();
     }
 
     public Scoreboard getScoreboard()
@@ -39,20 +40,20 @@ public class ScoreObjective
         return this.displayName;
     }
 
-    public void setDisplayName(String nameIn)
+    public void setDisplayName(String p_96681_1_)
     {
-        this.displayName = nameIn;
-        this.theScoreboard.onObjectiveDisplayNameChanged(this);
+        this.displayName = p_96681_1_;
+        this.theScoreboard.func_96532_b(this);
     }
 
-    public IScoreObjectiveCriteria.EnumRenderType getRenderType()
+    public IScoreObjectiveCriteria.EnumRenderType func_178766_e()
     {
-        return this.renderType;
+        return this.field_178768_d;
     }
 
-    public void setRenderType(IScoreObjectiveCriteria.EnumRenderType type)
+    public void func_178767_a(IScoreObjectiveCriteria.EnumRenderType p_178767_1_)
     {
-        this.renderType = type;
-        this.theScoreboard.onObjectiveDisplayNameChanged(this);
+        this.field_178768_d = p_178767_1_;
+        this.theScoreboard.func_96532_b(this);
     }
 }

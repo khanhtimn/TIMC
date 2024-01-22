@@ -10,7 +10,13 @@ import net.minecraft.world.LockCode;
 
 public abstract class TileEntityLockable extends TileEntity implements IInteractionObject, ILockableContainer
 {
-    private LockCode code = LockCode.EMPTY_CODE;
+    private LockCode code;
+    
+
+    public TileEntityLockable()
+    {
+        this.code = LockCode.EMPTY_CODE;
+    }
 
     public void readFromNBT(NBTTagCompound compound)
     {
@@ -43,9 +49,6 @@ public abstract class TileEntityLockable extends TileEntity implements IInteract
         this.code = code;
     }
 
-    /**
-     * Get the formatted ChatComponent that will be used for the sender's username in chat
-     */
     public IChatComponent getDisplayName()
     {
         return (IChatComponent)(this.hasCustomName() ? new ChatComponentText(this.getName()) : new ChatComponentTranslation(this.getName(), new Object[0]));

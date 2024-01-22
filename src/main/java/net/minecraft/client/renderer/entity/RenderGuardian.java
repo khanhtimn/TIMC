@@ -6,7 +6,8 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.culling.ICamera;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityGuardian;
 import net.minecraft.util.AxisAlignedBB;
@@ -14,37 +15,38 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import org.lwjgl.opengl.GL11;
 
-public class RenderGuardian extends RenderLiving<EntityGuardian>
+public class RenderGuardian extends RenderLiving
 {
-    private static final ResourceLocation GUARDIAN_TEXTURE = new ResourceLocation("textures/entity/guardian.png");
-    private static final ResourceLocation GUARDIAN_ELDER_TEXTURE = new ResourceLocation("textures/entity/guardian_elder.png");
-    private static final ResourceLocation GUARDIAN_BEAM_TEXTURE = new ResourceLocation("textures/entity/guardian_beam.png");
+    private static final ResourceLocation field_177114_e = new ResourceLocation("textures/entity/guardian.png");
+    private static final ResourceLocation field_177116_j = new ResourceLocation("textures/entity/guardian_elder.png");
+    private static final ResourceLocation field_177117_k = new ResourceLocation("textures/entity/guardian_beam.png");
     int field_177115_a;
+    
 
-    public RenderGuardian(RenderManager renderManagerIn)
+    public RenderGuardian(RenderManager p_i46171_1_)
     {
-        super(renderManagerIn, new ModelGuardian(), 0.5F);
+        super(p_i46171_1_, new ModelGuardian(), 0.5F);
         this.field_177115_a = ((ModelGuardian)this.mainModel).func_178706_a();
     }
 
-    public boolean shouldRender(EntityGuardian livingEntity, ICamera camera, double camX, double camY, double camZ)
+    public boolean func_177113_a(EntityGuardian p_177113_1_, ICamera p_177113_2_, double p_177113_3_, double p_177113_5_, double p_177113_7_)
     {
-        if (super.shouldRender(livingEntity, camera, camX, camY, camZ))
+        if (super.func_177104_a(p_177113_1_, p_177113_2_, p_177113_3_, p_177113_5_, p_177113_7_))
         {
             return true;
         }
         else
         {
-            if (livingEntity.hasTargetedEntity())
+            if (p_177113_1_.func_175474_cn())
             {
-                EntityLivingBase entitylivingbase = livingEntity.getTargetedEntity();
+                EntityLivingBase var9 = p_177113_1_.func_175466_co();
 
-                if (entitylivingbase != null)
+                if (var9 != null)
                 {
-                    Vec3 vec3 = this.func_177110_a(entitylivingbase, (double)entitylivingbase.height * 0.5D, 1.0F);
-                    Vec3 vec31 = this.func_177110_a(livingEntity, (double)livingEntity.getEyeHeight(), 1.0F);
+                    Vec3 var10 = this.func_177110_a(var9, (double)var9.height * 0.5D, 1.0F);
+                    Vec3 var11 = this.func_177110_a(p_177113_1_, (double)p_177113_1_.getEyeHeight(), 1.0F);
 
-                    if (camera.isBoundingBoxInFrustum(AxisAlignedBB.fromBounds(vec31.xCoord, vec31.yCoord, vec31.zCoord, vec3.xCoord, vec3.yCoord, vec3.zCoord)))
+                    if (p_177113_2_.isBoundingBoxInFrustum(AxisAlignedBB.fromBounds(var11.xCoord, var11.yCoord, var11.zCoord, var10.xCoord, var10.yCoord, var10.zCoord)))
                     {
                         return true;
                     }
@@ -55,18 +57,15 @@ public class RenderGuardian extends RenderLiving<EntityGuardian>
         }
     }
 
-    private Vec3 func_177110_a(EntityLivingBase entityLivingBaseIn, double p_177110_2_, float p_177110_4_)
+    private Vec3 func_177110_a(EntityLivingBase p_177110_1_, double p_177110_2_, float p_177110_4_)
     {
-        double d0 = entityLivingBaseIn.lastTickPosX + (entityLivingBaseIn.posX - entityLivingBaseIn.lastTickPosX) * (double)p_177110_4_;
-        double d1 = p_177110_2_ + entityLivingBaseIn.lastTickPosY + (entityLivingBaseIn.posY - entityLivingBaseIn.lastTickPosY) * (double)p_177110_4_;
-        double d2 = entityLivingBaseIn.lastTickPosZ + (entityLivingBaseIn.posZ - entityLivingBaseIn.lastTickPosZ) * (double)p_177110_4_;
-        return new Vec3(d0, d1, d2);
+        double var5 = p_177110_1_.lastTickPosX + (p_177110_1_.posX - p_177110_1_.lastTickPosX) * (double)p_177110_4_;
+        double var7 = p_177110_2_ + p_177110_1_.lastTickPosY + (p_177110_1_.posY - p_177110_1_.lastTickPosY) * (double)p_177110_4_;
+        double var9 = p_177110_1_.lastTickPosZ + (p_177110_1_.posZ - p_177110_1_.lastTickPosZ) * (double)p_177110_4_;
+        return new Vec3(var5, var7, var9);
     }
 
-    /**
-     * Renders the desired {@code T} type Entity.
-     */
-    public void doRender(EntityGuardian entity, double x, double y, double z, float entityYaw, float partialTicks)
+    public void func_177109_a(EntityGuardian p_177109_1_, double p_177109_2_, double p_177109_4_, double p_177109_6_, float p_177109_8_, float p_177109_9_)
     {
         if (this.field_177115_a != ((ModelGuardian)this.mainModel).func_178706_a())
         {
@@ -74,108 +73,159 @@ public class RenderGuardian extends RenderLiving<EntityGuardian>
             this.field_177115_a = ((ModelGuardian)this.mainModel).func_178706_a();
         }
 
-        super.doRender(entity, x, y, z, entityYaw, partialTicks);
-        EntityLivingBase entitylivingbase = entity.getTargetedEntity();
+        super.doRender((EntityLiving)p_177109_1_, p_177109_2_, p_177109_4_, p_177109_6_, p_177109_8_, p_177109_9_);
+        EntityLivingBase var10 = p_177109_1_.func_175466_co();
 
-        if (entitylivingbase != null)
+        if (var10 != null)
         {
-            float f = entity.func_175477_p(partialTicks);
-            Tessellator tessellator = Tessellator.getInstance();
-            WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-            this.bindTexture(GUARDIAN_BEAM_TEXTURE);
+            float var11 = p_177109_1_.func_175477_p(p_177109_9_);
+            Tessellator var12 = Tessellator.getInstance();
+            WorldRenderer var13 = var12.getWorldRenderer();
+            this.bindTexture(field_177117_k);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, 10497.0F);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, 10497.0F);
             GlStateManager.disableLighting();
             GlStateManager.disableCull();
             GlStateManager.disableBlend();
             GlStateManager.depthMask(true);
-            float f1 = 240.0F;
-            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, f1, f1);
+            float var14 = 240.0F;
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, var14, var14);
             GlStateManager.tryBlendFuncSeparate(770, 1, 1, 0);
-            float f2 = (float)entity.worldObj.getTotalWorldTime() + partialTicks;
-            float f3 = f2 * 0.5F % 1.0F;
-            float f4 = entity.getEyeHeight();
+            float var15 = (float)p_177109_1_.worldObj.getTotalWorldTime() + p_177109_9_;
+            float var16 = var15 * 0.5F % 1.0F;
+            float var17 = p_177109_1_.getEyeHeight();
             GlStateManager.pushMatrix();
-            GlStateManager.translate((float)x, (float)y + f4, (float)z);
-            Vec3 vec3 = this.func_177110_a(entitylivingbase, (double)entitylivingbase.height * 0.5D, partialTicks);
-            Vec3 vec31 = this.func_177110_a(entity, (double)f4, partialTicks);
-            Vec3 vec32 = vec3.subtract(vec31);
-            double d0 = vec32.lengthVector() + 1.0D;
-            vec32 = vec32.normalize();
-            float f5 = (float)Math.acos(vec32.yCoord);
-            float f6 = (float)Math.atan2(vec32.zCoord, vec32.xCoord);
-            GlStateManager.rotate((((float)Math.PI / 2F) + -f6) * (180F / (float)Math.PI), 0.0F, 1.0F, 0.0F);
-            GlStateManager.rotate(f5 * (180F / (float)Math.PI), 1.0F, 0.0F, 0.0F);
-            int i = 1;
-            double d1 = (double)f2 * 0.05D * (1.0D - (double)(i & 1) * 2.5D);
-            worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-            float f7 = f * f;
-            int j = 64 + (int)(f7 * 240.0F);
-            int k = 32 + (int)(f7 * 192.0F);
-            int l = 128 - (int)(f7 * 64.0F);
-            double d2 = (double)i * 0.2D;
-            double d3 = d2 * 1.41D;
-            double d4 = 0.0D + Math.cos(d1 + 2.356194490192345D) * d3;
-            double d5 = 0.0D + Math.sin(d1 + 2.356194490192345D) * d3;
-            double d6 = 0.0D + Math.cos(d1 + (Math.PI / 4D)) * d3;
-            double d7 = 0.0D + Math.sin(d1 + (Math.PI / 4D)) * d3;
-            double d8 = 0.0D + Math.cos(d1 + 3.9269908169872414D) * d3;
-            double d9 = 0.0D + Math.sin(d1 + 3.9269908169872414D) * d3;
-            double d10 = 0.0D + Math.cos(d1 + 5.497787143782138D) * d3;
-            double d11 = 0.0D + Math.sin(d1 + 5.497787143782138D) * d3;
-            double d12 = 0.0D + Math.cos(d1 + Math.PI) * d2;
-            double d13 = 0.0D + Math.sin(d1 + Math.PI) * d2;
-            double d14 = 0.0D + Math.cos(d1 + 0.0D) * d2;
-            double d15 = 0.0D + Math.sin(d1 + 0.0D) * d2;
-            double d16 = 0.0D + Math.cos(d1 + (Math.PI / 2D)) * d2;
-            double d17 = 0.0D + Math.sin(d1 + (Math.PI / 2D)) * d2;
-            double d18 = 0.0D + Math.cos(d1 + (Math.PI * 3D / 2D)) * d2;
-            double d19 = 0.0D + Math.sin(d1 + (Math.PI * 3D / 2D)) * d2;
-            double d20 = 0.0D;
-            double d21 = 0.4999D;
-            double d22 = (double)(-1.0F + f3);
-            double d23 = d0 * (0.5D / d2) + d22;
-            worldrenderer.pos(d12, d0, d13).tex(0.4999D, d23).color(j, k, l, 255).endVertex();
-            worldrenderer.pos(d12, 0.0D, d13).tex(0.4999D, d22).color(j, k, l, 255).endVertex();
-            worldrenderer.pos(d14, 0.0D, d15).tex(0.0D, d22).color(j, k, l, 255).endVertex();
-            worldrenderer.pos(d14, d0, d15).tex(0.0D, d23).color(j, k, l, 255).endVertex();
-            worldrenderer.pos(d16, d0, d17).tex(0.4999D, d23).color(j, k, l, 255).endVertex();
-            worldrenderer.pos(d16, 0.0D, d17).tex(0.4999D, d22).color(j, k, l, 255).endVertex();
-            worldrenderer.pos(d18, 0.0D, d19).tex(0.0D, d22).color(j, k, l, 255).endVertex();
-            worldrenderer.pos(d18, d0, d19).tex(0.0D, d23).color(j, k, l, 255).endVertex();
-            double d24 = 0.0D;
+            GlStateManager.translate((float)p_177109_2_, (float)p_177109_4_ + var17, (float)p_177109_6_);
+            Vec3 var18 = this.func_177110_a(var10, (double)var10.height * 0.5D, p_177109_9_);
+            Vec3 var19 = this.func_177110_a(p_177109_1_, (double)var17, p_177109_9_);
+            Vec3 var20 = var18.subtract(var19);
+            double var21 = var20.lengthVector() + 1.0D;
+            var20 = var20.normalize();
+            float var23 = (float)Math.acos(var20.yCoord);
+            float var24 = (float)Math.atan2(var20.zCoord, var20.xCoord);
+            GlStateManager.rotate((((float)Math.PI / 2F) + -var24) * (180F / (float)Math.PI), 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(var23 * (180F / (float)Math.PI), 1.0F, 0.0F, 0.0F);
+            byte var25 = 1;
+            double var26 = (double)var15 * 0.05D * (1.0D - (double)(var25 & 1) * 2.5D);
+            var13.startDrawingQuads();
+            float var28 = var11 * var11;
+            var13.func_178961_b(64 + (int)(var28 * 240.0F), 32 + (int)(var28 * 192.0F), 128 - (int)(var28 * 64.0F), 255);
+            double var29 = (double)var25 * 0.2D;
+            double var31 = var29 * 1.41D;
+            double var33 = 0.0D + Math.cos(var26 + 2.356194490192345D) * var31;
+            double var35 = 0.0D + Math.sin(var26 + 2.356194490192345D) * var31;
+            double var37 = 0.0D + Math.cos(var26 + (Math.PI / 4D)) * var31;
+            double var39 = 0.0D + Math.sin(var26 + (Math.PI / 4D)) * var31;
+            double var41 = 0.0D + Math.cos(var26 + 3.9269908169872414D) * var31;
+            double var43 = 0.0D + Math.sin(var26 + 3.9269908169872414D) * var31;
+            double var45 = 0.0D + Math.cos(var26 + 5.497787143782138D) * var31;
+            double var47 = 0.0D + Math.sin(var26 + 5.497787143782138D) * var31;
+            double var49 = 0.0D + Math.cos(var26 + Math.PI) * var29;
+            double var51 = 0.0D + Math.sin(var26 + Math.PI) * var29;
+            double var53 = 0.0D + Math.cos(var26 + 0.0D) * var29;
+            double var55 = 0.0D + Math.sin(var26 + 0.0D) * var29;
+            double var57 = 0.0D + Math.cos(var26 + (Math.PI / 2D)) * var29;
+            double var59 = 0.0D + Math.sin(var26 + (Math.PI / 2D)) * var29;
+            double var61 = 0.0D + Math.cos(var26 + (Math.PI * 3D / 2D)) * var29;
+            double var63 = 0.0D + Math.sin(var26 + (Math.PI * 3D / 2D)) * var29;
+            double var67 = 0.0D;
+            double var69 = 0.4999D;
+            double var71 = (double)(-1.0F + var16);
+            double var73 = var21 * (0.5D / var29) + var71;
+            var13.addVertexWithUV(var49, var21, var51, var69, var73);
+            var13.addVertexWithUV(var49, 0.0D, var51, var69, var71);
+            var13.addVertexWithUV(var53, 0.0D, var55, var67, var71);
+            var13.addVertexWithUV(var53, var21, var55, var67, var73);
+            var13.addVertexWithUV(var57, var21, var59, var69, var73);
+            var13.addVertexWithUV(var57, 0.0D, var59, var69, var71);
+            var13.addVertexWithUV(var61, 0.0D, var63, var67, var71);
+            var13.addVertexWithUV(var61, var21, var63, var67, var73);
+            double var75 = 0.0D;
 
-            if (entity.ticksExisted % 2 == 0)
+            if (p_177109_1_.ticksExisted % 2 == 0)
             {
-                d24 = 0.5D;
+                var75 = 0.5D;
             }
 
-            worldrenderer.pos(d4, d0, d5).tex(0.5D, d24 + 0.5D).color(j, k, l, 255).endVertex();
-            worldrenderer.pos(d6, d0, d7).tex(1.0D, d24 + 0.5D).color(j, k, l, 255).endVertex();
-            worldrenderer.pos(d10, d0, d11).tex(1.0D, d24).color(j, k, l, 255).endVertex();
-            worldrenderer.pos(d8, d0, d9).tex(0.5D, d24).color(j, k, l, 255).endVertex();
-            tessellator.draw();
+            var13.addVertexWithUV(var33, var21, var35, 0.5D, var75 + 0.5D);
+            var13.addVertexWithUV(var37, var21, var39, 1.0D, var75 + 0.5D);
+            var13.addVertexWithUV(var45, var21, var47, 1.0D, var75);
+            var13.addVertexWithUV(var41, var21, var43, 0.5D, var75);
+            var12.draw();
             GlStateManager.popMatrix();
         }
+    }
+
+    protected void func_177112_a(EntityGuardian p_177112_1_, float p_177112_2_)
+    {
+        if (p_177112_1_.func_175461_cl())
+        {
+            GlStateManager.scale(2.35F, 2.35F, 2.35F);
+        }
+    }
+
+    protected ResourceLocation func_177111_a(EntityGuardian p_177111_1_)
+    {
+        return p_177111_1_.func_175461_cl() ? field_177116_j : field_177114_e;
+    }
+
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
+    public void doRender(EntityLiving p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
+    {
+        this.func_177109_a((EntityGuardian)p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
+    }
+
+    public boolean func_177104_a(EntityLiving p_177104_1_, ICamera p_177104_2_, double p_177104_3_, double p_177104_5_, double p_177104_7_)
+    {
+        return this.func_177113_a((EntityGuardian)p_177104_1_, p_177104_2_, p_177104_3_, p_177104_5_, p_177104_7_);
     }
 
     /**
      * Allows the render to do any OpenGL state modifications necessary before the model is rendered. Args:
      * entityLiving, partialTickTime
      */
-    protected void preRenderCallback(EntityGuardian entitylivingbaseIn, float partialTickTime)
+    protected void preRenderCallback(EntityLivingBase p_77041_1_, float p_77041_2_)
     {
-        if (entitylivingbaseIn.isElder())
-        {
-            GlStateManager.scale(2.35F, 2.35F, 2.35F);
-        }
+        this.func_177112_a((EntityGuardian)p_77041_1_, p_77041_2_);
+    }
+
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
+    public void doRender(EntityLivingBase p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
+    {
+        this.func_177109_a((EntityGuardian)p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
     }
 
     /**
      * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
      */
-    protected ResourceLocation getEntityTexture(EntityGuardian entity)
+    protected ResourceLocation getEntityTexture(Entity p_110775_1_)
     {
-        return entity.isElder() ? GUARDIAN_ELDER_TEXTURE : GUARDIAN_TEXTURE;
+        return this.func_177111_a((EntityGuardian)p_110775_1_);
+    }
+
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
+    public void doRender(Entity p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
+    {
+        this.func_177109_a((EntityGuardian)p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
+    }
+
+    public boolean func_177071_a(Entity p_177071_1_, ICamera p_177071_2_, double p_177071_3_, double p_177071_5_, double p_177071_7_)
+    {
+        return this.func_177113_a((EntityGuardian)p_177071_1_, p_177071_2_, p_177071_3_, p_177071_5_, p_177071_7_);
     }
 }

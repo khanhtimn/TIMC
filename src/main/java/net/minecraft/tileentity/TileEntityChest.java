@@ -1,5 +1,7 @@
 package net.minecraft.tileentity;
 
+import java.util.Iterator;
+import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,12 +13,12 @@ import net.minecraft.inventory.InventoryLargeChest;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
 
-public class TileEntityChest extends TileEntityLockable implements ITickable, IInventory
+public class TileEntityChest extends TileEntityLockable implements IUpdatePlayerListBox, IInventory
 {
     private ItemStack[] chestContents = new ItemStack[27];
 
@@ -49,14 +51,17 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
     private int cachedChestType;
     private String customName;
 
+	public boolean isEmpty;
+    
+
     public TileEntityChest()
     {
         this.cachedChestType = -1;
     }
 
-    public TileEntityChest(int chestType)
+    public TileEntityChest(int p_i2350_1_)
     {
-        this.cachedChestType = chestType;
+        this.cachedChestType = p_i2350_1_;
     }
 
     /**
@@ -68,30 +73,33 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
     }
 
     /**
-     * Returns the stack in the given slot.
+     * Returns the stack in slot i
      */
-    public ItemStack getStackInSlot(int index)
+    public ItemStack getStackInSlot(int slotIn)
     {
-        return this.chestContents[index];
+        return this.chestContents[slotIn];
     }
 
     /**
-     * Removes up to a specified number of items from an inventory slot and returns them in a new stack.
+     * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a
+     * new stack.
      */
     public ItemStack decrStackSize(int index, int count)
     {
         if (this.chestContents[index] != null)
         {
+            ItemStack var3;
+
             if (this.chestContents[index].stackSize <= count)
             {
-                ItemStack itemstack1 = this.chestContents[index];
+                var3 = this.chestContents[index];
                 this.chestContents[index] = null;
                 this.markDirty();
-                return itemstack1;
+                return var3;
             }
             else
             {
-                ItemStack itemstack = this.chestContents[index].splitStack(count);
+                var3 = this.chestContents[index].splitStack(count);
 
                 if (this.chestContents[index].stackSize == 0)
                 {
@@ -99,7 +107,7 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
                 }
 
                 this.markDirty();
-                return itemstack;
+                return var3;
             }
         }
         else
@@ -109,15 +117,16 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
     }
 
     /**
-     * Removes a stack from the given slot and returns it.
+     * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem -
+     * like when you close a workbench GUI.
      */
-    public ItemStack removeStackFromSlot(int index)
+    public ItemStack getStackInSlotOnClosing(int index)
     {
         if (this.chestContents[index] != null)
         {
-            ItemStack itemstack = this.chestContents[index];
+            ItemStack var2 = this.chestContents[index];
             this.chestContents[index] = null;
-            return itemstack;
+            return var2;
         }
         else
         {
@@ -141,7 +150,7 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
     }
 
     /**
-     * Get the name of this object. For players this returns their username
+     * Gets the name of this command sender (usually username, but possibly "Rcon")
      */
     public String getName()
     {
@@ -156,15 +165,15 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
         return this.customName != null && this.customName.length() > 0;
     }
 
-    public void setCustomName(String name)
+    public void setCustomName(String p_145976_1_)
     {
-        this.customName = name;
+        this.customName = p_145976_1_;
     }
 
     public void readFromNBT(NBTTagCompound compound)
     {
         super.readFromNBT(compound);
-        NBTTagList nbttaglist = compound.getTagList("Items", 10);
+        NBTTagList var2 = compound.getTagList("Items", 10);
         this.chestContents = new ItemStack[this.getSizeInventory()];
 
         if (compound.hasKey("CustomName", 8))
@@ -172,14 +181,14 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
             this.customName = compound.getString("CustomName");
         }
 
-        for (int i = 0; i < nbttaglist.tagCount(); ++i)
+        for (int var3 = 0; var3 < var2.tagCount(); ++var3)
         {
-            NBTTagCompound nbttagcompound = nbttaglist.getCompoundTagAt(i);
-            int j = nbttagcompound.getByte("Slot") & 255;
+            NBTTagCompound var4 = var2.getCompoundTagAt(var3);
+            int var5 = var4.getByte("Slot") & 255;
 
-            if (j >= 0 && j < this.chestContents.length)
+            if (var5 >= 0 && var5 < this.chestContents.length)
             {
-                this.chestContents[j] = ItemStack.loadItemStackFromNBT(nbttagcompound);
+                this.chestContents[var5] = ItemStack.loadItemStackFromNBT(var4);
             }
         }
     }
@@ -187,20 +196,20 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
     public void writeToNBT(NBTTagCompound compound)
     {
         super.writeToNBT(compound);
-        NBTTagList nbttaglist = new NBTTagList();
+        NBTTagList var2 = new NBTTagList();
 
-        for (int i = 0; i < this.chestContents.length; ++i)
+        for (int var3 = 0; var3 < this.chestContents.length; ++var3)
         {
-            if (this.chestContents[i] != null)
+            if (this.chestContents[var3] != null)
             {
-                NBTTagCompound nbttagcompound = new NBTTagCompound();
-                nbttagcompound.setByte("Slot", (byte)i);
-                this.chestContents[i].writeToNBT(nbttagcompound);
-                nbttaglist.appendTag(nbttagcompound);
+                NBTTagCompound var4 = new NBTTagCompound();
+                var4.setByte("Slot", (byte)var3);
+                this.chestContents[var3].writeToNBT(var4);
+                var2.appendTag(var4);
             }
         }
 
-        compound.setTag("Items", nbttaglist);
+        compound.setTag("Items", var2);
 
         if (this.hasCustomName())
         {
@@ -209,7 +218,8 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
     }
 
     /**
-     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended.
+     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't
+     * this more of a set than a get?*
      */
     public int getInventoryStackLimit()
     {
@@ -219,9 +229,9 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
     /**
      * Do not make give this method the name canInteractWith because it clashes with Container
      */
-    public boolean isUseableByPlayer(EntityPlayer player)
+    public boolean isUseableByPlayer(EntityPlayer playerIn)
     {
-        return this.worldObj.getTileEntity(this.pos) != this ? false : player.getDistanceSq((double)this.pos.getX() + 0.5D, (double)this.pos.getY() + 0.5D, (double)this.pos.getZ() + 0.5D) <= 64.0D;
+        return this.worldObj.getTileEntity(this.pos) != this ? false : playerIn.getDistanceSq((double)this.pos.getX() + 0.5D, (double)this.pos.getY() + 0.5D, (double)this.pos.getZ() + 0.5D) <= 64.0D;
     }
 
     public void updateContainingBlockInfo()
@@ -230,43 +240,42 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
         this.adjacentChestChecked = false;
     }
 
-    @SuppressWarnings("incomplete-switch")
-    private void func_174910_a(TileEntityChest chestTe, EnumFacing side)
+    private void func_174910_a(TileEntityChest p_174910_1_, EnumFacing p_174910_2_)
     {
-        if (chestTe.isInvalid())
+        if (p_174910_1_.isInvalid())
         {
             this.adjacentChestChecked = false;
         }
         else if (this.adjacentChestChecked)
         {
-            switch (side)
+            switch (TileEntityChest.SwitchEnumFacing.field_177366_a[p_174910_2_.ordinal()])
             {
-                case NORTH:
-                    if (this.adjacentChestZNeg != chestTe)
+                case 1:
+                    if (this.adjacentChestZNeg != p_174910_1_)
                     {
                         this.adjacentChestChecked = false;
                     }
 
                     break;
 
-                case SOUTH:
-                    if (this.adjacentChestZPos != chestTe)
+                case 2:
+                    if (this.adjacentChestZPos != p_174910_1_)
                     {
                         this.adjacentChestChecked = false;
                     }
 
                     break;
 
-                case EAST:
-                    if (this.adjacentChestXPos != chestTe)
+                case 3:
+                    if (this.adjacentChestXPos != p_174910_1_)
                     {
                         this.adjacentChestChecked = false;
                     }
 
                     break;
 
-                case WEST:
-                    if (this.adjacentChestXNeg != chestTe)
+                case 4:
+                    if (this.adjacentChestXNeg != p_174910_1_)
                     {
                         this.adjacentChestChecked = false;
                     }
@@ -282,33 +291,33 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
         if (!this.adjacentChestChecked)
         {
             this.adjacentChestChecked = true;
-            this.adjacentChestXNeg = this.getAdjacentChest(EnumFacing.WEST);
-            this.adjacentChestXPos = this.getAdjacentChest(EnumFacing.EAST);
-            this.adjacentChestZNeg = this.getAdjacentChest(EnumFacing.NORTH);
-            this.adjacentChestZPos = this.getAdjacentChest(EnumFacing.SOUTH);
+            this.adjacentChestXNeg = this.func_174911_a(EnumFacing.WEST);
+            this.adjacentChestXPos = this.func_174911_a(EnumFacing.EAST);
+            this.adjacentChestZNeg = this.func_174911_a(EnumFacing.NORTH);
+            this.adjacentChestZPos = this.func_174911_a(EnumFacing.SOUTH);
         }
     }
 
-    protected TileEntityChest getAdjacentChest(EnumFacing side)
+    protected TileEntityChest func_174911_a(EnumFacing p_174911_1_)
     {
-        BlockPos blockpos = this.pos.offset(side);
+        BlockPos var2 = this.pos.offset(p_174911_1_);
 
-        if (this.isChestAt(blockpos))
+        if (this.func_174912_b(var2))
         {
-            TileEntity tileentity = this.worldObj.getTileEntity(blockpos);
+            TileEntity var3 = this.worldObj.getTileEntity(var2);
 
-            if (tileentity instanceof TileEntityChest)
+            if (var3 instanceof TileEntityChest)
             {
-                TileEntityChest tileentitychest = (TileEntityChest)tileentity;
-                tileentitychest.func_174910_a(this, side.getOpposite());
-                return tileentitychest;
+                TileEntityChest var4 = (TileEntityChest)var3;
+                var4.func_174910_a(this, p_174911_1_.getOpposite());
+                return var4;
             }
         }
 
         return null;
     }
 
-    private boolean isChestAt(BlockPos posIn)
+    private boolean func_174912_b(BlockPos p_174912_1_)
     {
         if (this.worldObj == null)
         {
@@ -316,34 +325,39 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
         }
         else
         {
-            Block block = this.worldObj.getBlockState(posIn).getBlock();
-            return block instanceof BlockChest && ((BlockChest)block).chestType == this.getChestType();
+            Block var2 = this.worldObj.getBlockState(p_174912_1_).getBlock();
+            return var2 instanceof BlockChest && ((BlockChest)var2).chestType == this.getChestType();
         }
     }
 
     /**
-     * Like the old updateEntity(), except more generic.
+     * Updates the JList with a new model.
      */
     public void update()
     {
         this.checkForAdjacentChests();
-        int i = this.pos.getX();
-        int j = this.pos.getY();
-        int k = this.pos.getZ();
+        int var1 = this.pos.getX();
+        int var2 = this.pos.getY();
+        int var3 = this.pos.getZ();
         ++this.ticksSinceSync;
+        float var4;
 
-        if (!this.worldObj.isRemote && this.numPlayersUsing != 0 && (this.ticksSinceSync + i + j + k) % 200 == 0)
+        if (!this.worldObj.isRemote && this.numPlayersUsing != 0 && (this.ticksSinceSync + var1 + var2 + var3) % 200 == 0)
         {
             this.numPlayersUsing = 0;
-            float f = 5.0F;
+            var4 = 5.0F;
+            List var5 = this.worldObj.getEntitiesWithinAABB(EntityPlayer.class, new AxisAlignedBB((double)((float)var1 - var4), (double)((float)var2 - var4), (double)((float)var3 - var4), (double)((float)(var1 + 1) + var4), (double)((float)(var2 + 1) + var4), (double)((float)(var3 + 1) + var4)));
+            Iterator var6 = var5.iterator();
 
-            for (EntityPlayer entityplayer : this.worldObj.getEntitiesWithinAABB(EntityPlayer.class, new AxisAlignedBB((double)((float)i - f), (double)((float)j - f), (double)((float)k - f), (double)((float)(i + 1) + f), (double)((float)(j + 1) + f), (double)((float)(k + 1) + f))))
+            while (var6.hasNext())
             {
-                if (entityplayer.openContainer instanceof ContainerChest)
-                {
-                    IInventory iinventory = ((ContainerChest)entityplayer.openContainer).getLowerChestInventory();
+                EntityPlayer var7 = (EntityPlayer)var6.next();
 
-                    if (iinventory == this || iinventory instanceof InventoryLargeChest && ((InventoryLargeChest)iinventory).isPartOfLargeChest(this))
+                if (var7.openContainer instanceof ContainerChest)
+                {
+                    IInventory var8 = ((ContainerChest)var7.openContainer).getLowerChestInventory();
+
+                    if (var8 == this || var8 instanceof InventoryLargeChest && ((InventoryLargeChest)var8).isPartOfLargeChest(this))
                     {
                         ++this.numPlayersUsing;
                     }
@@ -352,37 +366,38 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
         }
 
         this.prevLidAngle = this.lidAngle;
-        float f1 = 0.1F;
+        var4 = 0.1F;
+        double var14;
 
         if (this.numPlayersUsing > 0 && this.lidAngle == 0.0F && this.adjacentChestZNeg == null && this.adjacentChestXNeg == null)
         {
-            double d1 = (double)i + 0.5D;
-            double d2 = (double)k + 0.5D;
+            double var11 = (double)var1 + 0.5D;
+            var14 = (double)var3 + 0.5D;
 
             if (this.adjacentChestZPos != null)
             {
-                d2 += 0.5D;
+                var14 += 0.5D;
             }
 
             if (this.adjacentChestXPos != null)
             {
-                d1 += 0.5D;
+                var11 += 0.5D;
             }
 
-            this.worldObj.playSoundEffect(d1, (double)j + 0.5D, d2, "random.chestopen", 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
+            this.worldObj.playSoundEffect(var11, (double)var2 + 0.5D, var14, "random.chestopen", 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
         }
 
         if (this.numPlayersUsing == 0 && this.lidAngle > 0.0F || this.numPlayersUsing > 0 && this.lidAngle < 1.0F)
         {
-            float f2 = this.lidAngle;
+            float var12 = this.lidAngle;
 
             if (this.numPlayersUsing > 0)
             {
-                this.lidAngle += f1;
+                this.lidAngle += var4;
             }
             else
             {
-                this.lidAngle -= f1;
+                this.lidAngle -= var4;
             }
 
             if (this.lidAngle > 1.0F)
@@ -390,24 +405,24 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
                 this.lidAngle = 1.0F;
             }
 
-            float f3 = 0.5F;
+            float var13 = 0.5F;
 
-            if (this.lidAngle < f3 && f2 >= f3 && this.adjacentChestZNeg == null && this.adjacentChestXNeg == null)
+            if (this.lidAngle < var13 && var12 >= var13 && this.adjacentChestZNeg == null && this.adjacentChestXNeg == null)
             {
-                double d3 = (double)i + 0.5D;
-                double d0 = (double)k + 0.5D;
+                var14 = (double)var1 + 0.5D;
+                double var9 = (double)var3 + 0.5D;
 
                 if (this.adjacentChestZPos != null)
                 {
-                    d0 += 0.5D;
+                    var9 += 0.5D;
                 }
 
                 if (this.adjacentChestXPos != null)
                 {
-                    d3 += 0.5D;
+                    var14 += 0.5D;
                 }
 
-                this.worldObj.playSoundEffect(d3, (double)j + 0.5D, d0, "random.chestclosed", 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
+                this.worldObj.playSoundEffect(var14, (double)var2 + 0.5D, var9, "random.chestclosed", 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
             }
 
             if (this.lidAngle < 0.0F)
@@ -430,9 +445,9 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
         }
     }
 
-    public void openInventory(EntityPlayer player)
+    public void openInventory(EntityPlayer playerIn)
     {
-        if (!player.isSpectator())
+        if (!playerIn.func_175149_v())
         {
             if (this.numPlayersUsing < 0)
             {
@@ -442,18 +457,18 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
             ++this.numPlayersUsing;
             this.worldObj.addBlockEvent(this.pos, this.getBlockType(), 1, this.numPlayersUsing);
             this.worldObj.notifyNeighborsOfStateChange(this.pos, this.getBlockType());
-            this.worldObj.notifyNeighborsOfStateChange(this.pos.down(), this.getBlockType());
+            this.worldObj.notifyNeighborsOfStateChange(this.pos.offsetDown(), this.getBlockType());
         }
     }
 
-    public void closeInventory(EntityPlayer player)
+    public void closeInventory(EntityPlayer playerIn)
     {
-        if (!player.isSpectator() && this.getBlockType() instanceof BlockChest)
+        if (!playerIn.func_175149_v() && this.getBlockType() instanceof BlockChest)
         {
             --this.numPlayersUsing;
             this.worldObj.addBlockEvent(this.pos, this.getBlockType(), 1, this.numPlayersUsing);
             this.worldObj.notifyNeighborsOfStateChange(this.pos, this.getBlockType());
-            this.worldObj.notifyNeighborsOfStateChange(this.pos.down(), this.getBlockType());
+            this.worldObj.notifyNeighborsOfStateChange(this.pos.offsetDown(), this.getBlockType());
         }
     }
 
@@ -505,20 +520,63 @@ public class TileEntityChest extends TileEntityLockable implements ITickable, II
         return 0;
     }
 
-    public void setField(int id, int value)
-    {
-    }
+    public void setField(int id, int value) {}
 
     public int getFieldCount()
     {
         return 0;
     }
 
-    public void clear()
+    public void clearInventory()
     {
-        for (int i = 0; i < this.chestContents.length; ++i)
+        for (int var1 = 0; var1 < this.chestContents.length; ++var1)
         {
-            this.chestContents[i] = null;
+            this.chestContents[var1] = null;
+        }
+    }
+
+    static final class SwitchEnumFacing
+    {
+        static final int[] field_177366_a = new int[EnumFacing.values().length];
+        
+
+        static
+        {
+            try
+            {
+                field_177366_a[EnumFacing.NORTH.ordinal()] = 1;
+            }
+            catch (NoSuchFieldError var4)
+            {
+                ;
+            }
+
+            try
+            {
+                field_177366_a[EnumFacing.SOUTH.ordinal()] = 2;
+            }
+            catch (NoSuchFieldError var3)
+            {
+                ;
+            }
+
+            try
+            {
+                field_177366_a[EnumFacing.EAST.ordinal()] = 3;
+            }
+            catch (NoSuchFieldError var2)
+            {
+                ;
+            }
+
+            try
+            {
+                field_177366_a[EnumFacing.WEST.ordinal()] = 4;
+            }
+            catch (NoSuchFieldError var1)
+            {
+                ;
+            }
         }
     }
 }

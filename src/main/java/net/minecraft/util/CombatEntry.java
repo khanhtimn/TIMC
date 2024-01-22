@@ -6,19 +6,20 @@ public class CombatEntry
 {
     private final DamageSource damageSrc;
     private final int field_94567_b;
-    private final float damage;
-    private final float health;
+    private final float field_94568_c;
+    private final float field_94565_d;
     private final String field_94566_e;
-    private final float fallDistance;
+    private final float field_94564_f;
+    
 
-    public CombatEntry(DamageSource damageSrcIn, int p_i1564_2_, float healthAmount, float damageAmount, String p_i1564_5_, float fallDistanceIn)
+    public CombatEntry(DamageSource p_i1564_1_, int p_i1564_2_, float p_i1564_3_, float p_i1564_4_, String p_i1564_5_, float p_i1564_6_)
     {
-        this.damageSrc = damageSrcIn;
+        this.damageSrc = p_i1564_1_;
         this.field_94567_b = p_i1564_2_;
-        this.damage = damageAmount;
-        this.health = healthAmount;
+        this.field_94568_c = p_i1564_4_;
+        this.field_94565_d = p_i1564_3_;
         this.field_94566_e = p_i1564_5_;
-        this.fallDistance = fallDistanceIn;
+        this.field_94564_f = p_i1564_6_;
     }
 
     /**
@@ -31,13 +32,10 @@ public class CombatEntry
 
     public float func_94563_c()
     {
-        return this.damage;
+        return this.field_94568_c;
     }
 
-    /**
-     * Returns true if {@link net.minecraft.util.DamageSource#getEntity() damage source} is a living entity
-     */
-    public boolean isLivingDamageSrc()
+    public boolean func_94559_f()
     {
         return this.damageSrc.getEntity() instanceof EntityLivingBase;
     }
@@ -47,13 +45,13 @@ public class CombatEntry
         return this.field_94566_e;
     }
 
-    public IChatComponent getDamageSrcDisplayName()
+    public IChatComponent func_151522_h()
     {
         return this.getDamageSrc().getEntity() == null ? null : this.getDamageSrc().getEntity().getDisplayName();
     }
 
-    public float getDamageAmount()
+    public float func_94561_i()
     {
-        return this.damageSrc == DamageSource.outOfWorld ? Float.MAX_VALUE : this.fallDistance;
+        return this.damageSrc == DamageSource.outOfWorld ? Float.MAX_VALUE : this.field_94564_f;
     }
 }

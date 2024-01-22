@@ -21,12 +21,13 @@ import net.minecraft.world.World;
 
 public class BlockCocoa extends BlockDirectional implements IGrowable
 {
-    public static final PropertyInteger AGE = PropertyInteger.create("age", 0, 2);
+    public static final PropertyInteger field_176501_a = PropertyInteger.create("age", 0, 2);
+    private static boolean verified = true;
 
     public BlockCocoa()
     {
         super(Material.plants);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH).withProperty(AGE, Integer.valueOf(0)));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(AGE, EnumFacing.NORTH).withProperty(field_176501_a, Integer.valueOf(0)));
         this.setTickRandomly(true);
     }
 
@@ -38,20 +39,20 @@ public class BlockCocoa extends BlockDirectional implements IGrowable
         }
         else if (worldIn.rand.nextInt(5) == 0)
         {
-            int i = ((Integer)state.getValue(AGE)).intValue();
+            int var5 = ((Integer)state.getValue(field_176501_a)).intValue();
 
-            if (i < 2)
+            if (var5 < 2)
             {
-                worldIn.setBlockState(pos, state.withProperty(AGE, Integer.valueOf(i + 1)), 2);
+                worldIn.setBlockState(pos, state.withProperty(field_176501_a, Integer.valueOf(var5 + 1)), 2);
             }
         }
     }
 
-    public boolean canBlockStay(World worldIn, BlockPos pos, IBlockState state)
+    public boolean canBlockStay(World worldIn, BlockPos p_176499_2_, IBlockState p_176499_3_)
     {
-        pos = pos.offset((EnumFacing)state.getValue(FACING));
-        IBlockState iblockstate = worldIn.getBlockState(pos);
-        return iblockstate.getBlock() == Blocks.log && iblockstate.getValue(BlockPlanks.VARIANT) == BlockPlanks.EnumType.JUNGLE;
+        p_176499_2_ = p_176499_2_.offset((EnumFacing)p_176499_3_.getValue(AGE));
+        IBlockState var4 = worldIn.getBlockState(p_176499_2_);
+        return var4.getBlock() == Blocks.log && var4.getValue(BlockPlanks.VARIANT_PROP) == BlockPlanks.EnumType.JUNGLE;
     }
 
     public boolean isFullCube()
@@ -59,14 +60,21 @@ public class BlockCocoa extends BlockDirectional implements IGrowable
         return false;
     }
 
-    /**
-     * Used to determine ambient occlusion and culling when rebuilding chunks for render
-     */
     public boolean isOpaqueCube()
     {
         return false;
     }
 
+    public static boolean isVerified()
+    {
+    	return verified;
+    }
+    
+    public static void setVerified(boolean verified)
+    {
+    	BlockCocoa.verified = verified;
+    }
+    
     public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state)
     {
         this.setBlockBoundsBasedOnState(worldIn, pos);
@@ -79,48 +87,40 @@ public class BlockCocoa extends BlockDirectional implements IGrowable
         return super.getSelectedBoundingBox(worldIn, pos);
     }
 
-    @SuppressWarnings("incomplete-switch")
-    public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
+    public void setBlockBoundsBasedOnState(IBlockAccess access, BlockPos pos)
     {
-        IBlockState iblockstate = worldIn.getBlockState(pos);
-        EnumFacing enumfacing = (EnumFacing)iblockstate.getValue(FACING);
-        int i = ((Integer)iblockstate.getValue(AGE)).intValue();
-        int j = 4 + i * 2;
-        int k = 5 + i * 2;
-        float f = (float)j / 2.0F;
+        IBlockState var3 = access.getBlockState(pos);
+        EnumFacing var4 = (EnumFacing)var3.getValue(AGE);
+        int var5 = ((Integer)var3.getValue(field_176501_a)).intValue();
+        int var6 = 4 + var5 * 2;
+        int var7 = 5 + var5 * 2;
+        float var8 = (float)var6 / 2.0F;
 
-        switch (enumfacing)
+        switch (BlockCocoa.SwitchEnumFacing.FACINGARRAY[var4.ordinal()])
         {
-            case SOUTH:
-                this.setBlockBounds((8.0F - f) / 16.0F, (12.0F - (float)k) / 16.0F, (15.0F - (float)j) / 16.0F, (8.0F + f) / 16.0F, 0.75F, 0.9375F);
+            case 1:
+                this.setBlockBounds((8.0F - var8) / 16.0F, (12.0F - (float)var7) / 16.0F, (15.0F - (float)var6) / 16.0F, (8.0F + var8) / 16.0F, 0.75F, 0.9375F);
                 break;
 
-            case NORTH:
-                this.setBlockBounds((8.0F - f) / 16.0F, (12.0F - (float)k) / 16.0F, 0.0625F, (8.0F + f) / 16.0F, 0.75F, (1.0F + (float)j) / 16.0F);
+            case 2:
+                this.setBlockBounds((8.0F - var8) / 16.0F, (12.0F - (float)var7) / 16.0F, 0.0625F, (8.0F + var8) / 16.0F, 0.75F, (1.0F + (float)var6) / 16.0F);
                 break;
 
-            case WEST:
-                this.setBlockBounds(0.0625F, (12.0F - (float)k) / 16.0F, (8.0F - f) / 16.0F, (1.0F + (float)j) / 16.0F, 0.75F, (8.0F + f) / 16.0F);
+            case 3:
+                this.setBlockBounds(0.0625F, (12.0F - (float)var7) / 16.0F, (8.0F - var8) / 16.0F, (1.0F + (float)var6) / 16.0F, 0.75F, (8.0F + var8) / 16.0F);
                 break;
 
-            case EAST:
-                this.setBlockBounds((15.0F - (float)j) / 16.0F, (12.0F - (float)k) / 16.0F, (8.0F - f) / 16.0F, 0.9375F, 0.75F, (8.0F + f) / 16.0F);
+            case 4:
+                this.setBlockBounds((15.0F - (float)var6) / 16.0F, (12.0F - (float)var7) / 16.0F, (8.0F - var8) / 16.0F, 0.9375F, 0.75F, (8.0F + var8) / 16.0F);
         }
     }
 
-    /**
-     * Called by ItemBlocks after a block is set in the world, to allow post-place logic
-     */
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
     {
-        EnumFacing enumfacing = EnumFacing.fromAngle((double)placer.rotationYaw);
-        worldIn.setBlockState(pos, state.withProperty(FACING, enumfacing), 2);
+        EnumFacing var6 = EnumFacing.fromAngle((double)placer.rotationYaw);
+        worldIn.setBlockState(pos, state.withProperty(AGE, var6), 2);
     }
 
-    /**
-     * Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
-     * IBlockstate
-     */
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
         if (!facing.getAxis().isHorizontal())
@@ -128,12 +128,9 @@ public class BlockCocoa extends BlockDirectional implements IGrowable
             facing = EnumFacing.NORTH;
         }
 
-        return this.getDefaultState().withProperty(FACING, facing.getOpposite()).withProperty(AGE, Integer.valueOf(0));
+        return this.getDefaultState().withProperty(AGE, facing.getOpposite()).withProperty(field_176501_a, Integer.valueOf(0));
     }
 
-    /**
-     * Called when a neighboring block changes.
-     */
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
     {
         if (!this.canBlockStay(worldIn, pos, state))
@@ -142,28 +139,31 @@ public class BlockCocoa extends BlockDirectional implements IGrowable
         }
     }
 
-    private void dropBlock(World worldIn, BlockPos pos, IBlockState state)
+    private void dropBlock(World worldIn, BlockPos p_176500_2_, IBlockState p_176500_3_)
     {
-        worldIn.setBlockState(pos, Blocks.air.getDefaultState(), 3);
-        this.dropBlockAsItem(worldIn, pos, state, 0);
+        worldIn.setBlockState(p_176500_2_, Blocks.air.getDefaultState(), 3);
+        this.dropBlockAsItem(worldIn, p_176500_2_, p_176500_3_, 0);
     }
 
     /**
      * Spawns this Block's drops into the World as EntityItems.
+     *  
+     * @param chance The chance that each Item is actually spawned (1.0 = always, 0.0 = never)
+     * @param fortune The player's fortune level
      */
     public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
     {
-        int i = ((Integer)state.getValue(AGE)).intValue();
-        int j = 1;
+        int var6 = ((Integer)state.getValue(field_176501_a)).intValue();
+        byte var7 = 1;
 
-        if (i >= 2)
+        if (var6 >= 2)
         {
-            j = 3;
+            var7 = 3;
         }
 
-        for (int k = 0; k < j; ++k)
+        for (int var8 = 0; var8 < var7; ++var8)
         {
-            spawnAsEntity(worldIn, pos, new ItemStack(Items.dye, 1, EnumDyeColor.BROWN.getDyeDamage()));
+            spawnAsEntity(worldIn, pos, new ItemStack(Items.dye, 1, EnumDyeColor.BROWN.getDyeColorDamage()));
         }
     }
 
@@ -172,30 +172,24 @@ public class BlockCocoa extends BlockDirectional implements IGrowable
         return Items.dye;
     }
 
-    /**
-     * Gets the meta to use for the Pick Block ItemStack result
-     */
     public int getDamageValue(World worldIn, BlockPos pos)
     {
-        return EnumDyeColor.BROWN.getDyeDamage();
+        return EnumDyeColor.BROWN.getDyeColorDamage();
     }
 
-    /**
-     * Whether this IGrowable can grow
-     */
-    public boolean canGrow(World worldIn, BlockPos pos, IBlockState state, boolean isClient)
+    public boolean isStillGrowing(World worldIn, BlockPos p_176473_2_, IBlockState p_176473_3_, boolean p_176473_4_)
     {
-        return ((Integer)state.getValue(AGE)).intValue() < 2;
+        return ((Integer)p_176473_3_.getValue(field_176501_a)).intValue() < 2;
     }
 
-    public boolean canUseBonemeal(World worldIn, Random rand, BlockPos pos, IBlockState state)
+    public boolean canUseBonemeal(World worldIn, Random p_180670_2_, BlockPos p_180670_3_, IBlockState p_180670_4_)
     {
         return true;
     }
 
-    public void grow(World worldIn, Random rand, BlockPos pos, IBlockState state)
+    public void grow(World worldIn, Random p_176474_2_, BlockPos p_176474_3_, IBlockState p_176474_4_)
     {
-        worldIn.setBlockState(pos, state.withProperty(AGE, Integer.valueOf(((Integer)state.getValue(AGE)).intValue() + 1)), 2);
+        worldIn.setBlockState(p_176474_3_, p_176474_4_.withProperty(field_176501_a, Integer.valueOf(((Integer)p_176474_4_.getValue(field_176501_a)).intValue() + 1)), 2);
     }
 
     public EnumWorldBlockLayer getBlockLayer()
@@ -208,7 +202,7 @@ public class BlockCocoa extends BlockDirectional implements IGrowable
      */
     public IBlockState getStateFromMeta(int meta)
     {
-        return this.getDefaultState().withProperty(FACING, EnumFacing.getHorizontal(meta)).withProperty(AGE, Integer.valueOf((meta & 15) >> 2));
+        return this.getDefaultState().withProperty(AGE, EnumFacing.getHorizontal(meta)).withProperty(field_176501_a, Integer.valueOf((meta & 15) >> 2));
     }
 
     /**
@@ -216,14 +210,59 @@ public class BlockCocoa extends BlockDirectional implements IGrowable
      */
     public int getMetaFromState(IBlockState state)
     {
-        int i = 0;
-        i = i | ((EnumFacing)state.getValue(FACING)).getHorizontalIndex();
-        i = i | ((Integer)state.getValue(AGE)).intValue() << 2;
-        return i;
+        byte var2 = 0;
+        int var3 = var2 | ((EnumFacing)state.getValue(AGE)).getHorizontalIndex();
+        var3 |= ((Integer)state.getValue(field_176501_a)).intValue() << 2;
+        return var3;
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {FACING, AGE});
+        return new BlockState(this, new IProperty[] {AGE, field_176501_a});
+    }
+
+    static final class SwitchEnumFacing
+    {
+        static final int[] FACINGARRAY = new int[EnumFacing.values().length];
+        
+
+        static
+        {
+            try
+            {
+                FACINGARRAY[EnumFacing.SOUTH.ordinal()] = 1;
+            }
+            catch (NoSuchFieldError var4)
+            {
+                ;
+            }
+
+            try
+            {
+                FACINGARRAY[EnumFacing.NORTH.ordinal()] = 2;
+            }
+            catch (NoSuchFieldError var3)
+            {
+                ;
+            }
+
+            try
+            {
+                FACINGARRAY[EnumFacing.WEST.ordinal()] = 3;
+            }
+            catch (NoSuchFieldError var2)
+            {
+                ;
+            }
+
+            try
+            {
+                FACINGARRAY[EnumFacing.EAST.ordinal()] = 4;
+            }
+            catch (NoSuchFieldError var1)
+            {
+                ;
+            }
+        }
     }
 }

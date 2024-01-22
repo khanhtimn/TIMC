@@ -24,14 +24,16 @@ public interface ISound
 
     public static enum AttenuationType
     {
-        NONE(0),
-        LINEAR(2);
-
+        NONE("NONE", 0, 0),
+        LINEAR("LINEAR", 1, 2);
         private final int type;
 
-        private AttenuationType(int typeIn)
+        private static final ISound.AttenuationType[] $VALUES = new ISound.AttenuationType[]{NONE, LINEAR};
+        
+
+        private AttenuationType(String p_i45110_1_, int p_i45110_2_, int p_i45110_3_)
         {
-            this.type = typeIn;
+            this.type = p_i45110_3_;
         }
 
         public int getTypeInt()

@@ -1,6 +1,7 @@
 package net.minecraft.item.crafting;
 
 import com.google.common.collect.Maps;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import net.minecraft.block.Block;
@@ -15,12 +16,12 @@ import net.minecraft.item.ItemStack;
 public class FurnaceRecipes
 {
     private static final FurnaceRecipes smeltingBase = new FurnaceRecipes();
-    private Map<ItemStack, ItemStack> smeltingList = Maps.<ItemStack, ItemStack>newHashMap();
-    private Map<ItemStack, Float> experienceList = Maps.<ItemStack, Float>newHashMap();
 
-    /**
-     * Returns an instance of FurnaceRecipes.
-     */
+    /** The list of smelting results. */
+    private Map smeltingList = Maps.newHashMap();
+    private Map experienceList = Maps.newHashMap();
+    
+
     public static FurnaceRecipes instance()
     {
         return smeltingBase;
@@ -41,92 +42,96 @@ public class FurnaceRecipes
         this.addSmeltingRecipe(new ItemStack(Blocks.stonebrick, 1, BlockStoneBrick.DEFAULT_META), new ItemStack(Blocks.stonebrick, 1, BlockStoneBrick.CRACKED_META), 0.1F);
         this.addSmelting(Items.clay_ball, new ItemStack(Items.brick), 0.3F);
         this.addSmeltingRecipeForBlock(Blocks.clay, new ItemStack(Blocks.hardened_clay), 0.35F);
-        this.addSmeltingRecipeForBlock(Blocks.cactus, new ItemStack(Items.dye, 1, EnumDyeColor.GREEN.getDyeDamage()), 0.2F);
+        this.addSmeltingRecipeForBlock(Blocks.cactus, new ItemStack(Items.dye, 1, EnumDyeColor.GREEN.getDyeColorDamage()), 0.2F);
         this.addSmeltingRecipeForBlock(Blocks.log, new ItemStack(Items.coal, 1, 1), 0.15F);
         this.addSmeltingRecipeForBlock(Blocks.log2, new ItemStack(Items.coal, 1, 1), 0.15F);
         this.addSmeltingRecipeForBlock(Blocks.emerald_ore, new ItemStack(Items.emerald), 1.0F);
         this.addSmelting(Items.potato, new ItemStack(Items.baked_potato), 0.35F);
         this.addSmeltingRecipeForBlock(Blocks.netherrack, new ItemStack(Items.netherbrick), 0.1F);
         this.addSmeltingRecipe(new ItemStack(Blocks.sponge, 1, 1), new ItemStack(Blocks.sponge, 1, 0), 0.15F);
+        ItemFishFood.FishType[] var1 = ItemFishFood.FishType.values();
+        int var2 = var1.length;
 
-        for (ItemFishFood.FishType itemfishfood$fishtype : ItemFishFood.FishType.values())
+        for (int var3 = 0; var3 < var2; ++var3)
         {
-            if (itemfishfood$fishtype.canCook())
+            ItemFishFood.FishType var4 = var1[var3];
+
+            if (var4.getCookable())
             {
-                this.addSmeltingRecipe(new ItemStack(Items.fish, 1, itemfishfood$fishtype.getMetadata()), new ItemStack(Items.cooked_fish, 1, itemfishfood$fishtype.getMetadata()), 0.35F);
+                this.addSmeltingRecipe(new ItemStack(Items.fish, 1, var4.getItemDamage()), new ItemStack(Items.cooked_fish, 1, var4.getItemDamage()), 0.35F);
             }
         }
 
         this.addSmeltingRecipeForBlock(Blocks.coal_ore, new ItemStack(Items.coal), 0.1F);
         this.addSmeltingRecipeForBlock(Blocks.redstone_ore, new ItemStack(Items.redstone), 0.7F);
-        this.addSmeltingRecipeForBlock(Blocks.lapis_ore, new ItemStack(Items.dye, 1, EnumDyeColor.BLUE.getDyeDamage()), 0.2F);
+        this.addSmeltingRecipeForBlock(Blocks.lapis_ore, new ItemStack(Items.dye, 1, EnumDyeColor.BLUE.getDyeColorDamage()), 0.2F);
         this.addSmeltingRecipeForBlock(Blocks.quartz_ore, new ItemStack(Items.quartz), 0.2F);
     }
 
-    /**
-     * Adds a smelting recipe, where the input item is an instance of Block.
-     */
-    public void addSmeltingRecipeForBlock(Block input, ItemStack stack, float experience)
+    public void addSmeltingRecipeForBlock(Block p_151393_1_, ItemStack p_151393_2_, float p_151393_3_)
     {
-        this.addSmelting(Item.getItemFromBlock(input), stack, experience);
+        this.addSmelting(Item.getItemFromBlock(p_151393_1_), p_151393_2_, p_151393_3_);
     }
 
-    /**
-     * Adds a smelting recipe using an Item as the input item.
-     */
-    public void addSmelting(Item input, ItemStack stack, float experience)
+    public void addSmelting(Item p_151396_1_, ItemStack p_151396_2_, float p_151396_3_)
     {
-        this.addSmeltingRecipe(new ItemStack(input, 1, 32767), stack, experience);
+        this.addSmeltingRecipe(new ItemStack(p_151396_1_, 1, 32767), p_151396_2_, p_151396_3_);
     }
 
-    /**
-     * Adds a smelting recipe using an ItemStack as the input for the recipe.
-     */
-    public void addSmeltingRecipe(ItemStack input, ItemStack stack, float experience)
+    public void addSmeltingRecipe(ItemStack p_151394_1_, ItemStack p_151394_2_, float p_151394_3_)
     {
-        this.smeltingList.put(input, stack);
-        this.experienceList.put(stack, Float.valueOf(experience));
+        this.smeltingList.put(p_151394_1_, p_151394_2_);
+        this.experienceList.put(p_151394_2_, Float.valueOf(p_151394_3_));
     }
 
     /**
      * Returns the smelting result of an item.
      */
-    public ItemStack getSmeltingResult(ItemStack stack)
+    public ItemStack getSmeltingResult(ItemStack p_151395_1_)
     {
-        for (Entry<ItemStack, ItemStack> entry : this.smeltingList.entrySet())
+        Iterator var2 = this.smeltingList.entrySet().iterator();
+        Entry var3;
+
+        do
         {
-            if (this.compareItemStacks(stack, (ItemStack)entry.getKey()))
+            if (!var2.hasNext())
             {
-                return (ItemStack)entry.getValue();
+                return null;
             }
+
+            var3 = (Entry)var2.next();
         }
+        while (!this.func_151397_a(p_151395_1_, (ItemStack)var3.getKey()));
 
-        return null;
+        return (ItemStack)var3.getValue();
     }
 
-    /**
-     * Compares two itemstacks to ensure that they are the same. This checks both the item and the metadata of the item.
-     */
-    private boolean compareItemStacks(ItemStack stack1, ItemStack stack2)
+    private boolean func_151397_a(ItemStack p_151397_1_, ItemStack p_151397_2_)
     {
-        return stack2.getItem() == stack1.getItem() && (stack2.getMetadata() == 32767 || stack2.getMetadata() == stack1.getMetadata());
+        return p_151397_2_.getItem() == p_151397_1_.getItem() && (p_151397_2_.getMetadata() == 32767 || p_151397_2_.getMetadata() == p_151397_1_.getMetadata());
     }
 
-    public Map<ItemStack, ItemStack> getSmeltingList()
+    public Map getSmeltingList()
     {
         return this.smeltingList;
     }
 
-    public float getSmeltingExperience(ItemStack stack)
+    public float getSmeltingExperience(ItemStack p_151398_1_)
     {
-        for (Entry<ItemStack, Float> entry : this.experienceList.entrySet())
-        {
-            if (this.compareItemStacks(stack, (ItemStack)entry.getKey()))
-            {
-                return ((Float)entry.getValue()).floatValue();
-            }
-        }
+        Iterator var2 = this.experienceList.entrySet().iterator();
+        Entry var3;
 
-        return 0.0F;
+        do
+        {
+            if (!var2.hasNext())
+            {
+                return 0.0F;
+            }
+
+            var3 = (Entry)var2.next();
+        }
+        while (!this.func_151397_a(p_151398_1_, (ItemStack)var3.getKey()));
+
+        return ((Float)var3.getValue()).floatValue();
     }
 }

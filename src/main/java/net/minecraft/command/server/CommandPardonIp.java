@@ -12,9 +12,8 @@ import net.minecraft.util.BlockPos;
 
 public class CommandPardonIp extends CommandBase
 {
-    /**
-     * Gets the name of the command
-     */
+    
+
     public String getCommandName()
     {
         return "pardon-ip";
@@ -36,24 +35,18 @@ public class CommandPardonIp extends CommandBase
         return MinecraftServer.getServer().getConfigurationManager().getBannedIPs().isLanServer() && super.canCommandSenderUseCommand(sender);
     }
 
-    /**
-     * Gets the usage string for the command.
-     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.unbanip.usage";
     }
 
-    /**
-     * Callback when the command is invoked
-     */
     public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
         if (args.length == 1 && args[0].length() > 1)
         {
-            Matcher matcher = CommandBanIp.field_147211_a.matcher(args[0]);
+            Matcher var3 = CommandBanIp.field_147211_a.matcher(args[0]);
 
-            if (matcher.matches())
+            if (var3.matches())
             {
                 MinecraftServer.getServer().getConfigurationManager().getBannedIPs().removeEntry(args[0]);
                 notifyOperators(sender, this, "commands.unbanip.success", new Object[] {args[0]});
@@ -69,7 +62,7 @@ public class CommandPardonIp extends CommandBase
         }
     }
 
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         return args.length == 1 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getConfigurationManager().getBannedIPs().getKeys()) : null;
     }

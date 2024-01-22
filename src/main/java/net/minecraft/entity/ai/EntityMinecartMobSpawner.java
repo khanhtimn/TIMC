@@ -13,19 +13,21 @@ public class EntityMinecartMobSpawner extends EntityMinecart
     /** Mob spawner logic for this spawner minecart. */
     private final MobSpawnerBaseLogic mobSpawnerLogic = new MobSpawnerBaseLogic()
     {
-        public void func_98267_a(int id)
+        
+        public void func_98267_a(int p_98267_1_)
         {
-            EntityMinecartMobSpawner.this.worldObj.setEntityState(EntityMinecartMobSpawner.this, (byte)id);
+            EntityMinecartMobSpawner.this.worldObj.setEntityState(EntityMinecartMobSpawner.this, (byte)p_98267_1_);
         }
         public World getSpawnerWorld()
         {
             return EntityMinecartMobSpawner.this.worldObj;
         }
-        public BlockPos getSpawnerPosition()
+        public BlockPos func_177221_b()
         {
             return new BlockPos(EntityMinecartMobSpawner.this);
         }
     };
+    
 
     public EntityMinecartMobSpawner(World worldIn)
     {
@@ -37,12 +39,12 @@ public class EntityMinecartMobSpawner extends EntityMinecart
         super(worldIn, p_i1726_2_, p_i1726_4_, p_i1726_6_);
     }
 
-    public EntityMinecart.EnumMinecartType getMinecartType()
+    public EntityMinecart.EnumMinecartType func_180456_s()
     {
         return EntityMinecart.EnumMinecartType.SPAWNER;
     }
 
-    public IBlockState getDefaultDisplayTile()
+    public IBlockState func_180457_u()
     {
         return Blocks.mob_spawner.getDefaultState();
     }
@@ -65,9 +67,9 @@ public class EntityMinecartMobSpawner extends EntityMinecart
         this.mobSpawnerLogic.writeToNBT(tagCompound);
     }
 
-    public void handleStatusUpdate(byte id)
+    public void handleHealthUpdate(byte p_70103_1_)
     {
-        this.mobSpawnerLogic.setDelayToMin(id);
+        this.mobSpawnerLogic.setDelayToMin(p_70103_1_);
     }
 
     /**

@@ -19,13 +19,14 @@ public class Slot
 
     /** display position of the inventory slot on the screen y axis */
     public int yDisplayPosition;
+    
 
-    public Slot(IInventory inventoryIn, int index, int xPosition, int yPosition)
+    public Slot(IInventory p_i1824_1_, int p_i1824_2_, int p_i1824_3_, int p_i1824_4_)
     {
-        this.inventory = inventoryIn;
-        this.slotIndex = index;
-        this.xDisplayPosition = xPosition;
-        this.yDisplayPosition = yPosition;
+        this.inventory = p_i1824_1_;
+        this.slotIndex = p_i1824_2_;
+        this.xDisplayPosition = p_i1824_3_;
+        this.yDisplayPosition = p_i1824_4_;
     }
 
     /**
@@ -37,11 +38,11 @@ public class Slot
         {
             if (p_75220_1_.getItem() == p_75220_2_.getItem())
             {
-                int i = p_75220_2_.stackSize - p_75220_1_.stackSize;
+                int var3 = p_75220_2_.stackSize - p_75220_1_.stackSize;
 
-                if (i > 0)
+                if (var3 > 0)
                 {
-                    this.onCrafting(p_75220_1_, i);
+                    this.onCrafting(p_75220_1_, var3);
                 }
             }
         }
@@ -51,16 +52,12 @@ public class Slot
      * the itemStack passed in is the output - ie, iron ingots, and pickaxes, not ore and wood. Typically increases an
      * internal count then calls onCrafting(item).
      */
-    protected void onCrafting(ItemStack stack, int amount)
-    {
-    }
+    protected void onCrafting(ItemStack p_75210_1_, int p_75210_2_) {}
 
     /**
      * the itemStack passed in is the output - ie, iron ingots, and pickaxes, not ore and wood.
      */
-    protected void onCrafting(ItemStack stack)
-    {
-    }
+    protected void onCrafting(ItemStack p_75208_1_) {}
 
     public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack)
     {
@@ -94,9 +91,9 @@ public class Slot
     /**
      * Helper method to put a stack in the slot.
      */
-    public void putStack(ItemStack stack)
+    public void putStack(ItemStack p_75215_1_)
     {
-        this.inventory.setInventorySlotContents(this.slotIndex, stack);
+        this.inventory.setInventorySlotContents(this.slotIndex, p_75215_1_);
         this.onSlotChanged();
     }
 
@@ -117,12 +114,12 @@ public class Slot
         return this.inventory.getInventoryStackLimit();
     }
 
-    public int getItemStackLimit(ItemStack stack)
+    public int func_178170_b(ItemStack p_178170_1_)
     {
         return this.getSlotStackLimit();
     }
 
-    public String getSlotTexture()
+    public String func_178171_c()
     {
         return null;
     }
@@ -131,23 +128,23 @@ public class Slot
      * Decrease the size of the stack in slot (first int arg) by the amount of the second int arg. Returns the new
      * stack.
      */
-    public ItemStack decrStackSize(int amount)
+    public ItemStack decrStackSize(int p_75209_1_)
     {
-        return this.inventory.decrStackSize(this.slotIndex, amount);
+        return this.inventory.decrStackSize(this.slotIndex, p_75209_1_);
     }
 
     /**
      * returns true if the slot exists in the given inventory and location
      */
-    public boolean isHere(IInventory inv, int slotIn)
+    public boolean isHere(IInventory p_75217_1_, int p_75217_2_)
     {
-        return inv == this.inventory && slotIn == this.slotIndex;
+        return p_75217_1_ == this.inventory && p_75217_2_ == this.slotIndex;
     }
 
     /**
      * Return whether this slot's stack can be taken from this slot.
      */
-    public boolean canTakeStack(EntityPlayer playerIn)
+    public boolean canTakeStack(EntityPlayer p_82869_1_)
     {
         return true;
     }

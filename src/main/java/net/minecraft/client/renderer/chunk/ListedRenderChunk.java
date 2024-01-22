@@ -8,21 +8,22 @@ import net.minecraft.world.World;
 
 public class ListedRenderChunk extends RenderChunk
 {
-    private final int baseDisplayList = GLAllocation.generateDisplayLists(EnumWorldBlockLayer.values().length);
+    private final int field_178601_d = GLAllocation.generateDisplayLists(EnumWorldBlockLayer.values().length);
+    
 
-    public ListedRenderChunk(World worldIn, RenderGlobal renderGlobalIn, BlockPos pos, int indexIn)
+    public ListedRenderChunk(World worldIn, RenderGlobal p_i46198_2_, BlockPos p_i46198_3_, int p_i46198_4_)
     {
-        super(worldIn, renderGlobalIn, pos, indexIn);
+        super(worldIn, p_i46198_2_, p_i46198_3_, p_i46198_4_);
     }
 
-    public int getDisplayList(EnumWorldBlockLayer layer, CompiledChunk p_178600_2_)
+    public int func_178600_a(EnumWorldBlockLayer p_178600_1_, CompiledChunk p_178600_2_)
     {
-        return !p_178600_2_.isLayerEmpty(layer) ? this.baseDisplayList + layer.ordinal() : -1;
+        return !p_178600_2_.func_178491_b(p_178600_1_) ? this.field_178601_d + p_178600_1_.ordinal() : -1;
     }
 
-    public void deleteGlResources()
+    public void func_178566_a()
     {
-        super.deleteGlResources();
-        GLAllocation.deleteDisplayLists(this.baseDisplayList, EnumWorldBlockLayer.values().length);
+        super.func_178566_a();
+        GLAllocation.func_178874_a(this.field_178601_d, EnumWorldBlockLayer.values().length);
     }
 }

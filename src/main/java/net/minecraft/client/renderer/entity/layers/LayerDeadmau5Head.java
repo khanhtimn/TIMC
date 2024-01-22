@@ -3,36 +3,38 @@ package net.minecraft.client.renderer.entity.layers;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
+import net.minecraft.entity.EntityLivingBase;
 
-public class LayerDeadmau5Head implements LayerRenderer<AbstractClientPlayer>
+public class LayerDeadmau5Head implements LayerRenderer
 {
-    private final RenderPlayer playerRenderer;
+    private final RenderPlayer field_177208_a;
+    
 
-    public LayerDeadmau5Head(RenderPlayer playerRendererIn)
+    public LayerDeadmau5Head(RenderPlayer p_i46119_1_)
     {
-        this.playerRenderer = playerRendererIn;
+        this.field_177208_a = p_i46119_1_;
     }
 
-    public void doRenderLayer(AbstractClientPlayer entitylivingbaseIn, float p_177141_2_, float p_177141_3_, float partialTicks, float p_177141_5_, float p_177141_6_, float p_177141_7_, float scale)
+    public void func_177207_a(AbstractClientPlayer p_177207_1_, float p_177207_2_, float p_177207_3_, float p_177207_4_, float p_177207_5_, float p_177207_6_, float p_177207_7_, float p_177207_8_)
     {
-        if (entitylivingbaseIn.getName().equals("deadmau5") && entitylivingbaseIn.hasSkin() && !entitylivingbaseIn.isInvisible())
+        if (p_177207_1_.getName().equals("deadmau5") && p_177207_1_.hasSkin() && !p_177207_1_.isInvisible())
         {
-            this.playerRenderer.bindTexture(entitylivingbaseIn.getLocationSkin());
+            this.field_177208_a.bindTexture(p_177207_1_.getLocationSkin());
 
-            for (int i = 0; i < 2; ++i)
+            for (int var9 = 0; var9 < 2; ++var9)
             {
-                float f = entitylivingbaseIn.prevRotationYaw + (entitylivingbaseIn.rotationYaw - entitylivingbaseIn.prevRotationYaw) * partialTicks - (entitylivingbaseIn.prevRenderYawOffset + (entitylivingbaseIn.renderYawOffset - entitylivingbaseIn.prevRenderYawOffset) * partialTicks);
-                float f1 = entitylivingbaseIn.prevRotationPitch + (entitylivingbaseIn.rotationPitch - entitylivingbaseIn.prevRotationPitch) * partialTicks;
+                float var10 = p_177207_1_.prevRotationYaw + (p_177207_1_.rotationYaw - p_177207_1_.prevRotationYaw) * p_177207_4_ - (p_177207_1_.prevRenderYawOffset + (p_177207_1_.renderYawOffset - p_177207_1_.prevRenderYawOffset) * p_177207_4_);
+                float var11 = p_177207_1_.prevRotationPitch + (p_177207_1_.rotationPitch - p_177207_1_.prevRotationPitch) * p_177207_4_;
                 GlStateManager.pushMatrix();
-                GlStateManager.rotate(f, 0.0F, 1.0F, 0.0F);
-                GlStateManager.rotate(f1, 1.0F, 0.0F, 0.0F);
-                GlStateManager.translate(0.375F * (float)(i * 2 - 1), 0.0F, 0.0F);
+                GlStateManager.rotate(var10, 0.0F, 1.0F, 0.0F);
+                GlStateManager.rotate(var11, 1.0F, 0.0F, 0.0F);
+                GlStateManager.translate(0.375F * (float)(var9 * 2 - 1), 0.0F, 0.0F);
                 GlStateManager.translate(0.0F, -0.375F, 0.0F);
-                GlStateManager.rotate(-f1, 1.0F, 0.0F, 0.0F);
-                GlStateManager.rotate(-f, 0.0F, 1.0F, 0.0F);
-                float f2 = 1.3333334F;
-                GlStateManager.scale(f2, f2, f2);
-                this.playerRenderer.getMainModel().renderDeadmau5Head(0.0625F);
+                GlStateManager.rotate(-var11, 1.0F, 0.0F, 0.0F);
+                GlStateManager.rotate(-var10, 0.0F, 1.0F, 0.0F);
+                float var12 = 1.3333334F;
+                GlStateManager.scale(var12, var12, var12);
+                this.field_177208_a.func_177136_g().func_178727_b(0.0625F);
                 GlStateManager.popMatrix();
             }
         }
@@ -41,5 +43,10 @@ public class LayerDeadmau5Head implements LayerRenderer<AbstractClientPlayer>
     public boolean shouldCombineTextures()
     {
         return true;
+    }
+
+    public void doRenderLayer(EntityLivingBase p_177141_1_, float p_177141_2_, float p_177141_3_, float p_177141_4_, float p_177141_5_, float p_177141_6_, float p_177141_7_, float p_177141_8_)
+    {
+        this.func_177207_a((AbstractClientPlayer)p_177141_1_, p_177141_2_, p_177141_3_, p_177141_4_, p_177141_5_, p_177141_6_, p_177141_7_, p_177141_8_);
     }
 }

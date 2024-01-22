@@ -7,13 +7,14 @@ import java.io.IOException;
 public abstract class NBTBase
 {
     public static final String[] NBT_TYPES = new String[] {"END", "BYTE", "SHORT", "INT", "LONG", "FLOAT", "DOUBLE", "BYTE[]", "STRING", "LIST", "COMPOUND", "INT[]"};
+    
 
     /**
      * Write the actual data contents of the tag, implemented in NBT extension classes
      */
-    abstract void write(DataOutput output) throws IOException;
+    abstract void write(DataOutput var1) throws IOException;
 
-    abstract void read(DataInput input, int depth, NBTSizeTracker sizeTracker) throws IOException;
+    abstract void read(DataInput var1, int var2, NBTSizeTracker var3) throws IOException;
 
     public abstract String toString();
 
@@ -91,8 +92,8 @@ public abstract class NBTBase
         }
         else
         {
-            NBTBase nbtbase = (NBTBase)p_equals_1_;
-            return this.getId() == nbtbase.getId();
+            NBTBase var2 = (NBTBase)p_equals_1_;
+            return this.getId() == var2.getId();
         }
     }
 
@@ -108,6 +109,8 @@ public abstract class NBTBase
 
     public abstract static class NBTPrimitive extends NBTBase
     {
+        
+
         public abstract long getLong();
 
         public abstract int getInt();

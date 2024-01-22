@@ -8,35 +8,36 @@ import net.minecraft.util.IRegistry;
 
 public class ModelManager implements IResourceManagerReloadListener
 {
-    private IRegistry<ModelResourceLocation, IBakedModel> modelRegistry;
-    private final TextureMap texMap;
-    private final BlockModelShapes modelProvider;
+    private IRegistry modelRegistry;
+    private final TextureMap field_174956_b;
+    private final BlockModelShapes field_174957_c;
     private IBakedModel defaultModel;
+    
 
-    public ModelManager(TextureMap textures)
+    public ModelManager(TextureMap p_i46082_1_)
     {
-        this.texMap = textures;
-        this.modelProvider = new BlockModelShapes(this);
+        this.field_174956_b = p_i46082_1_;
+        this.field_174957_c = new BlockModelShapes(this);
     }
 
-    public void onResourceManagerReload(IResourceManager resourceManager)
+    public void onResourceManagerReload(IResourceManager p_110549_1_)
     {
-        ModelBakery modelbakery = new ModelBakery(resourceManager, this.texMap, this.modelProvider);
-        this.modelRegistry = modelbakery.setupModelRegistry();
+        ModelBakery var2 = new ModelBakery(p_110549_1_, this.field_174956_b, this.field_174957_c);
+        this.modelRegistry = var2.setupModelRegistry();
         this.defaultModel = (IBakedModel)this.modelRegistry.getObject(ModelBakery.MODEL_MISSING);
-        this.modelProvider.reloadModels();
+        this.field_174957_c.func_178124_c();
     }
 
-    public IBakedModel getModel(ModelResourceLocation modelLocation)
+    public IBakedModel getModel(ModelResourceLocation p_174953_1_)
     {
-        if (modelLocation == null)
+        if (p_174953_1_ == null)
         {
             return this.defaultModel;
         }
         else
         {
-            IBakedModel ibakedmodel = (IBakedModel)this.modelRegistry.getObject(modelLocation);
-            return ibakedmodel == null ? this.defaultModel : ibakedmodel;
+            IBakedModel var2 = (IBakedModel)this.modelRegistry.getObject(p_174953_1_);
+            return var2 == null ? this.defaultModel : var2;
         }
     }
 
@@ -45,13 +46,13 @@ public class ModelManager implements IResourceManagerReloadListener
         return this.defaultModel;
     }
 
-    public TextureMap getTextureMap()
+    public TextureMap func_174952_b()
     {
-        return this.texMap;
+        return this.field_174956_b;
     }
 
     public BlockModelShapes getBlockModelShapes()
     {
-        return this.modelProvider;
+        return this.field_174957_c;
     }
 }

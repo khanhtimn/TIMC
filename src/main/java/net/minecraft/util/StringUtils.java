@@ -5,28 +5,29 @@ import java.util.regex.Pattern;
 public class StringUtils
 {
     private static final Pattern patternControlCode = Pattern.compile("(?i)\\u00A7[0-9A-FK-OR]");
+    
 
     /**
      * Returns the time elapsed for the given number of ticks, in "mm:ss" format.
      */
-    public static String ticksToElapsedTime(int ticks)
+    public static String ticksToElapsedTime(int p_76337_0_)
     {
-        int i = ticks / 20;
-        int j = i / 60;
-        i = i % 60;
-        return i < 10 ? j + ":0" + i : j + ":" + i;
+        int var1 = p_76337_0_ / 20;
+        int var2 = var1 / 60;
+        var1 %= 60;
+        return var1 < 10 ? var2 + ":0" + var1 : var2 + ":" + var1;
     }
 
-    public static String stripControlCodes(String text)
+    public static String stripControlCodes(String p_76338_0_)
     {
-        return patternControlCode.matcher(text).replaceAll("");
+        return patternControlCode.matcher(p_76338_0_).replaceAll("");
     }
 
     /**
      * Returns a value indicating whether the given string is null or empty.
      */
-    public static boolean isNullOrEmpty(String string)
+    public static boolean isNullOrEmpty(String p_151246_0_)
     {
-        return org.apache.commons.lang3.StringUtils.isEmpty(string);
+        return org.apache.commons.lang3.StringUtils.isEmpty(p_151246_0_);
     }
 }

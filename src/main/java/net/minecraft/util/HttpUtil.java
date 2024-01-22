@@ -11,13 +11,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.ServerSocket;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Executors;
@@ -35,52 +36,56 @@ public class HttpUtil
     /** The number of download threads that we have started so far. */
     private static final AtomicInteger downloadThreadsStarted = new AtomicInteger(0);
     private static final Logger logger = LogManager.getLogger();
+    
 
     /**
      * Builds an encoded HTTP POST content string from a string map
      */
-    public static String buildPostString(Map<String, Object> data)
+    public static String buildPostString(Map data)
     {
-        StringBuilder stringbuilder = new StringBuilder();
+        StringBuilder var1 = new StringBuilder();
+        Iterator var2 = data.entrySet().iterator();
 
-        for (Entry<String, Object> entry : data.entrySet())
+        while (var2.hasNext())
         {
-            if (stringbuilder.length() > 0)
+            Entry var3 = (Entry)var2.next();
+
+            if (var1.length() > 0)
             {
-                stringbuilder.append('&');
+                var1.append('&');
             }
 
             try
             {
-                stringbuilder.append(URLEncoder.encode((String)entry.getKey(), "UTF-8"));
+                var1.append(URLEncoder.encode((String)var3.getKey(), "UTF-8"));
             }
-            catch (UnsupportedEncodingException unsupportedencodingexception1)
+            catch (UnsupportedEncodingException var6)
             {
-                unsupportedencodingexception1.printStackTrace();
+                var6.printStackTrace();
             }
 
-            if (entry.getValue() != null)
+            if (var3.getValue() != null)
             {
-                stringbuilder.append('=');
+                var1.append('=');
 
                 try
                 {
-                    stringbuilder.append(URLEncoder.encode(entry.getValue().toString(), "UTF-8"));
+                    var1.append(URLEncoder.encode(var3.getValue().toString(), "UTF-8"));
                 }
-                catch (UnsupportedEncodingException unsupportedencodingexception)
+                catch (UnsupportedEncodingException var5)
                 {
-                    unsupportedencodingexception.printStackTrace();
+                    var5.printStackTrace();
                 }
             }
         }
 
-        return stringbuilder.toString();
+        return var1.toString();
     }
 
     /**
      * Sends a POST to the given URL using the map as the POST args
      */
-    public static String postMap(URL url, Map<String, Object> data, boolean skipLoggingErrors)
+    public static String postMap(URL url, Map data, boolean skipLoggingErrors)
     {
         return post(url, buildPostString(data), skipLoggingErrors);
     }
@@ -92,58 +97,58 @@ public class HttpUtil
     {
         try
         {
-            Proxy proxy = MinecraftServer.getServer() == null ? null : MinecraftServer.getServer().getServerProxy();
+            Proxy var3 = MinecraftServer.getServer() == null ? null : MinecraftServer.getServer().getServerProxy();
 
-            if (proxy == null)
+            if (var3 == null)
             {
-                proxy = Proxy.NO_PROXY;
+                var3 = Proxy.NO_PROXY;
             }
 
-            HttpURLConnection httpurlconnection = (HttpURLConnection)url.openConnection(proxy);
-            httpurlconnection.setRequestMethod("POST");
-            httpurlconnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            httpurlconnection.setRequestProperty("Content-Length", "" + content.getBytes().length);
-            httpurlconnection.setRequestProperty("Content-Language", "en-US");
-            httpurlconnection.setUseCaches(false);
-            httpurlconnection.setDoInput(true);
-            httpurlconnection.setDoOutput(true);
-            DataOutputStream dataoutputstream = new DataOutputStream(httpurlconnection.getOutputStream());
-            dataoutputstream.writeBytes(content);
-            dataoutputstream.flush();
-            dataoutputstream.close();
-            BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(httpurlconnection.getInputStream()));
-            StringBuffer stringbuffer = new StringBuffer();
-            String s;
+            HttpURLConnection var4 = (HttpURLConnection)url.openConnection(var3);
+            var4.setRequestMethod("POST");
+            var4.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            var4.setRequestProperty("Content-Length", "" + content.getBytes().length);
+            var4.setRequestProperty("Content-Language", "en-US");
+            var4.setUseCaches(false);
+            var4.setDoInput(true);
+            var4.setDoOutput(true);
+            DataOutputStream var5 = new DataOutputStream(var4.getOutputStream());
+            var5.writeBytes(content);
+            var5.flush();
+            var5.close();
+            BufferedReader var6 = new BufferedReader(new InputStreamReader(var4.getInputStream()));
+            StringBuffer var8 = new StringBuffer();
+            String var7;
 
-            while ((s = bufferedreader.readLine()) != null)
+            while ((var7 = var6.readLine()) != null)
             {
-                stringbuffer.append(s);
-                stringbuffer.append('\r');
+                var8.append(var7);
+                var8.append('\r');
             }
 
-            bufferedreader.close();
-            return stringbuffer.toString();
+            var6.close();
+            return var8.toString();
         }
-        catch (Exception exception)
+        catch (Exception var9)
         {
             if (!skipLoggingErrors)
             {
-                logger.error((String)("Could not post to " + url), (Throwable)exception);
+                logger.error("Could not post to " + url, var9);
             }
 
             return "";
         }
     }
 
-    public static ListenableFuture<Object> downloadResourcePack(final File saveFile, final String packUrl, final Map<String, String> p_180192_2_, final int maxSize, final IProgressUpdate p_180192_4_, final Proxy p_180192_5_)
+    public static ListenableFuture func_180192_a(final File p_180192_0_, final String p_180192_1_, final Map p_180192_2_, final int p_180192_3_, final IProgressUpdate p_180192_4_, final Proxy p_180192_5_)
     {
-        ListenableFuture<?> listenablefuture = field_180193_a.submit(new Runnable()
+        ListenableFuture var6 = field_180193_a.submit(new Runnable()
         {
+            
             public void run()
             {
-                HttpURLConnection httpurlconnection = null;
-                InputStream inputstream = null;
-                OutputStream outputstream = null;
+                InputStream var2 = null;
+                DataOutputStream var3 = null;
 
                 if (p_180192_4_ != null)
                 {
@@ -155,36 +160,38 @@ public class HttpUtil
                 {
                     try
                     {
-                        byte[] abyte = new byte[4096];
-                        URL url = new URL(packUrl);
-                        httpurlconnection = (HttpURLConnection)url.openConnection(p_180192_5_);
-                        float f = 0.0F;
-                        float f1 = (float)p_180192_2_.entrySet().size();
+                        byte[] var4 = new byte[4096];
+                        URL var5 = new URL(p_180192_1_);
+                        URLConnection var1 = var5.openConnection(p_180192_5_);
+                        float var6 = 0.0F;
+                        float var7 = (float)p_180192_2_.entrySet().size();
+                        Iterator var8 = p_180192_2_.entrySet().iterator();
 
-                        for (Entry<String, String> entry : p_180192_2_.entrySet())
+                        while (var8.hasNext())
                         {
-                            httpurlconnection.setRequestProperty((String)entry.getKey(), (String)entry.getValue());
+                            Entry var9 = (Entry)var8.next();
+                            var1.setRequestProperty((String)var9.getKey(), (String)var9.getValue());
 
                             if (p_180192_4_ != null)
                             {
-                                p_180192_4_.setLoadingProgress((int)(++f / f1 * 100.0F));
+                                p_180192_4_.setLoadingProgress((int)(++var6 / var7 * 100.0F));
                             }
                         }
 
-                        inputstream = httpurlconnection.getInputStream();
-                        f1 = (float)httpurlconnection.getContentLength();
-                        int i = httpurlconnection.getContentLength();
+                        var2 = var1.getInputStream();
+                        var7 = (float)var1.getContentLength();
+                        int var16 = var1.getContentLength();
 
                         if (p_180192_4_ != null)
                         {
-                            p_180192_4_.displayLoadingString(String.format("Downloading file (%.2f MB)...", new Object[] {Float.valueOf(f1 / 1000.0F / 1000.0F)}));
+                            p_180192_4_.displayLoadingString(String.format("Downloading file (%.2f MB)...", new Object[] {Float.valueOf(var7 / 1000.0F / 1000.0F)}));
                         }
 
-                        if (saveFile.exists())
+                        if (p_180192_0_.exists())
                         {
-                            long j = saveFile.length();
+                            long var17 = p_180192_0_.length();
 
-                            if (j == (long)i)
+                            if (var17 == (long)var16)
                             {
                                 if (p_180192_4_ != null)
                                 {
@@ -194,60 +201,49 @@ public class HttpUtil
                                 return;
                             }
 
-                            HttpUtil.logger.warn("Deleting " + saveFile + " as it does not match what we currently have (" + i + " vs our " + j + ").");
-                            FileUtils.deleteQuietly(saveFile);
+                            HttpUtil.logger.warn("Deleting " + p_180192_0_ + " as it does not match what we currently have (" + var16 + " vs our " + var17 + ").");
+                            FileUtils.deleteQuietly(p_180192_0_);
                         }
-                        else if (saveFile.getParentFile() != null)
+                        else if (p_180192_0_.getParentFile() != null)
                         {
-                            saveFile.getParentFile().mkdirs();
+                            p_180192_0_.getParentFile().mkdirs();
                         }
 
-                        outputstream = new DataOutputStream(new FileOutputStream(saveFile));
+                        var3 = new DataOutputStream(new FileOutputStream(p_180192_0_));
 
-                        if (maxSize > 0 && f1 > (float)maxSize)
+                        if (p_180192_3_ > 0 && var7 > (float)p_180192_3_)
                         {
                             if (p_180192_4_ != null)
                             {
                                 p_180192_4_.setDoneWorking();
                             }
 
-                            throw new IOException("Filesize is bigger than maximum allowed (file is " + f + ", limit is " + maxSize + ")");
+                            throw new IOException("Filesize is bigger than maximum allowed (file is " + var6 + ", limit is " + p_180192_3_ + ")");
                         }
 
-                        int k = 0;
+                        boolean var18 = false;
+                        int var19;
 
-                        while ((k = inputstream.read(abyte)) >= 0)
+                        while ((var19 = var2.read(var4)) >= 0)
                         {
-                            f += (float)k;
+                            var6 += (float)var19;
 
                             if (p_180192_4_ != null)
                             {
-                                p_180192_4_.setLoadingProgress((int)(f / f1 * 100.0F));
+                                p_180192_4_.setLoadingProgress((int)(var6 / var7 * 100.0F));
                             }
 
-                            if (maxSize > 0 && f > (float)maxSize)
+                            if (p_180192_3_ > 0 && var6 > (float)p_180192_3_)
                             {
                                 if (p_180192_4_ != null)
                                 {
                                     p_180192_4_.setDoneWorking();
                                 }
 
-                                throw new IOException("Filesize was bigger than maximum allowed (got >= " + f + ", limit was " + maxSize + ")");
+                                throw new IOException("Filesize was bigger than maximum allowed (got >= " + var6 + ", limit was " + p_180192_3_ + ")");
                             }
 
-                            if (Thread.interrupted())
-                            {
-                                HttpUtil.logger.error("INTERRUPTED");
-
-                                if (p_180192_4_ != null)
-                                {
-                                    p_180192_4_.setDoneWorking();
-                                }
-
-                                return;
-                            }
-
-                            outputstream.write(abyte, 0, k);
+                            var3.write(var4, 0, var19);
                         }
 
                         if (p_180192_4_ != null)
@@ -256,58 +252,39 @@ public class HttpUtil
                             return;
                         }
                     }
-                    catch (Throwable throwable)
+                    catch (Throwable var14)
                     {
-                        throwable.printStackTrace();
-
-                        if (httpurlconnection != null)
-                        {
-                            InputStream inputstream1 = httpurlconnection.getErrorStream();
-
-                            try
-                            {
-                                HttpUtil.logger.error(IOUtils.toString(inputstream1));
-                            }
-                            catch (IOException ioexception)
-                            {
-                                ioexception.printStackTrace();
-                            }
-                        }
-
-                        if (p_180192_4_ != null)
-                        {
-                            p_180192_4_.setDoneWorking();
-                            return;
-                        }
+                        var14.printStackTrace();
                     }
                 }
                 finally
                 {
-                    IOUtils.closeQuietly(inputstream);
-                    IOUtils.closeQuietly(outputstream);
+                    IOUtils.closeQuietly(var2);
+                    IOUtils.closeQuietly(var3);
                 }
             }
         });
-        return (ListenableFuture<Object>) listenablefuture;
+        return var6;
     }
 
     public static int getSuitableLanPort() throws IOException
     {
-        ServerSocket serversocket = null;
-        int i = -1;
+        ServerSocket var0 = null;
+        boolean var1 = true;
+        int var10;
 
         try
         {
-            serversocket = new ServerSocket(0);
-            i = serversocket.getLocalPort();
+            var0 = new ServerSocket(0);
+            var10 = var0.getLocalPort();
         }
         finally
         {
             try
             {
-                if (serversocket != null)
+                if (var0 != null)
                 {
-                    serversocket.close();
+                    var0.close();
                 }
             }
             catch (IOException var8)
@@ -316,7 +293,7 @@ public class HttpUtil
             }
         }
 
-        return i;
+        return var10;
     }
 
     /**
@@ -324,19 +301,19 @@ public class HttpUtil
      */
     public static String get(URL url) throws IOException
     {
-        HttpURLConnection httpurlconnection = (HttpURLConnection)url.openConnection();
-        httpurlconnection.setRequestMethod("GET");
-        BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(httpurlconnection.getInputStream()));
-        StringBuilder stringbuilder = new StringBuilder();
-        String s;
+        HttpURLConnection var1 = (HttpURLConnection)url.openConnection();
+        var1.setRequestMethod("GET");
+        BufferedReader var2 = new BufferedReader(new InputStreamReader(var1.getInputStream()));
+        StringBuilder var4 = new StringBuilder();
+        String var3;
 
-        while ((s = bufferedreader.readLine()) != null)
+        while ((var3 = var2.readLine()) != null)
         {
-            stringbuilder.append(s);
-            stringbuilder.append('\r');
+            var4.append(var3);
+            var4.append('\r');
         }
 
-        bufferedreader.close();
-        return stringbuilder.toString();
+        var2.close();
+        return var4.toString();
     }
 }

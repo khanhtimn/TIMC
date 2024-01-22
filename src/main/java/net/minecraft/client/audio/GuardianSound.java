@@ -6,6 +6,7 @@ import net.minecraft.util.ResourceLocation;
 public class GuardianSound extends MovingSound
 {
     private final EntityGuardian guardian;
+    
 
     public GuardianSound(EntityGuardian guardian)
     {
@@ -17,18 +18,18 @@ public class GuardianSound extends MovingSound
     }
 
     /**
-     * Like the old updateEntity(), except more generic.
+     * Updates the JList with a new model.
      */
     public void update()
     {
-        if (!this.guardian.isDead && this.guardian.hasTargetedEntity())
+        if (!this.guardian.isDead && this.guardian.func_175474_cn())
         {
             this.xPosF = (float)this.guardian.posX;
             this.yPosF = (float)this.guardian.posY;
             this.zPosF = (float)this.guardian.posZ;
-            float f = this.guardian.func_175477_p(0.0F);
-            this.volume = 0.0F + 1.0F * f * f;
-            this.pitch = 0.7F + 0.5F * f;
+            float var1 = this.guardian.func_175477_p(0.0F);
+            this.volume = 0.0F + 1.0F * var1 * var1;
+            this.pitch = 0.7F + 0.5F * var1;
         }
         else
         {

@@ -2,86 +2,91 @@ package net.minecraft.network.play.server;
 
 import java.io.IOException;
 import net.minecraft.entity.item.EntityXPOrb;
+import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.util.MathHelper;
 
-public class S11PacketSpawnExperienceOrb implements Packet<INetHandlerPlayClient>
+public class S11PacketSpawnExperienceOrb implements Packet
 {
-    private int entityID;
-    private int posX;
-    private int posY;
-    private int posZ;
-    private int xpValue;
+    private int field_148992_a;
+    private int field_148990_b;
+    private int field_148991_c;
+    private int field_148988_d;
+    private int field_148989_e;
+    
 
-    public S11PacketSpawnExperienceOrb()
-    {
-    }
+    public S11PacketSpawnExperienceOrb() {}
 
-    public S11PacketSpawnExperienceOrb(EntityXPOrb xpOrb)
+    public S11PacketSpawnExperienceOrb(EntityXPOrb p_i45167_1_)
     {
-        this.entityID = xpOrb.getEntityId();
-        this.posX = MathHelper.floor_double(xpOrb.posX * 32.0D);
-        this.posY = MathHelper.floor_double(xpOrb.posY * 32.0D);
-        this.posZ = MathHelper.floor_double(xpOrb.posZ * 32.0D);
-        this.xpValue = xpOrb.getXpValue();
+        this.field_148992_a = p_i45167_1_.getEntityId();
+        this.field_148990_b = MathHelper.floor_double(p_i45167_1_.posX * 32.0D);
+        this.field_148991_c = MathHelper.floor_double(p_i45167_1_.posY * 32.0D);
+        this.field_148988_d = MathHelper.floor_double(p_i45167_1_.posZ * 32.0D);
+        this.field_148989_e = p_i45167_1_.getXpValue();
     }
 
     /**
      * Reads the raw packet data from the data stream.
      */
-    public void readPacketData(PacketBuffer buf) throws IOException
+    public void readPacketData(PacketBuffer data) throws IOException
     {
-        this.entityID = buf.readVarIntFromBuffer();
-        this.posX = buf.readInt();
-        this.posY = buf.readInt();
-        this.posZ = buf.readInt();
-        this.xpValue = buf.readShort();
+        this.field_148992_a = data.readVarIntFromBuffer();
+        this.field_148990_b = data.readInt();
+        this.field_148991_c = data.readInt();
+        this.field_148988_d = data.readInt();
+        this.field_148989_e = data.readShort();
     }
 
     /**
      * Writes the raw packet data to the data stream.
      */
-    public void writePacketData(PacketBuffer buf) throws IOException
+    public void writePacketData(PacketBuffer data) throws IOException
     {
-        buf.writeVarIntToBuffer(this.entityID);
-        buf.writeInt(this.posX);
-        buf.writeInt(this.posY);
-        buf.writeInt(this.posZ);
-        buf.writeShort(this.xpValue);
+        data.writeVarIntToBuffer(this.field_148992_a);
+        data.writeInt(this.field_148990_b);
+        data.writeInt(this.field_148991_c);
+        data.writeInt(this.field_148988_d);
+        data.writeShort(this.field_148989_e);
+    }
+
+    public void func_180719_a(INetHandlerPlayClient p_180719_1_)
+    {
+        p_180719_1_.handleSpawnExperienceOrb(this);
+    }
+
+    public int func_148985_c()
+    {
+        return this.field_148992_a;
+    }
+
+    public int func_148984_d()
+    {
+        return this.field_148990_b;
+    }
+
+    public int func_148983_e()
+    {
+        return this.field_148991_c;
+    }
+
+    public int func_148982_f()
+    {
+        return this.field_148988_d;
+    }
+
+    public int func_148986_g()
+    {
+        return this.field_148989_e;
     }
 
     /**
      * Passes this Packet on to the NetHandler for processing.
      */
-    public void processPacket(INetHandlerPlayClient handler)
+    public void processPacket(INetHandler handler)
     {
-        handler.handleSpawnExperienceOrb(this);
-    }
-
-    public int getEntityID()
-    {
-        return this.entityID;
-    }
-
-    public int getX()
-    {
-        return this.posX;
-    }
-
-    public int getY()
-    {
-        return this.posY;
-    }
-
-    public int getZ()
-    {
-        return this.posZ;
-    }
-
-    public int getXPValue()
-    {
-        return this.xpValue;
+        this.func_180719_a((INetHandlerPlayClient)handler);
     }
 }

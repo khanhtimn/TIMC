@@ -4,6 +4,8 @@ import net.minecraft.util.ResourceLocation;
 
 public class EnchantmentWaterWalker extends Enchantment
 {
+    
+
     public EnchantmentWaterWalker(int p_i45762_1_, ResourceLocation p_i45762_2_, int p_i45762_3_)
     {
         super(p_i45762_1_, p_i45762_2_, p_i45762_3_, EnumEnchantmentType.ARMOR_FEET);
@@ -13,17 +15,17 @@ public class EnchantmentWaterWalker extends Enchantment
     /**
      * Returns the minimal value of enchantability needed on the enchantment level passed.
      */
-    public int getMinEnchantability(int enchantmentLevel)
+    public int getMinEnchantability(int p_77321_1_)
     {
-        return enchantmentLevel * 10;
+        return p_77321_1_ * 10;
     }
 
     /**
      * Returns the maximum value of enchantability nedded on the enchantment level passed.
      */
-    public int getMaxEnchantability(int enchantmentLevel)
+    public int getMaxEnchantability(int p_77317_1_)
     {
-        return this.getMinEnchantability(enchantmentLevel) + 15;
+        return this.getMinEnchantability(p_77317_1_) + 15;
     }
 
     /**

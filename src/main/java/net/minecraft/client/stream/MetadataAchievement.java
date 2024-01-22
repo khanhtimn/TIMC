@@ -4,6 +4,8 @@ import net.minecraft.stats.Achievement;
 
 public class MetadataAchievement extends Metadata
 {
+    
+
     public MetadataAchievement(Achievement p_i1032_1_)
     {
         super("achievement");

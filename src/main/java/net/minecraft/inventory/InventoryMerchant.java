@@ -16,11 +16,12 @@ public class InventoryMerchant implements IInventory
     private final EntityPlayer thePlayer;
     private MerchantRecipe currentRecipe;
     private int currentRecipeIndex;
+    
 
-    public InventoryMerchant(EntityPlayer thePlayerIn, IMerchant theMerchantIn)
+    public InventoryMerchant(EntityPlayer p_i1820_1_, IMerchant p_i1820_2_)
     {
-        this.thePlayer = thePlayerIn;
-        this.theMerchant = theMerchantIn;
+        this.thePlayer = p_i1820_1_;
+        this.theMerchant = p_i1820_2_;
     }
 
     /**
@@ -32,29 +33,32 @@ public class InventoryMerchant implements IInventory
     }
 
     /**
-     * Returns the stack in the given slot.
+     * Returns the stack in slot i
      */
-    public ItemStack getStackInSlot(int index)
+    public ItemStack getStackInSlot(int slotIn)
     {
-        return this.theInventory[index];
+        return this.theInventory[slotIn];
     }
 
     /**
-     * Removes up to a specified number of items from an inventory slot and returns them in a new stack.
+     * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a
+     * new stack.
      */
     public ItemStack decrStackSize(int index, int count)
     {
         if (this.theInventory[index] != null)
         {
+            ItemStack var3;
+
             if (index == 2)
             {
-                ItemStack itemstack2 = this.theInventory[index];
+                var3 = this.theInventory[index];
                 this.theInventory[index] = null;
-                return itemstack2;
+                return var3;
             }
             else if (this.theInventory[index].stackSize <= count)
             {
-                ItemStack itemstack1 = this.theInventory[index];
+                var3 = this.theInventory[index];
                 this.theInventory[index] = null;
 
                 if (this.inventoryResetNeededOnSlotChange(index))
@@ -62,11 +66,11 @@ public class InventoryMerchant implements IInventory
                     this.resetRecipeAndSlots();
                 }
 
-                return itemstack1;
+                return var3;
             }
             else
             {
-                ItemStack itemstack = this.theInventory[index].splitStack(count);
+                var3 = this.theInventory[index].splitStack(count);
 
                 if (this.theInventory[index].stackSize == 0)
                 {
@@ -78,7 +82,7 @@ public class InventoryMerchant implements IInventory
                     this.resetRecipeAndSlots();
                 }
 
-                return itemstack;
+                return var3;
             }
         }
         else
@@ -96,15 +100,16 @@ public class InventoryMerchant implements IInventory
     }
 
     /**
-     * Removes a stack from the given slot and returns it.
+     * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem -
+     * like when you close a workbench GUI.
      */
-    public ItemStack removeStackFromSlot(int index)
+    public ItemStack getStackInSlotOnClosing(int index)
     {
         if (this.theInventory[index] != null)
         {
-            ItemStack itemstack = this.theInventory[index];
+            ItemStack var2 = this.theInventory[index];
             this.theInventory[index] = null;
-            return itemstack;
+            return var2;
         }
         else
         {
@@ -131,7 +136,7 @@ public class InventoryMerchant implements IInventory
     }
 
     /**
-     * Get the name of this object. For players this returns their username
+     * Gets the name of this command sender (usually username, but possibly "Rcon")
      */
     public String getName()
     {
@@ -146,16 +151,14 @@ public class InventoryMerchant implements IInventory
         return false;
     }
 
-    /**
-     * Get the formatted ChatComponent that will be used for the sender's username in chat
-     */
     public IChatComponent getDisplayName()
     {
         return (IChatComponent)(this.hasCustomName() ? new ChatComponentText(this.getName()) : new ChatComponentTranslation(this.getName(), new Object[0]));
     }
 
     /**
-     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended.
+     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't
+     * this more of a set than a get?*
      */
     public int getInventoryStackLimit()
     {
@@ -165,18 +168,14 @@ public class InventoryMerchant implements IInventory
     /**
      * Do not make give this method the name canInteractWith because it clashes with Container
      */
-    public boolean isUseableByPlayer(EntityPlayer player)
+    public boolean isUseableByPlayer(EntityPlayer playerIn)
     {
-        return this.theMerchant.getCustomer() == player;
+        return this.theMerchant.getCustomer() == playerIn;
     }
 
-    public void openInventory(EntityPlayer player)
-    {
-    }
+    public void openInventory(EntityPlayer playerIn) {}
 
-    public void closeInventory(EntityPlayer player)
-    {
-    }
+    public void closeInventory(EntityPlayer playerIn) {}
 
     /**
      * Returns true if automation is allowed to insert the given stack (ignoring stack size) into the given slot.
@@ -198,40 +197,40 @@ public class InventoryMerchant implements IInventory
     public void resetRecipeAndSlots()
     {
         this.currentRecipe = null;
-        ItemStack itemstack = this.theInventory[0];
-        ItemStack itemstack1 = this.theInventory[1];
+        ItemStack var1 = this.theInventory[0];
+        ItemStack var2 = this.theInventory[1];
 
-        if (itemstack == null)
+        if (var1 == null)
         {
-            itemstack = itemstack1;
-            itemstack1 = null;
+            var1 = var2;
+            var2 = null;
         }
 
-        if (itemstack == null)
+        if (var1 == null)
         {
             this.setInventorySlotContents(2, (ItemStack)null);
         }
         else
         {
-            MerchantRecipeList merchantrecipelist = this.theMerchant.getRecipes(this.thePlayer);
+            MerchantRecipeList var3 = this.theMerchant.getRecipes(this.thePlayer);
 
-            if (merchantrecipelist != null)
+            if (var3 != null)
             {
-                MerchantRecipe merchantrecipe = merchantrecipelist.canRecipeBeUsed(itemstack, itemstack1, this.currentRecipeIndex);
+                MerchantRecipe var4 = var3.canRecipeBeUsed(var1, var2, this.currentRecipeIndex);
 
-                if (merchantrecipe != null && !merchantrecipe.isRecipeDisabled())
+                if (var4 != null && !var4.isRecipeDisabled())
                 {
-                    this.currentRecipe = merchantrecipe;
-                    this.setInventorySlotContents(2, merchantrecipe.getItemToSell().copy());
+                    this.currentRecipe = var4;
+                    this.setInventorySlotContents(2, var4.getItemToSell().copy());
                 }
-                else if (itemstack1 != null)
+                else if (var2 != null)
                 {
-                    merchantrecipe = merchantrecipelist.canRecipeBeUsed(itemstack1, itemstack, this.currentRecipeIndex);
+                    var4 = var3.canRecipeBeUsed(var2, var1, this.currentRecipeIndex);
 
-                    if (merchantrecipe != null && !merchantrecipe.isRecipeDisabled())
+                    if (var4 != null && !var4.isRecipeDisabled())
                     {
-                        this.currentRecipe = merchantrecipe;
-                        this.setInventorySlotContents(2, merchantrecipe.getItemToSell().copy());
+                        this.currentRecipe = var4;
+                        this.setInventorySlotContents(2, var4.getItemToSell().copy());
                     }
                     else
                     {
@@ -253,9 +252,9 @@ public class InventoryMerchant implements IInventory
         return this.currentRecipe;
     }
 
-    public void setCurrentRecipeIndex(int currentRecipeIndexIn)
+    public void setCurrentRecipeIndex(int p_70471_1_)
     {
-        this.currentRecipeIndex = currentRecipeIndexIn;
+        this.currentRecipeIndex = p_70471_1_;
         this.resetRecipeAndSlots();
     }
 
@@ -264,20 +263,18 @@ public class InventoryMerchant implements IInventory
         return 0;
     }
 
-    public void setField(int id, int value)
-    {
-    }
+    public void setField(int id, int value) {}
 
     public int getFieldCount()
     {
         return 0;
     }
 
-    public void clear()
+    public void clearInventory()
     {
-        for (int i = 0; i < this.theInventory.length; ++i)
+        for (int var1 = 0; var1 < this.theInventory.length; ++var1)
         {
-            this.theInventory[i] = null;
+            this.theInventory[var1] = null;
         }
     }
 }

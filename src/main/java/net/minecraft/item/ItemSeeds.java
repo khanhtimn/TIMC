@@ -9,20 +9,24 @@ import net.minecraft.world.World;
 
 public class ItemSeeds extends Item
 {
-    private Block crops;
+    private Block field_150925_a;
 
     /** BlockID of the block the seeds can be planted on. */
     private Block soilBlockID;
+    
 
-    public ItemSeeds(Block crops, Block soil)
+    public ItemSeeds(Block p_i45352_1_, Block p_i45352_2_)
     {
-        this.crops = crops;
-        this.soilBlockID = soil;
+        this.field_150925_a = p_i45352_1_;
+        this.soilBlockID = p_i45352_2_;
         this.setCreativeTab(CreativeTabs.tabMaterials);
     }
 
     /**
      * Called when a Block is right-clicked with this Item
+     *  
+     * @param pos The block being right-clicked
+     * @param side The side being right-clicked
      */
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {
@@ -30,13 +34,13 @@ public class ItemSeeds extends Item
         {
             return false;
         }
-        else if (!playerIn.canPlayerEdit(pos.offset(side), side, stack))
+        else if (!playerIn.func_175151_a(pos.offset(side), side, stack))
         {
             return false;
         }
-        else if (worldIn.getBlockState(pos).getBlock() == this.soilBlockID && worldIn.isAirBlock(pos.up()))
+        else if (worldIn.getBlockState(pos).getBlock() == this.soilBlockID && worldIn.isAirBlock(pos.offsetUp()))
         {
-            worldIn.setBlockState(pos.up(), this.crops.getDefaultState());
+            worldIn.setBlockState(pos.offsetUp(), this.field_150925_a.getDefaultState());
             --stack.stackSize;
             return true;
         }

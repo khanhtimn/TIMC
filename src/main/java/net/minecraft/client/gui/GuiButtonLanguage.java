@@ -5,9 +5,11 @@ import net.minecraft.client.renderer.GlStateManager;
 
 public class GuiButtonLanguage extends GuiButton
 {
-    public GuiButtonLanguage(int buttonID, int xPos, int yPos)
+    
+
+    public GuiButtonLanguage(int p_i1041_1_, int p_i1041_2_, int p_i1041_3_)
     {
-        super(buttonID, xPos, yPos, 20, 20, "");
+        super(p_i1041_1_, p_i1041_2_, p_i1041_3_, 20, 20, "");
     }
 
     /**
@@ -19,15 +21,15 @@ public class GuiButtonLanguage extends GuiButton
         {
             mc.getTextureManager().bindTexture(GuiButton.buttonTextures);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            boolean flag = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
-            int i = 106;
+            boolean var4 = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+            int var5 = 106;
 
-            if (flag)
+            if (var4)
             {
-                i += this.height;
+                var5 += this.height;
             }
 
-            this.drawTexturedModalRect(this.xPosition, this.yPosition, 0, i, this.width, this.height);
+            this.drawTexturedModalRect(this.xPosition, this.yPosition, 0, var5, this.width, this.height);
         }
     }
 }

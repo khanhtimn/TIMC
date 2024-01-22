@@ -10,54 +10,55 @@ import net.minecraft.world.World;
 
 public abstract class EntityAgeable extends EntityCreature
 {
-    protected int growingAge;
+    protected int field_175504_a;
     protected int field_175502_b;
     protected int field_175503_c;
-    private float ageWidth = -1.0F;
-    private float ageHeight;
+    private float field_98056_d = -1.0F;
+    private float field_98057_e;
+    
 
     public EntityAgeable(World worldIn)
     {
         super(worldIn);
     }
 
-    public abstract EntityAgeable createChild(EntityAgeable ageable);
+    public abstract EntityAgeable createChild(EntityAgeable var1);
 
     /**
      * Called when a player interacts with a mob. e.g. gets milk from a cow, gets into the saddle on a pig.
      */
-    public boolean interact(EntityPlayer player)
+    public boolean interact(EntityPlayer p_70085_1_)
     {
-        ItemStack itemstack = player.inventory.getCurrentItem();
+        ItemStack var2 = p_70085_1_.inventory.getCurrentItem();
 
-        if (itemstack != null && itemstack.getItem() == Items.spawn_egg)
+        if (var2 != null && var2.getItem() == Items.spawn_egg)
         {
             if (!this.worldObj.isRemote)
             {
-                Class <? extends Entity > oclass = EntityList.getClassFromID(itemstack.getMetadata());
+                Class var3 = EntityList.getClassFromID(var2.getMetadata());
 
-                if (oclass != null && this.getClass() == oclass)
+                if (var3 != null && this.getClass() == var3)
                 {
-                    EntityAgeable entityageable = this.createChild(this);
+                    EntityAgeable var4 = this.createChild(this);
 
-                    if (entityageable != null)
+                    if (var4 != null)
                     {
-                        entityageable.setGrowingAge(-24000);
-                        entityageable.setLocationAndAngles(this.posX, this.posY, this.posZ, 0.0F, 0.0F);
-                        this.worldObj.spawnEntityInWorld(entityageable);
+                        var4.setGrowingAge(-24000);
+                        var4.setLocationAndAngles(this.posX, this.posY, this.posZ, 0.0F, 0.0F);
+                        this.worldObj.spawnEntityInWorld(var4);
 
-                        if (itemstack.hasDisplayName())
+                        if (var2.hasDisplayName())
                         {
-                            entityageable.setCustomNameTag(itemstack.getDisplayName());
+                            var4.setCustomNameTag(var2.getDisplayName());
                         }
 
-                        if (!player.capabilities.isCreativeMode)
+                        if (!p_70085_1_.capabilities.isCreativeMode)
                         {
-                            --itemstack.stackSize;
+                            --var2.stackSize;
 
-                            if (itemstack.stackSize <= 0)
+                            if (var2.stackSize <= 0)
                             {
-                                player.inventory.setInventorySlotContents(player.inventory.currentItem, (ItemStack)null);
+                                p_70085_1_.inventory.setInventorySlotContents(p_70085_1_.inventory.currentItem, (ItemStack)null);
                             }
                         }
                     }
@@ -85,31 +86,31 @@ public abstract class EntityAgeable extends EntityCreature
      */
     public int getGrowingAge()
     {
-        return this.worldObj.isRemote ? this.dataWatcher.getWatchableObjectByte(12) : this.growingAge;
+        return this.worldObj.isRemote ? this.dataWatcher.getWatchableObjectByte(12) : this.field_175504_a;
     }
 
     public void func_175501_a(int p_175501_1_, boolean p_175501_2_)
     {
-        int i = this.getGrowingAge();
-        int j = i;
-        i = i + p_175501_1_ * 20;
+        int var3 = this.getGrowingAge();
+        int var4 = var3;
+        var3 += p_175501_1_ * 20;
 
-        if (i > 0)
+        if (var3 > 0)
         {
-            i = 0;
+            var3 = 0;
 
-            if (j < 0)
+            if (var4 < 0)
             {
-                this.onGrowingAdult();
+                this.func_175500_n();
             }
         }
 
-        int k = i - j;
-        this.setGrowingAge(i);
+        int var5 = var3 - var4;
+        this.setGrowingAge(var3);
 
         if (p_175501_2_)
         {
-            this.field_175502_b += k;
+            this.field_175502_b += var5;
 
             if (this.field_175503_c == 0)
             {
@@ -127,19 +128,19 @@ public abstract class EntityAgeable extends EntityCreature
      * "Adds the value of the parameter times 20 to the age of this entity. If the entity is an adult (if the entity's
      * age is greater than 0), it will have no effect."
      */
-    public void addGrowth(int growth)
+    public void addGrowth(int p_110195_1_)
     {
-        this.func_175501_a(growth, false);
+        this.func_175501_a(p_110195_1_, false);
     }
 
     /**
      * The age value may be negative or positive or zero. If it's negative, it get's incremented on each tick, if it's
      * positive, it get's decremented each tick. With a negative value the Entity is considered a child.
      */
-    public void setGrowingAge(int age)
+    public void setGrowingAge(int p_70873_1_)
     {
-        this.dataWatcher.updateObject(12, Byte.valueOf((byte)MathHelper.clamp_int(age, -1, 1)));
-        this.growingAge = age;
+        this.dataWatcher.updateObject(12, Byte.valueOf((byte)MathHelper.clamp_int(p_70873_1_, -1, 1)));
+        this.field_175504_a = p_70873_1_;
         this.setScaleForAge(this.isChild());
     }
 
@@ -187,33 +188,27 @@ public abstract class EntityAgeable extends EntityCreature
         }
         else
         {
-            int i = this.getGrowingAge();
+            int var1 = this.getGrowingAge();
 
-            if (i < 0)
+            if (var1 < 0)
             {
-                ++i;
-                this.setGrowingAge(i);
+                ++var1;
+                this.setGrowingAge(var1);
 
-                if (i == 0)
+                if (var1 == 0)
                 {
-                    this.onGrowingAdult();
+                    this.func_175500_n();
                 }
             }
-            else if (i > 0)
+            else if (var1 > 0)
             {
-                --i;
-                this.setGrowingAge(i);
+                --var1;
+                this.setGrowingAge(var1);
             }
         }
     }
 
-    /**
-     * This is called when Entity's growing age timer reaches 0 (negative values are considered as a child, positive as
-     * an adult)
-     */
-    protected void onGrowingAdult()
-    {
-    }
+    protected void func_175500_n() {}
 
     /**
      * If Animal, checks if the age timer is negative
@@ -236,18 +231,18 @@ public abstract class EntityAgeable extends EntityCreature
      */
     protected final void setSize(float width, float height)
     {
-        boolean flag = this.ageWidth > 0.0F;
-        this.ageWidth = width;
-        this.ageHeight = height;
+        boolean var3 = this.field_98056_d > 0.0F;
+        this.field_98056_d = width;
+        this.field_98057_e = height;
 
-        if (!flag)
+        if (!var3)
         {
             this.setScale(1.0F);
         }
     }
 
-    protected final void setScale(float scale)
+    protected final void setScale(float p_98055_1_)
     {
-        super.setSize(this.ageWidth * scale, this.ageHeight * scale);
+        super.setSize(this.field_98056_d * p_98055_1_, this.field_98057_e * p_98055_1_);
     }
 }

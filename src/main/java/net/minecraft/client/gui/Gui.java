@@ -1,51 +1,58 @@
 package net.minecraft.client.gui;
 
-import com.teamti.timc.utils.render.GLUtil;
-import com.teamti.timc.utils.render.RenderUtil;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
-
-import static org.lwjgl.opengl.GL11.GL_QUADS;
 
 public class Gui
 {
+    public static Gui INSTANCE;
     public static final ResourceLocation optionsBackground = new ResourceLocation("textures/gui/options_background.png");
     public static final ResourceLocation statIcons = new ResourceLocation("textures/gui/container/stats_icons.png");
     public static final ResourceLocation icons = new ResourceLocation("textures/gui/icons.png");
-    protected float zLevel;
+    protected static float zLevel;
+    
 
+    public Gui(){
+    	INSTANCE = this;
+    }
+    
     /**
      * Draw a 1 pixel wide horizontal line. Args: x1, x2, y, color
      */
-    protected void drawHorizontalLine(int startX, int endX, int y, int color)
+    public static void drawHLine(float startX, float endX, float y, int color){
+    	INSTANCE.drawHorizontalLine(startX, endX, y, color);
+    }
+    public static void drawVLine(float startX, float endX, float y, int color){
+    	INSTANCE.drawVerticalLine(startX, endX, y, color);
+    }
+    protected void drawHorizontalLine(float startX, float endX, float y, int color)
     {
         if (endX < startX)
         {
-            int i = startX;
+        	float var5 = startX;
             startX = endX;
-            endX = i;
+            endX = var5;
         }
 
-        drawRect(startX, y, endX + 1, y + 1, color);
+        drawFloatRect(startX, y, endX + 1, y + 1, color);
     }
 
     /**
      * Draw a 1 pixel wide vertical line. Args : x, y1, y2, color
      */
-    protected void drawVerticalLine(int x, int startY, int endY, int color)
+    protected void drawVerticalLine(float x, float startY, float endY, int color)
     {
         if (endY < startY)
         {
-            int i = startY;
+        	float var5 = startY;
             startY = endY;
-            endY = i;
+            endY = var5;
         }
 
-        drawRect(x, startY + 1, x + 1, endY, color);
+        drawFloatRect(x, startY + 1, x + 1, endY, color);
     }
 
     /**
@@ -53,16 +60,52 @@ public class Gui
      */
     public static void drawRect(int left, int top, int right, int bottom, int color)
     {
+        int var5;
+
         if (left < right)
         {
-            int i = left;
+            var5 = left;
             left = right;
-            right = i;
+            right = var5;
         }
 
         if (top < bottom)
         {
-            int j = top;
+            var5 = top;
+            top = bottom;
+            bottom = var5;
+        }
+
+        float var11 = (float)(color >> 24 & 255) / 255.0F;
+        float var6 = (float)(color >> 16 & 255) / 255.0F;
+        float var7 = (float)(color >> 8 & 255) / 255.0F;
+        float var8 = (float)(color & 255) / 255.0F;
+        Tessellator var9 = Tessellator.getInstance();
+        WorldRenderer var10 = var9.getWorldRenderer();
+        GlStateManager.enableBlend();
+        GlStateManager.disableTexture2D();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.color(var6, var7, var8, var11);
+        var10.startDrawingQuads();
+        var10.addVertex((double)left, (double)bottom, 0.0D);
+        var10.addVertex((double)right, (double)bottom, 0.0D);
+        var10.addVertex((double)right, (double)top, 0.0D);
+        var10.addVertex((double)left, (double)top, 0.0D);
+        var9.draw();
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
+    }
+
+    public static void drawRect(double left, double top, double right, double bottom, int color) {
+        double j;
+        if (left < right) {
+            j = left;
+            left = right;
+            right = j;
+        }
+
+        if (top < bottom) {
+            j = top;
             top = bottom;
             bottom = j;
         }
@@ -77,87 +120,44 @@ public class Gui
         GlStateManager.disableTexture2D();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GlStateManager.color(f, f1, f2, f3);
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION);
-        worldrenderer.pos((double)left, (double)bottom, 0.0D).endVertex();
-        worldrenderer.pos((double)right, (double)bottom, 0.0D).endVertex();
-        worldrenderer.pos((double)right, (double)top, 0.0D).endVertex();
-        worldrenderer.pos((double)left, (double)top, 0.0D).endVertex();
+        worldrenderer.startDrawingQuads();
+        worldrenderer.addVertex((double)left, (double)bottom, 0.0D);
+        worldrenderer.addVertex((double)right, (double)bottom, 0.0D);
+        worldrenderer.addVertex((double)right, (double)top, 0.0D);
+        worldrenderer.addVertex((double)left, (double)top, 0.0D);
         tessellator.draw();
         GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
-    }
-
-    public static void drawRect2(double x, double y, double width, double height, int color) {
-        RenderUtil.resetColor();
-        RenderUtil.setAlphaLimit(0);
-        GLUtil.setup2DRendering(true);
-
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-
-        worldrenderer.begin(GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-        worldrenderer.pos(x, y, 0.0D).color(color).endVertex();
-        worldrenderer.pos(x, y + height, 0.0D).color(color).endVertex();
-        worldrenderer.pos(x + width, y + height, 0.0D).color(color).endVertex();
-        worldrenderer.pos(x + width, y, 0.0D).color(color).endVertex();
-        tessellator.draw();
-
-        GLUtil.end2DRendering();
-    }
-
-    public static void drawRect(double left, double top, double right, double bottom, int color) {
-        if (left < right) {
-            double i = left;
-            left = right;
-            right = i;
-        }
-
-        if (top < bottom) {
-            double j = top;
-            top = bottom;
-            bottom = j;
-        }
-        RenderUtil.resetColor();
-        RenderUtil.setAlphaLimit(0);
-        GLUtil.setup2DRendering(true);
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-
-        worldrenderer.begin(GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-        worldrenderer.pos(left, bottom, 0.0D).color(color).endVertex();
-        worldrenderer.pos( right, bottom, 0.0D).color(color).endVertex();
-        worldrenderer.pos(right, top, 0.0D).color(color).endVertex();
-        worldrenderer.pos(left, top, 0.0D).color(color).endVertex();
-        tessellator.draw();
-        GLUtil.end2DRendering();
     }
     /**
      * Draws a rectangle with a vertical gradient between the specified colors (ARGB format). Args : x1, y1, x2, y2,
      * topColor, bottomColor
      */
-    protected void drawGradientRect(int left, int top, int right, int bottom, int startColor, int endColor)
+    public void drawGradientRect(float g, float h, float i, float f, int startColor, int endColor)
     {
-        float f = (float)(startColor >> 24 & 255) / 255.0F;
-        float f1 = (float)(startColor >> 16 & 255) / 255.0F;
-        float f2 = (float)(startColor >> 8 & 255) / 255.0F;
-        float f3 = (float)(startColor & 255) / 255.0F;
-        float f4 = (float)(endColor >> 24 & 255) / 255.0F;
-        float f5 = (float)(endColor >> 16 & 255) / 255.0F;
-        float f6 = (float)(endColor >> 8 & 255) / 255.0F;
-        float f7 = (float)(endColor & 255) / 255.0F;
+        float var7 = (float)(startColor >> 24 & 255) / 255.0F;
+        float var8 = (float)(startColor >> 16 & 255) / 255.0F;
+        float var9 = (float)(startColor >> 8 & 255) / 255.0F;
+        float var10 = (float)(startColor & 255) / 255.0F;
+        float var11 = (float)(endColor >> 24 & 255) / 255.0F;
+        float var12 = (float)(endColor >> 16 & 255) / 255.0F;
+        float var13 = (float)(endColor >> 8 & 255) / 255.0F;
+        float var14 = (float)(endColor & 255) / 255.0F;
         GlStateManager.disableTexture2D();
         GlStateManager.enableBlend();
         GlStateManager.disableAlpha();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GlStateManager.shadeModel(7425);
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        worldrenderer.pos((double)right, (double)top, (double)this.zLevel).color(f1, f2, f3, f).endVertex();
-        worldrenderer.pos((double)left, (double)top, (double)this.zLevel).color(f1, f2, f3, f).endVertex();
-        worldrenderer.pos((double)left, (double)bottom, (double)this.zLevel).color(f5, f6, f7, f4).endVertex();
-        worldrenderer.pos((double)right, (double)bottom, (double)this.zLevel).color(f5, f6, f7, f4).endVertex();
-        tessellator.draw();
+        Tessellator var15 = Tessellator.getInstance();
+        WorldRenderer var16 = var15.getWorldRenderer();
+        var16.startDrawingQuads();
+        var16.func_178960_a(var8, var9, var10, var7);
+        var16.addVertex((double)i, (double)h, (double)this.zLevel);
+        var16.addVertex((double)g, (double)h, (double)this.zLevel);
+        var16.func_178960_a(var12, var13, var14, var11);
+        var16.addVertex((double)g, (double)f, (double)this.zLevel);
+        var16.addVertex((double)i, (double)f, (double)this.zLevel);
+        var15.draw();
         GlStateManager.shadeModel(7424);
         GlStateManager.disableBlend();
         GlStateManager.enableAlpha();
@@ -167,9 +167,9 @@ public class Gui
     /**
      * Renders the specified text to the screen, center-aligned. Args : renderer, string, x, y, color
      */
-    public void drawCenteredString(FontRenderer fontRendererIn, String text, int x, int y, int color)
+    public static void drawCenteredString(FontRenderer fontRendererIn, String text, int x, int y, int color)
     {
-        fontRendererIn.drawStringWithShadow(text, (float)(x - fontRendererIn.getStringWidth(text) / 2), (float)y, color);
+        fontRendererIn.func_175063_a(text, (float)(x - fontRendererIn.getStringWidth(text) / 2), (float)y, color);
     }
 
     /**
@@ -177,87 +177,67 @@ public class Gui
      */
     public void drawString(FontRenderer fontRendererIn, String text, int x, int y, int color)
     {
-        fontRendererIn.drawStringWithShadow(text, (float)x, (float)y, color);
+        fontRendererIn.func_175063_a(text, (float)x, (float)y, color);
     }
 
     /**
      * Draws a textured rectangle at the stored z-value. Args: x, y, u, v, width, height
      */
-    public void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height)
+    public void drawTexturedModalRect(float f, float g, float h, float i, float j, float k)
     {
-        float f = 0.00390625F;
-        float f1 = 0.00390625F;
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
-        worldrenderer.pos((double)(x + 0), (double)(y + height), (double)this.zLevel).tex((double)((float)(textureX + 0) * f), (double)((float)(textureY + height) * f1)).endVertex();
-        worldrenderer.pos((double)(x + width), (double)(y + height), (double)this.zLevel).tex((double)((float)(textureX + width) * f), (double)((float)(textureY + height) * f1)).endVertex();
-        worldrenderer.pos((double)(x + width), (double)(y + 0), (double)this.zLevel).tex((double)((float)(textureX + width) * f), (double)((float)(textureY + 0) * f1)).endVertex();
-        worldrenderer.pos((double)(x + 0), (double)(y + 0), (double)this.zLevel).tex((double)((float)(textureX + 0) * f), (double)((float)(textureY + 0) * f1)).endVertex();
-        tessellator.draw();
+        float var7 = 0.00390625F;
+        float var8 = 0.00390625F;
+        Tessellator var9 = Tessellator.getInstance();
+        WorldRenderer var10 = var9.getWorldRenderer();
+        var10.startDrawingQuads();
+        var10.addVertexWithUV((double)(f + 0), (double)(g + k), (double)this.zLevel, (double)((float)(h + 0) * var7), (double)((float)(i + k) * var8));
+        var10.addVertexWithUV((double)(f + j), (double)(g + k), (double)this.zLevel, (double)((float)(h + j) * var7), (double)((float)(i + k) * var8));
+        var10.addVertexWithUV((double)(f + j), (double)(g + 0), (double)this.zLevel, (double)((float)(h + j) * var7), (double)((float)(i + 0) * var8));
+        var10.addVertexWithUV((double)(f + 0), (double)(g + 0), (double)this.zLevel, (double)((float)(h + 0) * var7), (double)((float)(i + 0) * var8));
+        var9.draw();
     }
 
-    /**
-     * Draws a textured rectangle using the texture currently bound to the TextureManager
-     */
-    public void drawTexturedModalRect(float xCoord, float yCoord, int minU, int minV, int maxU, int maxV)
+    public void func_175174_a(float p_175174_1_, float p_175174_2_, int p_175174_3_, int p_175174_4_, int p_175174_5_, int p_175174_6_)
     {
-        float f = 0.00390625F;
-        float f1 = 0.00390625F;
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
-        worldrenderer.pos((double)(xCoord + 0.0F), (double)(yCoord + (float)maxV), (double)this.zLevel).tex((double)((float)(minU + 0) * f), (double)((float)(minV + maxV) * f1)).endVertex();
-        worldrenderer.pos((double)(xCoord + (float)maxU), (double)(yCoord + (float)maxV), (double)this.zLevel).tex((double)((float)(minU + maxU) * f), (double)((float)(minV + maxV) * f1)).endVertex();
-        worldrenderer.pos((double)(xCoord + (float)maxU), (double)(yCoord + 0.0F), (double)this.zLevel).tex((double)((float)(minU + maxU) * f), (double)((float)(minV + 0) * f1)).endVertex();
-        worldrenderer.pos((double)(xCoord + 0.0F), (double)(yCoord + 0.0F), (double)this.zLevel).tex((double)((float)(minU + 0) * f), (double)((float)(minV + 0) * f1)).endVertex();
-        tessellator.draw();
+        float var7 = 0.00390625F;
+        float var8 = 0.00390625F;
+        Tessellator var9 = Tessellator.getInstance();
+        WorldRenderer var10 = var9.getWorldRenderer();
+        var10.startDrawingQuads();
+        var10.addVertexWithUV((double)(p_175174_1_ + 0.0F), (double)(p_175174_2_ + (float)p_175174_6_), (double)this.zLevel, (double)((float)(p_175174_3_ + 0) * var7), (double)((float)(p_175174_4_ + p_175174_6_) * var8));
+        var10.addVertexWithUV((double)(p_175174_1_ + (float)p_175174_5_), (double)(p_175174_2_ + (float)p_175174_6_), (double)this.zLevel, (double)((float)(p_175174_3_ + p_175174_5_) * var7), (double)((float)(p_175174_4_ + p_175174_6_) * var8));
+        var10.addVertexWithUV((double)(p_175174_1_ + (float)p_175174_5_), (double)(p_175174_2_ + 0.0F), (double)this.zLevel, (double)((float)(p_175174_3_ + p_175174_5_) * var7), (double)((float)(p_175174_4_ + 0) * var8));
+        var10.addVertexWithUV((double)(p_175174_1_ + 0.0F), (double)(p_175174_2_ + 0.0F), (double)this.zLevel, (double)((float)(p_175174_3_ + 0) * var7), (double)((float)(p_175174_4_ + 0) * var8));
+        var9.draw();
     }
 
-    /**
-     * Draws a texture rectangle using the texture currently bound to the TextureManager
-     */
-    public void drawTexturedModalRect(int xCoord, int yCoord, TextureAtlasSprite textureSprite, int widthIn, int heightIn)
+    public void func_175175_a(int p_175175_1_, int p_175175_2_, TextureAtlasSprite p_175175_3_, int p_175175_4_, int p_175175_5_)
     {
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
-        worldrenderer.pos((double)(xCoord + 0), (double)(yCoord + heightIn), (double)this.zLevel).tex((double)textureSprite.getMinU(), (double)textureSprite.getMaxV()).endVertex();
-        worldrenderer.pos((double)(xCoord + widthIn), (double)(yCoord + heightIn), (double)this.zLevel).tex((double)textureSprite.getMaxU(), (double)textureSprite.getMaxV()).endVertex();
-        worldrenderer.pos((double)(xCoord + widthIn), (double)(yCoord + 0), (double)this.zLevel).tex((double)textureSprite.getMaxU(), (double)textureSprite.getMinV()).endVertex();
-        worldrenderer.pos((double)(xCoord + 0), (double)(yCoord + 0), (double)this.zLevel).tex((double)textureSprite.getMinU(), (double)textureSprite.getMinV()).endVertex();
-        tessellator.draw();
+        Tessellator var6 = Tessellator.getInstance();
+        WorldRenderer var7 = var6.getWorldRenderer();
+        var7.startDrawingQuads();
+        var7.addVertexWithUV((double)(p_175175_1_ + 0), (double)(p_175175_2_ + p_175175_5_), (double)this.zLevel, (double)p_175175_3_.getMinU(), (double)p_175175_3_.getMaxV());
+        var7.addVertexWithUV((double)(p_175175_1_ + p_175175_4_), (double)(p_175175_2_ + p_175175_5_), (double)this.zLevel, (double)p_175175_3_.getMaxU(), (double)p_175175_3_.getMaxV());
+        var7.addVertexWithUV((double)(p_175175_1_ + p_175175_4_), (double)(p_175175_2_ + 0), (double)this.zLevel, (double)p_175175_3_.getMaxU(), (double)p_175175_3_.getMinV());
+        var7.addVertexWithUV((double)(p_175175_1_ + 0), (double)(p_175175_2_ + 0), (double)this.zLevel, (double)p_175175_3_.getMinU(), (double)p_175175_3_.getMinV());
+        var6.draw();
     }
 
     /**
      * Draws a textured rectangle at z = 0. Args: x, y, u, v, width, height, textureWidth, textureHeight
      */
-    public static void drawModalRectWithCustomSizedTexture(int x, int y, float u, float v, int width, int height, float textureWidth, float textureHeight)
+    public static void drawModalRectWithCustomSizedTexture(float f, double d, float u, float v, double h, double e, double i, double g)
     {
-        float f = 1.0F / textureWidth;
-        float f1 = 1.0F / textureHeight;
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
-        worldrenderer.pos((double)x, (double)(y + height), 0.0D).tex((double)(u * f), (double)((v + (float)height) * f1)).endVertex();
-        worldrenderer.pos((double)(x + width), (double)(y + height), 0.0D).tex((double)((u + (float)width) * f), (double)((v + (float)height) * f1)).endVertex();
-        worldrenderer.pos((double)(x + width), (double)y, 0.0D).tex((double)((u + (float)width) * f), (double)(v * f1)).endVertex();
-        worldrenderer.pos((double)x, (double)y, 0.0D).tex((double)(u * f), (double)(v * f1)).endVertex();
-        tessellator.draw();
-    }
-    public static void drawModalRectWithCustomSizedTexture(float x, float y, float u, float v, float width, float height, float textureWidth, float textureHeight) {
-
-        float f = 1.0F / textureWidth;
-        float f1 = 1.0F / textureHeight;
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
-        worldrenderer.pos(x, y + height, 0.0D).tex(u * f, (v + height) * f1).endVertex();
-        worldrenderer.pos(x + width, y + height, 0.0D).tex((u + width) * f, (v + height) * f1).endVertex();
-        worldrenderer.pos(x + width, y, 0.0D).tex((u + width) * f, v * f1).endVertex();
-        worldrenderer.pos(x, y, 0.0D).tex(u * f, v * f1).endVertex();
-        tessellator.draw();
-
+    	double var8 = 1.0F / i;
+        double var9 = 1.0F / g;
+        Tessellator var10 = Tessellator.getInstance();
+        WorldRenderer var11 = var10.getWorldRenderer();
+        var11.startDrawingQuads();
+        var11.addVertexWithUV((double)f, (double)(d + e), 0.0D, (double)(u * var8), (double)((v + (float)e) * var9));
+        var11.addVertexWithUV((double)(f + h), (double)(d + e), 0.0D, (double)((u + (float)h) * var8), (double)((v + (float)e) * var9));
+        var11.addVertexWithUV((double)(f + h), (double)d, 0.0D, (double)((u + (float)h) * var8), (double)(v * var9));
+        var11.addVertexWithUV((double)f, (double)d, 0.0D, (double)(u * var8), (double)(v * var9));
+        var10.draw();
     }
 
     /**
@@ -265,15 +245,53 @@ public class Gui
      */
     public static void drawScaledCustomSizeModalRect(int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight)
     {
-        float f = 1.0F / tileWidth;
-        float f1 = 1.0F / tileHeight;
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
-        worldrenderer.pos((double)x, (double)(y + height), 0.0D).tex((double)(u * f), (double)((v + (float)vHeight) * f1)).endVertex();
-        worldrenderer.pos((double)(x + width), (double)(y + height), 0.0D).tex((double)((u + (float)uWidth) * f), (double)((v + (float)vHeight) * f1)).endVertex();
-        worldrenderer.pos((double)(x + width), (double)y, 0.0D).tex((double)((u + (float)uWidth) * f), (double)(v * f1)).endVertex();
-        worldrenderer.pos((double)x, (double)y, 0.0D).tex((double)(u * f), (double)(v * f1)).endVertex();
-        tessellator.draw();
+        float var10 = 1.0F / tileWidth;
+        float var11 = 1.0F / tileHeight;
+        Tessellator var12 = Tessellator.getInstance();
+        WorldRenderer var13 = var12.getWorldRenderer();
+        var13.startDrawingQuads();
+        var13.addVertexWithUV((double)x, (double)(y + height), 0.0D, (double)(u * var10), (double)((v + (float)vHeight) * var11));
+        var13.addVertexWithUV((double)(x + width), (double)(y + height), 0.0D, (double)((u + (float)uWidth) * var10), (double)((v + (float)vHeight) * var11));
+        var13.addVertexWithUV((double)(x + width), (double)y, 0.0D, (double)((u + (float)uWidth) * var10), (double)(v * var11));
+        var13.addVertexWithUV((double)x, (double)y, 0.0D, (double)(u * var10), (double)(v * var11));
+        var12.draw();
+    }
+
+    public static void drawFloatRect(double left, double top, double d, double bottom, int color)
+    {
+    	double var5;
+
+        if (left < d)
+        {
+            var5 = left;
+            left = d;
+            d = var5;
+        }
+
+        if (top < bottom)
+        {
+            var5 = top;
+            top = bottom;
+            bottom = var5;
+        }
+
+        float var11 = (float)(color >> 24 & 255) / 255.0F;
+        float var6 = (float)(color >> 16 & 255) / 255.0F;
+        float var7 = (float)(color >> 8 & 255) / 255.0F;
+        float var8 = (float)(color & 255) / 255.0F;
+        Tessellator var9 = Tessellator.getInstance();
+        WorldRenderer var10 = var9.getWorldRenderer();
+        GlStateManager.enableBlend();
+        GlStateManager.disableTexture2D();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.color(var6, var7, var8, var11);
+        var10.startDrawingQuads();
+        var10.addVertex((double)left, (double)bottom, 0.0D);
+        var10.addVertex((double)d, (double)bottom, 0.0D);
+        var10.addVertex((double)d, (double)top, 0.0D);
+        var10.addVertex((double)left, (double)top, 0.0D);
+        var9.draw();
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
     }
 }

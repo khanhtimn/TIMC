@@ -1,5 +1,6 @@
 package net.minecraft.command;
 
+import java.util.Iterator;
 import java.util.List;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.play.server.S19PacketEntityStatus;
@@ -10,9 +11,8 @@ import net.minecraft.world.GameRules;
 
 public class CommandGameRule extends CommandBase
 {
-    /**
-     * Gets the name of the command
-     */
+    
+
     public String getCommandName()
     {
         return "gamerule";
@@ -26,66 +26,62 @@ public class CommandGameRule extends CommandBase
         return 2;
     }
 
-    /**
-     * Gets the usage string for the command.
-     */
     public String getCommandUsage(ICommandSender sender)
     {
         return "commands.gamerule.usage";
     }
 
-    /**
-     * Callback when the command is invoked
-     */
     public void processCommand(ICommandSender sender, String[] args) throws CommandException
     {
-        GameRules gamerules = this.getGameRules();
-        String s = args.length > 0 ? args[0] : "";
-        String s1 = args.length > 1 ? buildString(args, 1) : "";
+        GameRules var3 = this.getGameRules();
+        String var4 = args.length > 0 ? args[0] : "";
+        String var5 = args.length > 1 ? func_180529_a(args, 1) : "";
 
         switch (args.length)
         {
             case 0:
-                sender.addChatMessage(new ChatComponentText(joinNiceString(gamerules.getRules())));
+                sender.addChatMessage(new ChatComponentText(joinNiceString(var3.getRules())));
                 break;
 
             case 1:
-                if (!gamerules.hasRule(s))
+                if (!var3.hasRule(var4))
                 {
-                    throw new CommandException("commands.gamerule.norule", new Object[] {s});
+                    throw new CommandException("commands.gamerule.norule", new Object[] {var4});
                 }
 
-                String s2 = gamerules.getString(s);
-                sender.addChatMessage((new ChatComponentText(s)).appendText(" = ").appendText(s2));
-                sender.setCommandStat(CommandResultStats.Type.QUERY_RESULT, gamerules.getInt(s));
+                String var6 = var3.getGameRuleStringValue(var4);
+                sender.addChatMessage((new ChatComponentText(var4)).appendText(" = ").appendText(var6));
+                sender.func_174794_a(CommandResultStats.Type.QUERY_RESULT, var3.getInt(var4));
                 break;
 
             default:
-                if (gamerules.areSameType(s, GameRules.ValueType.BOOLEAN_VALUE) && !"true".equals(s1) && !"false".equals(s1))
+                if (var3.areSameType(var4, GameRules.ValueType.BOOLEAN_VALUE) && !"true".equals(var5) && !"false".equals(var5))
                 {
-                    throw new CommandException("commands.generic.boolean.invalid", new Object[] {s1});
+                    throw new CommandException("commands.generic.boolean.invalid", new Object[] {var5});
                 }
 
-                gamerules.setOrCreateGameRule(s, s1);
-                func_175773_a(gamerules, s);
+                var3.setOrCreateGameRule(var4, var5);
+                func_175773_a(var3, var4);
                 notifyOperators(sender, this, "commands.gamerule.success", new Object[0]);
         }
     }
 
-    public static void func_175773_a(GameRules rules, String p_175773_1_)
+    public static void func_175773_a(GameRules p_175773_0_, String p_175773_1_)
     {
         if ("reducedDebugInfo".equals(p_175773_1_))
         {
-            byte b0 = (byte)(rules.getBoolean(p_175773_1_) ? 22 : 23);
+            int var2 = p_175773_0_.getGameRuleBooleanValue(p_175773_1_) ? 22 : 23;
+            Iterator var3 = MinecraftServer.getServer().getConfigurationManager().playerEntityList.iterator();
 
-            for (EntityPlayerMP entityplayermp : MinecraftServer.getServer().getConfigurationManager().getPlayerList())
+            while (var3.hasNext())
             {
-                entityplayermp.playerNetServerHandler.sendPacket(new S19PacketEntityStatus(entityplayermp, b0));
+                EntityPlayerMP var4 = (EntityPlayerMP)var3.next();
+                var4.playerNetServerHandler.sendPacket(new S19PacketEntityStatus(var4, (byte)var2));
             }
         }
     }
 
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
+    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos)
     {
         if (args.length == 1)
         {
@@ -95,9 +91,9 @@ public class CommandGameRule extends CommandBase
         {
             if (args.length == 2)
             {
-                GameRules gamerules = this.getGameRules();
+                GameRules var4 = this.getGameRules();
 
-                if (gamerules.areSameType(args[0], GameRules.ValueType.BOOLEAN_VALUE))
+                if (var4.areSameType(args[0], GameRules.ValueType.BOOLEAN_VALUE))
                 {
                     return getListOfStringsMatchingLastWord(args, new String[] {"true", "false"});
                 }

@@ -1,7 +1,6 @@
 package net.minecraft.entity.ai;
 
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityIronGolem;
 import net.minecraft.village.Village;
 
@@ -13,11 +12,12 @@ public class EntityAIDefendVillage extends EntityAITarget
      * The aggressor of the iron golem's village which is now the golem's attack target.
      */
     EntityLivingBase villageAgressorTarget;
+    
 
-    public EntityAIDefendVillage(EntityIronGolem ironGolemIn)
+    public EntityAIDefendVillage(EntityIronGolem p_i1659_1_)
     {
-        super(ironGolemIn, false, true);
-        this.irongolem = ironGolemIn;
+        super(p_i1659_1_, false, true);
+        this.irongolem = p_i1659_1_;
         this.setMutexBits(1);
     }
 
@@ -26,25 +26,21 @@ public class EntityAIDefendVillage extends EntityAITarget
      */
     public boolean shouldExecute()
     {
-        Village village = this.irongolem.getVillage();
+        Village var1 = this.irongolem.getVillage();
 
-        if (village == null)
+        if (var1 == null)
         {
             return false;
         }
         else
         {
-            this.villageAgressorTarget = village.findNearestVillageAggressor(this.irongolem);
+            this.villageAgressorTarget = var1.findNearestVillageAggressor(this.irongolem);
 
-            if (this.villageAgressorTarget instanceof EntityCreeper)
-            {
-                return false;
-            }
-            else if (!this.isSuitableTarget(this.villageAgressorTarget, false))
+            if (!this.isSuitableTarget(this.villageAgressorTarget, false))
             {
                 if (this.taskOwner.getRNG().nextInt(20) == 0)
                 {
-                    this.villageAgressorTarget = village.getNearestTargetPlayer(this.irongolem);
+                    this.villageAgressorTarget = var1.func_82685_c(this.irongolem);
                     return this.isSuitableTarget(this.villageAgressorTarget, false);
                 }
                 else

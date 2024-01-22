@@ -1,6 +1,7 @@
 package net.minecraft.world.gen;
 
 import com.google.common.collect.Lists;
+import java.util.Iterator;
 import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -17,81 +18,82 @@ import net.minecraft.world.chunk.IChunkProvider;
 
 public class ChunkProviderDebug implements IChunkProvider
 {
-    private static final List<IBlockState> field_177464_a = Lists.<IBlockState>newArrayList();
+    private static final List field_177464_a = Lists.newArrayList();
     private static final int field_177462_b;
-    private static final int field_181039_c;
-    private final World world;
+    private final World field_177463_c;
+    
 
     public ChunkProviderDebug(World worldIn)
     {
-        this.world = worldIn;
+        this.field_177463_c = worldIn;
     }
 
     /**
      * Will return back a chunk, if it doesn't exist and its not a MP client it will generates all the blocks for the
      * specified chunk from the map seed and chunk seed
      */
-    public Chunk provideChunk(int x, int z)
+    public Chunk provideChunk(int p_73154_1_, int p_73154_2_)
     {
-        ChunkPrimer chunkprimer = new ChunkPrimer();
+        ChunkPrimer var3 = new ChunkPrimer();
+        int var7;
 
-        for (int i = 0; i < 16; ++i)
+        for (int var4 = 0; var4 < 16; ++var4)
         {
-            for (int j = 0; j < 16; ++j)
+            for (int var5 = 0; var5 < 16; ++var5)
             {
-                int k = x * 16 + i;
-                int l = z * 16 + j;
-                chunkprimer.setBlockState(i, 60, j, Blocks.barrier.getDefaultState());
-                IBlockState iblockstate = func_177461_b(k, l);
+                int var6 = p_73154_1_ * 16 + var4;
+                var7 = p_73154_2_ * 16 + var5;
+                var3.setBlockState(var4, 60, var5, Blocks.barrier.getDefaultState());
+                IBlockState var8 = func_177461_b(var6, var7);
 
-                if (iblockstate != null)
+                if (var8 != null)
                 {
-                    chunkprimer.setBlockState(i, 70, j, iblockstate);
+                    var3.setBlockState(var4, 70, var5, var8);
                 }
             }
         }
 
-        Chunk chunk = new Chunk(this.world, chunkprimer, x, z);
-        chunk.generateSkylightMap();
-        BiomeGenBase[] abiomegenbase = this.world.getWorldChunkManager().loadBlockGeneratorData((BiomeGenBase[])null, x * 16, z * 16, 16, 16);
-        byte[] abyte = chunk.getBiomeArray();
+        Chunk var9 = new Chunk(this.field_177463_c, var3, p_73154_1_, p_73154_2_);
+        var9.generateSkylightMap();
+        BiomeGenBase[] var10 = this.field_177463_c.getWorldChunkManager().loadBlockGeneratorData((BiomeGenBase[])null, p_73154_1_ * 16, p_73154_2_ * 16, 16, 16);
+        byte[] var11 = var9.getBiomeArray();
 
-        for (int i1 = 0; i1 < abyte.length; ++i1)
+        for (var7 = 0; var7 < var11.length; ++var7)
         {
-            abyte[i1] = (byte)abiomegenbase[i1].biomeID;
+            var11[var7] = (byte)var10[var7].biomeID;
         }
 
-        chunk.generateSkylightMap();
-        return chunk;
+        var9.generateSkylightMap();
+        return var9;
     }
 
     public static IBlockState func_177461_b(int p_177461_0_, int p_177461_1_)
     {
-        IBlockState iblockstate = null;
+        IBlockState var2 = null;
 
         if (p_177461_0_ > 0 && p_177461_1_ > 0 && p_177461_0_ % 2 != 0 && p_177461_1_ % 2 != 0)
         {
-            p_177461_0_ = p_177461_0_ / 2;
-            p_177461_1_ = p_177461_1_ / 2;
+            p_177461_0_ /= 2;
+            p_177461_1_ /= 2;
 
-            if (p_177461_0_ <= field_177462_b && p_177461_1_ <= field_181039_c)
+            if (p_177461_0_ <= field_177462_b && p_177461_1_ <= field_177462_b)
             {
-                int i = MathHelper.abs_int(p_177461_0_ * field_177462_b + p_177461_1_);
+                int var3 = MathHelper.abs_int(p_177461_0_ * field_177462_b + p_177461_1_);
 
-                if (i < field_177464_a.size())
+                if (var3 < field_177464_a.size())
                 {
-                    iblockstate = (IBlockState)field_177464_a.get(i);
+                    var2 = (IBlockState)field_177464_a.get(var3);
                 }
             }
         }
 
-        return iblockstate;
+        return var2;
     }
 
     /**
-     * Checks to see if a chunk exists at x, z
+     * Checks to see if a chunk exists at x, y
      */
-    public boolean chunkExists(int x, int z)
+    public boolean chunkExists(int p_73149_1_, int p_73149_2_)
     {
         return true;
     }
@@ -99,11 +101,9 @@ public class ChunkProviderDebug implements IChunkProvider
     /**
      * Populates chunk with ores etc etc
      */
-    public void populate(IChunkProvider chunkProvider, int x, int z)
-    {
-    }
+    public void populate(IChunkProvider p_73153_1_, int p_73153_2_, int p_73153_3_) {}
 
-    public boolean populateChunk(IChunkProvider chunkProvider, Chunk chunkIn, int x, int z)
+    public boolean func_177460_a(IChunkProvider p_177460_1_, Chunk p_177460_2_, int p_177460_3_, int p_177460_4_)
     {
         return false;
     }
@@ -112,7 +112,7 @@ public class ChunkProviderDebug implements IChunkProvider
      * Two modes of operation: if passed true, save all Chunks in one go.  If passed false, save up to two chunks.
      * Return true if all chunks have been saved.
      */
-    public boolean saveChunks(boolean saveAllChunks, IProgressUpdate progressCallback)
+    public boolean saveChunks(boolean p_73151_1_, IProgressUpdate p_73151_2_)
     {
         return true;
     }
@@ -121,9 +121,7 @@ public class ChunkProviderDebug implements IChunkProvider
      * Save extra data not associated with any Chunk.  Not saved during autosave, only during world unload.  Currently
      * unimplemented.
      */
-    public void saveExtraData()
-    {
-    }
+    public void saveExtraData() {}
 
     /**
      * Unloads chunks that are marked to be unloaded. This is not guaranteed to unload every such chunk.
@@ -149,13 +147,13 @@ public class ChunkProviderDebug implements IChunkProvider
         return "DebugLevelSource";
     }
 
-    public List<BiomeGenBase.SpawnListEntry> getPossibleCreatures(EnumCreatureType creatureType, BlockPos pos)
+    public List func_177458_a(EnumCreatureType p_177458_1_, BlockPos p_177458_2_)
     {
-        BiomeGenBase biomegenbase = this.world.getBiomeGenForCoords(pos);
-        return biomegenbase.getSpawnableList(creatureType);
+        BiomeGenBase var3 = this.field_177463_c.getBiomeGenForCoords(p_177458_2_);
+        return var3.getSpawnableList(p_177458_1_);
     }
 
-    public BlockPos getStrongholdGen(World worldIn, String structureName, BlockPos position)
+    public BlockPos func_180513_a(World worldIn, String p_180513_2_, BlockPos p_180513_3_)
     {
         return null;
     }
@@ -165,23 +163,23 @@ public class ChunkProviderDebug implements IChunkProvider
         return 0;
     }
 
-    public void recreateStructures(Chunk chunkIn, int x, int z)
-    {
-    }
+    public void func_180514_a(Chunk p_180514_1_, int p_180514_2_, int p_180514_3_) {}
 
-    public Chunk provideChunk(BlockPos blockPosIn)
+    public Chunk func_177459_a(BlockPos p_177459_1_)
     {
-        return this.provideChunk(blockPosIn.getX() >> 4, blockPosIn.getZ() >> 4);
+        return this.provideChunk(p_177459_1_.getX() >> 4, p_177459_1_.getZ() >> 4);
     }
 
     static
     {
-        for (Block block : Block.blockRegistry)
+        Iterator var0 = Block.blockRegistry.iterator();
+
+        while (var0.hasNext())
         {
-            field_177464_a.addAll(block.getBlockState().getValidStates());
+            Block var1 = (Block)var0.next();
+            field_177464_a.addAll(var1.getBlockState().getValidStates());
         }
 
         field_177462_b = MathHelper.ceiling_float_int(MathHelper.sqrt_float((float)field_177464_a.size()));
-        field_181039_c = MathHelper.ceiling_float_int((float)field_177464_a.size() / (float)field_177462_b);
     }
 }

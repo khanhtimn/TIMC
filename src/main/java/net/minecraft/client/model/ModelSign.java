@@ -7,6 +7,7 @@ public class ModelSign extends ModelBase
 
     /** The stick a sign stands on. */
     public ModelRenderer signStick;
+    
 
     public ModelSign()
     {

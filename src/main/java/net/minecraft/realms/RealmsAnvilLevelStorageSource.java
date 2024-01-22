@@ -1,6 +1,8 @@
 package net.minecraft.realms;
 
 import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import net.minecraft.client.AnvilConverterException;
 import net.minecraft.util.IProgressUpdate;
@@ -10,15 +12,16 @@ import net.minecraft.world.storage.SaveFormatComparator;
 public class RealmsAnvilLevelStorageSource
 {
     private ISaveFormat levelStorageSource;
+    
 
-    public RealmsAnvilLevelStorageSource(ISaveFormat levelStorageSourceIn)
+    public RealmsAnvilLevelStorageSource(ISaveFormat p_i1106_1_)
     {
-        this.levelStorageSource = levelStorageSourceIn;
+        this.levelStorageSource = p_i1106_1_;
     }
 
     public String getName()
     {
-        return this.levelStorageSource.getName();
+        return this.levelStorageSource.func_154333_a();
     }
 
     public boolean levelExists(String p_levelExists_1_)
@@ -38,7 +41,7 @@ public class RealmsAnvilLevelStorageSource
 
     public boolean isNewLevelIdAcceptable(String p_isNewLevelIdAcceptable_1_)
     {
-        return this.levelStorageSource.isNewLevelIdAcceptable(p_isNewLevelIdAcceptable_1_);
+        return this.levelStorageSource.func_154335_d(p_isNewLevelIdAcceptable_1_);
     }
 
     public boolean deleteLevel(String p_deleteLevel_1_)
@@ -48,7 +51,7 @@ public class RealmsAnvilLevelStorageSource
 
     public boolean isConvertible(String p_isConvertible_1_)
     {
-        return this.levelStorageSource.isConvertible(p_isConvertible_1_);
+        return this.levelStorageSource.func_154334_a(p_isConvertible_1_);
     }
 
     public void renameLevel(String p_renameLevel_1_, String p_renameLevel_2_)
@@ -61,15 +64,17 @@ public class RealmsAnvilLevelStorageSource
         this.levelStorageSource.flushCache();
     }
 
-    public List<RealmsLevelSummary> getLevelList() throws AnvilConverterException
+    public List getLevelList() throws AnvilConverterException
     {
-        List<RealmsLevelSummary> list = Lists.<RealmsLevelSummary>newArrayList();
+        ArrayList var1 = Lists.newArrayList();
+        Iterator var2 = this.levelStorageSource.getSaveList().iterator();
 
-        for (SaveFormatComparator saveformatcomparator : this.levelStorageSource.getSaveList())
+        while (var2.hasNext())
         {
-            list.add(new RealmsLevelSummary(saveformatcomparator));
+            SaveFormatComparator var3 = (SaveFormatComparator)var2.next();
+            var1.add(new RealmsLevelSummary(var3));
         }
 
-        return list;
+        return var1;
     }
 }

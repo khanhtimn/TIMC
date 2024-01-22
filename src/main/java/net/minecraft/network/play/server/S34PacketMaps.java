@@ -2,43 +2,43 @@ package net.minecraft.network.play.server;
 
 import java.io.IOException;
 import java.util.Collection;
+import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.util.Vec4b;
 import net.minecraft.world.storage.MapData;
 
-public class S34PacketMaps implements Packet<INetHandlerPlayClient>
+public class S34PacketMaps implements Packet
 {
     private int mapId;
-    private byte mapScale;
-    private Vec4b[] mapVisiblePlayersVec4b;
-    private int mapMinX;
-    private int mapMinY;
-    private int mapMaxX;
-    private int mapMaxY;
-    private byte[] mapDataBytes;
+    private byte field_179739_b;
+    private Vec4b[] field_179740_c;
+    private int field_179737_d;
+    private int field_179738_e;
+    private int field_179735_f;
+    private int field_179736_g;
+    private byte[] field_179741_h;
+    
 
-    public S34PacketMaps()
+    public S34PacketMaps() {}
+
+    public S34PacketMaps(int p_i45975_1_, byte p_i45975_2_, Collection p_i45975_3_, byte[] p_i45975_4_, int p_i45975_5_, int p_i45975_6_, int p_i45975_7_, int p_i45975_8_)
     {
-    }
+        this.mapId = p_i45975_1_;
+        this.field_179739_b = p_i45975_2_;
+        this.field_179740_c = (Vec4b[])p_i45975_3_.toArray(new Vec4b[p_i45975_3_.size()]);
+        this.field_179737_d = p_i45975_5_;
+        this.field_179738_e = p_i45975_6_;
+        this.field_179735_f = p_i45975_7_;
+        this.field_179736_g = p_i45975_8_;
+        this.field_179741_h = new byte[p_i45975_7_ * p_i45975_8_];
 
-    public S34PacketMaps(int mapIdIn, byte scale, Collection<Vec4b> visiblePlayers, byte[] colors, int minX, int minY, int maxX, int maxY)
-    {
-        this.mapId = mapIdIn;
-        this.mapScale = scale;
-        this.mapVisiblePlayersVec4b = (Vec4b[])visiblePlayers.toArray(new Vec4b[visiblePlayers.size()]);
-        this.mapMinX = minX;
-        this.mapMinY = minY;
-        this.mapMaxX = maxX;
-        this.mapMaxY = maxY;
-        this.mapDataBytes = new byte[maxX * maxY];
-
-        for (int i = 0; i < maxX; ++i)
+        for (int var9 = 0; var9 < p_i45975_7_; ++var9)
         {
-            for (int j = 0; j < maxY; ++j)
+            for (int var10 = 0; var10 < p_i45975_8_; ++var10)
             {
-                this.mapDataBytes[i + j * maxX] = colors[minX + i + (minY + j) * 128];
+                this.field_179741_h[var9 + var10 * p_i45975_7_] = p_i45975_4_[p_i45975_5_ + var9 + (p_i45975_6_ + var10) * 128];
             }
         }
     }
@@ -46,62 +46,62 @@ public class S34PacketMaps implements Packet<INetHandlerPlayClient>
     /**
      * Reads the raw packet data from the data stream.
      */
-    public void readPacketData(PacketBuffer buf) throws IOException
+    public void readPacketData(PacketBuffer data) throws IOException
     {
-        this.mapId = buf.readVarIntFromBuffer();
-        this.mapScale = buf.readByte();
-        this.mapVisiblePlayersVec4b = new Vec4b[buf.readVarIntFromBuffer()];
+        this.mapId = data.readVarIntFromBuffer();
+        this.field_179739_b = data.readByte();
+        this.field_179740_c = new Vec4b[data.readVarIntFromBuffer()];
 
-        for (int i = 0; i < this.mapVisiblePlayersVec4b.length; ++i)
+        for (int var2 = 0; var2 < this.field_179740_c.length; ++var2)
         {
-            short short1 = (short)buf.readByte();
-            this.mapVisiblePlayersVec4b[i] = new Vec4b((byte)(short1 >> 4 & 15), buf.readByte(), buf.readByte(), (byte)(short1 & 15));
+            short var3 = (short)data.readByte();
+            this.field_179740_c[var2] = new Vec4b((byte)(var3 >> 4 & 15), data.readByte(), data.readByte(), (byte)(var3 & 15));
         }
 
-        this.mapMaxX = buf.readUnsignedByte();
+        this.field_179735_f = data.readUnsignedByte();
 
-        if (this.mapMaxX > 0)
+        if (this.field_179735_f > 0)
         {
-            this.mapMaxY = buf.readUnsignedByte();
-            this.mapMinX = buf.readUnsignedByte();
-            this.mapMinY = buf.readUnsignedByte();
-            this.mapDataBytes = buf.readByteArray();
+            this.field_179736_g = data.readUnsignedByte();
+            this.field_179737_d = data.readUnsignedByte();
+            this.field_179738_e = data.readUnsignedByte();
+            this.field_179741_h = data.readByteArray();
         }
     }
 
     /**
      * Writes the raw packet data to the data stream.
      */
-    public void writePacketData(PacketBuffer buf) throws IOException
+    public void writePacketData(PacketBuffer data) throws IOException
     {
-        buf.writeVarIntToBuffer(this.mapId);
-        buf.writeByte(this.mapScale);
-        buf.writeVarIntToBuffer(this.mapVisiblePlayersVec4b.length);
+        data.writeVarIntToBuffer(this.mapId);
+        data.writeByte(this.field_179739_b);
+        data.writeVarIntToBuffer(this.field_179740_c.length);
+        Vec4b[] var2 = this.field_179740_c;
+        int var3 = var2.length;
 
-        for (Vec4b vec4b : this.mapVisiblePlayersVec4b)
+        for (int var4 = 0; var4 < var3; ++var4)
         {
-            buf.writeByte((vec4b.func_176110_a() & 15) << 4 | vec4b.func_176111_d() & 15);
-            buf.writeByte(vec4b.func_176112_b());
-            buf.writeByte(vec4b.func_176113_c());
+            Vec4b var5 = var2[var4];
+            data.writeByte((var5.func_176110_a() & 15) << 4 | var5.func_176111_d() & 15);
+            data.writeByte(var5.func_176112_b());
+            data.writeByte(var5.func_176113_c());
         }
 
-        buf.writeByte(this.mapMaxX);
+        data.writeByte(this.field_179735_f);
 
-        if (this.mapMaxX > 0)
+        if (this.field_179735_f > 0)
         {
-            buf.writeByte(this.mapMaxY);
-            buf.writeByte(this.mapMinX);
-            buf.writeByte(this.mapMinY);
-            buf.writeByteArray(this.mapDataBytes);
+            data.writeByte(this.field_179736_g);
+            data.writeByte(this.field_179737_d);
+            data.writeByte(this.field_179738_e);
+            data.writeByteArray(this.field_179741_h);
         }
     }
 
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(INetHandlerPlayClient handler)
+    public void func_180741_a(INetHandlerPlayClient p_180741_1_)
     {
-        handler.handleMaps(this);
+        p_180741_1_.handleMaps(this);
     }
 
     public int getMapId()
@@ -109,26 +109,32 @@ public class S34PacketMaps implements Packet<INetHandlerPlayClient>
         return this.mapId;
     }
 
-    /**
-     * Sets new MapData from the packet to given MapData param
-     */
-    public void setMapdataTo(MapData mapdataIn)
+    public void func_179734_a(MapData p_179734_1_)
     {
-        mapdataIn.scale = this.mapScale;
-        mapdataIn.mapDecorations.clear();
+        p_179734_1_.scale = this.field_179739_b;
+        p_179734_1_.playersVisibleOnMap.clear();
+        int var2;
 
-        for (int i = 0; i < this.mapVisiblePlayersVec4b.length; ++i)
+        for (var2 = 0; var2 < this.field_179740_c.length; ++var2)
         {
-            Vec4b vec4b = this.mapVisiblePlayersVec4b[i];
-            mapdataIn.mapDecorations.put("icon-" + i, vec4b);
+            Vec4b var3 = this.field_179740_c[var2];
+            p_179734_1_.playersVisibleOnMap.put("icon-" + var2, var3);
         }
 
-        for (int j = 0; j < this.mapMaxX; ++j)
+        for (var2 = 0; var2 < this.field_179735_f; ++var2)
         {
-            for (int k = 0; k < this.mapMaxY; ++k)
+            for (int var4 = 0; var4 < this.field_179736_g; ++var4)
             {
-                mapdataIn.colors[this.mapMinX + j + (this.mapMinY + k) * 128] = this.mapDataBytes[j + k * this.mapMaxX];
+                p_179734_1_.colors[this.field_179737_d + var2 + (this.field_179738_e + var4) * 128] = this.field_179741_h[var2 + var4 * this.field_179735_f];
             }
         }
+    }
+
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandler handler)
+    {
+        this.func_180741_a((INetHandlerPlayClient)handler);
     }
 }

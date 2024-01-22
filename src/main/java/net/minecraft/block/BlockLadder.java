@@ -1,5 +1,6 @@
 package net.minecraft.block;
 
+import java.util.Iterator;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
@@ -16,12 +17,13 @@ import net.minecraft.world.World;
 
 public class BlockLadder extends Block
 {
-    public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
+    public static final PropertyDirection field_176382_a = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
+    
 
     protected BlockLadder()
     {
         super(Material.circuits);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(field_176382_a, EnumFacing.NORTH));
         this.setCreativeTab(CreativeTabs.tabDecorations);
     }
 
@@ -37,38 +39,35 @@ public class BlockLadder extends Block
         return super.getSelectedBoundingBox(worldIn, pos);
     }
 
-    public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
+    public void setBlockBoundsBasedOnState(IBlockAccess access, BlockPos pos)
     {
-        IBlockState iblockstate = worldIn.getBlockState(pos);
+        IBlockState var3 = access.getBlockState(pos);
 
-        if (iblockstate.getBlock() == this)
+        if (var3.getBlock() == this)
         {
-            float f = 0.125F;
+            float var4 = 0.125F;
 
-            switch ((EnumFacing)iblockstate.getValue(FACING))
+            switch (BlockLadder.SwitchEnumFacing.field_180190_a[((EnumFacing)var3.getValue(field_176382_a)).ordinal()])
             {
-                case NORTH:
-                    this.setBlockBounds(0.0F, 0.0F, 1.0F - f, 1.0F, 1.0F, 1.0F);
+                case 1:
+                    this.setBlockBounds(0.0F, 0.0F, 1.0F - var4, 1.0F, 1.0F, 1.0F);
                     break;
 
-                case SOUTH:
-                    this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, f);
+                case 2:
+                    this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, var4);
                     break;
 
-                case WEST:
-                    this.setBlockBounds(1.0F - f, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
+                case 3:
+                    this.setBlockBounds(1.0F - var4, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
                     break;
 
-                case EAST:
+                case 4:
                 default:
-                    this.setBlockBounds(0.0F, 0.0F, 0.0F, f, 1.0F, 1.0F);
+                    this.setBlockBounds(0.0F, 0.0F, 0.0F, var4, 1.0F, 1.0F);
             }
         }
     }
 
-    /**
-     * Used to determine ambient occlusion and culling when rebuilding chunks for render
-     */
     public boolean isOpaqueCube()
     {
         return false;
@@ -81,41 +80,40 @@ public class BlockLadder extends Block
 
     public boolean canPlaceBlockAt(World worldIn, BlockPos pos)
     {
-        return worldIn.getBlockState(pos.west()).getBlock().isNormalCube() ? true : (worldIn.getBlockState(pos.east()).getBlock().isNormalCube() ? true : (worldIn.getBlockState(pos.north()).getBlock().isNormalCube() ? true : worldIn.getBlockState(pos.south()).getBlock().isNormalCube()));
+        return worldIn.getBlockState(pos.offsetWest()).getBlock().isNormalCube() ? true : (worldIn.getBlockState(pos.offsetEast()).getBlock().isNormalCube() ? true : (worldIn.getBlockState(pos.offsetNorth()).getBlock().isNormalCube() ? true : worldIn.getBlockState(pos.offsetSouth()).getBlock().isNormalCube()));
     }
 
-    /**
-     * Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
-     * IBlockstate
-     */
     public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
     {
-        if (facing.getAxis().isHorizontal() && this.canBlockStay(worldIn, pos, facing))
+        if (facing.getAxis().isHorizontal() && this.func_176381_b(worldIn, pos, facing))
         {
-            return this.getDefaultState().withProperty(FACING, facing);
+            return this.getDefaultState().withProperty(field_176382_a, facing);
         }
         else
         {
-            for (EnumFacing enumfacing : EnumFacing.Plane.HORIZONTAL)
-            {
-                if (this.canBlockStay(worldIn, pos, enumfacing))
-                {
-                    return this.getDefaultState().withProperty(FACING, enumfacing);
-                }
-            }
+            Iterator var9 = EnumFacing.Plane.HORIZONTAL.iterator();
+            EnumFacing var10;
 
-            return this.getDefaultState();
+            do
+            {
+                if (!var9.hasNext())
+                {
+                    return this.getDefaultState();
+                }
+
+                var10 = (EnumFacing)var9.next();
+            }
+            while (!this.func_176381_b(worldIn, pos, var10));
+
+            return this.getDefaultState().withProperty(field_176382_a, var10);
         }
     }
 
-    /**
-     * Called when a neighboring block changes.
-     */
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
     {
-        EnumFacing enumfacing = (EnumFacing)state.getValue(FACING);
+        EnumFacing var5 = (EnumFacing)state.getValue(field_176382_a);
 
-        if (!this.canBlockStay(worldIn, pos, enumfacing))
+        if (!this.func_176381_b(worldIn, pos, var5))
         {
             this.dropBlockAsItem(worldIn, pos, state, 0);
             worldIn.setBlockToAir(pos);
@@ -124,9 +122,9 @@ public class BlockLadder extends Block
         super.onNeighborBlockChange(worldIn, pos, state, neighborBlock);
     }
 
-    protected boolean canBlockStay(World worldIn, BlockPos pos, EnumFacing facing)
+    protected boolean func_176381_b(World worldIn, BlockPos p_176381_2_, EnumFacing p_176381_3_)
     {
-        return worldIn.getBlockState(pos.offset(facing.getOpposite())).getBlock().isNormalCube();
+        return worldIn.getBlockState(p_176381_2_.offset(p_176381_3_.getOpposite())).getBlock().isNormalCube();
     }
 
     public EnumWorldBlockLayer getBlockLayer()
@@ -139,14 +137,14 @@ public class BlockLadder extends Block
      */
     public IBlockState getStateFromMeta(int meta)
     {
-        EnumFacing enumfacing = EnumFacing.getFront(meta);
+        EnumFacing var2 = EnumFacing.getFront(meta);
 
-        if (enumfacing.getAxis() == EnumFacing.Axis.Y)
+        if (var2.getAxis() == EnumFacing.Axis.Y)
         {
-            enumfacing = EnumFacing.NORTH;
+            var2 = EnumFacing.NORTH;
         }
 
-        return this.getDefaultState().withProperty(FACING, enumfacing);
+        return this.getDefaultState().withProperty(field_176382_a, var2);
     }
 
     /**
@@ -154,11 +152,56 @@ public class BlockLadder extends Block
      */
     public int getMetaFromState(IBlockState state)
     {
-        return ((EnumFacing)state.getValue(FACING)).getIndex();
+        return ((EnumFacing)state.getValue(field_176382_a)).getIndex();
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {FACING});
+        return new BlockState(this, new IProperty[] {field_176382_a});
+    }
+
+    static final class SwitchEnumFacing
+    {
+        static final int[] field_180190_a = new int[EnumFacing.values().length];
+        
+
+        static
+        {
+            try
+            {
+                field_180190_a[EnumFacing.NORTH.ordinal()] = 1;
+            }
+            catch (NoSuchFieldError var4)
+            {
+                ;
+            }
+
+            try
+            {
+                field_180190_a[EnumFacing.SOUTH.ordinal()] = 2;
+            }
+            catch (NoSuchFieldError var3)
+            {
+                ;
+            }
+
+            try
+            {
+                field_180190_a[EnumFacing.WEST.ordinal()] = 3;
+            }
+            catch (NoSuchFieldError var2)
+            {
+                ;
+            }
+
+            try
+            {
+                field_180190_a[EnumFacing.EAST.ordinal()] = 4;
+            }
+            catch (NoSuchFieldError var1)
+            {
+                ;
+            }
+        }
     }
 }

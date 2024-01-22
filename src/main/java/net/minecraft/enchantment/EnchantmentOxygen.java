@@ -4,26 +4,28 @@ import net.minecraft.util.ResourceLocation;
 
 public class EnchantmentOxygen extends Enchantment
 {
-    public EnchantmentOxygen(int enchID, ResourceLocation p_i45766_2_, int p_i45766_3_)
+    
+
+    public EnchantmentOxygen(int p_i45766_1_, ResourceLocation p_i45766_2_, int p_i45766_3_)
     {
-        super(enchID, p_i45766_2_, p_i45766_3_, EnumEnchantmentType.ARMOR_HEAD);
+        super(p_i45766_1_, p_i45766_2_, p_i45766_3_, EnumEnchantmentType.ARMOR_HEAD);
         this.setName("oxygen");
     }
 
     /**
      * Returns the minimal value of enchantability needed on the enchantment level passed.
      */
-    public int getMinEnchantability(int enchantmentLevel)
+    public int getMinEnchantability(int p_77321_1_)
     {
-        return 10 * enchantmentLevel;
+        return 10 * p_77321_1_;
     }
 
     /**
      * Returns the maximum value of enchantability nedded on the enchantment level passed.
      */
-    public int getMaxEnchantability(int enchantmentLevel)
+    public int getMaxEnchantability(int p_77317_1_)
     {
-        return this.getMinEnchantability(enchantmentLevel) + 30;
+        return this.getMinEnchantability(p_77317_1_) + 30;
     }
 
     /**

@@ -18,11 +18,12 @@ public class ItemBucket extends Item
 {
     /** field for checking if the bucket has been filled. */
     private Block isFull;
+    
 
-    public ItemBucket(Block containedBlock)
+    public ItemBucket(Block p_i45331_1_)
     {
         this.maxStackSize = 1;
-        this.isFull = containedBlock;
+        this.isFull = p_i45331_1_;
         this.setCreativeTab(CreativeTabs.tabMisc);
     }
 
@@ -31,46 +32,46 @@ public class ItemBucket extends Item
      */
     public ItemStack onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn)
     {
-        boolean flag = this.isFull == Blocks.air;
-        MovingObjectPosition movingobjectposition = this.getMovingObjectPositionFromPlayer(worldIn, playerIn, flag);
+        boolean var4 = this.isFull == Blocks.air;
+        MovingObjectPosition var5 = this.getMovingObjectPositionFromPlayer(worldIn, playerIn, var4);
 
-        if (movingobjectposition == null)
+        if (var5 == null)
         {
             return itemStackIn;
         }
         else
         {
-            if (movingobjectposition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
+            if (var5.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
             {
-                BlockPos blockpos = movingobjectposition.getBlockPos();
+                BlockPos var6 = var5.func_178782_a();
 
-                if (!worldIn.isBlockModifiable(playerIn, blockpos))
+                if (!worldIn.isBlockModifiable(playerIn, var6))
                 {
                     return itemStackIn;
                 }
 
-                if (flag)
+                if (var4)
                 {
-                    if (!playerIn.canPlayerEdit(blockpos.offset(movingobjectposition.sideHit), movingobjectposition.sideHit, itemStackIn))
+                    if (!playerIn.func_175151_a(var6.offset(var5.field_178784_b), var5.field_178784_b, itemStackIn))
                     {
                         return itemStackIn;
                     }
 
-                    IBlockState iblockstate = worldIn.getBlockState(blockpos);
-                    Material material = iblockstate.getBlock().getMaterial();
+                    IBlockState var7 = worldIn.getBlockState(var6);
+                    Material var8 = var7.getBlock().getMaterial();
 
-                    if (material == Material.water && ((Integer)iblockstate.getValue(BlockLiquid.LEVEL)).intValue() == 0)
+                    if (var8 == Material.water && ((Integer)var7.getValue(BlockLiquid.LEVEL)).intValue() == 0)
                     {
-                        worldIn.setBlockToAir(blockpos);
+                        worldIn.setBlockToAir(var6);
                         playerIn.triggerAchievement(StatList.objectUseStats[Item.getIdFromItem(this)]);
-                        return this.fillBucket(itemStackIn, playerIn, Items.water_bucket);
+                        return this.func_150910_a(itemStackIn, playerIn, Items.water_bucket);
                     }
 
-                    if (material == Material.lava && ((Integer)iblockstate.getValue(BlockLiquid.LEVEL)).intValue() == 0)
+                    if (var8 == Material.lava && ((Integer)var7.getValue(BlockLiquid.LEVEL)).intValue() == 0)
                     {
-                        worldIn.setBlockToAir(blockpos);
+                        worldIn.setBlockToAir(var6);
                         playerIn.triggerAchievement(StatList.objectUseStats[Item.getIdFromItem(this)]);
-                        return this.fillBucket(itemStackIn, playerIn, Items.lava_bucket);
+                        return this.func_150910_a(itemStackIn, playerIn, Items.lava_bucket);
                     }
                 }
                 else
@@ -80,14 +81,14 @@ public class ItemBucket extends Item
                         return new ItemStack(Items.bucket);
                     }
 
-                    BlockPos blockpos1 = blockpos.offset(movingobjectposition.sideHit);
+                    BlockPos var9 = var6.offset(var5.field_178784_b);
 
-                    if (!playerIn.canPlayerEdit(blockpos1, movingobjectposition.sideHit, itemStackIn))
+                    if (!playerIn.func_175151_a(var9, var5.field_178784_b, itemStackIn))
                     {
                         return itemStackIn;
                     }
 
-                    if (this.tryPlaceContainedLiquid(worldIn, blockpos1) && !playerIn.capabilities.isCreativeMode)
+                    if (this.func_180616_a(worldIn, var9) && !playerIn.capabilities.isCreativeMode)
                     {
                         playerIn.triggerAchievement(StatList.objectUseStats[Item.getIdFromItem(this)]);
                         return new ItemStack(Items.bucket);
@@ -99,28 +100,28 @@ public class ItemBucket extends Item
         }
     }
 
-    private ItemStack fillBucket(ItemStack emptyBuckets, EntityPlayer player, Item fullBucket)
+    private ItemStack func_150910_a(ItemStack p_150910_1_, EntityPlayer p_150910_2_, Item p_150910_3_)
     {
-        if (player.capabilities.isCreativeMode)
+        if (p_150910_2_.capabilities.isCreativeMode)
         {
-            return emptyBuckets;
+            return p_150910_1_;
         }
-        else if (--emptyBuckets.stackSize <= 0)
+        else if (--p_150910_1_.stackSize <= 0)
         {
-            return new ItemStack(fullBucket);
+            return new ItemStack(p_150910_3_);
         }
         else
         {
-            if (!player.inventory.addItemStackToInventory(new ItemStack(fullBucket)))
+            if (!p_150910_2_.inventory.addItemStackToInventory(new ItemStack(p_150910_3_)))
             {
-                player.dropPlayerItemWithRandomChoice(new ItemStack(fullBucket, 1, 0), false);
+                p_150910_2_.dropPlayerItemWithRandomChoice(new ItemStack(p_150910_3_, 1, 0), false);
             }
 
-            return emptyBuckets;
+            return p_150910_1_;
         }
     }
 
-    public boolean tryPlaceContainedLiquid(World worldIn, BlockPos pos)
+    public boolean func_180616_a(World worldIn, BlockPos p_180616_2_)
     {
         if (this.isFull == Blocks.air)
         {
@@ -128,35 +129,35 @@ public class ItemBucket extends Item
         }
         else
         {
-            Material material = worldIn.getBlockState(pos).getBlock().getMaterial();
-            boolean flag = !material.isSolid();
+            Material var3 = worldIn.getBlockState(p_180616_2_).getBlock().getMaterial();
+            boolean var4 = !var3.isSolid();
 
-            if (!worldIn.isAirBlock(pos) && !flag)
+            if (!worldIn.isAirBlock(p_180616_2_) && !var4)
             {
                 return false;
             }
             else
             {
-                if (worldIn.provider.doesWaterVaporize() && this.isFull == Blocks.flowing_water)
+                if (worldIn.provider.func_177500_n() && this.isFull == Blocks.flowing_water)
                 {
-                    int i = pos.getX();
-                    int j = pos.getY();
-                    int k = pos.getZ();
-                    worldIn.playSoundEffect((double)((float)i + 0.5F), (double)((float)j + 0.5F), (double)((float)k + 0.5F), "random.fizz", 0.5F, 2.6F + (worldIn.rand.nextFloat() - worldIn.rand.nextFloat()) * 0.8F);
+                    int var5 = p_180616_2_.getX();
+                    int var6 = p_180616_2_.getY();
+                    int var7 = p_180616_2_.getZ();
+                    worldIn.playSoundEffect((double)((float)var5 + 0.5F), (double)((float)var6 + 0.5F), (double)((float)var7 + 0.5F), "random.fizz", 0.5F, 2.6F + (worldIn.rand.nextFloat() - worldIn.rand.nextFloat()) * 0.8F);
 
-                    for (int l = 0; l < 8; ++l)
+                    for (int var8 = 0; var8 < 8; ++var8)
                     {
-                        worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, (double)i + Math.random(), (double)j + Math.random(), (double)k + Math.random(), 0.0D, 0.0D, 0.0D, new int[0]);
+                        worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, (double)var5 + Math.random(), (double)var6 + Math.random(), (double)var7 + Math.random(), 0.0D, 0.0D, 0.0D, new int[0]);
                     }
                 }
                 else
                 {
-                    if (!worldIn.isRemote && flag && !material.isLiquid())
+                    if (!worldIn.isRemote && var4 && !var3.isLiquid())
                     {
-                        worldIn.destroyBlock(pos, true);
+                        worldIn.destroyBlock(p_180616_2_, true);
                     }
 
-                    worldIn.setBlockState(pos, this.isFull.getDefaultState(), 3);
+                    worldIn.setBlockState(p_180616_2_, this.isFull.getDefaultState(), 3);
                 }
 
                 return true;

@@ -4,109 +4,128 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.EntityFishHook;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 
-public class RenderFish extends Render<EntityFishHook>
+public class RenderFish extends Render
 {
-    private static final ResourceLocation FISH_PARTICLES = new ResourceLocation("textures/particle/particles.png");
+    private static final ResourceLocation field_110792_a = new ResourceLocation("textures/particle/particles.png");
+    
 
-    public RenderFish(RenderManager renderManagerIn)
+    public RenderFish(RenderManager p_i46175_1_)
     {
-        super(renderManagerIn);
+        super(p_i46175_1_);
     }
 
-    /**
-     * Renders the desired {@code T} type Entity.
-     */
-    public void doRender(EntityFishHook entity, double x, double y, double z, float entityYaw, float partialTicks)
+    public void func_180558_a(EntityFishHook p_180558_1_, double p_180558_2_, double p_180558_4_, double p_180558_6_, float p_180558_8_, float p_180558_9_)
     {
         GlStateManager.pushMatrix();
-        GlStateManager.translate((float)x, (float)y, (float)z);
+        GlStateManager.translate((float)p_180558_2_, (float)p_180558_4_, (float)p_180558_6_);
         GlStateManager.enableRescaleNormal();
         GlStateManager.scale(0.5F, 0.5F, 0.5F);
-        this.bindEntityTexture(entity);
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        int i = 1;
-        int j = 2;
-        float f = 0.0625F;
-        float f1 = 0.125F;
-        float f2 = 0.125F;
-        float f3 = 0.1875F;
-        float f4 = 1.0F;
-        float f5 = 0.5F;
-        float f6 = 0.5F;
+        this.bindEntityTexture(p_180558_1_);
+        Tessellator var10 = Tessellator.getInstance();
+        WorldRenderer var11 = var10.getWorldRenderer();
+        byte var12 = 1;
+        byte var13 = 2;
+        float var14 = (float)(var12 * 8 + 0) / 128.0F;
+        float var15 = (float)(var12 * 8 + 8) / 128.0F;
+        float var16 = (float)(var13 * 8 + 0) / 128.0F;
+        float var17 = (float)(var13 * 8 + 8) / 128.0F;
+        float var18 = 1.0F;
+        float var19 = 0.5F;
+        float var20 = 0.5F;
         GlStateManager.rotate(180.0F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(-this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_NORMAL);
-        worldrenderer.pos(-0.5D, -0.5D, 0.0D).tex(0.0625D, 0.1875D).normal(0.0F, 1.0F, 0.0F).endVertex();
-        worldrenderer.pos(0.5D, -0.5D, 0.0D).tex(0.125D, 0.1875D).normal(0.0F, 1.0F, 0.0F).endVertex();
-        worldrenderer.pos(0.5D, 0.5D, 0.0D).tex(0.125D, 0.125D).normal(0.0F, 1.0F, 0.0F).endVertex();
-        worldrenderer.pos(-0.5D, 0.5D, 0.0D).tex(0.0625D, 0.125D).normal(0.0F, 1.0F, 0.0F).endVertex();
-        tessellator.draw();
+        var11.startDrawingQuads();
+        var11.func_178980_d(0.0F, 1.0F, 0.0F);
+        var11.addVertexWithUV((double)(0.0F - var19), (double)(0.0F - var20), 0.0D, (double)var14, (double)var17);
+        var11.addVertexWithUV((double)(var18 - var19), (double)(0.0F - var20), 0.0D, (double)var15, (double)var17);
+        var11.addVertexWithUV((double)(var18 - var19), (double)(1.0F - var20), 0.0D, (double)var15, (double)var16);
+        var11.addVertexWithUV((double)(0.0F - var19), (double)(1.0F - var20), 0.0D, (double)var14, (double)var16);
+        var10.draw();
         GlStateManager.disableRescaleNormal();
         GlStateManager.popMatrix();
 
-        if (entity.angler != null)
+        if (p_180558_1_.angler != null)
         {
-            float f7 = entity.angler.getSwingProgress(partialTicks);
-            float f8 = MathHelper.sin(MathHelper.sqrt_float(f7) * (float)Math.PI);
-            Vec3 vec3 = new Vec3(-0.36D, 0.03D, 0.35D);
-            vec3 = vec3.rotatePitch(-(entity.angler.prevRotationPitch + (entity.angler.rotationPitch - entity.angler.prevRotationPitch) * partialTicks) * (float)Math.PI / 180.0F);
-            vec3 = vec3.rotateYaw(-(entity.angler.prevRotationYaw + (entity.angler.rotationYaw - entity.angler.prevRotationYaw) * partialTicks) * (float)Math.PI / 180.0F);
-            vec3 = vec3.rotateYaw(f8 * 0.5F);
-            vec3 = vec3.rotatePitch(-f8 * 0.7F);
-            double d0 = entity.angler.prevPosX + (entity.angler.posX - entity.angler.prevPosX) * (double)partialTicks + vec3.xCoord;
-            double d1 = entity.angler.prevPosY + (entity.angler.posY - entity.angler.prevPosY) * (double)partialTicks + vec3.yCoord;
-            double d2 = entity.angler.prevPosZ + (entity.angler.posZ - entity.angler.prevPosZ) * (double)partialTicks + vec3.zCoord;
-            double d3 = (double)entity.angler.getEyeHeight();
+            float var21 = p_180558_1_.angler.getSwingProgress(p_180558_9_);
+            float var22 = MathHelper.sin(MathHelper.sqrt_float(var21) * (float)Math.PI);
+            Vec3 var23 = new Vec3(-0.36D, 0.03D, 0.35D);
+            var23 = var23.rotatePitch(-(p_180558_1_.angler.prevRotationPitch + (p_180558_1_.angler.rotationPitch - p_180558_1_.angler.prevRotationPitch) * p_180558_9_) * (float)Math.PI / 180.0F);
+            var23 = var23.rotateYaw(-(p_180558_1_.angler.prevRotationYaw + (p_180558_1_.angler.rotationYaw - p_180558_1_.angler.prevRotationYaw) * p_180558_9_) * (float)Math.PI / 180.0F);
+            var23 = var23.rotateYaw(var22 * 0.5F);
+            var23 = var23.rotatePitch(-var22 * 0.7F);
+            double var24 = p_180558_1_.angler.prevPosX + (p_180558_1_.angler.posX - p_180558_1_.angler.prevPosX) * (double)p_180558_9_ + var23.xCoord;
+            double var26 = p_180558_1_.angler.prevPosY + (p_180558_1_.angler.posY - p_180558_1_.angler.prevPosY) * (double)p_180558_9_ + var23.yCoord;
+            double var28 = p_180558_1_.angler.prevPosZ + (p_180558_1_.angler.posZ - p_180558_1_.angler.prevPosZ) * (double)p_180558_9_ + var23.zCoord;
+            double var30 = (double)p_180558_1_.angler.getEyeHeight();
 
-            if (this.renderManager.options != null && this.renderManager.options.showDebugInfo > 0 || entity.angler != Minecraft.getMinecraft().thePlayer)
+            if (this.renderManager.options != null && this.renderManager.options.thirdPersonView > 0 || p_180558_1_.angler != Minecraft.getMinecraft().thePlayer)
             {
-                float f9 = (entity.angler.prevRenderYawOffset + (entity.angler.renderYawOffset - entity.angler.prevRenderYawOffset) * partialTicks) * (float)Math.PI / 180.0F;
-                double d4 = (double)MathHelper.sin(f9);
-                double d6 = (double)MathHelper.cos(f9);
-                double d8 = 0.35D;
-                double d10 = 0.8D;
-                d0 = entity.angler.prevPosX + (entity.angler.posX - entity.angler.prevPosX) * (double)partialTicks - d6 * 0.35D - d4 * 0.8D;
-                d1 = entity.angler.prevPosY + d3 + (entity.angler.posY - entity.angler.prevPosY) * (double)partialTicks - 0.45D;
-                d2 = entity.angler.prevPosZ + (entity.angler.posZ - entity.angler.prevPosZ) * (double)partialTicks - d4 * 0.35D + d6 * 0.8D;
-                d3 = entity.angler.isSneaking() ? -0.1875D : 0.0D;
+                float var32 = (p_180558_1_.angler.prevRenderYawOffset + (p_180558_1_.angler.renderYawOffset - p_180558_1_.angler.prevRenderYawOffset) * p_180558_9_) * (float)Math.PI / 180.0F;
+                double var33 = (double)MathHelper.sin(var32);
+                double var35 = (double)MathHelper.cos(var32);
+                double var37 = 0.35D;
+                double var39 = 0.8D;
+                var24 = p_180558_1_.angler.prevPosX + (p_180558_1_.angler.posX - p_180558_1_.angler.prevPosX) * (double)p_180558_9_ - var35 * 0.35D - var33 * 0.8D;
+                var26 = p_180558_1_.angler.prevPosY + var30 + (p_180558_1_.angler.posY - p_180558_1_.angler.prevPosY) * (double)p_180558_9_ - 0.45D;
+                var28 = p_180558_1_.angler.prevPosZ + (p_180558_1_.angler.posZ - p_180558_1_.angler.prevPosZ) * (double)p_180558_9_ - var33 * 0.35D + var35 * 0.8D;
+                var30 = p_180558_1_.angler.isSneaking() ? -0.1875D : 0.0D;
             }
 
-            double d13 = entity.prevPosX + (entity.posX - entity.prevPosX) * (double)partialTicks;
-            double d5 = entity.prevPosY + (entity.posY - entity.prevPosY) * (double)partialTicks + 0.25D;
-            double d7 = entity.prevPosZ + (entity.posZ - entity.prevPosZ) * (double)partialTicks;
-            double d9 = (double)((float)(d0 - d13));
-            double d11 = (double)((float)(d1 - d5)) + d3;
-            double d12 = (double)((float)(d2 - d7));
+            double var47 = p_180558_1_.prevPosX + (p_180558_1_.posX - p_180558_1_.prevPosX) * (double)p_180558_9_;
+            double var34 = p_180558_1_.prevPosY + (p_180558_1_.posY - p_180558_1_.prevPosY) * (double)p_180558_9_ + 0.25D;
+            double var36 = p_180558_1_.prevPosZ + (p_180558_1_.posZ - p_180558_1_.prevPosZ) * (double)p_180558_9_;
+            double var38 = (double)((float)(var24 - var47));
+            double var40 = (double)((float)(var26 - var34)) + var30;
+            double var42 = (double)((float)(var28 - var36));
             GlStateManager.disableTexture2D();
             GlStateManager.disableLighting();
-            worldrenderer.begin(3, DefaultVertexFormats.POSITION_COLOR);
-            int k = 16;
+            var11.startDrawing(3);
+            var11.func_178991_c(0);
+            byte var44 = 16;
 
-            for (int l = 0; l <= 16; ++l)
+            for (int var45 = 0; var45 <= var44; ++var45)
             {
-                float f10 = (float)l / 16.0F;
-                worldrenderer.pos(x + d9 * (double)f10, y + d11 * (double)(f10 * f10 + f10) * 0.5D + 0.25D, z + d12 * (double)f10).color(0, 0, 0, 255).endVertex();
+                float var46 = (float)var45 / (float)var44;
+                var11.addVertex(p_180558_2_ + var38 * (double)var46, p_180558_4_ + var40 * (double)(var46 * var46 + var46) * 0.5D + 0.25D, p_180558_6_ + var42 * (double)var46);
             }
 
-            tessellator.draw();
+            var10.draw();
             GlStateManager.enableLighting();
             GlStateManager.enableTexture2D();
-            super.doRender(entity, x, y, z, entityYaw, partialTicks);
+            super.doRender(p_180558_1_, p_180558_2_, p_180558_4_, p_180558_6_, p_180558_8_, p_180558_9_);
         }
     }
 
     /**
      * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
      */
-    protected ResourceLocation getEntityTexture(EntityFishHook entity)
+    protected ResourceLocation getEntityTexture(EntityFishHook p_110775_1_)
     {
-        return FISH_PARTICLES;
+        return field_110792_a;
+    }
+
+    /**
+     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
+     */
+    protected ResourceLocation getEntityTexture(Entity p_110775_1_)
+    {
+        return this.getEntityTexture((EntityFishHook)p_110775_1_);
+    }
+
+    /**
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
+     */
+    public void doRender(Entity p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
+    {
+        this.func_180558_a((EntityFishHook)p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
     }
 }

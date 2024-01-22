@@ -8,6 +8,7 @@ public class NBTTagString extends NBTBase
 {
     /** The string value for the tag (cannot be empty). */
     private String data;
+    
 
     public NBTTagString()
     {
@@ -34,7 +35,6 @@ public class NBTTagString extends NBTBase
 
     void read(DataInput input, int depth, NBTSizeTracker sizeTracker) throws IOException
     {
-        sizeTracker.read(288L);
         this.data = input.readUTF();
         sizeTracker.read((long)(16 * this.data.length()));
     }
@@ -76,8 +76,8 @@ public class NBTTagString extends NBTBase
         }
         else
         {
-            NBTTagString nbttagstring = (NBTTagString)p_equals_1_;
-            return this.data == null && nbttagstring.data == null || this.data != null && this.data.equals(nbttagstring.data);
+            NBTTagString var2 = (NBTTagString)p_equals_1_;
+            return this.data == null && var2.data == null || this.data != null && this.data.equals(var2.data);
         }
     }
 

@@ -10,11 +10,12 @@ public class EntityAIPanic extends EntityAIBase
     private double randPosX;
     private double randPosY;
     private double randPosZ;
+    
 
-    public EntityAIPanic(EntityCreature creature, double speedIn)
+    public EntityAIPanic(EntityCreature p_i1645_1_, double p_i1645_2_)
     {
-        this.theEntityCreature = creature;
-        this.speed = speedIn;
+        this.theEntityCreature = p_i1645_1_;
+        this.speed = p_i1645_2_;
         this.setMutexBits(1);
     }
 
@@ -29,17 +30,17 @@ public class EntityAIPanic extends EntityAIBase
         }
         else
         {
-            Vec3 vec3 = RandomPositionGenerator.findRandomTarget(this.theEntityCreature, 5, 4);
+            Vec3 var1 = RandomPositionGenerator.findRandomTarget(this.theEntityCreature, 5, 4);
 
-            if (vec3 == null)
+            if (var1 == null)
             {
                 return false;
             }
             else
             {
-                this.randPosX = vec3.xCoord;
-                this.randPosY = vec3.yCoord;
-                this.randPosZ = vec3.zCoord;
+                this.randPosX = var1.xCoord;
+                this.randPosY = var1.yCoord;
+                this.randPosZ = var1.zCoord;
                 return true;
             }
         }

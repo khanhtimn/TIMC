@@ -1,11 +1,12 @@
 package net.minecraft.util;
 
-public abstract class LazyLoadBase<T>
+public abstract class LazyLoadBase
 {
-    private T value;
+    private Object value;
     private boolean isLoaded = false;
+    
 
-    public T getValue()
+    public Object getValue()
     {
         if (!this.isLoaded)
         {
@@ -16,5 +17,5 @@ public abstract class LazyLoadBase<T>
         return this.value;
     }
 
-    protected abstract T load();
+    protected abstract Object load();
 }

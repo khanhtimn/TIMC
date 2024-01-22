@@ -33,18 +33,19 @@ import net.minecraft.world.World;
 
 public class EntityOcelot extends EntityTameable
 {
-    private EntityAIAvoidEntity<EntityPlayer> avoidEntity;
+    private EntityAIAvoidEntity field_175545_bm;
 
     /**
      * The tempt AI task for this mob, used to prevent taming while it is fleeing.
      */
     private EntityAITempt aiTempt;
+    
 
     public EntityOcelot(World worldIn)
     {
         super(worldIn);
         this.setSize(0.6F, 0.7F);
-        ((PathNavigateGround)this.getNavigator()).setAvoidsWater(true);
+        ((PathNavigateGround)this.getNavigator()).func_179690_a(true);
         this.tasks.addTask(1, new EntityAISwimming(this));
         this.tasks.addTask(2, this.aiSit);
         this.tasks.addTask(3, this.aiTempt = new EntityAITempt(this, 0.6D, Items.fish, true));
@@ -68,14 +69,14 @@ public class EntityOcelot extends EntityTameable
     {
         if (this.getMoveHelper().isUpdating())
         {
-            double d0 = this.getMoveHelper().getSpeed();
+            double var1 = this.getMoveHelper().getSpeed();
 
-            if (d0 == 0.6D)
+            if (var1 == 0.6D)
             {
                 this.setSneaking(true);
                 this.setSprinting(false);
             }
-            else if (d0 == 1.33D)
+            else if (var1 == 1.33D)
             {
                 this.setSneaking(false);
                 this.setSprinting(true);
@@ -108,9 +109,7 @@ public class EntityOcelot extends EntityTameable
         this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.30000001192092896D);
     }
 
-    public void fall(float distance, float damageMultiplier)
-    {
-    }
+    public void fall(float distance, float damageMultiplier) {}
 
     /**
      * (abstract) Protected helper method to write subclass entity data to NBT.
@@ -167,9 +166,9 @@ public class EntityOcelot extends EntityTameable
         return Items.leather;
     }
 
-    public boolean attackEntityAsMob(Entity entityIn)
+    public boolean attackEntityAsMob(Entity p_70652_1_)
     {
-        return entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), 3.0F);
+        return p_70652_1_.attackEntityFrom(DamageSource.causeMobDamage(this), 3.0F);
     }
 
     /**
@@ -177,7 +176,7 @@ public class EntityOcelot extends EntityTameable
      */
     public boolean attackEntityFrom(DamageSource source, float amount)
     {
-        if (this.isEntityInvulnerable(source))
+        if (this.func_180431_b(source))
         {
             return false;
         }
@@ -190,39 +189,33 @@ public class EntityOcelot extends EntityTameable
 
     /**
      * Drop 0-2 items of this living's type
-     *  
-     * @param wasRecentlyHit true if this this entity was recently hit by appropriate entity (generally only if player
-     * or tameable)
-     * @param lootingModifier level of enchanment to be applied to this drop
      */
-    protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier)
-    {
-    }
+    protected void dropFewItems(boolean p_70628_1_, int p_70628_2_) {}
 
     /**
      * Called when a player interacts with a mob. e.g. gets milk from a cow, gets into the saddle on a pig.
      */
-    public boolean interact(EntityPlayer player)
+    public boolean interact(EntityPlayer p_70085_1_)
     {
-        ItemStack itemstack = player.inventory.getCurrentItem();
+        ItemStack var2 = p_70085_1_.inventory.getCurrentItem();
 
         if (this.isTamed())
         {
-            if (this.isOwner(player) && !this.worldObj.isRemote && !this.isBreedingItem(itemstack))
+            if (this.func_152114_e(p_70085_1_) && !this.worldObj.isRemote && !this.isBreedingItem(var2))
             {
                 this.aiSit.setSitting(!this.isSitting());
             }
         }
-        else if (this.aiTempt.isRunning() && itemstack != null && itemstack.getItem() == Items.fish && player.getDistanceSqToEntity(this) < 9.0D)
+        else if (this.aiTempt.isRunning() && var2 != null && var2.getItem() == Items.fish && p_70085_1_.getDistanceSqToEntity(this) < 9.0D)
         {
-            if (!player.capabilities.isCreativeMode)
+            if (!p_70085_1_.capabilities.isCreativeMode)
             {
-                --itemstack.stackSize;
+                --var2.stackSize;
             }
 
-            if (itemstack.stackSize <= 0)
+            if (var2.stackSize <= 0)
             {
-                player.inventory.setInventorySlotContents(player.inventory.currentItem, (ItemStack)null);
+                p_70085_1_.inventory.setInventorySlotContents(p_70085_1_.inventory.currentItem, (ItemStack)null);
             }
 
             if (!this.worldObj.isRemote)
@@ -231,7 +224,7 @@ public class EntityOcelot extends EntityTameable
                 {
                     this.setTamed(true);
                     this.setTameSkin(1 + this.worldObj.rand.nextInt(3));
-                    this.setOwnerId(player.getUniqueID().toString());
+                    this.func_152115_b(p_70085_1_.getUniqueID().toString());
                     this.playTameEffect(true);
                     this.aiSit.setSitting(true);
                     this.worldObj.setEntityState(this, (byte)7);
@@ -246,38 +239,38 @@ public class EntityOcelot extends EntityTameable
             return true;
         }
 
-        return super.interact(player);
+        return super.interact(p_70085_1_);
     }
 
-    public EntityOcelot createChild(EntityAgeable ageable)
+    public EntityOcelot func_180493_b(EntityAgeable p_180493_1_)
     {
-        EntityOcelot entityocelot = new EntityOcelot(this.worldObj);
+        EntityOcelot var2 = new EntityOcelot(this.worldObj);
 
         if (this.isTamed())
         {
-            entityocelot.setOwnerId(this.getOwnerId());
-            entityocelot.setTamed(true);
-            entityocelot.setTameSkin(this.getTameSkin());
+            var2.func_152115_b(this.func_152113_b());
+            var2.setTamed(true);
+            var2.setTameSkin(this.getTameSkin());
         }
 
-        return entityocelot;
+        return var2;
     }
 
     /**
      * Checks if the parameter is an item which this animal can be fed to breed it (wheat, carrots or seeds depending on
      * the animal type)
      */
-    public boolean isBreedingItem(ItemStack stack)
+    public boolean isBreedingItem(ItemStack p_70877_1_)
     {
-        return stack != null && stack.getItem() == Items.fish;
+        return p_70877_1_ != null && p_70877_1_.getItem() == Items.fish;
     }
 
     /**
      * Returns true if the mob is currently able to mate with the specified mob.
      */
-    public boolean canMateWith(EntityAnimal otherAnimal)
+    public boolean canMateWith(EntityAnimal p_70878_1_)
     {
-        if (otherAnimal == this)
+        if (p_70878_1_ == this)
         {
             return false;
         }
@@ -285,14 +278,14 @@ public class EntityOcelot extends EntityTameable
         {
             return false;
         }
-        else if (!(otherAnimal instanceof EntityOcelot))
+        else if (!(p_70878_1_ instanceof EntityOcelot))
         {
             return false;
         }
         else
         {
-            EntityOcelot entityocelot = (EntityOcelot)otherAnimal;
-            return !entityocelot.isTamed() ? false : this.isInLove() && entityocelot.isInLove();
+            EntityOcelot var2 = (EntityOcelot)p_70878_1_;
+            return !var2.isTamed() ? false : this.isInLove() && var2.isInLove();
         }
     }
 
@@ -301,9 +294,9 @@ public class EntityOcelot extends EntityTameable
         return this.dataWatcher.getWatchableObjectByte(18);
     }
 
-    public void setTameSkin(int skinId)
+    public void setTameSkin(int p_70912_1_)
     {
-        this.dataWatcher.updateObject(18, Byte.valueOf((byte)skinId));
+        this.dataWatcher.updateObject(18, Byte.valueOf((byte)p_70912_1_));
     }
 
     /**
@@ -315,22 +308,22 @@ public class EntityOcelot extends EntityTameable
     }
 
     /**
-     * Checks that the entity is not colliding with any blocks / liquids
+     * Whether or not the current entity is in lava
      */
-    public boolean isNotColliding()
+    public boolean handleLavaMovement()
     {
         if (this.worldObj.checkNoEntityCollision(this.getEntityBoundingBox(), this) && this.worldObj.getCollidingBoundingBoxes(this, this.getEntityBoundingBox()).isEmpty() && !this.worldObj.isAnyLiquid(this.getEntityBoundingBox()))
         {
-            BlockPos blockpos = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
+            BlockPos var1 = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
 
-            if (blockpos.getY() < this.worldObj.getSeaLevel())
+            if (var1.getY() < 63)
             {
                 return false;
             }
 
-            Block block = this.worldObj.getBlockState(blockpos.down()).getBlock();
+            Block var2 = this.worldObj.getBlockState(var1.offsetDown()).getBlock();
 
-            if (block == Blocks.grass || block.getMaterial() == Material.leaves)
+            if (var2 == Blocks.grass || var2.getMaterial() == Material.leaves)
             {
                 return true;
             }
@@ -340,52 +333,64 @@ public class EntityOcelot extends EntityTameable
     }
 
     /**
-     * Get the name of this object. For players this returns their username
+     * Gets the name of this command sender (usually username, but possibly "Rcon")
      */
     public String getName()
     {
         return this.hasCustomName() ? this.getCustomNameTag() : (this.isTamed() ? StatCollector.translateToLocal("entity.Cat.name") : super.getName());
     }
 
-    public void setTamed(boolean tamed)
+    public void setTamed(boolean p_70903_1_)
     {
-        super.setTamed(tamed);
+        super.setTamed(p_70903_1_);
     }
 
-    protected void setupTamedAI()
+    protected void func_175544_ck()
     {
-        if (this.avoidEntity == null)
+        if (this.field_175545_bm == null)
         {
-            this.avoidEntity = new EntityAIAvoidEntity(this, EntityPlayer.class, 16.0F, 0.8D, 1.33D);
+            this.field_175545_bm = new EntityAIAvoidEntity(this, new Predicate()
+            {
+                
+                public boolean func_179874_a(Entity p_179874_1_)
+                {
+                    return p_179874_1_ instanceof EntityPlayer;
+                }
+                public boolean apply(Object p_apply_1_)
+                {
+                    return this.func_179874_a((Entity)p_apply_1_);
+                }
+            }, 16.0F, 0.8D, 1.33D);
         }
 
-        this.tasks.removeTask(this.avoidEntity);
+        this.tasks.removeTask(this.field_175545_bm);
 
         if (!this.isTamed())
         {
-            this.tasks.addTask(4, this.avoidEntity);
+            this.tasks.addTask(4, this.field_175545_bm);
         }
     }
 
-    /**
-     * Called only once on an entity when first time spawned, via egg, mob spawner, natural spawning etc, but not called
-     * when entity is reloaded from nbt. Mainly used for initializing attributes and inventory
-     */
-    public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, IEntityLivingData livingdata)
+    public IEntityLivingData func_180482_a(DifficultyInstance p_180482_1_, IEntityLivingData p_180482_2_)
     {
-        livingdata = super.onInitialSpawn(difficulty, livingdata);
+        p_180482_2_ = super.func_180482_a(p_180482_1_, p_180482_2_);
 
         if (this.worldObj.rand.nextInt(7) == 0)
         {
-            for (int i = 0; i < 2; ++i)
+            for (int var3 = 0; var3 < 2; ++var3)
             {
-                EntityOcelot entityocelot = new EntityOcelot(this.worldObj);
-                entityocelot.setLocationAndAngles(this.posX, this.posY, this.posZ, this.rotationYaw, 0.0F);
-                entityocelot.setGrowingAge(-24000);
-                this.worldObj.spawnEntityInWorld(entityocelot);
+                EntityOcelot var4 = new EntityOcelot(this.worldObj);
+                var4.setLocationAndAngles(this.posX, this.posY, this.posZ, this.rotationYaw, 0.0F);
+                var4.setGrowingAge(-24000);
+                this.worldObj.spawnEntityInWorld(var4);
             }
         }
 
-        return livingdata;
+        return p_180482_2_;
+    }
+
+    public EntityAgeable createChild(EntityAgeable p_90011_1_)
+    {
+        return this.func_180493_b(p_90011_1_);
     }
 }

@@ -2,6 +2,7 @@ package net.minecraft.block.state.pattern;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import net.minecraft.block.Block;
@@ -9,36 +10,43 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 
-public class BlockStateHelper implements Predicate<IBlockState>
+public class BlockStateHelper implements Predicate
 {
-    private final BlockState blockstate;
-    private final Map<IProperty, Predicate> propertyPredicates = Maps.<IProperty, Predicate>newHashMap();
+    private final BlockState field_177641_a;
+    private final Map field_177640_b = Maps.newHashMap();
+    
 
-    private BlockStateHelper(BlockState blockStateIn)
+    private BlockStateHelper(BlockState p_i45653_1_)
     {
-        this.blockstate = blockStateIn;
+        this.field_177641_a = p_i45653_1_;
     }
 
-    public static BlockStateHelper forBlock(Block blockIn)
+    public static BlockStateHelper forBlock(Block p_177638_0_)
     {
-        return new BlockStateHelper(blockIn.getBlockState());
+        return new BlockStateHelper(p_177638_0_.getBlockState());
     }
 
-    public boolean apply(IBlockState p_apply_1_)
+    public boolean func_177639_a(IBlockState p_177639_1_)
     {
-        if (p_apply_1_ != null && p_apply_1_.getBlock().equals(this.blockstate.getBlock()))
+        if (p_177639_1_ != null && p_177639_1_.getBlock().equals(this.field_177641_a.getBlock()))
         {
-            for (Entry<IProperty, Predicate> entry : this.propertyPredicates.entrySet())
+            Iterator var2 = this.field_177640_b.entrySet().iterator();
+            Entry var3;
+            Comparable var4;
+
+            do
             {
-                Object object = p_apply_1_.getValue((IProperty)entry.getKey());
-
-                if (!((Predicate)entry.getValue()).apply(object))
+                if (!var2.hasNext())
                 {
-                    return false;
+                    return true;
                 }
-            }
 
-            return true;
+                var3 = (Entry)var2.next();
+                var4 = p_177639_1_.getValue((IProperty)var3.getKey());
+            }
+            while (((Predicate)var3.getValue()).apply(var4));
+
+            return false;
         }
         else
         {
@@ -46,16 +54,21 @@ public class BlockStateHelper implements Predicate<IBlockState>
         }
     }
 
-    public <V extends Comparable<V>> BlockStateHelper where(IProperty<V> property, Predicate <? extends V > is)
+    public BlockStateHelper func_177637_a(IProperty p_177637_1_, Predicate p_177637_2_)
     {
-        if (!this.blockstate.getProperties().contains(property))
+        if (!this.field_177641_a.getProperties().contains(p_177637_1_))
         {
-            throw new IllegalArgumentException(this.blockstate + " cannot support property " + property);
+            throw new IllegalArgumentException(this.field_177641_a + " cannot support property " + p_177637_1_);
         }
         else
         {
-            this.propertyPredicates.put(property, is);
+            this.field_177640_b.put(p_177637_1_, p_177637_2_);
             return this;
         }
+    }
+
+    public boolean apply(Object p_apply_1_)
+    {
+        return this.func_177639_a((IBlockState)p_apply_1_);
     }
 }

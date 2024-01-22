@@ -1,17 +1,17 @@
 package net.minecraft.network.status.server;
 
 import java.io.IOException;
+import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.status.INetHandlerStatusClient;
 
-public class S01PacketPong implements Packet<INetHandlerStatusClient>
+public class S01PacketPong implements Packet
 {
     private long clientTime;
+    
 
-    public S01PacketPong()
-    {
-    }
+    public S01PacketPong() {}
 
     public S01PacketPong(long time)
     {
@@ -21,17 +21,17 @@ public class S01PacketPong implements Packet<INetHandlerStatusClient>
     /**
      * Reads the raw packet data from the data stream.
      */
-    public void readPacketData(PacketBuffer buf) throws IOException
+    public void readPacketData(PacketBuffer data) throws IOException
     {
-        this.clientTime = buf.readLong();
+        this.clientTime = data.readLong();
     }
 
     /**
      * Writes the raw packet data to the data stream.
      */
-    public void writePacketData(PacketBuffer buf) throws IOException
+    public void writePacketData(PacketBuffer data) throws IOException
     {
-        buf.writeLong(this.clientTime);
+        data.writeLong(this.clientTime);
     }
 
     /**
@@ -40,5 +40,13 @@ public class S01PacketPong implements Packet<INetHandlerStatusClient>
     public void processPacket(INetHandlerStatusClient handler)
     {
         handler.handlePong(this);
+    }
+
+    /**
+     * Passes this Packet on to the NetHandler for processing.
+     */
+    public void processPacket(INetHandler handler)
+    {
+        this.processPacket((INetHandlerStatusClient)handler);
     }
 }

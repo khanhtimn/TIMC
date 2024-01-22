@@ -2,12 +2,8 @@ package net.minecraft.world.gen.feature;
 
 import java.util.Random;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockLeaves;
-import net.minecraft.block.BlockNewLeaf;
-import net.minecraft.block.BlockNewLog;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -15,145 +11,187 @@ import net.minecraft.world.World;
 
 public class WorldGenCanopyTree extends WorldGenAbstractTree
 {
-    private static final IBlockState field_181640_a = Blocks.log2.getDefaultState().withProperty(BlockNewLog.VARIANT, BlockPlanks.EnumType.DARK_OAK);
-    private static final IBlockState field_181641_b = Blocks.leaves2.getDefaultState().withProperty(BlockNewLeaf.VARIANT, BlockPlanks.EnumType.DARK_OAK).withProperty(BlockLeaves.CHECK_DECAY, Boolean.valueOf(false));
+    
 
     public WorldGenCanopyTree(boolean p_i45461_1_)
     {
         super(p_i45461_1_);
     }
 
-    public boolean generate(World worldIn, Random rand, BlockPos position)
+    public boolean generate(World worldIn, Random p_180709_2_, BlockPos p_180709_3_)
     {
-        int i = rand.nextInt(3) + rand.nextInt(2) + 6;
-        int j = position.getX();
-        int k = position.getY();
-        int l = position.getZ();
+        int var4 = p_180709_2_.nextInt(3) + p_180709_2_.nextInt(2) + 6;
+        boolean var5 = true;
 
-        if (k >= 1 && k + i + 1 < 256)
+        if (p_180709_3_.getY() >= 1 && p_180709_3_.getY() + var4 + 1 <= 256)
         {
-            BlockPos blockpos = position.down();
-            Block block = worldIn.getBlockState(blockpos).getBlock();
+            int var8;
+            int var9;
 
-            if (block != Blocks.grass && block != Blocks.dirt)
+            for (int var6 = p_180709_3_.getY(); var6 <= p_180709_3_.getY() + 1 + var4; ++var6)
             {
-                return false;
+                byte var7 = 1;
+
+                if (var6 == p_180709_3_.getY())
+                {
+                    var7 = 0;
+                }
+
+                if (var6 >= p_180709_3_.getY() + 1 + var4 - 2)
+                {
+                    var7 = 2;
+                }
+
+                for (var8 = p_180709_3_.getX() - var7; var8 <= p_180709_3_.getX() + var7 && var5; ++var8)
+                {
+                    for (var9 = p_180709_3_.getZ() - var7; var9 <= p_180709_3_.getZ() + var7 && var5; ++var9)
+                    {
+                        if (var6 >= 0 && var6 < 256)
+                        {
+                            if (!this.func_150523_a(worldIn.getBlockState(new BlockPos(var8, var6, var9)).getBlock()))
+                            {
+                                var5 = false;
+                            }
+                        }
+                        else
+                        {
+                            var5 = false;
+                        }
+                    }
+                }
             }
-            else if (!this.func_181638_a(worldIn, position, i))
+
+            if (!var5)
             {
                 return false;
             }
             else
             {
-                this.func_175921_a(worldIn, blockpos);
-                this.func_175921_a(worldIn, blockpos.east());
-                this.func_175921_a(worldIn, blockpos.south());
-                this.func_175921_a(worldIn, blockpos.south().east());
-                EnumFacing enumfacing = EnumFacing.Plane.HORIZONTAL.random(rand);
-                int i1 = i - rand.nextInt(4);
-                int j1 = 2 - rand.nextInt(3);
-                int k1 = j;
-                int l1 = l;
-                int i2 = k + i - 1;
+                Block var18 = worldIn.getBlockState(p_180709_3_.offsetDown()).getBlock();
 
-                for (int j2 = 0; j2 < i; ++j2)
+                if ((var18 == Blocks.grass || var18 == Blocks.dirt) && p_180709_3_.getY() < 256 - var4 - 1)
                 {
-                    if (j2 >= i1 && j1 > 0)
+                    this.func_175921_a(worldIn, p_180709_3_.offsetDown());
+                    this.func_175921_a(worldIn, p_180709_3_.add(1, -1, 0));
+                    this.func_175921_a(worldIn, p_180709_3_.add(1, -1, 1));
+                    this.func_175921_a(worldIn, p_180709_3_.add(0, -1, 1));
+                    EnumFacing var19 = EnumFacing.Plane.HORIZONTAL.random(p_180709_2_);
+                    var8 = var4 - p_180709_2_.nextInt(4);
+                    var9 = 2 - p_180709_2_.nextInt(3);
+                    int var10 = p_180709_3_.getX();
+                    int var11 = p_180709_3_.getZ();
+                    int var12 = 0;
+                    int var13;
+                    int var14;
+
+                    for (var13 = 0; var13 < var4; ++var13)
                     {
-                        k1 += enumfacing.getFrontOffsetX();
-                        l1 += enumfacing.getFrontOffsetZ();
-                        --j1;
-                    }
+                        var14 = p_180709_3_.getY() + var13;
 
-                    int k2 = k + j2;
-                    BlockPos blockpos1 = new BlockPos(k1, k2, l1);
-                    Material material = worldIn.getBlockState(blockpos1).getBlock().getMaterial();
-
-                    if (material == Material.air || material == Material.leaves)
-                    {
-                        this.func_181639_b(worldIn, blockpos1);
-                        this.func_181639_b(worldIn, blockpos1.east());
-                        this.func_181639_b(worldIn, blockpos1.south());
-                        this.func_181639_b(worldIn, blockpos1.east().south());
-                    }
-                }
-
-                for (int i3 = -2; i3 <= 0; ++i3)
-                {
-                    for (int l3 = -2; l3 <= 0; ++l3)
-                    {
-                        int k4 = -1;
-                        this.func_150526_a(worldIn, k1 + i3, i2 + k4, l1 + l3);
-                        this.func_150526_a(worldIn, 1 + k1 - i3, i2 + k4, l1 + l3);
-                        this.func_150526_a(worldIn, k1 + i3, i2 + k4, 1 + l1 - l3);
-                        this.func_150526_a(worldIn, 1 + k1 - i3, i2 + k4, 1 + l1 - l3);
-
-                        if ((i3 > -2 || l3 > -1) && (i3 != -1 || l3 != -2))
+                        if (var13 >= var8 && var9 > 0)
                         {
-                            k4 = 1;
-                            this.func_150526_a(worldIn, k1 + i3, i2 + k4, l1 + l3);
-                            this.func_150526_a(worldIn, 1 + k1 - i3, i2 + k4, l1 + l3);
-                            this.func_150526_a(worldIn, k1 + i3, i2 + k4, 1 + l1 - l3);
-                            this.func_150526_a(worldIn, 1 + k1 - i3, i2 + k4, 1 + l1 - l3);
+                            var10 += var19.getFrontOffsetX();
+                            var11 += var19.getFrontOffsetZ();
+                            --var9;
+                        }
+
+                        BlockPos var15 = new BlockPos(var10, var14, var11);
+                        Material var16 = worldIn.getBlockState(var15).getBlock().getMaterial();
+
+                        if (var16 == Material.air || var16 == Material.leaves)
+                        {
+                            this.func_175905_a(worldIn, var15, Blocks.log2, BlockPlanks.EnumType.DARK_OAK.func_176839_a() - 4);
+                            this.func_175905_a(worldIn, var15.offsetEast(), Blocks.log2, BlockPlanks.EnumType.DARK_OAK.func_176839_a() - 4);
+                            this.func_175905_a(worldIn, var15.offsetSouth(), Blocks.log2, BlockPlanks.EnumType.DARK_OAK.func_176839_a() - 4);
+                            this.func_175905_a(worldIn, var15.offsetEast().offsetSouth(), Blocks.log2, BlockPlanks.EnumType.DARK_OAK.func_176839_a() - 4);
+                            var12 = var14;
                         }
                     }
-                }
 
-                if (rand.nextBoolean())
-                {
-                    this.func_150526_a(worldIn, k1, i2 + 2, l1);
-                    this.func_150526_a(worldIn, k1 + 1, i2 + 2, l1);
-                    this.func_150526_a(worldIn, k1 + 1, i2 + 2, l1 + 1);
-                    this.func_150526_a(worldIn, k1, i2 + 2, l1 + 1);
-                }
-
-                for (int j3 = -3; j3 <= 4; ++j3)
-                {
-                    for (int i4 = -3; i4 <= 4; ++i4)
+                    for (var13 = -2; var13 <= 0; ++var13)
                     {
-                        if ((j3 != -3 || i4 != -3) && (j3 != -3 || i4 != 4) && (j3 != 4 || i4 != -3) && (j3 != 4 || i4 != 4) && (Math.abs(j3) < 3 || Math.abs(i4) < 3))
+                        for (var14 = -2; var14 <= 0; ++var14)
                         {
-                            this.func_150526_a(worldIn, k1 + j3, i2, l1 + i4);
-                        }
-                    }
-                }
+                            byte var20 = -1;
+                            this.func_150526_a(worldIn, var10 + var13, var12 + var20, var11 + var14);
+                            this.func_150526_a(worldIn, 1 + var10 - var13, var12 + var20, var11 + var14);
+                            this.func_150526_a(worldIn, var10 + var13, var12 + var20, 1 + var11 - var14);
+                            this.func_150526_a(worldIn, 1 + var10 - var13, var12 + var20, 1 + var11 - var14);
 
-                for (int k3 = -1; k3 <= 2; ++k3)
-                {
-                    for (int j4 = -1; j4 <= 2; ++j4)
-                    {
-                        if ((k3 < 0 || k3 > 1 || j4 < 0 || j4 > 1) && rand.nextInt(3) <= 0)
-                        {
-                            int l4 = rand.nextInt(3) + 2;
-
-                            for (int i5 = 0; i5 < l4; ++i5)
+                            if ((var13 > -2 || var14 > -1) && (var13 != -1 || var14 != -2))
                             {
-                                this.func_181639_b(worldIn, new BlockPos(j + k3, i2 - i5 - 1, l + j4));
+                                byte var21 = 1;
+                                this.func_150526_a(worldIn, var10 + var13, var12 + var21, var11 + var14);
+                                this.func_150526_a(worldIn, 1 + var10 - var13, var12 + var21, var11 + var14);
+                                this.func_150526_a(worldIn, var10 + var13, var12 + var21, 1 + var11 - var14);
+                                this.func_150526_a(worldIn, 1 + var10 - var13, var12 + var21, 1 + var11 - var14);
                             }
+                        }
+                    }
 
-                            for (int j5 = -1; j5 <= 1; ++j5)
+                    if (p_180709_2_.nextBoolean())
+                    {
+                        this.func_150526_a(worldIn, var10, var12 + 2, var11);
+                        this.func_150526_a(worldIn, var10 + 1, var12 + 2, var11);
+                        this.func_150526_a(worldIn, var10 + 1, var12 + 2, var11 + 1);
+                        this.func_150526_a(worldIn, var10, var12 + 2, var11 + 1);
+                    }
+
+                    for (var13 = -3; var13 <= 4; ++var13)
+                    {
+                        for (var14 = -3; var14 <= 4; ++var14)
+                        {
+                            if ((var13 != -3 || var14 != -3) && (var13 != -3 || var14 != 4) && (var13 != 4 || var14 != -3) && (var13 != 4 || var14 != 4) && (Math.abs(var13) < 3 || Math.abs(var14) < 3))
                             {
-                                for (int l2 = -1; l2 <= 1; ++l2)
+                                this.func_150526_a(worldIn, var10 + var13, var12, var11 + var14);
+                            }
+                        }
+                    }
+
+                    for (var13 = -1; var13 <= 2; ++var13)
+                    {
+                        for (var14 = -1; var14 <= 2; ++var14)
+                        {
+                            if ((var13 < 0 || var13 > 1 || var14 < 0 || var14 > 1) && p_180709_2_.nextInt(3) <= 0)
+                            {
+                                int var22 = p_180709_2_.nextInt(3) + 2;
+                                int var23;
+
+                                for (var23 = 0; var23 < var22; ++var23)
                                 {
-                                    this.func_150526_a(worldIn, k1 + k3 + j5, i2, l1 + j4 + l2);
+                                    this.func_175905_a(worldIn, new BlockPos(p_180709_3_.getX() + var13, var12 - var23 - 1, p_180709_3_.getZ() + var14), Blocks.log2, BlockPlanks.EnumType.DARK_OAK.func_176839_a() - 4);
                                 }
-                            }
 
-                            for (int k5 = -2; k5 <= 2; ++k5)
-                            {
-                                for (int l5 = -2; l5 <= 2; ++l5)
+                                int var17;
+
+                                for (var23 = -1; var23 <= 1; ++var23)
                                 {
-                                    if (Math.abs(k5) != 2 || Math.abs(l5) != 2)
+                                    for (var17 = -1; var17 <= 1; ++var17)
                                     {
-                                        this.func_150526_a(worldIn, k1 + k3 + k5, i2 - 1, l1 + j4 + l5);
+                                        this.func_150526_a(worldIn, var10 + var13 + var23, var12 - 0, var11 + var14 + var17);
+                                    }
+                                }
+
+                                for (var23 = -2; var23 <= 2; ++var23)
+                                {
+                                    for (var17 = -2; var17 <= 2; ++var17)
+                                    {
+                                        if (Math.abs(var23) != 2 || Math.abs(var17) != 2)
+                                        {
+                                            this.func_150526_a(worldIn, var10 + var13 + var23, var12 - 1, var11 + var14 + var17);
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-                return true;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
         else
@@ -162,58 +200,13 @@ public class WorldGenCanopyTree extends WorldGenAbstractTree
         }
     }
 
-    private boolean func_181638_a(World p_181638_1_, BlockPos p_181638_2_, int p_181638_3_)
-    {
-        int i = p_181638_2_.getX();
-        int j = p_181638_2_.getY();
-        int k = p_181638_2_.getZ();
-        BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
-
-        for (int l = 0; l <= p_181638_3_ + 1; ++l)
-        {
-            int i1 = 1;
-
-            if (l == 0)
-            {
-                i1 = 0;
-            }
-
-            if (l >= p_181638_3_ - 1)
-            {
-                i1 = 2;
-            }
-
-            for (int j1 = -i1; j1 <= i1; ++j1)
-            {
-                for (int k1 = -i1; k1 <= i1; ++k1)
-                {
-                    if (!this.func_150523_a(p_181638_1_.getBlockState(blockpos$mutableblockpos.set(i + j1, j + l, k + k1)).getBlock()))
-                    {
-                        return false;
-                    }
-                }
-            }
-        }
-
-        return true;
-    }
-
-    private void func_181639_b(World p_181639_1_, BlockPos p_181639_2_)
-    {
-        if (this.func_150523_a(p_181639_1_.getBlockState(p_181639_2_).getBlock()))
-        {
-            this.setBlockAndNotifyAdequately(p_181639_1_, p_181639_2_, field_181640_a);
-        }
-    }
-
     private void func_150526_a(World worldIn, int p_150526_2_, int p_150526_3_, int p_150526_4_)
     {
-        BlockPos blockpos = new BlockPos(p_150526_2_, p_150526_3_, p_150526_4_);
-        Block block = worldIn.getBlockState(blockpos).getBlock();
+        Block var5 = worldIn.getBlockState(new BlockPos(p_150526_2_, p_150526_3_, p_150526_4_)).getBlock();
 
-        if (block.getMaterial() == Material.air)
+        if (var5.getMaterial() == Material.air)
         {
-            this.setBlockAndNotifyAdequately(worldIn, blockpos, field_181641_b);
+            this.func_175905_a(worldIn, new BlockPos(p_150526_2_, p_150526_3_, p_150526_4_), Blocks.leaves2, 1);
         }
     }
 }

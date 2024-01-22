@@ -6,18 +6,29 @@ import net.minecraft.entity.passive.IAnimals;
 
 public interface IMob extends IAnimals
 {
-    Predicate<Entity> mobSelector = new Predicate<Entity>()
+    /** Entity selector for IMob types. */
+    Predicate mobSelector = new Predicate()
     {
-        public boolean apply(Entity p_apply_1_)
+        
+        public boolean func_179983_a(Entity p_179983_1_)
         {
-            return p_apply_1_ instanceof IMob;
+            return p_179983_1_ instanceof IMob;
+        }
+        public boolean apply(Object p_apply_1_)
+        {
+            return this.func_179983_a((Entity)p_apply_1_);
         }
     };
-    Predicate<Entity> VISIBLE_MOB_SELECTOR = new Predicate<Entity>()
+    Predicate field_175450_e = new Predicate()
     {
-        public boolean apply(Entity p_apply_1_)
+        
+        public boolean func_179982_a(Entity p_179982_1_)
         {
-            return p_apply_1_ instanceof IMob && !p_apply_1_.isInvisible();
+            return p_179982_1_ instanceof IMob && !p_179982_1_.isInvisible();
+        }
+        public boolean apply(Object p_apply_1_)
+        {
+            return this.func_179982_a((Entity)p_apply_1_);
         }
     };
 }

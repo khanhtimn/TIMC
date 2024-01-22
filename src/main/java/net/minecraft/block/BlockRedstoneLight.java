@@ -12,13 +12,14 @@ import net.minecraft.world.World;
 public class BlockRedstoneLight extends Block
 {
     private final boolean isOn;
+    
 
-    public BlockRedstoneLight(boolean isOn)
+    public BlockRedstoneLight(boolean p_i45421_1_)
     {
         super(Material.redstoneLight);
-        this.isOn = isOn;
+        this.isOn = p_i45421_1_;
 
-        if (isOn)
+        if (p_i45421_1_)
         {
             this.setLightLevel(1.0F);
         }
@@ -39,9 +40,6 @@ public class BlockRedstoneLight extends Block
         }
     }
 
-    /**
-     * Called when a neighboring block changes.
-     */
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
     {
         if (!worldIn.isRemote)
@@ -70,6 +68,8 @@ public class BlockRedstoneLight extends Block
 
     /**
      * Get the Item that this Block should drop when harvested.
+     *  
+     * @param fortune the level of the Fortune enchantment on the player's tool
      */
     public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {

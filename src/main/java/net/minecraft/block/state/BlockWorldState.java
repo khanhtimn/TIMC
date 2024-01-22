@@ -9,37 +9,36 @@ public class BlockWorldState
 {
     private final World world;
     private final BlockPos pos;
-    private final boolean field_181628_c;
-    private IBlockState state;
-    private TileEntity tileEntity;
-    private boolean tileEntityInitialized;
+    private IBlockState field_177514_c;
+    private TileEntity field_177511_d;
+    private boolean field_177512_e;
+    
 
-    public BlockWorldState(World worldIn, BlockPos posIn, boolean p_i46451_3_)
+    public BlockWorldState(World worldIn, BlockPos p_i45659_2_)
     {
         this.world = worldIn;
-        this.pos = posIn;
-        this.field_181628_c = p_i46451_3_;
+        this.pos = p_i45659_2_;
     }
 
-    public IBlockState getBlockState()
+    public IBlockState func_177509_a()
     {
-        if (this.state == null && (this.field_181628_c || this.world.isBlockLoaded(this.pos)))
+        if (this.field_177514_c == null && this.world.isBlockLoaded(this.pos))
         {
-            this.state = this.world.getBlockState(this.pos);
+            this.field_177514_c = this.world.getBlockState(this.pos);
         }
 
-        return this.state;
+        return this.field_177514_c;
     }
 
-    public TileEntity getTileEntity()
+    public TileEntity func_177507_b()
     {
-        if (this.tileEntity == null && !this.tileEntityInitialized)
+        if (this.field_177511_d == null && !this.field_177512_e)
         {
-            this.tileEntity = this.world.getTileEntity(this.pos);
-            this.tileEntityInitialized = true;
+            this.field_177511_d = this.world.getTileEntity(this.pos);
+            this.field_177512_e = true;
         }
 
-        return this.tileEntity;
+        return this.field_177511_d;
     }
 
     public BlockPos getPos()
@@ -47,13 +46,18 @@ public class BlockWorldState
         return this.pos;
     }
 
-    public static Predicate<BlockWorldState> hasState(final Predicate<IBlockState> predicatesIn)
+    public static Predicate hasState(final Predicate p_177510_0_)
     {
-        return new Predicate<BlockWorldState>()
+        return new Predicate()
         {
-            public boolean apply(BlockWorldState p_apply_1_)
+            
+            public boolean func_177503_a(BlockWorldState p_177503_1_)
             {
-                return p_apply_1_ != null && predicatesIn.apply(p_apply_1_.getBlockState());
+                return p_177503_1_ != null && p_177510_0_.apply(p_177503_1_.func_177509_a());
+            }
+            public boolean apply(Object p_apply_1_)
+            {
+                return this.func_177503_a((BlockWorldState)p_apply_1_);
             }
         };
     }

@@ -4,6 +4,8 @@ import net.minecraft.entity.EntityLivingBase;
 
 public class MetadataPlayerDeath extends Metadata
 {
+    
+
     public MetadataPlayerDeath(EntityLivingBase p_i46066_1_, EntityLivingBase p_i46066_2_)
     {
         super("player_death");

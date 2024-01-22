@@ -2,6 +2,8 @@ package net.minecraft.world.gen.layer;
 
 public class GenLayerSmooth extends GenLayer
 {
+    
+
     public GenLayerSmooth(long p_i2131_1_, GenLayer p_i2131_3_)
     {
         super(p_i2131_1_);
@@ -14,53 +16,53 @@ public class GenLayerSmooth extends GenLayer
      */
     public int[] getInts(int areaX, int areaY, int areaWidth, int areaHeight)
     {
-        int i = areaX - 1;
-        int j = areaY - 1;
-        int k = areaWidth + 2;
-        int l = areaHeight + 2;
-        int[] aint = this.parent.getInts(i, j, k, l);
-        int[] aint1 = IntCache.getIntCache(areaWidth * areaHeight);
+        int var5 = areaX - 1;
+        int var6 = areaY - 1;
+        int var7 = areaWidth + 2;
+        int var8 = areaHeight + 2;
+        int[] var9 = this.parent.getInts(var5, var6, var7, var8);
+        int[] var10 = IntCache.getIntCache(areaWidth * areaHeight);
 
-        for (int i1 = 0; i1 < areaHeight; ++i1)
+        for (int var11 = 0; var11 < areaHeight; ++var11)
         {
-            for (int j1 = 0; j1 < areaWidth; ++j1)
+            for (int var12 = 0; var12 < areaWidth; ++var12)
             {
-                int k1 = aint[j1 + 0 + (i1 + 1) * k];
-                int l1 = aint[j1 + 2 + (i1 + 1) * k];
-                int i2 = aint[j1 + 1 + (i1 + 0) * k];
-                int j2 = aint[j1 + 1 + (i1 + 2) * k];
-                int k2 = aint[j1 + 1 + (i1 + 1) * k];
+                int var13 = var9[var12 + 0 + (var11 + 1) * var7];
+                int var14 = var9[var12 + 2 + (var11 + 1) * var7];
+                int var15 = var9[var12 + 1 + (var11 + 0) * var7];
+                int var16 = var9[var12 + 1 + (var11 + 2) * var7];
+                int var17 = var9[var12 + 1 + (var11 + 1) * var7];
 
-                if (k1 == l1 && i2 == j2)
+                if (var13 == var14 && var15 == var16)
                 {
-                    this.initChunkSeed((long)(j1 + areaX), (long)(i1 + areaY));
+                    this.initChunkSeed((long)(var12 + areaX), (long)(var11 + areaY));
 
                     if (this.nextInt(2) == 0)
                     {
-                        k2 = k1;
+                        var17 = var13;
                     }
                     else
                     {
-                        k2 = i2;
+                        var17 = var15;
                     }
                 }
                 else
                 {
-                    if (k1 == l1)
+                    if (var13 == var14)
                     {
-                        k2 = k1;
+                        var17 = var13;
                     }
 
-                    if (i2 == j2)
+                    if (var15 == var16)
                     {
-                        k2 = i2;
+                        var17 = var15;
                     }
                 }
 
-                aint1[j1 + i1 * areaWidth] = k2;
+                var10[var12 + var11 * areaWidth] = var17;
             }
         }
 
-        return aint1;
+        return var10;
     }
 }

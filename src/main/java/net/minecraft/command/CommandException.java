@@ -3,14 +3,15 @@ package net.minecraft.command;
 public class CommandException extends Exception
 {
     private final Object[] errorObjects;
+    
 
-    public CommandException(String message, Object... objects)
+    public CommandException(String p_i1359_1_, Object ... p_i1359_2_)
     {
-        super(message);
-        this.errorObjects = objects;
+        super(p_i1359_1_);
+        this.errorObjects = p_i1359_2_;
     }
 
-    public Object[] getErrorObjects()
+    public Object[] getErrorOjbects()
     {
         return this.errorObjects;
     }

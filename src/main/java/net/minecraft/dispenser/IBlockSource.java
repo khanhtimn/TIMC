@@ -1,5 +1,6 @@
 package net.minecraft.dispenser;
 
+import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 
@@ -13,7 +14,9 @@ public interface IBlockSource extends ILocatableSource
 
     BlockPos getBlockPos();
 
+    Block getBlock();
+
     int getBlockMetadata();
 
-    <T extends TileEntity> T getBlockTileEntity();
+    TileEntity getBlockTileEntity();
 }

@@ -11,51 +11,48 @@ import net.minecraft.world.World;
 
 public class BlockWallSign extends BlockSign
 {
-    public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
+    public static final PropertyDirection field_176412_a = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
+    
 
     public BlockWallSign()
     {
-        this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(field_176412_a, EnumFacing.NORTH));
     }
 
-    @SuppressWarnings("incomplete-switch")
-    public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
+    public void setBlockBoundsBasedOnState(IBlockAccess access, BlockPos pos)
     {
-        EnumFacing enumfacing = (EnumFacing)worldIn.getBlockState(pos).getValue(FACING);
-        float f = 0.28125F;
-        float f1 = 0.78125F;
-        float f2 = 0.0F;
-        float f3 = 1.0F;
-        float f4 = 0.125F;
+        EnumFacing var3 = (EnumFacing)access.getBlockState(pos).getValue(field_176412_a);
+        float var4 = 0.28125F;
+        float var5 = 0.78125F;
+        float var6 = 0.0F;
+        float var7 = 1.0F;
+        float var8 = 0.125F;
         this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 
-        switch (enumfacing)
+        switch (BlockWallSign.SwitchEnumFacing.field_177331_a[var3.ordinal()])
         {
-            case NORTH:
-                this.setBlockBounds(f2, f, 1.0F - f4, f3, f1, 1.0F);
+            case 1:
+                this.setBlockBounds(var6, var4, 1.0F - var8, var7, var5, 1.0F);
                 break;
 
-            case SOUTH:
-                this.setBlockBounds(f2, f, 0.0F, f3, f1, f4);
+            case 2:
+                this.setBlockBounds(var6, var4, 0.0F, var7, var5, var8);
                 break;
 
-            case WEST:
-                this.setBlockBounds(1.0F - f4, f, f2, 1.0F, f1, f3);
+            case 3:
+                this.setBlockBounds(1.0F - var8, var4, var6, 1.0F, var5, var7);
                 break;
 
-            case EAST:
-                this.setBlockBounds(0.0F, f, f2, f4, f1, f3);
+            case 4:
+                this.setBlockBounds(0.0F, var4, var6, var8, var5, var7);
         }
     }
 
-    /**
-     * Called when a neighboring block changes.
-     */
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
     {
-        EnumFacing enumfacing = (EnumFacing)state.getValue(FACING);
+        EnumFacing var5 = (EnumFacing)state.getValue(field_176412_a);
 
-        if (!worldIn.getBlockState(pos.offset(enumfacing.getOpposite())).getBlock().getMaterial().isSolid())
+        if (!worldIn.getBlockState(pos.offset(var5.getOpposite())).getBlock().getMaterial().isSolid())
         {
             this.dropBlockAsItem(worldIn, pos, state, 0);
             worldIn.setBlockToAir(pos);
@@ -69,14 +66,14 @@ public class BlockWallSign extends BlockSign
      */
     public IBlockState getStateFromMeta(int meta)
     {
-        EnumFacing enumfacing = EnumFacing.getFront(meta);
+        EnumFacing var2 = EnumFacing.getFront(meta);
 
-        if (enumfacing.getAxis() == EnumFacing.Axis.Y)
+        if (var2.getAxis() == EnumFacing.Axis.Y)
         {
-            enumfacing = EnumFacing.NORTH;
+            var2 = EnumFacing.NORTH;
         }
 
-        return this.getDefaultState().withProperty(FACING, enumfacing);
+        return this.getDefaultState().withProperty(field_176412_a, var2);
     }
 
     /**
@@ -84,11 +81,56 @@ public class BlockWallSign extends BlockSign
      */
     public int getMetaFromState(IBlockState state)
     {
-        return ((EnumFacing)state.getValue(FACING)).getIndex();
+        return ((EnumFacing)state.getValue(field_176412_a)).getIndex();
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {FACING});
+        return new BlockState(this, new IProperty[] {field_176412_a});
+    }
+
+    static final class SwitchEnumFacing
+    {
+        static final int[] field_177331_a = new int[EnumFacing.values().length];
+        
+
+        static
+        {
+            try
+            {
+                field_177331_a[EnumFacing.NORTH.ordinal()] = 1;
+            }
+            catch (NoSuchFieldError var4)
+            {
+                ;
+            }
+
+            try
+            {
+                field_177331_a[EnumFacing.SOUTH.ordinal()] = 2;
+            }
+            catch (NoSuchFieldError var3)
+            {
+                ;
+            }
+
+            try
+            {
+                field_177331_a[EnumFacing.WEST.ordinal()] = 3;
+            }
+            catch (NoSuchFieldError var2)
+            {
+                ;
+            }
+
+            try
+            {
+                field_177331_a[EnumFacing.EAST.ordinal()] = 4;
+            }
+            catch (NoSuchFieldError var1)
+            {
+                ;
+            }
+        }
     }
 }

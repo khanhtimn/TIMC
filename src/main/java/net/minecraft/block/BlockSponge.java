@@ -2,8 +2,9 @@ package net.minecraft.block;
 
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Random;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -17,109 +18,104 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.StatCollector;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.World;
 
 public class BlockSponge extends Block
 {
-    public static final PropertyBool WET = PropertyBool.create("wet");
+    public static final PropertyBool WET_PROP = PropertyBool.create("wet");
+    
 
     protected BlockSponge()
     {
         super(Material.sponge);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(WET, Boolean.valueOf(false)));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(WET_PROP, Boolean.valueOf(false)));
         this.setCreativeTab(CreativeTabs.tabBlock);
     }
 
     /**
-     * Gets the localized name of this block. Used for the statistics page.
-     */
-    public String getLocalizedName()
-    {
-        return StatCollector.translateToLocal(this.getUnlocalizedName() + ".dry.name");
-    }
-
-    /**
-     * Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It
-     * returns the metadata of the dropped item based on the old metadata of the block.
+     * Get the damage value that this Block should drop
      */
     public int damageDropped(IBlockState state)
     {
-        return ((Boolean)state.getValue(WET)).booleanValue() ? 1 : 0;
+        return ((Boolean)state.getValue(WET_PROP)).booleanValue() ? 1 : 0;
     }
 
     public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state)
     {
-        this.tryAbsorb(worldIn, pos, state);
+        this.setWet(worldIn, pos, state);
     }
 
-    /**
-     * Called when a neighboring block changes.
-     */
     public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock)
     {
-        this.tryAbsorb(worldIn, pos, state);
+        this.setWet(worldIn, pos, state);
         super.onNeighborBlockChange(worldIn, pos, state, neighborBlock);
     }
 
-    protected void tryAbsorb(World worldIn, BlockPos pos, IBlockState state)
+    protected void setWet(World worldIn, BlockPos p_176311_2_, IBlockState p_176311_3_)
     {
-        if (!((Boolean)state.getValue(WET)).booleanValue() && this.absorb(worldIn, pos))
+        if (!((Boolean)p_176311_3_.getValue(WET_PROP)).booleanValue() && this.absorbWater(worldIn, p_176311_2_))
         {
-            worldIn.setBlockState(pos, state.withProperty(WET, Boolean.valueOf(true)), 2);
-            worldIn.playAuxSFX(2001, pos, Block.getIdFromBlock(Blocks.water));
+            worldIn.setBlockState(p_176311_2_, p_176311_3_.withProperty(WET_PROP, Boolean.valueOf(true)), 2);
+            worldIn.playAuxSFX(2001, p_176311_2_, Block.getIdFromBlock(Blocks.water));
         }
     }
 
-    private boolean absorb(World worldIn, BlockPos pos)
+    private boolean absorbWater(World worldIn, BlockPos p_176312_2_)
     {
-        Queue<Tuple<BlockPos, Integer>> queue = Lists.<Tuple<BlockPos, Integer>>newLinkedList();
-        ArrayList<BlockPos> arraylist = Lists.<BlockPos>newArrayList();
-        queue.add(new Tuple(pos, Integer.valueOf(0)));
-        int i = 0;
+        LinkedList var3 = Lists.newLinkedList();
+        ArrayList var4 = Lists.newArrayList();
+        var3.add(new Tuple(p_176312_2_, Integer.valueOf(0)));
+        int var5 = 0;
+        BlockPos var7;
 
-        while (!((Queue)queue).isEmpty())
+        while (!var3.isEmpty())
         {
-            Tuple<BlockPos, Integer> tuple = (Tuple)queue.poll();
-            BlockPos blockpos = (BlockPos)tuple.getFirst();
-            int j = ((Integer)tuple.getSecond()).intValue();
+            Tuple var6 = (Tuple)var3.poll();
+            var7 = (BlockPos)var6.getFirst();
+            int var8 = ((Integer)var6.getSecond()).intValue();
+            EnumFacing[] var9 = EnumFacing.values();
+            int var10 = var9.length;
 
-            for (EnumFacing enumfacing : EnumFacing.values())
+            for (int var11 = 0; var11 < var10; ++var11)
             {
-                BlockPos blockpos1 = blockpos.offset(enumfacing);
+                EnumFacing var12 = var9[var11];
+                BlockPos var13 = var7.offset(var12);
 
-                if (worldIn.getBlockState(blockpos1).getBlock().getMaterial() == Material.water)
+                if (worldIn.getBlockState(var13).getBlock().getMaterial() == Material.water)
                 {
-                    worldIn.setBlockState(blockpos1, Blocks.air.getDefaultState(), 2);
-                    arraylist.add(blockpos1);
-                    ++i;
+                    worldIn.setBlockState(var13, Blocks.air.getDefaultState(), 2);
+                    var4.add(var13);
+                    ++var5;
 
-                    if (j < 6)
+                    if (var8 < 6)
                     {
-                        queue.add(new Tuple(blockpos1, Integer.valueOf(j + 1)));
+                        var3.add(new Tuple(var13, Integer.valueOf(var8 + 1)));
                     }
                 }
             }
 
-            if (i > 64)
+            if (var5 > 64)
             {
                 break;
             }
         }
 
-        for (BlockPos blockpos2 : arraylist)
+        Iterator var14 = var4.iterator();
+
+        while (var14.hasNext())
         {
-            worldIn.notifyNeighborsOfStateChange(blockpos2, Blocks.air);
+            var7 = (BlockPos)var14.next();
+            worldIn.notifyNeighborsOfStateChange(var7, Blocks.air);
         }
 
-        return i > 0;
+        return var5 > 0;
     }
 
     /**
      * returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)
      */
-    public void getSubBlocks(Item itemIn, CreativeTabs tab, List<ItemStack> list)
+    public void getSubBlocks(Item itemIn, CreativeTabs tab, List list)
     {
         list.add(new ItemStack(itemIn, 1, 0));
         list.add(new ItemStack(itemIn, 1, 1));
@@ -130,7 +126,7 @@ public class BlockSponge extends Block
      */
     public IBlockState getStateFromMeta(int meta)
     {
-        return this.getDefaultState().withProperty(WET, Boolean.valueOf((meta & 1) == 1));
+        return this.getDefaultState().withProperty(WET_PROP, Boolean.valueOf((meta & 1) == 1));
     }
 
     /**
@@ -138,65 +134,65 @@ public class BlockSponge extends Block
      */
     public int getMetaFromState(IBlockState state)
     {
-        return ((Boolean)state.getValue(WET)).booleanValue() ? 1 : 0;
+        return ((Boolean)state.getValue(WET_PROP)).booleanValue() ? 1 : 0;
     }
 
     protected BlockState createBlockState()
     {
-        return new BlockState(this, new IProperty[] {WET});
+        return new BlockState(this, new IProperty[] {WET_PROP});
     }
 
     public void randomDisplayTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
-        if (((Boolean)state.getValue(WET)).booleanValue())
+        if (((Boolean)state.getValue(WET_PROP)).booleanValue())
         {
-            EnumFacing enumfacing = EnumFacing.random(rand);
+            EnumFacing var5 = EnumFacing.random(rand);
 
-            if (enumfacing != EnumFacing.UP && !World.doesBlockHaveSolidTopSurface(worldIn, pos.offset(enumfacing)))
+            if (var5 != EnumFacing.UP && !World.doesBlockHaveSolidTopSurface(worldIn, pos.offset(var5)))
             {
-                double d0 = (double)pos.getX();
-                double d1 = (double)pos.getY();
-                double d2 = (double)pos.getZ();
+                double var6 = (double)pos.getX();
+                double var8 = (double)pos.getY();
+                double var10 = (double)pos.getZ();
 
-                if (enumfacing == EnumFacing.DOWN)
+                if (var5 == EnumFacing.DOWN)
                 {
-                    d1 = d1 - 0.05D;
-                    d0 += rand.nextDouble();
-                    d2 += rand.nextDouble();
+                    var8 -= 0.05D;
+                    var6 += rand.nextDouble();
+                    var10 += rand.nextDouble();
                 }
                 else
                 {
-                    d1 = d1 + rand.nextDouble() * 0.8D;
+                    var8 += rand.nextDouble() * 0.8D;
 
-                    if (enumfacing.getAxis() == EnumFacing.Axis.X)
+                    if (var5.getAxis() == EnumFacing.Axis.X)
                     {
-                        d2 += rand.nextDouble();
+                        var10 += rand.nextDouble();
 
-                        if (enumfacing == EnumFacing.EAST)
+                        if (var5 == EnumFacing.EAST)
                         {
-                            ++d0;
+                            ++var6;
                         }
                         else
                         {
-                            d0 += 0.05D;
+                            var6 += 0.05D;
                         }
                     }
                     else
                     {
-                        d0 += rand.nextDouble();
+                        var6 += rand.nextDouble();
 
-                        if (enumfacing == EnumFacing.SOUTH)
+                        if (var5 == EnumFacing.SOUTH)
                         {
-                            ++d2;
+                            ++var10;
                         }
                         else
                         {
-                            d2 += 0.05D;
+                            var10 += 0.05D;
                         }
                     }
                 }
 
-                worldIn.spawnParticle(EnumParticleTypes.DRIP_WATER, d0, d1, d2, 0.0D, 0.0D, 0.0D, new int[0]);
+                worldIn.spawnParticle(EnumParticleTypes.DRIP_WATER, var6, var8, var10, 0.0D, 0.0D, 0.0D, new int[0]);
             }
         }
     }

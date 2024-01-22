@@ -6,18 +6,20 @@ import net.minecraft.world.World;
 
 public class EntitySuspendFX extends EntityFX
 {
-    protected EntitySuspendFX(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn)
+    
+
+    protected EntitySuspendFX(World worldIn, double p_i1231_2_, double p_i1231_4_, double p_i1231_6_, double p_i1231_8_, double p_i1231_10_, double p_i1231_12_)
     {
-        super(worldIn, xCoordIn, yCoordIn - 0.125D, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
+        super(worldIn, p_i1231_2_, p_i1231_4_ - 0.125D, p_i1231_6_, p_i1231_8_, p_i1231_10_, p_i1231_12_);
         this.particleRed = 0.4F;
         this.particleGreen = 0.4F;
         this.particleBlue = 0.7F;
         this.setParticleTextureIndex(0);
         this.setSize(0.01F, 0.01F);
         this.particleScale *= this.rand.nextFloat() * 0.6F + 0.2F;
-        this.motionX = xSpeedIn * 0.0D;
-        this.motionY = ySpeedIn * 0.0D;
-        this.motionZ = zSpeedIn * 0.0D;
+        this.motionX = p_i1231_8_ * 0.0D;
+        this.motionY = p_i1231_10_ * 0.0D;
+        this.motionZ = p_i1231_12_ * 0.0D;
         this.particleMaxAge = (int)(16.0D / (Math.random() * 0.8D + 0.2D));
     }
 
@@ -44,9 +46,11 @@ public class EntitySuspendFX extends EntityFX
 
     public static class Factory implements IParticleFactory
     {
-        public EntityFX getEntityFX(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn, int... p_178902_15_)
+        
+
+        public EntityFX func_178902_a(int p_178902_1_, World worldIn, double p_178902_3_, double p_178902_5_, double p_178902_7_, double p_178902_9_, double p_178902_11_, double p_178902_13_, int ... p_178902_15_)
         {
-            return new EntitySuspendFX(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
+            return new EntitySuspendFX(worldIn, p_178902_3_, p_178902_5_, p_178902_7_, p_178902_9_, p_178902_11_, p_178902_13_);
         }
     }
 }

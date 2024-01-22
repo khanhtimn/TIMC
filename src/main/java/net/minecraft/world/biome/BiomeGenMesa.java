@@ -24,16 +24,17 @@ public class BiomeGenMesa extends BiomeGenBase
     private NoiseGeneratorPerlin field_150625_aG;
     private boolean field_150626_aH;
     private boolean field_150620_aI;
+    
 
-    public BiomeGenMesa(int id, boolean p_i45380_2_, boolean p_i45380_3_)
+    public BiomeGenMesa(int p_i45380_1_, boolean p_i45380_2_, boolean p_i45380_3_)
     {
-        super(id);
+        super(p_i45380_1_);
         this.field_150626_aH = p_i45380_2_;
         this.field_150620_aI = p_i45380_3_;
         this.setDisableRain();
         this.setTemperatureRainfall(2.0F, 0.0F);
         this.spawnableCreatureList.clear();
-        this.topBlock = Blocks.sand.getDefaultState().withProperty(BlockSand.VARIANT, BlockSand.EnumType.RED_SAND);
+        this.topBlock = Blocks.sand.getDefaultState().withProperty(BlockSand.VARIANT_PROP, BlockSand.EnumType.RED_SAND);
         this.fillerBlock = Blocks.stained_hardened_clay.getDefaultState();
         this.theBiomeDecorator.treesPerChunk = -999;
         this.theBiomeDecorator.deadBushPerChunk = 20;
@@ -48,27 +49,27 @@ public class BiomeGenMesa extends BiomeGenBase
         }
     }
 
-    public WorldGenAbstractTree genBigTreeChance(Random rand)
+    public WorldGenAbstractTree genBigTreeChance(Random p_150567_1_)
     {
         return this.worldGeneratorTrees;
     }
 
-    public int getFoliageColorAtPos(BlockPos pos)
+    public int func_180625_c(BlockPos p_180625_1_)
     {
         return 10387789;
     }
 
-    public int getGrassColorAtPos(BlockPos pos)
+    public int func_180627_b(BlockPos p_180627_1_)
     {
         return 9470285;
     }
 
-    public void decorate(World worldIn, Random rand, BlockPos pos)
+    public void func_180624_a(World worldIn, Random p_180624_2_, BlockPos p_180624_3_)
     {
-        super.decorate(worldIn, rand, pos);
+        super.func_180624_a(worldIn, p_180624_2_, p_180624_3_);
     }
 
-    public void genTerrainBlocks(World worldIn, Random rand, ChunkPrimer chunkPrimerIn, int x, int z, double noiseVal)
+    public void genTerrainBlocks(World worldIn, Random p_180622_2_, ChunkPrimer p_180622_3_, int p_180622_4_, int p_180622_5_, double p_180622_6_)
     {
         if (this.field_150621_aC == null || this.field_150622_aD != worldIn.getSeed())
         {
@@ -77,149 +78,154 @@ public class BiomeGenMesa extends BiomeGenBase
 
         if (this.field_150623_aE == null || this.field_150624_aF == null || this.field_150622_aD != worldIn.getSeed())
         {
-            Random random = new Random(this.field_150622_aD);
-            this.field_150623_aE = new NoiseGeneratorPerlin(random, 4);
-            this.field_150624_aF = new NoiseGeneratorPerlin(random, 1);
+            Random var8 = new Random(this.field_150622_aD);
+            this.field_150623_aE = new NoiseGeneratorPerlin(var8, 4);
+            this.field_150624_aF = new NoiseGeneratorPerlin(var8, 1);
         }
 
         this.field_150622_aD = worldIn.getSeed();
-        double d4 = 0.0D;
+        double var22 = 0.0D;
+        int var10;
+        int var11;
 
         if (this.field_150626_aH)
         {
-            int i = (x & -16) + (z & 15);
-            int j = (z & -16) + (x & 15);
-            double d0 = Math.min(Math.abs(noiseVal), this.field_150623_aE.func_151601_a((double)i * 0.25D, (double)j * 0.25D));
+            var10 = (p_180622_4_ & -16) + (p_180622_5_ & 15);
+            var11 = (p_180622_5_ & -16) + (p_180622_4_ & 15);
+            double var12 = Math.min(Math.abs(p_180622_6_), this.field_150623_aE.func_151601_a((double)var10 * 0.25D, (double)var11 * 0.25D));
 
-            if (d0 > 0.0D)
+            if (var12 > 0.0D)
             {
-                double d1 = 0.001953125D;
-                double d2 = Math.abs(this.field_150624_aF.func_151601_a((double)i * d1, (double)j * d1));
-                d4 = d0 * d0 * 2.5D;
-                double d3 = Math.ceil(d2 * 50.0D) + 14.0D;
+                double var14 = 0.001953125D;
+                double var16 = Math.abs(this.field_150624_aF.func_151601_a((double)var10 * var14, (double)var11 * var14));
+                var22 = var12 * var12 * 2.5D;
+                double var18 = Math.ceil(var16 * 50.0D) + 14.0D;
 
-                if (d4 > d3)
+                if (var22 > var18)
                 {
-                    d4 = d3;
+                    var22 = var18;
                 }
 
-                d4 = d4 + 64.0D;
+                var22 += 64.0D;
             }
         }
 
-        int j1 = x & 15;
-        int k1 = z & 15;
-        int l1 = worldIn.getSeaLevel();
-        IBlockState iblockstate = Blocks.stained_hardened_clay.getDefaultState();
-        IBlockState iblockstate3 = this.fillerBlock;
-        int k = (int)(noiseVal / 3.0D + 3.0D + rand.nextDouble() * 0.25D);
-        boolean flag = Math.cos(noiseVal / 3.0D * Math.PI) > 0.0D;
-        int l = -1;
-        boolean flag1 = false;
+        var10 = p_180622_4_ & 15;
+        var11 = p_180622_5_ & 15;
+        boolean var23 = true;
+        IBlockState var13 = Blocks.stained_hardened_clay.getDefaultState();
+        IBlockState var24 = this.fillerBlock;
+        int var15 = (int)(p_180622_6_ / 3.0D + 3.0D + p_180622_2_.nextDouble() * 0.25D);
+        boolean var25 = Math.cos(p_180622_6_ / 3.0D * Math.PI) > 0.0D;
+        int var17 = -1;
+        boolean var26 = false;
 
-        for (int i1 = 255; i1 >= 0; --i1)
+        for (int var19 = 255; var19 >= 0; --var19)
         {
-            if (chunkPrimerIn.getBlockState(k1, i1, j1).getBlock().getMaterial() == Material.air && i1 < (int)d4)
+            if (p_180622_3_.getBlockState(var11, var19, var10).getBlock().getMaterial() == Material.air && var19 < (int)var22)
             {
-                chunkPrimerIn.setBlockState(k1, i1, j1, Blocks.stone.getDefaultState());
+                p_180622_3_.setBlockState(var11, var19, var10, Blocks.stone.getDefaultState());
             }
 
-            if (i1 <= rand.nextInt(5))
+            if (var19 <= p_180622_2_.nextInt(5))
             {
-                chunkPrimerIn.setBlockState(k1, i1, j1, Blocks.bedrock.getDefaultState());
+                p_180622_3_.setBlockState(var11, var19, var10, Blocks.bedrock.getDefaultState());
             }
             else
             {
-                IBlockState iblockstate1 = chunkPrimerIn.getBlockState(k1, i1, j1);
+                IBlockState var20 = p_180622_3_.getBlockState(var11, var19, var10);
 
-                if (iblockstate1.getBlock().getMaterial() == Material.air)
+                if (var20.getBlock().getMaterial() == Material.air)
                 {
-                    l = -1;
+                    var17 = -1;
                 }
-                else if (iblockstate1.getBlock() == Blocks.stone)
+                else if (var20.getBlock() == Blocks.stone)
                 {
-                    if (l == -1)
+                    IBlockState var21;
+
+                    if (var17 == -1)
                     {
-                        flag1 = false;
+                        var26 = false;
 
-                        if (k <= 0)
+                        if (var15 <= 0)
                         {
-                            iblockstate = null;
-                            iblockstate3 = Blocks.stone.getDefaultState();
+                            var13 = null;
+                            var24 = Blocks.stone.getDefaultState();
                         }
-                        else if (i1 >= l1 - 4 && i1 <= l1 + 1)
+                        else if (var19 >= 59 && var19 <= 64)
                         {
-                            iblockstate = Blocks.stained_hardened_clay.getDefaultState();
-                            iblockstate3 = this.fillerBlock;
-                        }
-
-                        if (i1 < l1 && (iblockstate == null || iblockstate.getBlock().getMaterial() == Material.air))
-                        {
-                            iblockstate = Blocks.water.getDefaultState();
+                            var13 = Blocks.stained_hardened_clay.getDefaultState();
+                            var24 = this.fillerBlock;
                         }
 
-                        l = k + Math.max(0, i1 - l1);
-
-                        if (i1 < l1 - 1)
+                        if (var19 < 63 && (var13 == null || var13.getBlock().getMaterial() == Material.air))
                         {
-                            chunkPrimerIn.setBlockState(k1, i1, j1, iblockstate3);
+                            var13 = Blocks.water.getDefaultState();
+                        }
 
-                            if (iblockstate3.getBlock() == Blocks.stained_hardened_clay)
+                        var17 = var15 + Math.max(0, var19 - 63);
+
+                        if (var19 >= 62)
+                        {
+                            if (this.field_150620_aI && var19 > 86 + var15 * 2)
                             {
-                                chunkPrimerIn.setBlockState(k1, i1, j1, iblockstate3.getBlock().getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.ORANGE));
-                            }
-                        }
-                        else if (this.field_150620_aI && i1 > 86 + k * 2)
-                        {
-                            if (flag)
-                            {
-                                chunkPrimerIn.setBlockState(k1, i1, j1, Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.COARSE_DIRT));
-                            }
-                            else
-                            {
-                                chunkPrimerIn.setBlockState(k1, i1, j1, Blocks.grass.getDefaultState());
-                            }
-                        }
-                        else if (i1 <= l1 + 3 + k)
-                        {
-                            chunkPrimerIn.setBlockState(k1, i1, j1, this.topBlock);
-                            flag1 = true;
-                        }
-                        else
-                        {
-                            IBlockState iblockstate4;
-
-                            if (i1 >= 64 && i1 <= 127)
-                            {
-                                if (flag)
+                                if (var25)
                                 {
-                                    iblockstate4 = Blocks.hardened_clay.getDefaultState();
+                                    p_180622_3_.setBlockState(var11, var19, var10, Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.COARSE_DIRT));
                                 }
                                 else
                                 {
-                                    iblockstate4 = this.func_180629_a(x, i1, z);
+                                    p_180622_3_.setBlockState(var11, var19, var10, Blocks.grass.getDefaultState());
                                 }
+                            }
+                            else if (var19 > 66 + var15)
+                            {
+                                if (var19 >= 64 && var19 <= 127)
+                                {
+                                    if (var25)
+                                    {
+                                        var21 = Blocks.hardened_clay.getDefaultState();
+                                    }
+                                    else
+                                    {
+                                        var21 = this.func_180629_a(p_180622_4_, var19, p_180622_5_);
+                                    }
+                                }
+                                else
+                                {
+                                    var21 = Blocks.stained_hardened_clay.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.ORANGE);
+                                }
+
+                                p_180622_3_.setBlockState(var11, var19, var10, var21);
                             }
                             else
                             {
-                                iblockstate4 = Blocks.stained_hardened_clay.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.ORANGE);
+                                p_180622_3_.setBlockState(var11, var19, var10, this.topBlock);
+                                var26 = true;
                             }
-
-                            chunkPrimerIn.setBlockState(k1, i1, j1, iblockstate4);
-                        }
-                    }
-                    else if (l > 0)
-                    {
-                        --l;
-
-                        if (flag1)
-                        {
-                            chunkPrimerIn.setBlockState(k1, i1, j1, Blocks.stained_hardened_clay.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.ORANGE));
                         }
                         else
                         {
-                            IBlockState iblockstate2 = this.func_180629_a(x, i1, z);
-                            chunkPrimerIn.setBlockState(k1, i1, j1, iblockstate2);
+                            p_180622_3_.setBlockState(var11, var19, var10, var24);
+
+                            if (var24.getBlock() == Blocks.stained_hardened_clay)
+                            {
+                                p_180622_3_.setBlockState(var11, var19, var10, var24.getBlock().getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.ORANGE));
+                            }
+                        }
+                    }
+                    else if (var17 > 0)
+                    {
+                        --var17;
+
+                        if (var26)
+                        {
+                            p_180622_3_.setBlockState(var11, var19, var10, Blocks.stained_hardened_clay.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.ORANGE));
+                        }
+                        else
+                        {
+                            var21 = this.func_180629_a(p_180622_4_, var19, p_180622_5_);
+                            p_180622_3_.setBlockState(var11, var19, var10, var21);
                         }
                     }
                 }
@@ -231,78 +237,84 @@ public class BiomeGenMesa extends BiomeGenBase
     {
         this.field_150621_aC = new IBlockState[64];
         Arrays.fill(this.field_150621_aC, Blocks.hardened_clay.getDefaultState());
-        Random random = new Random(p_150619_1_);
-        this.field_150625_aG = new NoiseGeneratorPerlin(random, 1);
+        Random var3 = new Random(p_150619_1_);
+        this.field_150625_aG = new NoiseGeneratorPerlin(var3, 1);
+        int var4;
 
-        for (int l1 = 0; l1 < 64; ++l1)
+        for (var4 = 0; var4 < 64; ++var4)
         {
-            l1 += random.nextInt(5) + 1;
+            var4 += var3.nextInt(5) + 1;
 
-            if (l1 < 64)
+            if (var4 < 64)
             {
-                this.field_150621_aC[l1] = Blocks.stained_hardened_clay.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.ORANGE);
+                this.field_150621_aC[var4] = Blocks.stained_hardened_clay.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.ORANGE);
             }
         }
 
-        int i2 = random.nextInt(4) + 2;
+        var4 = var3.nextInt(4) + 2;
+        int var5;
+        int var6;
+        int var7;
+        int var8;
 
-        for (int i = 0; i < i2; ++i)
+        for (var5 = 0; var5 < var4; ++var5)
         {
-            int j = random.nextInt(3) + 1;
-            int k = random.nextInt(64);
+            var6 = var3.nextInt(3) + 1;
+            var7 = var3.nextInt(64);
 
-            for (int l = 0; k + l < 64 && l < j; ++l)
+            for (var8 = 0; var7 + var8 < 64 && var8 < var6; ++var8)
             {
-                this.field_150621_aC[k + l] = Blocks.stained_hardened_clay.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.YELLOW);
+                this.field_150621_aC[var7 + var8] = Blocks.stained_hardened_clay.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.YELLOW);
             }
         }
 
-        int j2 = random.nextInt(4) + 2;
+        var5 = var3.nextInt(4) + 2;
+        int var9;
 
-        for (int k2 = 0; k2 < j2; ++k2)
+        for (var6 = 0; var6 < var5; ++var6)
         {
-            int i3 = random.nextInt(3) + 2;
-            int l3 = random.nextInt(64);
+            var7 = var3.nextInt(3) + 2;
+            var8 = var3.nextInt(64);
 
-            for (int i1 = 0; l3 + i1 < 64 && i1 < i3; ++i1)
+            for (var9 = 0; var8 + var9 < 64 && var9 < var7; ++var9)
             {
-                this.field_150621_aC[l3 + i1] = Blocks.stained_hardened_clay.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.BROWN);
+                this.field_150621_aC[var8 + var9] = Blocks.stained_hardened_clay.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.BROWN);
             }
         }
 
-        int l2 = random.nextInt(4) + 2;
+        var6 = var3.nextInt(4) + 2;
 
-        for (int j3 = 0; j3 < l2; ++j3)
+        for (var7 = 0; var7 < var6; ++var7)
         {
-            int i4 = random.nextInt(3) + 1;
-            int k4 = random.nextInt(64);
+            var8 = var3.nextInt(3) + 1;
+            var9 = var3.nextInt(64);
 
-            for (int j1 = 0; k4 + j1 < 64 && j1 < i4; ++j1)
+            for (int var10 = 0; var9 + var10 < 64 && var10 < var8; ++var10)
             {
-                this.field_150621_aC[k4 + j1] = Blocks.stained_hardened_clay.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.RED);
+                this.field_150621_aC[var9 + var10] = Blocks.stained_hardened_clay.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.RED);
             }
         }
 
-        int k3 = random.nextInt(3) + 3;
-        int j4 = 0;
+        var7 = var3.nextInt(3) + 3;
+        var8 = 0;
 
-        for (int l4 = 0; l4 < k3; ++l4)
+        for (var9 = 0; var9 < var7; ++var9)
         {
-            int i5 = 1;
-            j4 += random.nextInt(16) + 4;
+            byte var12 = 1;
+            var8 += var3.nextInt(16) + 4;
 
-            for (int k1 = 0; j4 + k1 < 64 && k1 < i5; ++k1)
+            for (int var11 = 0; var8 + var11 < 64 && var11 < var12; ++var11)
             {
-                this.field_150621_aC[j4 + k1] = Blocks.stained_hardened_clay.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.WHITE);
+                this.field_150621_aC[var8 + var11] = Blocks.stained_hardened_clay.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.WHITE);
 
-                if (j4 + k1 > 1 && random.nextBoolean())
+                if (var8 + var11 > 1 && var3.nextBoolean())
                 {
-                    this.field_150621_aC[j4 + k1 - 1] = Blocks.stained_hardened_clay.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.SILVER);
+                    this.field_150621_aC[var8 + var11 - 1] = Blocks.stained_hardened_clay.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.SILVER);
                 }
 
-                if (j4 + k1 < 63 && random.nextBoolean())
+                if (var8 + var11 < 63 && var3.nextBoolean())
                 {
-                    this.field_150621_aC[j4 + k1 + 1] = Blocks.stained_hardened_clay.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.SILVER);
+                    this.field_150621_aC[var8 + var11 + 1] = Blocks.stained_hardened_clay.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.SILVER);
                 }
             }
         }
@@ -310,26 +322,26 @@ public class BiomeGenMesa extends BiomeGenBase
 
     private IBlockState func_180629_a(int p_180629_1_, int p_180629_2_, int p_180629_3_)
     {
-        int i = (int)Math.round(this.field_150625_aG.func_151601_a((double)p_180629_1_ * 1.0D / 512.0D, (double)p_180629_1_ * 1.0D / 512.0D) * 2.0D);
-        return this.field_150621_aC[(p_180629_2_ + i + 64) % 64];
+        int var4 = (int)Math.round(this.field_150625_aG.func_151601_a((double)p_180629_1_ * 1.0D / 512.0D, (double)p_180629_1_ * 1.0D / 512.0D) * 2.0D);
+        return this.field_150621_aC[(p_180629_2_ + var4 + 64) % 64];
     }
 
     protected BiomeGenBase createMutatedBiome(int p_180277_1_)
     {
-        boolean flag = this.biomeID == BiomeGenBase.mesa.biomeID;
-        BiomeGenMesa biomegenmesa = new BiomeGenMesa(p_180277_1_, flag, this.field_150620_aI);
+        boolean var2 = this.biomeID == BiomeGenBase.mesa.biomeID;
+        BiomeGenMesa var3 = new BiomeGenMesa(p_180277_1_, var2, this.field_150620_aI);
 
-        if (!flag)
+        if (!var2)
         {
-            biomegenmesa.setHeight(height_LowHills);
-            biomegenmesa.setBiomeName(this.biomeName + " M");
+            var3.setHeight(height_LowHills);
+            var3.setBiomeName(this.biomeName + " M");
         }
         else
         {
-            biomegenmesa.setBiomeName(this.biomeName + " (Bryce)");
+            var3.setBiomeName(this.biomeName + " (Bryce)");
         }
 
-        biomegenmesa.func_150557_a(this.color, true);
-        return biomegenmesa;
+        var3.func_150557_a(this.color, true);
+        return var3;
     }
 }

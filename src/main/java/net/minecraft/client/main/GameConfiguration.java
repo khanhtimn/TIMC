@@ -1,96 +1,109 @@
 package net.minecraft.client.main;
 
 import com.mojang.authlib.properties.PropertyMap;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.net.Proxy;
+import java.net.URL;
+import java.util.ArrayList;
+
+import javax.net.ssl.HttpsURLConnection;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.Session;
 
 public class GameConfiguration
 {
-    public final GameConfiguration.UserInformation userInfo;
-    public final GameConfiguration.DisplayInformation displayInfo;
-    public final GameConfiguration.FolderInformation folderInfo;
-    public final GameConfiguration.GameInformation gameInfo;
-    public final GameConfiguration.ServerInformation serverInfo;
+    public final GameConfiguration.UserInformation field_178745_a;
+    public final GameConfiguration.DisplayInformation field_178743_b;
+    public final GameConfiguration.FolderInformation field_178744_c;
+    public final GameConfiguration.GameInformation field_178741_d;
+    public final GameConfiguration.ServerInformation field_178742_e;
+    
 
-    public GameConfiguration(GameConfiguration.UserInformation userInfoIn, GameConfiguration.DisplayInformation displayInfoIn, GameConfiguration.FolderInformation folderInfoIn, GameConfiguration.GameInformation gameInfoIn, GameConfiguration.ServerInformation serverInfoIn)
+    public GameConfiguration(GameConfiguration.UserInformation p_i45491_1_, GameConfiguration.DisplayInformation p_i45491_2_, GameConfiguration.FolderInformation p_i45491_3_, GameConfiguration.GameInformation p_i45491_4_, GameConfiguration.ServerInformation p_i45491_5_)
     {
-        this.userInfo = userInfoIn;
-        this.displayInfo = displayInfoIn;
-        this.folderInfo = folderInfoIn;
-        this.gameInfo = gameInfoIn;
-        this.serverInfo = serverInfoIn;
+        this.field_178745_a = p_i45491_1_;
+        this.field_178743_b = p_i45491_2_;
+        this.field_178744_c = p_i45491_3_;
+        this.field_178741_d = p_i45491_4_;
+        this.field_178742_e = p_i45491_5_;
     }
-
+    
     public static class DisplayInformation
     {
-        public final int width;
-        public final int height;
-        public final boolean fullscreen;
-        public final boolean checkGlErrors;
+        public final int field_178764_a;
+        public final int field_178762_b;
+        public final boolean field_178763_c;
+        public final boolean field_178761_d;
+        
 
-        public DisplayInformation(int widthIn, int heightIn, boolean fullscreenIn, boolean checkGlErrorsIn)
+        public DisplayInformation(int p_i45490_1_, int p_i45490_2_, boolean p_i45490_3_, boolean p_i45490_4_)
         {
-            this.width = widthIn;
-            this.height = heightIn;
-            this.fullscreen = fullscreenIn;
-            this.checkGlErrors = checkGlErrorsIn;
+            this.field_178764_a = p_i45490_1_;
+            this.field_178762_b = p_i45490_2_;
+            this.field_178763_c = p_i45490_3_;
+            this.field_178761_d = p_i45490_4_;
         }
     }
 
     public static class FolderInformation
     {
-        public final File mcDataDir;
-        public final File resourcePacksDir;
-        public final File assetsDir;
-        public final String assetIndex;
+        public final File field_178760_a;
+        public final File field_178758_b;
+        public final File field_178759_c;
+        public final String field_178757_d;
+        
 
-        public FolderInformation(File mcDataDirIn, File resourcePacksDirIn, File assetsDirIn, String assetIndexIn)
+        public FolderInformation(File p_i45489_1_, File p_i45489_2_, File p_i45489_3_, String p_i45489_4_)
         {
-            this.mcDataDir = mcDataDirIn;
-            this.resourcePacksDir = resourcePacksDirIn;
-            this.assetsDir = assetsDirIn;
-            this.assetIndex = assetIndexIn;
+            this.field_178760_a = p_i45489_1_;
+            this.field_178758_b = p_i45489_2_;
+            this.field_178759_c = p_i45489_3_;
+            this.field_178757_d = p_i45489_4_;
         }
     }
 
     public static class GameInformation
     {
-        public final boolean isDemo;
-        public final String version;
+        public final boolean field_178756_a;
+        public final String field_178755_b;
+        
 
-        public GameInformation(boolean isDemoIn, String versionIn)
+        public GameInformation(boolean p_i45488_1_, String p_i45488_2_)
         {
-            this.isDemo = isDemoIn;
-            this.version = versionIn;
+            this.field_178756_a = p_i45488_1_;
+            this.field_178755_b = p_i45488_2_;
         }
     }
 
     public static class ServerInformation
     {
-        public final String serverName;
-        public final int serverPort;
+        public final String field_178754_a;
+        public final int field_178753_b;
+        
 
-        public ServerInformation(String serverNameIn, int serverPortIn)
+        public ServerInformation(String p_i45487_1_, int p_i45487_2_)
         {
-            this.serverName = serverNameIn;
-            this.serverPort = serverPortIn;
+            this.field_178754_a = p_i45487_1_;
+            this.field_178753_b = p_i45487_2_;
         }
     }
 
     public static class UserInformation
     {
-        public final Session session;
-        public final PropertyMap userProperties;
-        public final PropertyMap profileProperties;
-        public final Proxy proxy;
+        public final Session field_178752_a;
+        public final PropertyMap field_178750_b;
+        public final Proxy field_178751_c;
+        
 
-        public UserInformation(Session sessionIn, PropertyMap userPropertiesIn, PropertyMap profilePropertiesIn, Proxy proxyIn)
+        public UserInformation(Session p_i45486_1_, PropertyMap p_i45486_2_, Proxy p_i45486_3_)
         {
-            this.session = sessionIn;
-            this.userProperties = userPropertiesIn;
-            this.profileProperties = profilePropertiesIn;
-            this.proxy = proxyIn;
+            this.field_178752_a = p_i45486_1_;
+            this.field_178750_b = p_i45486_2_;
+            this.field_178751_c = p_i45486_3_;
         }
     }
 }
